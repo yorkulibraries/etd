@@ -1,0 +1,43 @@
+<h4 class="blend soft">Student Record</h4>
+<table width="100%">
+	<tr>
+		<td>
+			<h1 title="<%= @student.sisid %>">
+				<%= link_to_unless controller.controller_name == "students" && controller.action_name == "show", @student.name, @student, title: @student.sisid %>
+				<% if @student.blocked? %><i class="fa fa-ban red" title="blocked"></i><% end %>
+			</h1>
+			<h5 class="trivial">Created by <%= @student.created_by.name%>
+				<% if can?(:login_as, :student) && is_controller_and_action?("students", "show") %>
+				- <%= link_to "Login as this student", login_as_student_path(id: @student.id) %>
+				<% end %>
+			</h5>
+		</td>
+
+		<% if controller_name == "students" && action_name == "show" %>
+			<td width="10%">
+					<%= link_to "Audit trail", audit_trail_student_path(@student) %><br/>
+					<span class="trivial">all actions</span>
+			</td>
+			<td width="14%">
+				<%= link_to "Make changes", edit_student_path(@student), class: "green" %><br/>
+				<span class="trivial">to student details</span>
+			</td>
+			<td width="12%">
+				<% if @student.blocked? %>
+					<%= link_to "Unblock student",  unblock_student_path(@student), method: :post, :data => { :confirm => 'Are you sure?'}, :class => "red"  %><br/>
+					<span class="trivial">allow access</span>
+				<% else %>
+					<%= link_to "Block student",  block_student_path(@student), :data => { :confirm => 'Are you sure?'} , :method => :post, :class => "red" %><br/>
+					<span class="trivial">disable access</span>
+				<% end %>
+
+			</td>
+		<% else %>
+			<td width="14%">
+				<%= link_to "Student Details", student_path(@student), class: "green" %><br/>
+				<span class="trivial">and thesis</span>
+			</td>
+		<% end %>
+	</tr>
+
+</table>

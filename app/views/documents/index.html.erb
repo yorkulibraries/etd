@@ -1,0 +1,21 @@
+<% title "Documents" %>
+
+<table>
+  <tr>
+    <th>Thesis</th>
+    <th>User</th>
+    <th>Supplemental</th>
+    <th>Name</th>
+  </tr>
+  <% for document in @documents %>
+    <tr>
+      <td><%= document.supplemental %></td>
+      <td><%= document.name %></td>
+      <td><%= link_to "Show", [@student, @thesis, document] %></td>
+      <td><%= link_to "Edit", edit_student_thesis_document_path(@student, @thesis, document) %></td>
+      <td><%= link_to "Destroy", [@student, @thesis, document],  data: { confirm: 'Are you sure?' }, :method => :delete %></td>
+    </tr>
+  <% end %>
+</table>
+
+<p><%= link_to "New Document", new_student_thesis_document_path(@student, @thesis) %></p>

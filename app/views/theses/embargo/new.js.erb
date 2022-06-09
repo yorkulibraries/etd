@@ -1,0 +1,4 @@
+$("#permanent_embargo_holder").remove();
+$("body").append("<div class='modal hide fade' id='permanent_embargo_holder'></div>");
+$("#permanent_embargo_holder").append("<%= j render "form" %>");
+$("#permanent_embargo_holder").modal('show');

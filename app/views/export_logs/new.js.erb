@@ -1,0 +1,9 @@
+$("#new_export_log").modal('hide');
+
+$("#new_export_log_holder").empty();
+$("#new_export_log_holder").remove();
+
+$("body").append("<div id='new_export_log_holder'></div>");
+$('#new_export_log_holder').prepend('<%=escape_javascript render("export_logs/form") %>');
+
+$("#new_export_log").modal('show');

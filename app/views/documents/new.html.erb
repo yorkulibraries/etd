@@ -1,0 +1,13 @@
+<% title "Upload New Document File" %>
+
+<% title_html do %>
+	<%= render partial: "students/header" %>
+<% end %>
+
+
+<div class="fitted">
+	<h4 style="margin-bottom: 20px;">Upload New Document File </h4>
+	<h5><%= link_to @thesis.title, student_thesis_path(@student, @thesis)  %></h5>
+
+	<%= render 'form' %>
+</div>

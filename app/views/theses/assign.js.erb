@@ -1,0 +1,9 @@
+<% if @user %>
+	<% name = (@user.id == current_user.id) ? "I'm working on it" : @user.name %>
+	$(".assign_to #assigned_name_<%= @thesis.id %>").html("<%= j truncate(name, length: 25) %>");
+	$(".assign_to #assigned_name_<%= @thesis.id %>").attr("title", "<%= j name %> ");	
+	
+	if ($(".assign_to .user-selection #unassign-link_<%= @thesis.id %>").length == 0 )	{
+		$(".assign_to .user-selection #auxilary-unassign_<%= @thesis.id %>").show();
+	}
+<% end %>

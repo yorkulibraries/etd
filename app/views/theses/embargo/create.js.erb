@@ -1,0 +1,7 @@
+<% if @thesis.errors.size == 0 %>
+	$("#permanent_embargo_holder").modal('hide');
+	$("#permanent_embargo_holder").remove();
+  $("#place_under_embargo_button").replaceWith("<p>This thesis has been placed under permanent embargo. It will not be published.</p>")
+<% else %>
+	$("#permanent_embargo_holder").html("<%= j render "form" %>");
+<% end %>

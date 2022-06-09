@@ -1,0 +1,10 @@
+<tr id="committee_member_<%= committee_member.id %>">
+	<td class="name"><%= committee_member.name %></td>
+	<td class="role"><%= committee_member.role %></td>
+	<% if can?(:manage, committee_member) && @thesis.status != Thesis::PUBLISHED  %>
+	<td class="remove">
+		<%= link_to student_thesis_committee_member_path(@student, @thesis, committee_member),
+								method: :delete, class: "close", remote: true, data: { confirm: "Are you sure?" } do %>&times;<% end %>
+	</td>
+	<% end %>
+</tr>

@@ -1,0 +1,48 @@
+<% title "Theses" %>
+
+<table>
+  <tr>
+    <th>Title</th>
+    <th>Author</th>
+    <th>Supervisor</th>
+    <th>Committee</th>
+    <th>Student</th>
+    <th>Subjects</th>
+    <th>Keywords</th>
+    <th>Abstract</th>
+    <th>Comments</th>
+    <th>Acknowledgements</th>
+    <th>Embargo</th>
+    <th>Language</th>
+    <th>Degree Name</th>
+    <th>Degree Level</th>
+    <th>Program</th>
+    <th>Exam Date</th>
+    <th>Published Date</th>
+    <th>Status</th>
+  </tr>
+  <% for thesis in @theses %>
+    <tr>
+      <td><%= thesis.title %></td>
+      <td><%= thesis.author %></td>
+      <td><%= thesis.supervisor %></td>
+      <td><%= thesis.committee %></td>
+      <td><%= thesis.student.name %></td>
+      <td><%= thesis.keywords %></td>
+      <td><%= thesis.abstract %></td>
+      <td><%= thesis.embargo %></td>
+      <td><%= thesis.language %></td>
+      <td><%= thesis.degree_name %></td>
+      <td><%= thesis.degree_level %></td>
+      <td><%= thesis.program %></td>
+      <td><%= thesis.exam_date %></td>
+      <td><%= thesis.published_date %></td>
+      <td><%= thesis.status %></td>
+      <td><%= link_to "Show", [@student, thesis] %></td>
+      <td><%= link_to "Edit", edit_student_thesis_path(@student, thesis) %></td>
+      <td><%= link_to "Destroy", [@student, thesis], :date => { :confirm => 'Are you sure?' }, :method => :delete %></td>
+    </tr>
+  <% end %>
+</table>
+
+<p><%= link_to "New Thesis", new_student_thesis_path(@student) %></p>

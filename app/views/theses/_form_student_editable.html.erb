@@ -1,0 +1,43 @@
+
+
+<hr class="fitted"/>
+
+<%= f.input :language, collection: Thesis::LANGUAGE, readonly: read_only_if_student("language"), input_html: { aria_label: "Language" }  %>
+
+<%= f.input :abstract, input_html: { class: "span6", rows: "8" }, readonly: read_only_if_student("abstract"),
+						hint: "Masters: 150 word limit. Doctoral: 350 word limit."  %>
+
+<hr class="fitted"/>
+
+
+<div class="control-group">
+	<label class="text optional control-label">Subjects</label>
+	<div class="controls" id="">
+			<p class="fitted">Please select the one category from the drop down list below that best describes the overall subject of your dissertation or thesis. You must select at least one primary subject and may select up to two additional secondary subjects (optional). </p>
+
+		<div id="thesis_loc_subject_ids" class="span3 no-space">
+
+			<% @thesis.loc_subjects.each_with_index do |subject, index| %>
+					<%= select_tag "thesis[loc_subject_ids][]", options_from_collection_for_select(LocSubject.order(:name), "id", "name", subject.id),
+												include_blank: true, id: "select_subjects_#{index+1}", class: "select_subjects_fields", aria:{ label: "Subject #{index}" } %>
+					<br/><br/>
+			<% end %>
+
+			<% how_many = 3 - @thesis.loc_subjects.size %>
+			<% (1..how_many).each do |index| %>
+				<%= select_tag "thesis[loc_subject_ids][]", options_from_collection_for_select(LocSubject.order(:name), "id", "name"), include_blank: true,  id: "select_subjects_#{index+10}", class: "select_subjects_fields", aria:{ label: "Subject #{index}" } %>
+				<br/><br/>
+			<% end %>
+
+		</div>
+	</div>
+</div>
+<div class="control-group">
+	<label class="text optional control-label">Keywords</label>
+	<div class="controls">
+		<p class="fitted">
+			Enter as many appropriate keywords about your work as possible. The more terms you provide, the more likely it is that users will find your work in their searches. Please use a comma to separate each keyword or string of keywords. (e.g. business, corporate social responsibility, sustainable business models)
+		</p>
+	</div>
+</div>
+<%= f.input :keywords, label: false, input_html: { class: "span6", rows: "2",  aria:{ label: "Keywords" } }, readonly: read_only_if_student("keywords") %>

@@ -1,0 +1,93 @@
+@import "twitter/bootstrap/variables";
+@import "twitter/bootstrap/mixins";
+
+/* body {  background:   image-url("background.png"); } */
+body { background: #DADBD3; }
+
+/** common classes **/
+.clear { clear: both; }
+.hide { display: none;}
+.weak { color: #5c6062 !important; font-size: 10px !important;}
+.soft { font-weight: normal !important; }
+.bigger { font-size: 120%; }
+.trivial { color: #AA9C84;  }
+.red { color: #CC0000;}
+.black { color: #000000; }
+.royalblue { color: #2B60DE; }
+.green { color: #008a00; }
+.distinct { color: black; }
+.blend { color: #737779; }
+.small { font-size: 11px; }
+.strong { font-weight: bold;}
+.odd { background-color: #f6f6f6;}
+.float-right { float: right;}
+.float-left { float: left;}
+.half-column {float: left; width: 50%;}
+.centered { text-align: center; }
+div.push-down { margin-top: 20px; }
+
+.bordered { 	border: 1px solid #dfdfdf; padding: 6px; }
+
+/*** YORK STYLE ***/
+.york_header {
+	padding: 5px 10px; background: #fff;  .box-shadow(0 0 4px rgba(0, 0, 0, 0.35)); .border-radius(0 0 5px 5px);
+	img { width: 80px; }
+	h4 { margin: 10px; color: #000; font-size: 22px; }
+}
+
+/** NAVIGATION **/
+.search { .box-shadow(0 0 4px rgba(255, 255, 255, 0.0)); .border-radius(3px); border: none; padding: 5px 8px; }
+
+
+/** COMMON SECTIONS ***/
+[class*="span"] { &.no-space  { margin-left: 0; } }
+
+.fitted {
+	margin-right: 60px;
+}
+
+.workspace {
+	background-color: #FFFFFF; .border-radius(5px);
+	.box-shadow(0 1px 5px rgba(0, 0, 0, 0.35));
+	margin-bottom: 15px; padding: 10px 30px;
+
+}
+
+.page-header {
+	margin: 5px 0px 18px 0;
+	padding-bottom: 5px;
+	h1 {
+		color: #000000; display: inline-block;
+		font-size: 24px; font-weight: bold;
+		line-height: 28px;
+	}
+
+	h4 > a { color: #797D7F; }
+	h5 { font-size: 12px; }
+}
+
+.hint-text {
+	background: #fafafa; border: 1px solid #ddd; color: #343434;  margin-bottom: 20px; padding: 10px 20px;
+	.example { font-size: 13px; text-align: center; }
+}
+
+
+
+/*** FORMS ****/
+
+.simple_form {
+	.control-label { color: #444; }
+
+	textarea, input, select {
+		&.readonly {
+			background: white; border: none; border-radius: none; box-shadow: none; color: #000; font-weight: 500; transition: none;
+		}
+	}
+
+	.readonly-field {
+		margin-left: 180px; padding-top: 5px; position: absolute; font-weight: bold;
+		a { font-size: 11px; text-transform: capitalize; font-weight: normal; }
+	}
+}
+
+.modal form { margin: 0; }

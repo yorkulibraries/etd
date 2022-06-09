@@ -1,0 +1,10 @@
+<% title "New Thesis" %>
+<% title_html do %>
+	<%= render partial: "students/header" %>
+<% end %>
+
+
+<div class="fitted">
+	<h4 style="margin-bottom: 20px;"><%= @thesis.title %> </h4>
+	<%= render 'form' %>
+</div>

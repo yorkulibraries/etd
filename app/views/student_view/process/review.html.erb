@@ -1,0 +1,110 @@
+<% title "#{@student.name}" %>
+
+<% title_html do %>
+	<h4 class="blend soft">My ETD Submission</h4>
+	<h1><%= @student.name %></h1>
+<% end %>
+
+<%= progress_bar (Thesis::PROCESS_REVIEW) %>
+
+<% if @thesis.status == Thesis::UNDER_REVIEW %>
+	<div class="alert alert-info fitted" id="student_blocked_message">
+		<strong>This submission is being reviewed. You will not be able to make any further changes at this time.</strong>
+	</div>
+<% end %>
+
+
+<div class="thesis fitted student-view review">
+	<h3 class="title" title="title"><%= @thesis.title %></h3>
+	<div class="span9 no-space">
+
+		<p>Please review all of the information on this page for accuracy and completeness and ensure all files are uploaded. If you are satisfied with the information you have provided, click "Submit for Review".</p>
+	</div>
+	<div class="span2">
+
+	</div>
+
+	<div class="clear abstract" title="abstract"><label>abstract</label> <%= format @thesis.abstract, true %></div>
+
+	<div class="span4 no-space">
+		<p class="supervisor" title="supervisor"><label>supervisor</label> <%= format @thesis.supervisor %></p>
+		<p class="exam_date" title="exam date"><label>exam date</label> <%= @thesis.exam_date.strftime("%B %d, %Y") rescue nil %></p>
+		<p class="publsh_on"><label>publish on</label>
+			<%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
+	</div>
+
+	<div class="span5 committee" title="examining committee">
+		<label>examining committee</label>
+		<table class="committee_members" id="committee_members">
+			<% @thesis.committee_members.each do |committee_member| %>
+				<%= render partial: committee_member %>
+			<% end %>
+		</table>
+	</div>
+
+	<hr class="fitted clear"/>
+
+	<div class="span4 no-space">
+		<p class="degree_level"><label>Degree Name and Level</label><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+	</div>
+
+	<div class="span5 ">
+
+		<p class="program"><label>Program</label><%= format @thesis.program %></p>
+	</div>
+
+	<hr class="fitted clear"/>
+
+	<div class="span4 no-space">
+			<p class="language"><label>Language</label> <%= format @thesis.language %></p>
+			<p class="loc_subjects"><label>Subjects</label> <%= format @thesis.loc_subjects.map(&:name).join ', ' %></p>
+	</div>
+
+	<div class="span5">
+		<p class="keywords"><label>Keywords</label> <%= format @thesis.keywords%></p>
+	</div>
+
+</div>
+
+<hr class="fitted clear"/>
+
+<div class="documents fitted student-view">
+
+	<h3>Files and Documents</h3>
+	<p>You have uploaded the following files:</p>
+	<h5>Primary</h5>
+	<% @primary_documents.each do | document | %>
+		<%= render partial: document %>
+	<% end %>
+
+	<% if @primary_documents.count == 0 %>
+		<p>There are no <strong>primary</strong> files or documents attached to this thesis/dissertation.</p>
+	<% end %>
+
+
+
+	<h5>Supplementary</h5>
+	<% @supplemental_documents.each do | document | %>
+		<%= render partial: document %>
+	<% end %>
+	<% if @supplemental_documents.count == 0 %>
+		<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
+	<% end %>
+
+
+	<%  unless block_thesis_changes?(@thesis) %>
+
+		<hr/>
+		<div class="process-nav float-right">
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD) %>" class="next-btn back" title="Upload Thesis Files">
+				<i class="fa fa-angle-double-left"></i></a>
+			<%= link_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), title: "Submit Thesis For Review",
+					 	class: "next-btn", data: { confirm: "Have you completed all thesis details and uploaded all files?" } do %>
+						<i class="fa fa-angle-double-right"></i> Submit For Review
+			<% end %>
+		</div>
+
+
+
+	 <% end %>
+</div>

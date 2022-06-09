@@ -1,0 +1,35 @@
+<% title "DSpace Export" %>
+<% title_html do %>
+	<h1>DSpace Export</h1>
+	<div class="float-right"><p><%= link_to "+ DSpace Export", new_export_log_path, remote: true %></p></div>
+<% end %>
+
+
+<div class="home fitted">
+
+
+	<div id="reports">
+
+		<ul id="export_logs_nav" class="nav nav-pills">
+      <% ExportLog::JOB_STATUSES.each do |s| %>
+        <li class="<%= "active" if @status == s %>" data-status="<%= s %>">
+  				<a href="<%= export_logs_path(which: s) %>" data-remote="true">
+  				  <%= s.upcase %>
+  				</a>
+  			</li>
+      <% end %>
+
+
+		</ul>
+
+		<div id="export_logs_list">
+			<%= render partial: "export_logs_list" %>
+		</div>
+
+
+
+
+
+	</div>
+
+</div>

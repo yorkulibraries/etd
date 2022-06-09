@@ -1,0 +1,25 @@
+<div class="document clearfix">
+	<div class="thumb">
+		<%= link_to_unless_current edit_student_thesis_document_path(@student, @thesis, document) do %>
+			<i class="fa fa-file"></i>
+		<% end %>
+	</div>
+	<div class="details">
+		<p class="name <%= "suplemental" if document.supplemental? %>" title="<%= File.basename(document.file_url) %>">
+			<%= truncate File.basename(document.file_url), length: 60 %>
+		</p>
+		<p class="file_path" >
+		  <% if document.name %>
+				<%= document.name %>
+				&nbsp; &nbsp;
+			<% end %>
+			<% unless block_thesis_changes?(@thesis) %>
+			<p><a href="<%= edit_student_thesis_document_path(@student, @thesis, document)  %>" class=" green" title="Edit File">
+				<i class="fa fa-edit green"></i> Edit file
+			</a></p>
+			or <% end %>
+			<a href="<%= document.file_url %>" class="download" title="Download file"><i class="fa fa-download"></i> Download</a>
+		  <span class="weak small">[<%=number_to_human_size document.file.file.size rescue nil%>]</span>
+		</p>
+	</div>
+</div>

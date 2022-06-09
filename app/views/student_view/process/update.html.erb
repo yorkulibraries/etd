@@ -1,0 +1,99 @@
+<% title "#{@student.name}" %>
+
+<% title_html do %>
+	<h4 class="blend soft">My Thesis Submission</h4>
+	<h1><%= @student.name %></h1>
+<% end %>
+
+<%= progress_bar (Thesis::PROCESS_UPDATE) %>
+
+<div class="student-view fitted update">
+	<h3><%= @thesis.title %></h3>
+	<p>The fields in this section are automatically pulled from your Student Information System (SIS) and Graduate Event Module (GEM) records.</p>
+	<p>If there are any errors or changes required to this information, please contact a Thesis Coordinator at gsthesis@yorku.ca.</p>
+	<p>Please include your student number in all communications.</p>
+
+	<table class="thesis well" id="thesis">
+		<tr>
+			<td colspan="2" class="thesis_title span6">
+				<label>title</label>
+				<span id="thesis_title"><%= @thesis.title %></span>
+			</td>
+			<td id="thesis_authdor">
+				<label>author</label>
+				<span id="thesis_author"><%= @student.name %></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="exam_date">
+				<label>exam date</label>
+				<span id="thesis_examdate">	<%= @thesis.exam_date.strftime("%B %d, %Y") %></span>
+			</td>
+			<td  class="supervisor" >
+				<label>supervisor</label>
+				<span id="thesis_supervisor"><%= format @thesis.supervisor %></span>
+			</td>
+			<td class="published_date">
+				<label>Publish On</label>
+				<span id="thesis_publishdate">
+					<%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %>
+			  </span>
+			</td>
+		</tr>
+		<tr>
+			<td class="supervising_committee" colspan="3">
+				<label>examination committee members</label>
+				<div class="row">
+				<span id="thesis_supervising_committee">
+
+						<% @thesis.committee_members.each do |committee_member| %>
+							<div class="span2" style="margin-bottom: 10px;">
+								<span class="empty-field"><%= committee_member.role %></span><br/>
+								<%= committee_member.name %>
+							</div>
+						<% end %>
+
+				 	</span>
+					</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="degree_level">
+				<label>Degree Name and Level</label>
+				<span id="thesis_degree_name_and_level"><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></span>
+			</td>
+			<td class="program span6" colspan="2">
+				<label>Program</label>
+				<span id="thesis_program"><%= format @thesis.program %></span>
+			</td>
+		</tr>
+	</table>
+
+
+<p>Please provide the information requested in the following fields. </p>
+
+<%= simple_form_for [@student, @thesis], html: { class: "form-horizontal" } do |f| %>
+
+
+	<%= render partial: "theses/form_student_editable", locals: { f: f } %>
+
+	<input type="submit" name="Save Details" value="" class="hidden" aria-label="Save Details">
+	<hr/>
+
+	<div class="process-nav float-right">
+		<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_BEGIN) %>" class="next-btn back" title="Begin Submission">
+			<i class="fa fa-angle-double-left"></i></a>
+
+			<a href="#" class="next-btn save" title="Save Details and Continue" onclick="$(this).closest('form').submit(); return false">
+				<i class='fa fa-angle-double-right'></i> Save Details
+			</a>
+	</div>
+
+	<div class="hide error_messages">
+		<%= f.error_messages %>
+	</div>
+
+<% end %>
+</div>
+
+<% render partial: "theses/form_help_text" %>

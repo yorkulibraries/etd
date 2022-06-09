@@ -1,0 +1,104 @@
+
+<div id="help_text" class="hide">
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_language" data-toggle="popover"
+		data-original-title="Language of Thesis or Dissertation"
+		data-content="A thesis or dissertation normally should be written in English, but approval may be given to write in French or the language of any Aboriginal/First Nations people in North America. Please indicate English, French or Other.">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_abstract" data-toggle="popover"
+		data-original-title="Abstract"
+		data-content="For a Master’s thesis the abstract may not exceed 150 words. For a doctoral dissertation the abstract may not exceed 350 words. This abstract must be provided in English regardless of the language of your thesis or dissertation.">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_loc_subject_ids" data-toggle="popover"
+		data-original-title="Subjects"
+		data-content="Click on the drop down menus to select the subject(s) that best match your area of research. You must select at least one subject. ">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_keywords" data-toggle="popover"
+		data-original-title="Keywords"
+		data-content="Enter as many terms or search phrases as you like, separated by a comma. The more terms you provide, the more likely it is that users will find your work in their searches. ">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_acknowledgements" data-toggle="popover"
+		data-original-title="Acknowledgements"
+		data-content="What goes in here?">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_comments" data-toggle="popover"
+		data-original-title="Comments"
+		data-content="What goes in here?">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+	<!-- not editable by student -->
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_title" data-toggle="popover"
+		data-original-title="Title"
+		data-content="This is the title that was provided on the Recommendation for Oral Exam form.">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_author" data-toggle="popover"
+		data-original-title="Author"
+		data-content="Your name as it appears in your official York student record.">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_supervisor" data-toggle="popover"
+		data-original-title="Supervisor"
+		data-content="Your Principal Supervisor.">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_supervising_committee" data-toggle="popover"
+		data-original-title="Examination Committee Members"
+		data-content="These are the Examination Committee Members that were provided on the Recommendation for Oral Exam form.  ">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_examdate" data-toggle="popover"
+		data-original-title="Exam Date"
+		data-content="The date of your oral examination">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_publishdate" data-toggle="popover"
+		data-original-title="Publish On"
+		data-content="This is the date your thesis/dissertation will be deposited to YorkSpace and publicly accessible through the Library and through Library and Archives Canada. The date is entered by a staff member in FGS and refers to the date you are expected to have completed all your degree requirements and receive your degree. If you have requested an embargo on the publication of your thesis/dissertation and it is not reflected here, please contact a Thesis Coordinator at gsthesis@yorku.ca.">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_program" data-toggle="popover"
+		data-original-title="Program"
+		data-content="The name of your graduate program.">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+	<a 	class="thesis-help-sign"  href="#" data-for-element="thesis_degree_name_and_level" data-toggle="popover"
+		data-original-title="Degree Name and Level"
+		data-content="The degree you will be granted. Level: Master’s or Doctoral">
+		<i class="fa fa-quetion-circle-o"></i>
+	</a>
+
+</div>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#help_text").children().each(function(i) {
+			var element = $(this).data("for-element");
+			$("#" + element).after($(this));
+			$(this).click(function(){ return false; });
+			//$("#thesis_language").after($("#language_help"));
+		});
+
+		$("#help_text").remove();
+	});
+</script>

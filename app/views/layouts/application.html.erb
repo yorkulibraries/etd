@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for?(:title) ? yield(:title) : "Untitled" %></title>
+    <%= stylesheet_link_tag "application" %>
+    <%= javascript_include_tag "application" %>
+    <%= csrf_meta_tag %>
+    <%= yield(:head) %>
+
+		<meta charset="UTF-8">
+  </head>
+  <body>
+
+	<div class="container">
+		<div class="york_header">
+			<%= image_tag("yorklogo.gif", alt: "York University - Graduate Studies")%>
+
+			<h4 class="float-right">Faculty of Graduate Studies</h4>
+		</div>
+
+		<%= render :template => "layouts/navbar" %>
+	</div>
+
+	 <div class="container">
+
+
+    <% if AppSettings.app_maintenance == "true" %>
+      <div class="alert alert-block">
+        <h3>Attention!</h3>
+        <%= AppSettings.app_maintenance_message %>
+      </div>
+    <% end %>
+
+		<div class="workspace">
+			<% flash.each do |name, msg| %>        
+			  <div class="alert alert-<%= name == "notice" ? "success" : "error" %>">
+
+			    <a class="close" data-dismiss="alert">×</a>
+			    <strong><%= name.capitalize %>: </strong><%= msg %>
+			  </div>
+			<% end %>
+			<div class="page-header">
+		    	<%= content_tag :h1, yield(:title) if show_title? && !content_for?(:title_html) %>
+				<%= yield (:title_html) if content_for?(:title_html)%>
+		    </div>
+
+			<div class="row">
+				<div class="<%= content_for?(:sidebar) ? "span9" : "span12" %>">
+					<%= yield %>
+				</div>
+				<% if content_for?(:sidebar) %>
+				<div class="span3">
+						<%=  yield (:sidebar) %>
+				</div>
+				<% end %>
+
+			</div>
+		</div>
+	  	<section class="weak push-down">ETD - York University Libraries - v.<%= app_version %></section>
+	  </div>
+
+
+
+  </body>
+</html>

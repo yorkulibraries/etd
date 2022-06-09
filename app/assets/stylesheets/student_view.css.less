@@ -1,0 +1,108 @@
+.student-view {
+	> h3 { font-size: 26px; margin-bottom: 15px; line-height: 32px;}
+	p { font-size: 15px; line-height: 22px;}
+
+
+	.process-nav {
+		padding: 20px 0 30px;
+
+
+		.next-btn {
+			background: #528400; border: 1px solid #96BF48; border-radius: 1px;
+			color: #fff; font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; font-size: 18px;
+			padding: 14px 30px; text-shadow: 0 1px 1px #486A08;
+
+
+			&:hover { background: #99C245; border-color: #8BB43D; text-decoration: none; }
+			&.save { background: #2f72e2; border-color: #3079ED; &:hover { background: #357Ae8; } }
+			&.back { background: #9DCE41;  padding: 14px 20px; &:hover { background: #99C24B; } }
+			&.send { background: #C32F17; border-color: #AC2915; &:hover { background: DA341A; }}
+		}
+	}
+
+
+	&.begin { }
+
+	&.update {
+		table.thesis { width: 100%; td { padding: 10px 15px; vertical-align: top; } }
+	}
+
+	&.upload {
+		.documents {
+			h3 { padding: 0px; }
+			h5 { padding: 0; margin-bottom: 20px; }
+		}
+
+	}
+
+	&.review {}
+
+	&.submit {
+		h4, h5 { margin-bottom: 20px; }
+		ul, ol { margin: 20px 0 20px 30px; }
+		ul li, ol li { font-size: 14px; line-height: 26px; }
+
+	}
+
+	&.status {
+		font-size: 16px; line-height: 22px;
+		text-shadow: 0 -1px 0 rgba(255, 255, 255, 0.25);
+
+		div.status {
+			border: 1px solid #DDDDDD; border-radius: 6px; box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+	    margin: 0px 0 20px; padding: 10px 20px; opacity: 0.6; color: #767676;
+
+			> i { margin-right: 10px; }
+			> span {  font-weight: bold; }
+			> p.help-text { color: #000; font-size: 16px; margin: 15px 0 0; }
+
+		  &.current {
+				opacity: 1;
+				border: 1px solid #999999;
+
+				> i { font-weight: bold; font-size: 22px; }
+				> span { font-size: 22px; line-height: 26px; }
+
+
+				&.open { color: #39628E;}
+				&.under_review { color: #0044CC; }
+				&.accepted { color: #468847; }
+				&.published { color:#2D153D; }
+				&.rejected { color: #CC0000; }
+				&.returned { color: #B94A48; }
+			}
+		}
+
+		.popover { color: #222; }
+
+	}
+
+}
+
+.progress_bar {
+	width: 100%;
+	margin-bottom: 20px;
+
+	&:after { clear: both}
+	&:before, &:after { content: ""; display: table; }
+
+	.step {
+		background: #F6F3EE; border: 1px solid #DAD6CD; width: 140px; height: 45px; margin-right: 10px; float: left;
+
+		i { float: left; font-size: 22px; padding: 10px; color: #363636; }
+		a {
+			float: left; font-size: 12px; padding: 8px 0;
+			color:#5B5B5B; line-height: 14px;
+
+			&:hover { text-decoration: none}
+		}
+
+		&.disable, &.disable:hover { opacity: 0.4; background: lighten(#DAD6CD, 60%);  border: 1px solid #A1A1A1; cursor: default; a:hover { cursor: default; }}
+
+		&:hover, &.active {
+			background: lighten(#B9DB7A, 10%); border: 1px solid #73B800;
+			i { color: #121212; }
+			a { color: #121212; }
+		}
+	}
+}

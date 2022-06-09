@@ -1,0 +1,46 @@
+<% title "#{@student.name}" %>
+
+<% title_html do %>
+	<h4 class="blend soft">My ETD Submission</h4>
+	<h1><%= @student.name %></h1>
+<% end %>
+
+<%= progress_bar (Thesis::PROCESS_BEGIN) %>
+
+
+
+
+
+<div class="student-view begin fitted">
+	<h3>Hello <%= @student.name %></h3>
+	<p>Welcome to York University’s Electronic Thesis and Dissertation (ETD) application. This interface will enable to you to upload and submit your final approved thesis or dissertation to the Thesis Coordinator in the Faculty of Graduate Studies. </p>
+	<p>Once your submission is approved and all requirements for graduation are met, your thesis or dissertation will be submitted to YorkSpace, York University's digital library of research outputs and will be available for electronic viewing through Library and Archives Canada.</p>
+	<p>For step-by-step submission instructions and more information on ETD, please click <a href=" http://www.yorku.ca/grads/policies_procedures/thesis_dissertations_index.html">here</a>. At any point while you are using the application, you may click on the help button next to each field for more information. </p>
+	<p>Click on the title of your thesis/dissertation to get started.
+	</p>
+	<hr/>
+
+
+	<div class="thesis row">
+			<div class="span9">
+				<h4 class="title" title="title"><%= link_to @thesis.title, student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE), title: "Update Thesis Details" %></h4>
+			</div>
+
+			<div class="span4">
+				<p class="supervisor" title="supervisor"><label>supervisor</label> <%= format @thesis.supervisor %></p>
+				<p class="exam_date" title="exam date"><label>exam date</label> <%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
+			</div>
+
+			<div class="span5">
+				<p class="degree_level"><label>Degree Name and Level</label><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+				<p class="program"><label>Program</label><%= format @thesis.program %></p>
+			</div>
+	</div>
+
+	<hr/>
+	<div class="process-nav float-right">
+		<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="next-btn" title="Update Thesis Details">
+ 			<i class="fa fa-angle-double-right"></i> Update Details
+		</a>
+	</div>
+</div>

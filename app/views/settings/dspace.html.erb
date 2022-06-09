@@ -1,0 +1,45 @@
+<% title "Update DSpace Export - Settings" %>
+
+<%= simple_form_for AppSettings, url: settings_path, method: :patch, html: { class: "settings" } do |f| %>
+
+	<h5 style="padding-bottom: 10px;">Test Server Settings</h5>
+	<div class="row">
+		<div class="span4">
+			<%= f.input :dspace_test_username, input_html: { class: "input-block-level"} %>
+		</div>
+		<div class="span4">
+			<%= f.input :dspace_test_password, as: :string, input_html: { class: "input-block-level"} %>
+		</div>
+	</div>
+
+  <%= f.input :dspace_test_service_document_url, input_html: { class: "span8" } %>
+  <%= f.input :dspace_test_collection_uri, input_html: { class: "span8" } %>
+  <%= f.input :dspace_test_collection_title, input_html: { class: "span8" } %>
+
+	<hr class="fitted"/>
+
+	<h5 style="padding-bottom: 10px;">Live Server Settings</h5>
+  <div class="alert alert-warning span8">
+    <strong>Warning:</strong> ETD will use these settings to export theses to a live DSpace server. Ensure they are correct.
+  </div>
+
+  <div class="row">
+		<div class="span4">
+			<%= f.input :dspace_live_username, input_html: { class: "input-block-level"} %>
+		</div>
+		<div class="span4">
+			<%= f.input :dspace_live_password, as: :string, input_html: { class: "input-block-level"} %>
+		</div>
+	</div>
+
+  <%= f.input :dspace_live_service_document_url, input_html: { class: "span8" } %>
+  <%= f.input :dspace_live_collection_uri, input_html: { class: "span8" } %>
+  <%= f.input :dspace_live_collection_title, input_html: { class: "span8" } %>
+
+
+	<hr class="fitted"/>
+  <input type="hidden" name="return_to" value="dspace"/>
+	<%= f.submit "Save Settings", class: "btn btn-success" %>
+<% end %>
+
+<!-- Nav tabs -->

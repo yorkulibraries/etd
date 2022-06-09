@@ -1,0 +1,10 @@
+<%= simple_form_for @user do |f| %>
+
+  	<%= f.input :username %>
+	<%= f.input :name %>
+	<%= f.input :email %>
+	<%= f.input :role, :collection =>  User::ROLES  %>
+	
+	<%= f.button :submit %> or <%= link_to "Cancel",  @user.blocked? ? blocked_users_path : users_path %>
+
+<% end %>

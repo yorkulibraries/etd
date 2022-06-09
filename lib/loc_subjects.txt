@@ -1,0 +1,432 @@
+>AREA, ETHNIC, AND GENDER STUDIES 
+African American studies 
+African studies 
+American studies 
+Asian American studies 
+Asian studies 
+Baltic studies 
+Black studies 
+Canadian studies 
+Caribbean studies 
+Classical studies 
+East European studies 
+Ethnic studies 
+European studies 
+French Canadian culture 
+Gender studies 
+GLBT  studies 
+Hispanic American studies 
+Holocaust studies 
+Islamic culture 
+Judaic studies 
+Latin American studies 
+Middle Eastern studies 
+Native American studies 
+Near Eastern studies 
+North African studies 
+Pacific Rim studies 
+Regional studies 
+Scandinavian studies 
+Slavic studies 
+South African studies 
+South Asian studies 
+Sub Saharan Africa studies 
+Women's studies 
+>BUSINESS   
+Accounting 
+Arts management 
+Banking 
+Business 
+Entrepreneurship 
+Finance 
+Management 
+Marketing 
+Sports management 
+>COMMUNICATIONS AND INFORMATION SCIENCES 
+Communication 
+Information science 
+Journalism 
+Library science 
+Mass communication 
+Technical communication 
+Web studies 
+>FINE AND PERFORMING ARTS 
+Art criticism 
+Art history 
+Cinematography 
+Dance 
+Design 
+Film studies 
+Fine arts 
+Music 
+Performing arts 
+Theater 
+Theater history 
+>EDUCATION 
+Adult  education 
+Art education 
+Bilingual education 
+Business education 
+Community college education 
+Continuing education 
+Curriculum development 
+Early childhood education 
+Education 
+Education finance 
+Education policy 
+Educational administration 
+Educational evaluation 
+Educational leadership 
+Educational psychology 
+Educational technology 
+Educational tests & measurements 
+Elementary education 
+English as a second language 
+Foreign language instruction 
+Gifted education 
+Health education 
+Higher education 
+Higher education administration 
+History of education 
+Home economics education 
+Industrial arts education 
+Instructional design 
+Language arts 
+Mathematics education 
+Middle school education 
+Multicultural education 
+Music education 
+Pedagogy 
+Performing arts education 
+Philosophy of education 
+Physical education 
+Reading instruction 
+Religious education 
+School counseling 
+Science education 
+Secondary education 
+Social sciences education 
+Sociology of education 
+Special education 
+Teacher education 
+Vocational education 
+>HISTORY 
+African history 
+American history 
+Ancient history 
+Asian history 
+Black history 
+Canadian history 
+European history 
+History 
+History of Oceania 
+History of science 
+Latin American history 
+Medieval history 
+Middle Eastern history 
+Military history 
+Modern history 
+Russian history 
+World history 
+>LANGUAGE & LITERATURE 
+African literature 
+American literature 
+Ancient languages 
+Asian literature 
+British and Irish literature 
+Canadian literature 
+Caribbean literature 
+Classical literature 
+Comparative literature 
+French Canadian literature 
+Germanic literature 
+Icelandic & Scandinavian literature 
+Language 
+Latin American literature 
+Linguistics 
+Literature 
+Literature of Oceania 
+Medieval literature 
+Middle Eastern literature 
+Modern language 
+Modern literature 
+Rhetoric 
+Romance literature 
+Slavic literature 
+>PHILOSOPHY AND RELIGION 
+Aesthetics 
+Biblical studies 
+Canon law 
+Clerical studies 
+Comparative religion 
+Divinity 
+Epistemology 
+Ethics 
+Logic 
+Metaphysics 
+Pastoral counseling 
+Philosophy 
+Philosophy of Religion 
+Philosophy of science 
+Religion 
+Religious history 
+Spirituality 
+Theology 
+>LAW AND LEGAL STUDIES 
+Alternative dispute resolution 
+Intellectual property 
+International law 
+Law 
+Patent law 
+>SOCIAL SCIENCES 
+Archaeology 
+Area planning and development 
+Criminology 
+Cultural anthropology 
+Demography 
+Economic history 
+Economic theory 
+Economics 
+Economics, Commerce-Business 
+Economics, Labor 
+Folklore 
+Forensic anthropology 
+Geography 
+Individual & family studies 
+International relations 
+Labor relations 
+Military studies 
+Organization theory 
+Organizational behavior 
+Peace studies 
+Physical anthropology 
+Political Science 
+Public administration 
+Public policy 
+Recreation and tourism 
+Social research 
+Social structure 
+Social work 
+Sociolinguistics 
+Sociology 
+Transportation planning 
+Urban planning 
+>INTERDISCIPLINARY 
+Alternative energy 
+Biographies 
+Climate change 
+Cultural resources management 
+Energy 
+Food science 
+Home economics 
+Information technology 
+Multimedia 
+Museum studies 
+Sustainability 
+Textile research 
+Wood sciences
+>AGRICULTURE 
+Agriculture 
+Agriculture economics 
+Agriculture education 
+Agriculture engineering 
+Agronomy 
+Animal diseases 
+Animal sciences 
+Fisheries and aquatic sciences 
+Forestry 
+Horticulture 
+Plant pathology 
+Plant sciences 
+Range management 
+Soil sciences 
+Urban forestry 
+Wildlife management 
+>ARCHITECTURE 
+Architecture 
+Architectural engineering 
+Landscape architecture 
+>BEHAVIORAL SCIENCES 
+Animal behavior 
+Behavioral sciences 
+Clinical psychology 
+Cognitive psychology 
+Counseling psychology 
+Developmental psychology 
+Experimental psychology 
+Occupational psychology 
+Personality psychology 
+Physiological psychology 
+Psychobiology 
+Psychology 
+Quantitative psychology and  
+psychometrics 
+Social psychology 
+>BIOLOGICAL SCIENCES 
+Biochemistry 
+Bioinformatics 
+Biology 
+Biomechanics 
+Biophysics 
+Biostatistics 
+Cellular biology 
+Developmental biology 
+Endocrinology 
+Entomology 
+Evolution & development 
+Genetics 
+Histology 
+Limnology 
+Microbiology 
+Molecular biology 
+Morphology 
+Neurosciences 
+Parasitology 
+Physiology 
+Plant biology 
+Systematic biology 
+Virology 
+Zoology 
+>ECOSYSTEM SCIENCES 
+Ecology 
+Macroecology 
+Paleoecology 
+>ENGINEERING 
+Aerospace engineering 
+Artificial intelligence 
+Automotive engineering 
+Biomedical engineering 
+Chemical engineering 
+Civil engineering 
+Computer engineering 
+Computer science 
+Electrical engineering 
+Engineering 
+Geological engineering 
+Geophysical engineering 
+Geotechnology 
+Industrial engineering 
+Mechanical engineering 
+Mining engineering 
+Naval engineering 
+Nanotechnology 
+Nuclear engineering 
+Ocean engineering 
+Operations research 
+Packaging 
+Petroleum engineering 
+Plastics 
+Robotics 
+System science 
+Materials Science 
+>ENVIRONMENTAL SCIENCES 
+Conservation biology 
+Environmental economics 
+Environmental education 
+Environmental engineering 
+Environmental geology 
+Environmental health 
+Environmental justice 
+Environmental law 
+Environmental management 
+Environmental philosophy 
+Environmental science 
+Environmental studies 
+Land use planning 
+Natural resource management 
+Water resources management 
+Wildlife conservation 
+>GEOSCIENCES 
+Aeronomy  
+Atmospheric chemistry 
+Atmospheric sciences 
+Biogeochemistry 
+Biological oceanography 
+Chemical oceanography 
+Continental dynamics 
+Geobiology 
+Geochemistry 
+Geographic information science  
+and geodesy 
+Geology 
+Geomorphology 
+Geophysics 
+Hydrologic sciences 
+Marine geology 
+Meteorology 
+Mineralogy 
+Paleoclimate science 
+Paleontology 
+Petroleum geology 
+Petrology 
+Physical geography 
+Physical oceanography 
+Planetology 
+Plate tectonics 
+Remote sensing 
+Sedimentary geology 
+>HEALTH AND MEDICAL SCIENCES 
+Aging 
+Alternative medicine 
+Audiology 
+Dentistry 
+Epidemiology 
+Gerontology 
+Health care management 
+Health sciences 
+Immunology 
+Kinesiology 
+Medical ethics 
+Medical imaging and radiology 
+Medicine 
+Mental health 
+Nursing 
+Nutrition 
+Obstetrics and gynecology 
+Occupational health 
+Occupational therapy 
+Oncology 
+Ophthalmology 
+Osteopathic medicine 
+Pathology 
+Pharmaceutical sciences 
+Pharmacology 
+Physical therapy 
+Public health 
+Public health occupations  
+education 
+Speech therapy 
+Surgery 
+Toxicology 
+Veterinary medicine 
+>MATHEMATICAL AND PHYSICAL SCIENCES 
+Acoustics 
+Analytical chemistry 
+Applied mathematics 
+Astronomy 
+Astrophysics 
+Atomic physics 
+Chemistry 
+Condensed matter physics 
+Electromagnetics 
+High temperature physics 
+Inorganic chemistry 
+Low temperature physics 
+Materials science 
+Mathematics 
+Mechanics 
+Molecular chemistry 
+Molecular physics 
+Nanoscience 
+Nuclear chemistry 
+Nuclear physics 
+Optics 
+Organic chemistry 
+Particle physics 
+Physical chemistry 
+Physics 
+Plasma physics 
+Polymer chemistry 
+Quantum physics 
+Statistics 
+Theoretical mathematics 

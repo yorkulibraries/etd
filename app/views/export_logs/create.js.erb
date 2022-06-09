@@ -1,0 +1,8 @@
+<% if @export_log.errors.size == 0 %>
+  $("#new_export_log").modal('hide');
+  $("#new_export_log_holder").empty();
+  $("#export_logs_list").replaceWith('<%=escape_javascript render partial: "export_logs_list" %>');
+<% else %>
+  $("#new_export_log_holder").empty();
+  $('#new_export_log_holder').prepend('<%=escape_javascript render("export_logs/form") %>');
+<% end %>

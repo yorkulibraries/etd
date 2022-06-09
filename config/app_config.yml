@@ -1,0 +1,11 @@
+development:
+  domain: localhost:3000
+
+test:
+    domain: test.host
+
+demo:
+  domain: example.com
+
+production:
+  domain: example.com

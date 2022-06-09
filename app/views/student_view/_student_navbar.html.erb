@@ -1,0 +1,7 @@
+<li class="<%= "active" if controller_name == "student_view" && action_name !="details" %>">
+	<a href="<%= student_view_index_path %>">My ETD Submission</a>
+</li>
+<li class="<%= "active" if controller_name == "student_view" && action_name =="details"%>">
+	<a href="<%= student_view_details_path %>">My Details</a>
+</li>	
+

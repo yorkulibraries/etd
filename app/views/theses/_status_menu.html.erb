@@ -1,0 +1,63 @@
+<% statuses = Thesis::STATUSES.reject { |s| s == Thesis::PUBLISHED || s == Thesis::RETURNED } %>
+<% statuses = [Thesis::RETURNED, Thesis::ACCEPTED] if Thesis::UNDER_REVIEW == @thesis.status %>
+<% statuses = [Thesis::UNDER_REVIEW, Thesis::ACCEPTED] if Thesis::RETURNED == @thesis.status %>
+<% statuses = [Thesis::RETURNED] if [Thesis::REJECTED, Thesis::ACCEPTED].include?(@thesis.status) %>
+<% statuses = [] if Thesis::PUBLISHED == @thesis.status %>
+
+<div id="status_menu">
+	<button id="status_change_link" class="btn" data-toggle="dropdown" title="Change Thesis Status">
+	Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span> &nbsp;<span class="caret"></span>
+  </button>
+
+
+	<div id="status_change" class="hide">
+		<%= form_tag update_status_student_thesis_path(@student, @thesis) do %>
+			<div class="statuses">
+				<% statuses.each do |status |%>
+					<span class="status status-<%= status %>">
+						<input type="radio" name="status" value="<%= status %>"><%= Thesis::STATUS_ACTIONS[status]%>
+					</span>
+				<% end %>
+			</div>
+			<hr>
+
+			<div class="notifications <%= "disabled" if AppSettings.email_status_change_allow == false %>">
+				<% if AppSettings.email_status_change_allow == false %>
+				<div class="disabled">
+					<h3>Notification Disabled</h3>
+				</div>
+				<% end %>
+				<p><strong>Notify People?</strong></p>
+				<div class="notice">
+					<input type="checkbox" checked="checked" id="notify_student" onchange="confirm_notification();" name="notify_student" value="true"/> <%= @student.name %>
+				</div>
+				<div class="notice">
+					<input type="checkbox" checked="checked" id="notify_current_user" name="notify_current_user" value="true"/> <%= current_user.name %> <strong>(Me)</strong>
+				</div>
+				<hr/>
+				<textarea rows="2" cols="10" name="custom_message" placeholder="Custom message..."></textarea>
+				<br/><br/>
+
+			</div>
+
+			<input type="submit" value="Change Status" id="status_change_button"/> or <a href="#" onclick="$('#status_change_link').popover('hide');">Cancel</a>
+		<% end %>
+	</div>
+</div>
+
+<script type="text/javascript">
+function confirm_notification() {
+	var notify = document.getElementById("notify_student").checked;
+
+	if (notify == false) {
+		document.getElementById("notify_current_user").checked = false;
+		document.getElementById("notify_current_user").disabled = true;
+	} else {
+		document.getElementById("notify_current_user").checked = true;
+		document.getElementById("notify_current_user").disabled = false;
+	}
+
+
+}
+
+</script>

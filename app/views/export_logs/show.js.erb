@@ -1,0 +1,9 @@
+$("#full_info_export_log").modal('hide');
+
+$("#full_info_export_log_holder").empty();
+$("#full_info_export_log_holder").remove();
+
+$("body").append("<div id='full_info_export_log_holder'></div>");
+$('#full_info_export_log_holder').prepend('<%=escape_javascript render("export_logs/full_info") %>');
+
+$("#full_info_export_log").modal('show');

@@ -1,0 +1,90 @@
+<% title "#{@student.name}" %>
+
+<% title_html do %>
+	<h4 class="blend soft">My ETD Submission</h4>
+	<h1><%= @student.name %></h1>
+<% end %>
+
+<%= progress_bar (Thesis::PROCESS_UPLOAD) %>
+
+<div class="student-view fitted upload">
+	<div class="thesis row">
+
+		<div class="span9">
+			<h3 class="title" title="title"><%= @thesis.title %></h3>
+		</div>
+	</div>
+
+
+	<div class="documents">
+
+		<h3>Files and Documents</h3>
+
+		<div  class="hint-text">
+			<p>Your thesis or dissertation must be submitted as a PDF file (.pdf) only. You may submit only one file, which must be saved using the following naming convention:	</p>
+			<p class="example"><span class="strong">Lastname_Firstname_MiddleInitial_yearofcopyright_PhdORMasters</span> (e.g. Smith_Jane_E_2014_PhD)</p>
+			<p>If necessary, you can add supplementary files to your thesis/dissertation. Supplementary files refer to items that are part of the approved, examined thesis/dissertation that cannot be included in the PDF, such as multi-media, sound, video or hypertext.</p>
+			<p>A supplementary file is NOT an appendix. Regular appendices can be included in the PDF document of your thesis/dissertation. </p>
+		</div>
+
+
+
+		<h5>Primary &nbsp; &nbsp;
+				<%  unless block_thesis_changes?(@thesis) %>
+					<% if @primary_documents.count == 0 %>
+						<a href="#primary-file" data-toggle="modal" role="button" class="btn btn-mini" title="Upload Primary File"> Upload Primary File</a>
+					<% end %>
+				<% end %>
+		</h5>
+
+		<% @primary_documents.each do | document | %>
+			<%= render partial: document %>
+		<% end %>
+
+		<% if @primary_documents.count == 0 %>
+			<p>There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
+		<% end %>
+
+		<div class="push-down"></div>
+
+		<h5>Supplementary  &nbsp; &nbsp;
+				<%  unless block_thesis_changes?(@thesis) %>
+					<a href="#supplemental-files" data-toggle="modal" role="button" class="btn btn-mini" title="Upload Supplementary Files"> Upload Supplementary Files</a>
+				<% end %>
+		</h5>
+
+		<% @supplemental_documents.each do | document | %>
+			<%= render partial: document %>
+		<% end %>
+		<% if @supplemental_documents.count == 0 %>
+			<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
+		<% end %>
+
+
+
+	</div>
+
+
+	<%  unless block_thesis_changes?(@thesis) %>
+		<hr/>
+		<div class="process-nav float-right">
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="next-btn back" title="Update Details">
+				<i class="fa fa-angle-double-left"></i></a>
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn" title="Continue to Review Details">
+	 			<i class="fa fa-angle-double-right"></i> Review Details
+			</a>
+		</div>
+	 <% end %>
+
+</div>
+
+
+<div id="primary-file" class="modal hide fade">
+	<% @document = Document.new %>
+	<%= render partial: "documents/new_form", locals: { primary: true } %>
+</div>
+
+<div id="supplemental-files" class="modal hide fade">
+	<% @document = Document.new %>
+	<%= render partial: "documents/new_form", locals: { primary: false } %>
+</div>

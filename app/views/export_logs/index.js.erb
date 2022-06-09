@@ -1,0 +1,4 @@
+$("#export_logs_list").empty().html("<%= j render partial: "export_logs_list" %>");
+$("#export_logs_nav li").removeClass("active");
+
+$("#export_logs_nav li[data-status='<%= @status == nil ? "nil" : @status %>']").addClass("active");

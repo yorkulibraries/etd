@@ -1,0 +1,20 @@
+<% title "Gem Records" %>
+
+<% if @search_result %>
+	<h4><%= @search_result %></h4>
+<% end %>
+
+<div class="pagination">
+	<%= paginate @gem_records %>
+</div>
+
+
+<div class="gem_records">
+	<% @gem_records.each do |gem_record| %>
+		<%= render partial: gem_record %>
+	<% end %>
+</div>
+
+<div class="pagination">
+	<%= paginate @gem_records %>
+</div>

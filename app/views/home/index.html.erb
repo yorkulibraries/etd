@@ -1,0 +1,26 @@
+<% title "Overview" %>
+
+<div class="home fitted">
+	
+	<ul class="nav nav-tabs">
+		<li class="<%= "active" if @which == Thesis::OPEN %>">
+			<a href="<%= root_path %>">Open</a>
+		</li>
+		<li class="<%= "active" if @which == Thesis::UNDER_REVIEW %>">
+			<a href="<%= root_path(which: Thesis::UNDER_REVIEW) %>">Under Review</a>
+		</li>
+		<li class="<%= "active" if @which == Thesis::ACCEPTED %>">
+			<a href="<%= root_path(which: Thesis::ACCEPTED) %>">Accepted</a>
+		</li>
+	</ul>
+	
+	<div id="theses">
+		<% if @theses.size == 0 %>
+			<p>There are no <strong><%= @which.humanize.titleize %></strong> theses available right now.</p>
+		<% end %>
+		<% @theses.each do |thesis| %>			
+			<%= render partial: thesis %>
+		<% end %>		
+	</div>
+	
+</div>

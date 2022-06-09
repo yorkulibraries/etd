@@ -1,0 +1,47 @@
+<%= f.input :title, as: :text, input_html: { class: "span6", rows: 2 }, readonly: read_only_if_student("title") %>
+<%= f.input :author, input_html: { class: "span4" }, readonly: read_only_if_student("author") %>
+<%= f.input :supervisor, input_html: { class: "span4" }, readonly: read_only_if_student("supervisor") %>
+
+<hr class="fitted"/>
+
+<div class="readonly-field">
+	 <%= @thesis.exam_date ? @thesis.exam_date.strftime("%B %d, %Y") : format(@thesis.exam_date)  %> <a href="#" data-id="thesis_exam_date">update</a>
+</div>
+<%= f.input :exam_date, as: :string, readonly:  read_only_if_student("exam_date"), input_html: { class: "hide", autocomplete: "off"} %>
+
+<hr class="fitted"/>
+
+<%= f.input :program, input_html: { class: "span6", rows: "2" }, as: :text, readonly: read_only_if_student("program")  %>
+
+<% if  read_only_if_student("degree_name") %>
+	<%= f.input :degree_name, readonly: true %>
+	<%= f.input :degree_level, readonly: true %>
+<% else %>
+	<%= f.input :degree_name, collection: Thesis::DEGREENAME %>
+	<%= f.input :degree_level, collection: Thesis::DEGREELEVEL  %>
+<% end %>
+
+<hr class="fitted"/>
+
+<%= f.input :published_date, label: "Publish On", collection: publish_on_dates(6.months) %>
+
+<hr class="fitted"/>
+
+<h5 style="padding-bottom: 10px;">Committee Members</h5>
+
+<%= f.fields_for :committee_members do |builder| %>
+	<%= render 'committee_member_fields', f: builder %>
+<% end %>
+
+<%= link_to_add_fields raw("<i class='fa fa-plus'></i> Add Committee Member"), f, :committee_members%>
+
+
+<hr class="fitted"/>
+
+
+<script type="text/javascript">
+//var committee_member_names_list = "";
+//$( ".committee_member_names" ).autocomplete({
+// source: committee_member_names_list
+//});
+</script>

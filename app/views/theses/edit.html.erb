@@ -1,0 +1,11 @@
+<% title "Edit Thesis" %>
+<% title_html do %>
+	<%= render partial: "students/header" %>
+<% end %>
+
+
+<h4 style="margin-bottom: 20px;" class="fitted"><%= link_to @thesis.title, student_thesis_path(@student, @thesis)  %></h4>
+
+
+<%= render 'form' %>
+

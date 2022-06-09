@@ -1,0 +1,26 @@
+/*
+ *= require bootstrap_and_overrides
+ *= require styles
+ *= require theses
+ *= require documents
+ *= require students
+ *= require gem_records
+ *= require users
+ *= require student_view
+ *= require reports
+ *= require unauthorized
+ *= require audit_trail
+ *= require settings
+ *= require export_logs
+ *= require chosen
+ *= require jquery-ui
+ *= require jquery-tablesorter/theme.dropbox
+ *= require jquery-tablesorter/theme.grey
+ *= require jquery-tablesorter/theme.bootstrap_2
+ *= require jquery-tablesorter/theme.blue
+ *= require jquery-tablesorter/theme.black-ice
+ *= require jquery-tablesorter/theme.default
+ *= require jquery-tablesorter/theme.dark
+ *= require jquery-tablesorter/theme.jui
+ *= require font-awesome
+ */

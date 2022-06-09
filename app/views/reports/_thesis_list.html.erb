@@ -1,0 +1,38 @@
+<table class="tabl reports tablesorter-default">
+  <thead>
+    <tr>
+      <th>SSID</th>
+      <th>Name</th>
+      <th>Thesis</th>
+      <th>Publish</th>
+      <th>Exam</th>
+      <th>Returned</th>
+      <th>Assigned</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @theses.each do |thesis| %>
+      <tr>
+        <td><%=  thesis.student.sisid %></td>
+        <td><%=  thesis.student.name %></td>
+        <td><%= link_to thesis.title, reports_review_thesis_path(id: thesis.id) %></td>
+
+        <td class="date"><%= thesis.published_date.strftime("%b %d, %Y") rescue nil %></td>
+        <td class="date"><%= thesis.exam_date.strftime("%b %d, %Y") rescue nil %></td>
+        <td class="date"><%= thesis.returned_at.strftime("%b %d, %Y") rescue nil %></td>
+        <td class="small">
+          <% if thesis.assigned? %>
+            <%= thesis.assigned_to.name %>
+          <% else %>
+            Unassigned
+          <% end %>
+        </td>
+
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<a href="<%= reports_by_status_path(status: @status, date: @date, order: @order, format: "xlsx") %>">
+  <span class="fa fa-th"></span> Download Exel
+</a>

@@ -1,0 +1,32 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Published Date</th>
+      <th>Total Theses</th>
+      <th>Successsful / Failed</th>
+      <th>Production Server?</th>
+      <th>More Info</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @export_logs.each do |export_log| %>
+      <tr>
+        <td><%=  export_log.creator.name %></td>
+        <td class="date"><%=  export_log.published_date.strftime("%b %d, %Y") rescue nil %></td>
+        <td><%= export_log.theses_count.to_i %></td>
+        <td><%= export_log.successful_count.to_i %> / <%= export_log.failed_count.to_i %></td>
+        <td><%= export_log.production_export? ? "Production" : "Test" %></td>
+        <td><%= link_to "More Info", export_log_path(export_log), remote: true %></td>
+      </tr>
+    <% end %>
+
+    <% if @export_logs.size == 0 %>
+      <tr>
+        <td colspan="8">
+          There are not <strong><%= @status.upcase %></strong> export logs.
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

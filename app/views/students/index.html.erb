@@ -1,0 +1,29 @@
+<% title "Students" %>
+<% title_html do %>
+	<h1>Students</h1>
+<% end %>
+
+<% if @search_result %>
+	<h4><%= @search_result %></h4>
+<% else%>
+	<h4> Students </h4>
+<% end %>
+
+<div class="pull-right fitted">
+	<%= link_to_if params[:oldest], "Newest", students_path(newest: true) %> | 
+	<%= link_to_unless params[:oldest], "Oldest", students_path(oldest: true) %>	
+</div>
+<div class="pagination">
+	<%= paginate @students %>
+</div>
+
+<div class="students">
+	<% @students.each do |student| %>
+		<%= render partial: student %>
+	<% end %>
+</div>
+
+
+<div class="pagination">
+	<%= paginate @students %>
+</div>

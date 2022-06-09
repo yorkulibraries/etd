@@ -1,0 +1,21 @@
+<%
+
+case @new_status
+when Thesis::UNDER_REVIEW
+	@status_message = "Your submission has been received and is being reviewed by a Thesis Coordinator in the Faculty of Graduate Studies. If you need to re-open your ETD record to make any changes, please email gsthesis@yorku.ca."
+when Thesis::RETURNED
+	@status_message = "Your submission is being returned to you because there are one or more revisions required. Please log in to the ETD application to make the revisions outlined below."
+when Thesis::ACCEPTED
+	@status_message = "Your submission has been accepted and will be deposited in YorkSpace following conferral of your degree."
+when Thesis::PUBLISHED
+	@status_message = "Your thesis/dissertation has been deposited in YorkSpace, York University's institutional repository and is available for viewing via Library and Archives Canada as well as other search engines."
+else
+	@status_message = ""
+end
+
+%>
+<% options = { "date" => @date, 'date-short' => @date_short, "application_url" => @application_url,
+						"custom_message" => @custom_message, "old_status" => @old_status, "new_status" => @new_status, "status_message" => @status_message,
+						"thesis_title" => @thesis.title, "student_name" => @student.name } %>
+
+<%= @template.render( options ) %>

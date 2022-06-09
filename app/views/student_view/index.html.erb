@@ -1,0 +1,30 @@
+<% title "#{@student.name}" %>
+
+<% title_html do %>
+	<h4 class="blend soft">My ETD Submission</h4>
+	<h1><%= @student.name %></h1>
+<% end %>
+
+
+<div class="student-view">
+	<h3>Hello <%= @student.name %></h3>
+
+	<div class="fitted">
+		<p>Welcome to York University’s Electronic Thesis and Dissertation (ETD) application. This interface will enable to you to upload and submit your final approved thesis or dissertation to the Thesis Coordinator in the Faculty of Graduate Studies. Once your submission is approved and all requirements for graduation are met, your thesis or dissertation will be submitted to YorkSpace, York University's digital library of research outputs. </p>
+		<hr/>
+	</div>
+
+	<section class="theses fitted">
+			<% if @theses.size > 0 %>
+				<p>Select which thesis you want to work on:</p>
+				<% @theses.each do |thesis| %>
+					<h4 class="title clearfix" title="title">
+						<%= link_to thesis.title, student_view_thesis_process_path(thesis, Thesis::PROCESS_BEGIN) %>
+					</h4>
+				<% end %>
+			<% else %>
+				<p>Currently you do not have an open thesis or dissertation. Once you have successfully defended your oral exam, a Thesis Coordinator will open an ETD record for you and you will be notified by email, with instructions on how to submit.</p>
+			<% end %>
+
+	</section>
+</div>

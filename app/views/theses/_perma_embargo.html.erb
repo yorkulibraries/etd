@@ -1,0 +1,15 @@
+
+<% if @thesis.embargoed == true %>
+	<div class="control-group">
+		<label class="control-label">Permanent Embargo</label>
+		<div class="controls">
+			<p class="alert alert-danger fitted">This thesis has been permanently embargoed. It will not be published. </p>
+      <hr class="fitted"/>
+      <p><%= format @thesis.embargo, true, "Embargo explanation was not filled in..." %></p>
+		</div>
+	</div>
+<% elsif @thesis.embargoed == false && can?(:embargo, :student) %>	
+
+  <%= f.input :embargo,  input_html: { class: "span5", rows: "2" },
+		label: "Embargo Explanation", readonly: read_only_if_student("embargo")   %>
+<% end %>

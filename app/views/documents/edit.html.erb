@@ -1,0 +1,27 @@
+<% title "Update Thesis File" %>
+
+<% title_html do %>
+	<%= render partial: "students/header" %>
+<% end %>
+
+
+
+<h3 class="fitted">
+	<% if current_user.role == User::STUDENT %>
+		<%= link_to @thesis.title, student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD) %>
+	<% else %>
+		<%= link_to @thesis.title, student_thesis_path(@student, @thesis)  %>
+	<% end %>
+</h3>
+
+<br/>
+<h4>Update <%= @document.supplemental? ? " Supplemental" : "Primary" %> Thesis File </h4>
+<br/><br/>
+<%= render 'form' %>
+
+
+<div class="fitted">
+<%= link_to [@student, @thesis, @document], data: { confirm: 'Are you sure?' }, class: "red float-right", :method => :delete do %>
+	<i class="fa fa-trash"></i> Delete this file?
+<% end %>
+</div>

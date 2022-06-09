@@ -1,0 +1,33 @@
+<html>
+	<head>
+		<title><%= content_for?(:title) ? yield(:title) : "Untitled" %></title>
+	    <%= stylesheet_link_tag "application" %>
+	    <%= javascript_include_tag "application" %>
+	    <%= csrf_meta_tag %>
+	</head>
+	<body>
+		
+		 <div class="container">
+
+			<% flash.each do |name, msg| %>
+			  <div class="push-down"></div>
+			  <div class="alert alert-<%= name == :notice ? "success" : "error" %>">
+			    <a class="close" data-dismiss="alert">×</a>
+			    <%= msg %>
+			  </div>
+			<% end %>
+
+			<div class="page-header">
+		    	<%= content_tag :h1, yield(:title) if show_title? && !content_for?(:title_html) %>
+				<%= yield (:title_html) if content_for?(:title_html)%>	     
+		    </div>
+			<div class="row">
+				<div class="span12">									    					
+					<%= yield %>
+				</div>
+			
+			</div>
+		  	<section class="weak push-down">ETD - York University Libraries</section>	
+		  </div>
+	</body>
+</html>

@@ -1,0 +1,60 @@
+.documents {
+	margin-top: 10px;
+	
+	h6, h5, h3 { padding: 20px 0 10px 0; color: #2D76B8; }
+	h3 { font-size: 20px; margin-bottom: 10px; }
+	
+	.upload-file { max-width: 200px; margin-top: 20px; }
+	
+	
+	
+	.document {
+		padding: 0 0 10px 10px;
+		margin-bottom: 10px;
+	
+		
+		.thumb {
+			float: left;
+			width: 40px;
+			font-size: 50px;
+			line-height: 45px;
+
+		}
+		
+		.details {
+			padding: 2px 0 0 10px;
+			float: left;
+			overflow: hidden;			
+			max-width: 600px;
+			
+			p.name {
+				font-size: 18px;
+				font-weight: bold;
+				color: black;
+				margin: 0;
+				margin-bottom: 5px;
+				line-height: 20px;
+				
+				&.suplemental { color: #444; font-size: 16px; margin-bottom: 2px; }
+				
+				a { 
+					color: inherit;
+					&:hover { text-decoration: underline; }
+				}
+				
+				
+			}
+			
+			p.file_path { 
+				font-size: 14px;
+				width: 700px;
+				
+				a.download {
+					font-size: 12px;
+					font-weight: normal;
+					color: #0047B3;
+				}
+			}
+		}
+	}
+}

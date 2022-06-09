@@ -1,0 +1,10 @@
+<% title "Gem Record Search" %>
+
+<% if @student_not_found %>
+	Student Was Not Found <%= params[:sisid]%>
+<% else %>
+	Search For Student in GEM
+	<form method="get" action="<%= gem_search_students_path %>">
+		<input type="text" placeholder="Enter SISID ..." name="sisid"/>
+	</form>
+<% end %>

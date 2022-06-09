@@ -1,0 +1,27 @@
+<div class="modal" id="new_export_log" style="width: 660px;">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>DSpace Export</h3>
+  </div>
+  <%= simple_form_for @export_log, html: { remote: true } do |f| %>
+    <div class="modal-body">
+      <%= f.input :published_date, collection: publish_on_dates %>
+      <div class="row">
+        <div class="span3">
+          <p class="trivial">The following options are for advance users, leave them unchanged unless you are sure of their use</p>
+          <%= f.input :production_export, as: :boolean, boolean_style: :inline, label: "Export To Production Server?" %>
+        </div>
+        <div class="span3">
+          <%= f.input :complete_thesis, as: :boolean, boolean_style: :inline, label: "Complete Submission?" %>
+          <%= f.input :publish_thesis, as: :boolean, boolean_style: :inline, label: "Change status to published?" %>
+        </div>
+      </div>
+
+
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+      <%= f.button :submit, "Queue Up Export", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

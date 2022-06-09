@@ -1,0 +1,7 @@
+ $("#thesis_list").html("<%= j render partial: "thesis_list" %>");
+ $("#date_nav li").removeClass("active");
+
+$("#date_nav li[data-date='<%= @date == nil ? "nil" : @date %>']").addClass("active");
+
+
+$(".reports").tablesorter();

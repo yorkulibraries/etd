@@ -1,0 +1,21 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: "Thesis") do |sheet|
+  sheet.add_row ["SSID", "Student Name","Thesis", "Publish Date", "Exam Date", "Returned Date", "Assigned To"]
+
+
+  @theses.each do |thesis|
+    s = thesis.student != nil ? thesis.student : Student.new
+    pd = thesis.published_date != nil ? thesis.published_date.strftime("%b %d, %Y") : "No Date"
+    ed = thesis.exam_date != nil ? thesis.exam_date.strftime("%b %d, %Y") : "No Date"
+    rd = thesis.returned_at != nil ? thesis.returned_at.strftime("%b %d, %Y") : "No Date"
+    as = thesis.assigned_to != nil ? thesis.assigned_to.name : "Unassigned"
+
+    sheet.add_row [s.sisid, s.name, thesis.title, pd, ed, rd, as]
+  end
+
+  sheet.add_row []
+  sheet.add_row []
+  sheet.add_row []
+  sheet.add_row [ "Publish Date:", @date ]
+
+end

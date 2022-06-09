@@ -1,0 +1,4 @@
+$("#add_committee_member").remove();
+$("body").append("<div class='modal hide fade' id='add_committee_member'></div>");
+$("#add_committee_member").append("<%= j render "form" %>");
+$("#add_committee_member").modal('show');

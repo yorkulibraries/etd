@@ -1,0 +1,51 @@
+<% title "#{@student.name}" %>
+
+<% title_html do %>
+	<h4 class="blend soft">My ETD Submission</h4>
+	<h1><%= @student.name %></h1>
+<% end %>
+
+<%= progress_bar (Thesis::PROCESS_SUBMIT) %>
+
+
+<div class="student-view fitted submit">
+	<h3><%= @thesis.title %></h3>
+	<p>By completing this form, you are confirming that your thesis/dissertation is your original work, that your thesis/dissertation does not infringe on any rights of others and that you have the right to make the grant conferred by this copyright license.</p>
+
+	<p>Once you accept and send for review, you will not be able to make further changes and your submission will be reviewed by a Thesis Coordinator in the Faculty of Graduate Studies. You will receive an email notifying you of one of two outcomes: </p>
+	<ol>
+		<li>Your submission has been approved and will be deposited in YorkSpace, York University's Institutional Repository, upon conferral of your degree.</li>
+		<li>Your submission has formatting or other errors and has been returned to you for modification. In this case, your ETD record will be reopened to enable you to make the required changes and resubmit.</li>
+	</ol>
+
+	<div class="well">
+		<h4>Non-Exclusive License to York University</h4>
+
+		<p>In the interests of facilitating research and contributing to scholarship at York University (“York”) and elsewhere, the author (“Author”) hereby grants to York a non-exclusive, royalty free and irrevocable license on the following terms:</p>
+
+		<ol>
+			<li>York is permitted to reproduce, copy, store, archive, distribute, translate, publish and loan  to the public the Author’s thesis or dissertation, including the abstract and metadata  (“the Work”), in whole or in part, anywhere in the world, for non-commercial purposes, in any format and in any medium.  Distribution may be in any form, including, but not limited to, the right to transmit or publish the Work through the Internet or any other telecommunications device; to digitize, photocopy and microfiche the Work; or through library, interlibrary and public loans.  York is permitted to sub-license or assign any of the rights mentioned in this agreement to third party agents to act on York's behalf.</li>
+			<li>York may keep more than one copy of the Work and convert the Work from its original format into any medium or format for the purposes of security, back-up, and preservation or to facilitate the exercise of York’s rights under this license.</li>
+			<li>York may collect cost-recovery fees for reproducing or otherwise making the Work available.</li>
+			<li>The Author confirms that the Work is the approved and final version, in whole and without alteration, submitted to the Faculty of Graduate Studies, York University, as a requirement of the York degree program. </li>
+			<li>The Author confirms that the Work is their original work, that they have the right and authority to grant the rights set out in this license and that the Work does not infringe copyright or other intellectual property rights of any other person or institution.  If the Work contains material to which the Author does not hold copyright it is clearly identified and acknowledged. Copyright–protected material not in the public domain is included either under the "fair dealing" provisions of the Copyright Act (Canada) or the Author has obtained and retained copies of written permission from the copyright holder(s) to include the material and to grant to York the rights set out in this license.</li>
+			<li>York will clearly identify the Author as the copyright holder of the Work and will not make any alteration, other than as allowed by this license, to the Work. All copies of the Work will include a statement to the effect that the copy is being made available in this form by authority of the Author and copyright owner solely for the purpose of private study and research and may not be copied, further distributed or altered for any purpose, except as permitted by copyright law, without written authority from the Author. </li>
+			<li>A nonexclusive license in no way limits the Author as the copyright holder in making other nonexclusive uses of the Work. The Author otherwise retains all rights in the Work subject to the nonexclusive grants and conditions of this license and accordingly holds sole responsibility for complying with copyright and other legal requirements.</li>
+			<li>The Author agrees that York is not responsible for any misuse of the Work by third parties who access the Work through YorkSpace, York's Institutional Repository. </li>
+			<li>I have reviewed and agree to accept the conditions and regulations of the Faculty of Graduate Studies as outlined in the Thesis and Dissertation Handbook.</li>
+		</ol>
+
+		<hr/>
+		<h4>	<%= Date.today.strftime("%B %d, %Y")%></h4>
+
+
+		<div class="process-nav">
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn back" title="Review Thesis Details">
+				<i class="fa fa-angle-double-left"></i></a>
+
+			<%= link_to "I accept and send for review", submit_for_review_student_thesis_path(@current_user, @thesis), method: :post, title: "Accept and send for review",
+			 	class: "next-btn send", data: { confirm: "Are you sure? You will not be able to make further changes." } %></div>
+		</div>
+
+
+</div>
