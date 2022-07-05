@@ -5,7 +5,7 @@ gem 'rack', '2.0.9'
 gem 'rails', '6.1'
 
 ## DATABASES ##
-gem 'mysql2', '0.5.3'
+gem 'mysql2', '0.5.3', group: :production
 
 ## CSS AND JAVASCRIPT ##
 gem 'coffee-rails', '~> 4.2'
@@ -27,7 +27,7 @@ gem 'twitter-bootstrap-rails', '2.2.8'
 gem 'audited', '~> 4.7'
 
 ## APP SETTINGS ##
-gem 'rails-settings-cached' # , "0.4.1"
+gem 'rails-settings-cached', '~> 0.5.0'
 
 ## EXCEPTION NOTIFICATIONS ##
 gem 'exception_notification', '~> 4.4', '>= 4.4.1'
@@ -67,7 +67,7 @@ group :development do
 end
 
 group :development, :test do
-  gem 'sqlite3', '~> 1.3.13'
+  gem 'sqlite3'
 end
 
 group :test do

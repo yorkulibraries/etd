@@ -1,6 +1,5 @@
 FactoryGirl.define do
   factory :user do
-
     username { FactoryGirl.generate(:random_username) }
     name { FactoryGirl.generate(:random_name) }
     email { FactoryGirl.generate(:random_email) }
@@ -8,5 +7,4 @@ FactoryGirl.define do
     role User::STAFF
     blocked false
   end
-  
 end

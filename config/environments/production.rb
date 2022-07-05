@@ -99,7 +99,7 @@ Rails.application.configure do
 
   # set delivery method to :smtp, :sendmail or :test
   config.action_mailer.delivery_method = :sendmail
-  config.action_mailer.default_url_options = { :host => "etd.library.yorku.ca" }
+  config.action_mailer.default_url_options = { host: 'etd.library.yorku.ca' }
   # Inserts middleware to perform automatic connection switching.
   # The `database_selector` hash is used to pass options to the DatabaseSelector
   # middleware. The `delay` is used to determine how long to wait after a write

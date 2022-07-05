@@ -3,13 +3,12 @@ class Theses::EmbargoController < ApplicationController
   before_action :load_student_and_thesis
 
   def create
-
     @thesis.embargo = params[:thesis][:embargo]
 
     if @thesis.embargo.blank?
-      @thesis.errors.add(:embargo, "Please fill in the reason for embargo")
+      @thesis.errors.add(:embargo, 'Please fill in the reason for embargo')
     else
-      
+
       @thesis.embargoed = true
       @thesis.embargoed_by = current_user
       @thesis.embargoed_at = Date.today
@@ -24,6 +23,7 @@ class Theses::EmbargoController < ApplicationController
   end
 
   private
+
   def load_student_and_thesis
     @student = Student.find(params[:student_id])
     @thesis = @student.theses.find(params[:thesis_id])

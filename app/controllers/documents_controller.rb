@@ -9,7 +9,7 @@ class DocumentsController < ApplicationController
   def deleted
     @documents = @thesis.documents.deleted.oldest
     @deleted_documents = true
-    render "index"
+    render 'index'
   end
 
   def show
@@ -20,18 +20,19 @@ class DocumentsController < ApplicationController
     @document = @thesis.documents.build
   end
 
-  def create    
+  def create
     @document = @thesis.documents.new(document_params)
     @document.thesis = @thesis
     @document.user = current_user
     @document.audit_comment = "Document was uploaded. File: #{@document.name}"
 
     if @document.save
-        if current_user.role == User::STUDENT
-          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), notice: "Successfully created document"
-        else
-         redirect_to [@student, @thesis], notice: "Successfully created document."
-        end
+      if current_user.role == User::STUDENT
+        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
+                    notice: 'Successfully created document'
+      else
+        redirect_to [@student, @thesis], notice: 'Successfully created document.'
+      end
     else
       respond_to do |format|
         format.html { render action: 'new' }
@@ -50,12 +51,13 @@ class DocumentsController < ApplicationController
     @document.audit_comment = "Document was updated. File: #{@document.name}"
     if @document.update_attributes(document_params)
       if current_user.role == User::STUDENT
-        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), notice: "Successfully updated document"
+        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
+                    notice: 'Successfully updated document'
       else
-        redirect_to [@student, @thesis], :notice  => "Successfully updated document."
+        redirect_to [@student, @thesis], notice: 'Successfully updated document.'
       end
     else
-      render :action => 'edit'
+      render action: 'edit'
     end
   end
 
@@ -65,21 +67,21 @@ class DocumentsController < ApplicationController
     @document.destroy
 
     if current_user.role == User::STUDENT
-      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), notice: "Successfully deleted the document"
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
+                  notice: 'Successfully deleted the document'
     else
-      redirect_to student_thesis_url(@student, @thesis), :notice => "Successfully deleted the document."
+      redirect_to student_thesis_url(@student, @thesis), notice: 'Successfully deleted the document.'
     end
   end
 
   private
+
   def load_student_and_thesis
     @student = Student.find(params[:student_id])
     @thesis = @student.theses.find(params[:thesis_id])
-
   end
 
   def document_params
     params.require(:document).permit(:supplemental, :name, :file)
   end
-
 end

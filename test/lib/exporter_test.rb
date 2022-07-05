@@ -1,8 +1,7 @@
 require 'test_helper'
-require "etd/exporter"
+require 'etd/exporter'
 
 class ExporterTest < ActiveSupport::TestCase
-
   # should "connect to server or throw an error if can't" do
   #   exporter = ETD::Exporter.new
   #
@@ -122,5 +121,4 @@ class ExporterTest < ActiveSupport::TestCase
   #   assert receipt.instance_of?(Sword2Ruby::DepositReceipt), "Should be an instance Deposit Receipt"
   #
   # end
-
 end
