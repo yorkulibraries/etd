@@ -13,7 +13,7 @@ gem 'jquery-rails' # "4.0.5"
 gem 'jquery-tablesorter' # , "1.21.1"
 gem 'jquery-ui-rails' # "5.0.5"
 gem 'sass-rails' # '~> 4.0.0'
-gem 'therubyracer', platforms: :ruby
+gem 'therubyracer'
 gem 'uglifier' # , '>= 1.3.0'
 
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
