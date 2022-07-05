@@ -49,7 +49,7 @@ class DocumentsController < ApplicationController
   def update
     @document = @thesis.documents.find(params[:id])
     @document.audit_comment = "Document was updated. File: #{@document.name}"
-    if @document.update_attributes(document_params)
+    if @document.update(document_params)
       if current_user.role == User::STUDENT
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
                     notice: 'Successfully updated document'

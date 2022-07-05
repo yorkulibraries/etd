@@ -125,7 +125,7 @@ class StudentsController < ApplicationController
 
     @student.audit_comment = 'Updating student details.'
 
-    if @student.update_attributes(student_params)
+    if @student.update(student_params)
       redirect_to @student, notice: 'Successfully updated student.'
     else
       render action: 'edit'

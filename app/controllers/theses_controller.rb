@@ -70,7 +70,7 @@ class ThesesController < ApplicationController
 
     # params[:thesis] = params[:thesis].reject { |p| Student::IMMUTABLE_THESIS_FIELDS.include?(p) } if current_user.role == User::STUDENT
     ## Need to check if thesis params are empty or not, if they are -> don't update
-    if @thesis.update_attributes(thesis_params)
+    if @thesis.update(thesis_params)
 
       if current_user.role == User::STUDENT
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
