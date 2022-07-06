@@ -28,7 +28,7 @@ gem 'twitter-bootstrap-rails', '2.2.8'
 gem 'audited', '~> 5.0'
 
 ## APP SETTINGS ##
-gem 'rails-settings-cached', '0.4.1'
+gem 'rails-settings-cached', '~> 2.8', '>= 2.8.2'
 
 ## EXCEPTION NOTIFICATIONS ##
 gem 'exception_notification', '~> 4.4', '>= 4.4.1'
@@ -57,7 +57,6 @@ gem 'zip-zip', '~> 0.3'
 
 group :development do
   gem 'bullet', '5.2.0' # Testing SQL queries
-  gem 'faker'
   gem 'nifty-generators', '0.4.6'
   gem 'populator', git: 'https://github.com/ryanb/populator.git'
   gem 'rack-livereload'
@@ -71,6 +70,7 @@ group :development, :test do
 end
 
 group :test do
+  gem 'faker'
   gem 'capybara', '2.1.0'
   gem 'database_cleaner', '1.5.2'
   gem 'factory_girl_rails', '4.5.0'
