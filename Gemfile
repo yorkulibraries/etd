@@ -58,7 +58,6 @@ gem 'zip-zip', '~> 0.3'
 group :development do
   gem 'bullet', '5.2.0' # Testing SQL queries
   gem 'faker'
-  gem 'guard-livereload', require: false
   gem 'nifty-generators', '0.4.6'
   gem 'populator', git: 'https://github.com/ryanb/populator.git'
   gem 'rack-livereload'
@@ -66,6 +65,8 @@ group :development do
 end
 
 group :development, :test do
+  gem 'guard-bundler', '~> 3.0'
+  gem 'guard-livereload', require: false
   gem 'sqlite3'
 end
 
