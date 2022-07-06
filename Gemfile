@@ -1,8 +1,8 @@
 source 'http://rubygems.org'
 
-gem 'rack', '2.0.9'
+gem 'rack', '2.2.3.1'
 
-gem 'rails', '~> 6.1', '>= 6.1.6'
+gem 'rails', '~> 7.0', '>= 7.0.3'
 
 ## DATABASES ##
 gem 'mysql2', '0.5.3', group: :production
@@ -28,10 +28,10 @@ gem 'simple_form' # , "3.2.1"
 gem 'twitter-bootstrap-rails', '2.2.8'
 
 ## AUDITS ##
-gem 'audited', '~> 4.7'
+gem 'audited', '~> 5.0'
 
 ## APP SETTINGS ##
-gem 'rails-settings-cached', '~> 0.5.0'
+gem 'rails-settings-cached', '0.4.1'
 
 ## EXCEPTION NOTIFICATIONS ##
 gem 'exception_notification', '~> 4.4', '>= 4.4.1'
@@ -52,10 +52,10 @@ gem 'unicode' # , "0.4.4"
 gem 'validates_timeliness', '4.0.2'
 
 ## EXEL EXPORT ##
-gem 'axlsx' # , "2.0.0"
-gem 'axlsx_rails' # , "0.1.5"
+gem 'axlsx', git: 'https://github.com/randym/axlsx.git'
+gem 'axlsx_rails', '0.5.1'
 gem 'roo' # , "1.13.2"
-gem 'zip-zip', '0.3'
+gem 'zip-zip', '~> 0.3'
 
 ## TESTING && DEVELOPMENT ##
 
@@ -83,9 +83,9 @@ group :test do
   gem 'mocha', '0.14', require: false
   gem 'rails-controller-testing', '~> 1.0', '>= 1.0.5'
   gem 'ruby-prof'
-  gem 'shoulda' # , "3.5"
+  # gem 'shoulda' # , "3.5"
   gem 'shoulda-context'
-  gem 'shoulda-matchers'
+  gem 'shoulda-matchers', '~> 5.1'
   gem 'spring' # , "1.3.6"
   gem 'webrat', '0.7.3'
 end
