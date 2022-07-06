@@ -13,17 +13,14 @@ gem 'jquery-rails' # "4.0.5"
 gem 'jquery-tablesorter' # , "1.21.1"
 gem 'jquery-ui-rails' # "5.0.5"
 gem 'sass-rails' # '~> 4.0.0'
-
-gem 'mini_racer', "0.6.2"
-gem 'execjs'
+gem 'therubyracer'
 
 gem 'uglifier' # , '>= 1.3.0'
 
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
-gem 'chosen-rails', '1.8.7'
-gem 'font-awesome-sass', '~> 5.13.0'
-# gem 'less-rails'
-gem "rexml"
+gem 'chosen-rails', '~> 1.10'
+gem 'font-awesome-sass', '~> 6.1', '>= 6.1.1'
+gem 'less-rails', '~> 5.0'
 gem 'simple_form' # , "3.2.1"
 gem 'twitter-bootstrap-rails', '2.2.8'
 
@@ -43,7 +40,6 @@ gem 'sword2ruby', git: 'https://github.com/yorkulcs/sword2ruby.git'
 gem 'json' # , '1.8.3'
 gem 'kaminari' # , "0.17.0"
 gem 'nokogiri' # , '1.6.7.2'
-# gem "cancan", "1.6.10"
 gem 'cancancan', '1.16.0'
 gem 'carrierwave', '1.3.1'
 gem 'liquid' # , '3.0.6'
@@ -63,7 +59,6 @@ group :development do
   gem 'bullet', '5.2.0' # Testing SQL queries
   gem 'faker'
   gem 'guard-livereload', require: false
-  gem 'mailcatcher' # FOR TESTING MAIL. Run mailcatcher, then go to localhost:1080
   gem 'nifty-generators', '0.4.6'
   gem 'populator', git: 'https://github.com/ryanb/populator.git'
   gem 'rack-livereload'

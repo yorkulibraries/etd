@@ -1,3 +1,4 @@
+require 'app_settings'
 ## GENERAL
 
 if ActiveRecord::Base.connection.data_source_exists? 'settings'
