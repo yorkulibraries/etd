@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 
 gem 'rack', '2.0.9'
 
-gem 'rails', '6.1'
+gem 'rails', '~> 6.1', '>= 6.1.6'
 
 ## DATABASES ##
 gem 'mysql2', '0.5.3', group: :production
@@ -13,13 +13,17 @@ gem 'jquery-rails' # "4.0.5"
 gem 'jquery-tablesorter' # , "1.21.1"
 gem 'jquery-ui-rails' # "5.0.5"
 gem 'sass-rails' # '~> 4.0.0'
-gem 'therubyracer'
+
+gem 'mini_racer', "0.6.2"
+gem 'execjs'
+
 gem 'uglifier' # , '>= 1.3.0'
 
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
 gem 'chosen-rails', '1.8.7'
 gem 'font-awesome-sass', '~> 5.13.0'
-gem 'less-rails'
+# gem 'less-rails'
+gem "rexml"
 gem 'simple_form' # , "3.2.1"
 gem 'twitter-bootstrap-rails', '2.2.8'
 
