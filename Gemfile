@@ -37,12 +37,12 @@ gem 'exception_notification', '~> 4.4', '>= 4.4.1'
 gem 'sword2ruby', git: 'https://github.com/yorkulcs/sword2ruby.git'
 
 ## OTHER TOOLS AND UTILITIES ##
-gem 'json' # , '1.8.3'
-gem 'kaminari' # , "0.17.0"
-gem 'nokogiri' # , '1.6.7.2'
 gem 'cancancan', '1.16.0'
 gem 'carrierwave', '1.3.1'
+gem 'json' # , '1.8.3'
+gem 'kaminari' # , "0.17.0"
 gem 'liquid' # , '3.0.6'
+gem 'nokogiri' # , '1.6.7.2'
 gem 'rubyzip', '~> 1.2.2'
 gem 'unicode' # , "0.4.4"
 gem 'validates_timeliness', '4.0.2'
@@ -70,16 +70,16 @@ group :development, :test do
 end
 
 group :test do
-  gem 'faker'
+  gem 'byebug'
   gem 'capybara', '2.1.0'
   gem 'database_cleaner', '1.5.2'
   gem 'factory_girl_rails', '4.5.0'
+  gem 'faker'
   gem 'guard-minitest', '2.4.4'
   gem 'minitest', '5.6.1'
   gem 'mocha', '0.14', require: false
   gem 'rails-controller-testing', '~> 1.0', '>= 1.0.5'
   gem 'ruby-prof'
-  # gem 'shoulda' # , "3.5"
   gem 'shoulda-context'
   gem 'shoulda-matchers', '~> 5.1'
   gem 'spring' # , "1.3.6"

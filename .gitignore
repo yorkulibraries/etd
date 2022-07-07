@@ -18,3 +18,4 @@ yarn.lock
 .bundle
 lib/tasks/gem_records.txt
 app_settings.yml
+.byebug_history
