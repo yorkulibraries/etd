@@ -1,3 +1,7 @@
+# encoding: ASCII-8BIT   # make sure this runs in binary mode
+# frozen_string_literal: false
+
+# some of the comments are in UTF-8
 ENV['RAILS_ENV'] = 'test'
 require File.expand_path('../config/environment', __dir__)
 require 'rails/test_help'
