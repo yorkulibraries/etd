@@ -27,7 +27,7 @@ class DocumentsControllerTest < ActionController::TestCase
       documents = assigns(:documents)
       assert_equal 3, documents.size, 'There are three documents here'
 
-      get :show, params: { id: document.id,  thesis_id: @thesis.id, student_id: @student.id }
+      get :show, params: { id: document.id, thesis_id: @thesis.id, student_id: @student.id }
       d = assigns(:document)
       assert_equal d.id, document.id, 'Should find the proper document'
 
@@ -87,8 +87,8 @@ class DocumentsControllerTest < ActionController::TestCase
       thesis = create(:thesis)
       user = create(:user)
       assert_difference 'Document.count' do
-        post :create,  params: { thesis_id: @thesis.id, student_id: @student.id,
-                                 document: attributes_for(:document, thesis: thesis, user: user) }
+        post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
+                                document: attributes_for(:document, thesis: thesis, user: user) }
       end
       document = assigns(:document)
 
@@ -97,11 +97,11 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     should 'update attachments' do
-      d = create(:document, file: fixture_file_upload('files/document-microsoft.doc', 'application/text'),
+      d = create(:document, file: fixture_file_upload('document-microsoft.doc', 'application/text'),
                             thesis: @thesis)
 
       post :update, params: { id: d.id, thesis_id: @thesis.id, student_id: @student.id,
-                              document: { file: fixture_file_upload('files/html-document.html', 'text/html') } }
+                              document: { file: fixture_file_upload('html-document.html', 'text/html') } }
       document = assigns(:document)
 
       assert_equal "/uploads/theses/#{@thesis.id}/files/#{d.id}/html-document.html", document.file.url,
@@ -151,13 +151,14 @@ class DocumentsControllerTest < ActionController::TestCase
       get :new, params: { thesis_id: thesis.id, student_id: @student.id }
       assert_redirected_to unauthorized_url
 
-      post :update, params: { thesis_id: thesis.id, student_id: @student.id, id:
-        document.id, document: { file: fixture_file_upload('files/html-document.html', 'text/html') } }
+      post :update,
+           params: { thesis_id: thesis.id, student_id: @student.id, id: document.id,
+                     document: { file: fixture_file_upload('files/html-document.html', 'text/html') } }
       assert_redirected_to unauthorized_url
     end
 
     should 'be able to upload another primary file if there is a primary file' do
-      d = create(:document, file: fixture_file_upload('files/document-microsoft.doc', 'application/text'),
+      d = create(:document, file: fixture_file_upload('document-microsoft.doc', 'application/text'),
                             thesis: @thesis, supplemental: false)
       assert_no_difference 'Document.count' do
         post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
@@ -182,17 +183,17 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     should 'update file and redirect to student thesis view' do
-      d = create(:document, file: fixture_file_upload('files/document-microsoft.doc', 'application/text'),
+      d = create(:document, file: fixture_file_upload('document-microsoft.doc', 'application/text'),
                             thesis: @thesis)
       post :update, params: { id: d.id, thesis_id: @thesis.id, student_id: @student.id,
-                              document: { file: fixture_file_upload('files/html-document.html', 'text/html') } }
+                              document: { file: fixture_file_upload('html-document.html', 'text/html') } }
 
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
                            'Should redirect to student view upload process path'
     end
 
     should 'destroy file and redirect to studet thesis view' do
-      d = create(:document, file: fixture_file_upload('files/document-microsoft.doc', 'application/text'),
+      d = create(:document, file: fixture_file_upload('document-microsoft.doc', 'application/text'),
                             thesis: @thesis)
       post :destroy, params: { id: d.id, thesis_id: @thesis.id, student_id: @student.id }
 

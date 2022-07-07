@@ -37,7 +37,7 @@ class DocumentTest < ActiveSupport::TestCase
 
   should 'upload non-image files without complaining' do
     d = build(:document, file: nil)
-    d.file = fixture_file_upload('files/html-document.html', 'text/html')
+    d.file = fixture_file_upload('html-document.html', 'text/html')
 
     assert d.save, 'Should save this properly'
     assert_equal "/uploads/theses/#{d.thesis.id}/files/#{d.id}/html-document.html", d.file.url,
@@ -46,9 +46,7 @@ class DocumentTest < ActiveSupport::TestCase
 
   should 'update the file when it changes' do
     d = create(:document)
-
-    d.file = fixture_file_upload('files/html-document.html', 'text/html')
-
+    d.file = fixture_file_upload('html-document.html', 'text/html')
     assert d.save, "should save properly #{d.errors.inspect}"
 
     assert_equal "/uploads/theses/#{d.thesis.id}/files/#{d.id}/html-document.html", d.file.url
@@ -73,11 +71,11 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   should 'tell if file is image or not' do
-    d = create(:document, file: fixture_file_upload('files/html-document.html', 'text/html'))
+    d = create(:document, file: fixture_file_upload('html-document.html', 'text/html'))
 
     assert !d.image?, 'Should not be an image'
 
-    d = create(:document, file: fixture_file_upload('files/image-example.jpg', 'image/jpg'))
+    d = create(:document, file: fixture_file_upload('image-example.jpg', 'image/jpg'))
 
     assert d.image?, 'This one should be an image'
   end
