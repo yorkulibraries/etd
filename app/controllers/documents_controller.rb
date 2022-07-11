@@ -79,6 +79,7 @@ class DocumentsController < ApplicationController
   def load_student_and_thesis
     @student = Student.find(params[:student_id])
     @thesis = @student.theses.find(params[:thesis_id])
+    authorize! :update, @thesis
   end
 
   def document_params

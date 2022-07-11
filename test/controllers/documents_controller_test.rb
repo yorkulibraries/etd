@@ -153,7 +153,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
       post :update,
            params: { thesis_id: thesis.id, student_id: @student.id, id: document.id,
-                     document: { file: fixture_file_upload('files/html-document.html', 'text/html') } }
+                     document: { file: fixture_file_upload('html-document.html', 'text/html') } }
       assert_redirected_to unauthorized_url
     end
 
