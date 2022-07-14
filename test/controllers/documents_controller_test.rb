@@ -18,7 +18,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     should 'not load documents from other thesis on all actions' do
       thesis = create(:thesis)
-      create_list(:document, 10, thesis: thesis)
+      create_list(:document, 10, thesis:)
       create_list(:document, 2, thesis: @thesis)
       document = create(:document, thesis: @thesis)
 
@@ -88,7 +88,7 @@ class DocumentsControllerTest < ActionController::TestCase
       user = create(:user)
       assert_difference 'Document.count' do
         post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
-                                document: attributes_for(:document, thesis: thesis, user: user) }
+                                document: attributes_for(:document, thesis:, user:) }
       end
       document = assigns(:document)
 
@@ -135,24 +135,23 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     should 'not be able to edit or delete documents if thesis is not open' do
-      thesis = create(:thesis, student: @student, status: Thesis::UNDER_REVIEW)
-      document = create(:document, thesis: thesis)
+      document = create(:document, thesis: create(:thesis, student: @student, status: Thesis::UNDER_REVIEW))
       ability = Ability.new(@student)
       assert ability.cannot?(:manage, document)
     end
 
     should 'not be able to got the new, edit, update or delete pages' do
-      thesis = create(:thesis, student: @student, status: Thesis::UNDER_REVIEW)
-      document = create(:document, thesis: thesis)
+      @thesis = create(:thesis, student: @student, status: Thesis::UNDER_REVIEW)
+      document = create(:document, thesis: @thesis)
 
-      get :edit, params: { thesis_id: thesis.id, student_id: @student.id, id: document.id }
+      get :edit, params: { thesis_id: @thesis.id, id: document.id, student_id: @student.id }
       assert_redirected_to unauthorized_url
 
-      get :new, params: { thesis_id: thesis.id, student_id: @student.id }
+      get :new, params: { thesis_id: @thesis.id, student_id: @student.id }
       assert_redirected_to unauthorized_url
 
       post :update,
-           params: { thesis_id: thesis.id, student_id: @student.id, id: document.id,
+           params: { thesis_id: @thesis.id, student_id: @student.id, id: document.id,
                      document: { file: fixture_file_upload('html-document.html', 'text/html') } }
       assert_redirected_to unauthorized_url
     end
