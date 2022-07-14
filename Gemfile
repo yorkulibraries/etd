@@ -45,7 +45,7 @@ gem 'nokogiri' # , '1.6.7.2'
 gem 'rexml', '~> 3.2', '>= 3.2.5'
 gem 'rubyzip', '~> 1.2.2'
 gem 'unicode' # , "0.4.4"
-gem 'validates_timeliness', '~> 5.0'
+gem 'validates_timeliness', github: 'mitsuru/validates_timeliness', branch: 'rails7'
 
 ## EXEL EXPORT ##
 gem 'axlsx', git: 'https://github.com/randym/axlsx.git'
