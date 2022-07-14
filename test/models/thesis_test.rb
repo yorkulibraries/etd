@@ -14,14 +14,11 @@ class ThesisTest < ActiveSupport::TestCase
     assert !build(:thesis, title: nil).valid?, 'Title for thesis must be present'
     assert !build(:thesis, author: nil).valid?, "Author's name must be filled in"
     assert !build(:thesis, supervisor: nil).valid?, "Supervisor's name must be present"
-
     assert !build(:thesis, degree_name: nil).valid?, 'Degree Name must be set'
     assert !build(:thesis, degree_level: nil).valid?, 'Degree Level should be present'
     assert !build(:thesis, program: nil).valid?, 'Program name must be present'
     assert !build(:thesis, exam_date: nil).valid?, 'Exam date is required'
-
     assert !build(:thesis, gem_record_event_id: nil).valid?, 'Gem Record Event ID must be present'
-
     assert !build(:thesis, published_date: '29302').valid?, 'Must be a valid date'
     assert !build(:thesis, exam_date: '#29302').valid?, 'Must be a valid date'
   end
@@ -56,11 +53,11 @@ class ThesisTest < ActiveSupport::TestCase
   end
 
   should 'delete associated documents if thesis is deleted' do
-    thesis = create(:thesis)
-    document = create(:document, thesis: thesis)
+    @thesis = create(:thesis)
+    document = create(:document, thesis: @thesis)
 
     assert_difference 'Document.count', -1 do
-      thesis.destroy
+      @thesis.destroy
     end
   end
 

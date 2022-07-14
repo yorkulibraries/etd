@@ -1,4 +1,13 @@
 GIT
+  remote: https://github.com/mitsuru/validates_timeliness.git
+  revision: f28a62589cc069d1d1f5dfd99e1749edca04cd68
+  branch: rails7
+  specs:
+    validates_timeliness (6.0.0.beta2)
+      activemodel (>= 6.0.0, < 7.1)
+      timeliness (>= 0.3.10, < 1)
+
+GIT
   remote: https://github.com/randym/axlsx.git
   revision: 8e7b4b3b7259103452c191f73ce0bf64f66033fe
   specs:
@@ -364,8 +373,6 @@ GEM
       execjs (>= 0.3.0, < 3)
     unicode (0.4.4.4)
     uniform_notifier (1.10.0)
-    validates_timeliness (5.0.0)
-      timeliness (>= 0.3.10, < 1)
     web-console (2.3.0)
       activemodel (>= 4.0)
       binding_of_caller (>= 0.7.2)
@@ -439,7 +446,7 @@ DEPENDENCIES
   twitter-bootstrap-rails (= 2.2.8)
   uglifier
   unicode
-  validates_timeliness (~> 5.0)
+  validates_timeliness!
   web-console (~> 2.0)
   webrat (= 0.7.3)
   zip-zip (~> 0.3)
