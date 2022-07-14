@@ -1,5 +1,5 @@
 source 'http://rubygems.org'
-
+ruby '3.1.2'
 gem 'rack', '2.2.3.1'
 
 gem 'rails', '~> 7.0', '>= 7.0.3'
@@ -20,7 +20,7 @@ gem 'uglifier' # , '>= 1.3.0'
 gem 'chosen-rails', '~> 1.10'
 gem 'font-awesome-sass', '~> 6.1', '>= 6.1.1'
 # gem 'less-rails', '~> 5.0'
-gem 'simple_form' # , "3.2.1"
+gem 'simple_form', '4.0.0'
 gem 'twitter-bootstrap-rails', '2.2.8'
 
 ## AUDITS ##
@@ -36,7 +36,7 @@ gem 'exception_notification', '~> 4.4', '>= 4.4.1'
 gem 'sword2ruby', git: 'https://github.com/yorkulcs/sword2ruby.git'
 
 ## OTHER TOOLS AND UTILITIES ##
-gem 'cancancan', '1.16.0'
+gem 'cancancan', '~> 3.4'
 gem 'carrierwave', '~> 2.2', '>= 2.2.2'
 gem 'json' # , '1.8.3'
 gem 'kaminari' # , "0.17.0"
@@ -45,7 +45,7 @@ gem 'nokogiri' # , '1.6.7.2'
 gem 'rexml', '~> 3.2', '>= 3.2.5'
 gem 'rubyzip', '~> 1.2.2'
 gem 'unicode' # , "0.4.4"
-gem 'validates_timeliness', '4.0.2'
+gem 'validates_timeliness', '~> 5.0'
 
 ## EXEL EXPORT ##
 gem 'axlsx', git: 'https://github.com/randym/axlsx.git'
