@@ -12,14 +12,14 @@ gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails' # "4.0.5"
 gem 'jquery-tablesorter' # , "1.21.1"
 gem 'jquery-ui-rails' # "5.0.5"
+gem 'mini_racer', '~> 0.6.2'
 gem 'sass-rails' # '~> 4.0.0'
-gem 'therubyracer'
 gem 'uglifier' # , '>= 1.3.0'
 
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
 gem 'chosen-rails', '~> 1.10'
 gem 'font-awesome-sass', '~> 6.1', '>= 6.1.1'
-gem 'less-rails', '~> 5.0'
+# gem 'less-rails', '~> 5.0'
 gem 'simple_form' # , "3.2.1"
 gem 'twitter-bootstrap-rails', '2.2.8'
 
@@ -37,11 +37,12 @@ gem 'sword2ruby', git: 'https://github.com/yorkulcs/sword2ruby.git'
 
 ## OTHER TOOLS AND UTILITIES ##
 gem 'cancancan', '1.16.0'
-gem 'carrierwave', '1.3.1'
+gem 'carrierwave', '~> 2.2', '>= 2.2.2'
 gem 'json' # , '1.8.3'
 gem 'kaminari' # , "0.17.0"
 gem 'liquid' # , '3.0.6'
 gem 'nokogiri' # , '1.6.7.2'
+gem 'rexml', '~> 3.2', '>= 3.2.5'
 gem 'rubyzip', '~> 1.2.2'
 gem 'unicode' # , "0.4.4"
 gem 'validates_timeliness', '4.0.2'
@@ -74,11 +75,11 @@ group :test do
   gem 'database_cleaner', '1.5.2'
   gem 'factory_girl_rails', '4.5.0'
   gem 'faker'
-  gem 'guard-minitest', '2.4.4'
+  gem 'guard-minitest', '2.4.6'
   gem 'minitest', '5.6.1'
   gem 'mocha', '0.14', require: false
   gem 'rails-controller-testing', '~> 1.0', '>= 1.0.5'
-  gem 'ruby-prof'
+  # gem 'ruby-prof'
   gem 'shoulda-context'
   gem 'shoulda-matchers', '~> 5.1'
   gem 'spring' # , "1.3.6"
