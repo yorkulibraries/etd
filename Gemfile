@@ -19,9 +19,7 @@ gem 'uglifier' # , '>= 1.3.0'
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
 gem 'chosen-rails', '~> 1.10'
 gem 'font-awesome-sass', '~> 6.1', '>= 6.1.1'
-# gem 'less-rails', '~> 5.0'
 gem 'simple_form', '4.0.0'
-gem 'twitter-bootstrap-rails', '2.2.8'
 
 ## AUDITS ##
 gem 'audited', '~> 5.0'
@@ -56,7 +54,7 @@ gem 'zip-zip', '~> 0.3'
 ## TESTING && DEVELOPMENT ##
 
 group :development do
-  gem 'bullet', '5.2.0' # Testing SQL queries
+  gem 'bullet', '~> 7.0', '>= 7.0.2'
   gem 'nifty-generators', '0.4.6'
   gem 'populator', git: 'https://github.com/ryanb/populator.git'
   gem 'rack-livereload'
@@ -79,7 +77,6 @@ group :test do
   gem 'minitest', '5.6.1'
   gem 'mocha', '0.14', require: false
   gem 'rails-controller-testing', '~> 1.0', '>= 1.0.5'
-  # gem 'ruby-prof'
   gem 'shoulda-context'
   gem 'shoulda-matchers', '~> 5.1'
   gem 'spring' # , "1.3.6"
