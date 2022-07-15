@@ -1,5 +1,4 @@
 class WordCountValidator < ActiveModel::EachValidator
-
   ## USAGE
   # validates :summary, maximum: 30, word_count: true
   # validates :about_author, minimum: 25, word_count: true
@@ -10,8 +9,9 @@ class WordCountValidator < ActiveModel::EachValidator
     minimum = options[:minimum]
     between = options[:in]
 
-    #puts "VALUE: #{value}"
+    # puts "VALUE: #{value}"
     return if value.blank?
+
     word_count = value.scan((/[\w-]+/)).size
 
     if maximum && maximum.is_a?(Integer) && word_count.to_i > maximum.to_i
