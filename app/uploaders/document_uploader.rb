@@ -1,7 +1,4 @@
-# encoding: utf-8
-
 class DocumentUploader < CarrierWave::Uploader::Base
-
   # Include RMagick or MiniMagick support:
   # include CarrierWave::RMagick
   # include CarrierWave::MiniMagick
@@ -39,5 +36,4 @@ class DocumentUploader < CarrierWave::Uploader::Base
   def move_to_store
     true
   end
-
 end
