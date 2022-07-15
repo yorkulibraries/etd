@@ -9,13 +9,13 @@ module LayoutHelper
   end
 
   def title_html(&block)
-     content_for(:title_html) do
-       yield block
-     end
-   end
-   
+    content_for(:title_html) do
+      yield block
+    end
+  end
+
   def progress_bar(which_to_activate)
-    render partial: "student_view/progress_bar", locals: { activate: which_to_activate }
+    render partial: 'student_view/progress_bar', locals: { activate: which_to_activate }
   end
 
   def show_title?
@@ -29,19 +29,18 @@ module LayoutHelper
   def javascript(*args)
     content_for(:head) { javascript_include_tag(*args) }
   end
-  
+
   def sidebar(&block)
-      content_for (:sidebar) do 
-          yield block
-      end 
-   end
-   
-   
-   def show_system_message
-     false
-   end
-   
-   def system_message
-     content_tag :h4, "We are upgrading. ETD will be unavailable today April 7, 2014 from 2:00 pm to 3:00 pm."
-   end
+    content_for(:sidebar) do
+      yield block
+    end
+  end
+
+  def show_system_message
+    false
+  end
+
+  def system_message
+    content_tag :h4, 'We are upgrading. ETD will be unavailable today April 7, 2014 from 2:00 pm to 3:00 pm.'
+  end
 end

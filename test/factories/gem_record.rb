@@ -1,5 +1,4 @@
 FactoryGirl.define do
-
   factory :gem_record do
     studentname   { FactoryGirl.generate(:random_name) }
     sisid         { FactoryGirl.generate(:random_student_id) }
@@ -13,5 +12,4 @@ FactoryGirl.define do
     superv        { FactoryGirl.generate(:random_name) }
     seqgradevent  { FactoryGirl.generate(:random_seqgradevent) }
   end
-  
 end

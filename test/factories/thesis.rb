@@ -3,7 +3,7 @@ FactoryGirl.define do
     gem_record_event_id { FactoryGirl.generate(:random_seqgradevent) }
 
     title { FactoryGirl.generate(:random_string) }
-    association :student, :factory => :student
+    association :student, factory: :student
     assigned_to nil
 
     author { FactoryGirl.generate(:random_name) }
@@ -25,6 +25,5 @@ FactoryGirl.define do
     status Thesis::OPEN
 
     embargoed false
-
   end
 end

@@ -22,7 +22,7 @@ class CommitteeMembersController < ApplicationController
       if @committee_member.save
         format.html { redirect_to student_thesis_path(@student, @thesis) }
       else
-        format.html { render action: "new" }
+        format.html { render action: 'new' }
       end
 
       format.js
@@ -40,6 +40,7 @@ class CommitteeMembersController < ApplicationController
   end
 
   private
+
   def committee_member_params
     params.require(:committee_member).permit(:first_name, :last_name, :role, :thesis_id)
   end

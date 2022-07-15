@@ -1,6 +1,5 @@
 class StudentViewController < ApplicationController
-  before_action :authorize_controller, :load_student, :except => :login_as_student
-
+  before_action :authorize_controller, :load_student, except: :login_as_student
 
   def index
     if @student.theses.count == 1
@@ -13,7 +12,7 @@ class StudentViewController < ApplicationController
 
   def thesis_process_router
     @which = params[:process_step]
-    @thesis =  @student.theses.find(params[:id])
+    @thesis = @student.theses.find(params[:id])
     @thesis.current_user = current_user
 
     if (@thesis.status != Thesis::OPEN && @thesis.status != Thesis::RETURNED) && @which != Thesis::PROCESS_REVIEW
@@ -22,23 +21,23 @@ class StudentViewController < ApplicationController
 
     case @which
     when Thesis::PROCESS_BEGIN
-      render template: "student_view/process/begin"
+      render template: 'student_view/process/begin'
     when Thesis::PROCESS_UPDATE
-      render template: "student_view/process/update"
+      render template: 'student_view/process/update'
     when Thesis::PROCESS_UPLOAD
       @primary_documents = @thesis.documents.not_deleted.primary
       @supplemental_documents = @thesis.documents.not_deleted.supplemental
-      render template: "student_view/process/upload"
+      render template: 'student_view/process/upload'
     when Thesis::PROCESS_REVIEW
       @primary_documents = @thesis.documents.not_deleted.primary
       @supplemental_documents = @thesis.documents.not_deleted.supplemental
-      render template: "student_view/process/review"
+      render template: 'student_view/process/review'
     when Thesis::PROCESS_SUBMIT
-      render template: "student_view/process/submit"
+      render template: 'student_view/process/submit'
     when Thesis::PROCESS_STATUS
-       render template: "student_view/process/status"
+      render template: 'student_view/process/status'
     else
-      render template: "student_view/process/status"
+      render template: 'student_view/process/status'
     end
   end
 
@@ -47,7 +46,7 @@ class StudentViewController < ApplicationController
   end
 
   def login_as_student
-   authorize! :login_as, :student
+    authorize! :login_as, :student
 
     @student = Student.find_by_id(params[:id])
     if @student
@@ -62,23 +61,22 @@ class StudentViewController < ApplicationController
       @student.audit_comment = "#{current_user.name} logged in as this student"
       @student.save(validate: false)
 
-
       redirect_to student_view_index_path
     else
-      redirect_to students_path,  alert: "No such student found"
+      redirect_to students_path, alert: 'No such student found'
     end
   end
 
   def logout_as_student
     student_id = current_user.id
-    session[:terms_accepted]  = nil
+    session[:terms_accepted] = nil
     session[:user_id] = session[:return_to_user_id]
     session[:return_to_user_id] = nil
     redirect_to student_path(student_id)
   end
 
-
   private
+
   def authorize_controller
     authorize! :show, :student
   end
@@ -86,6 +84,4 @@ class StudentViewController < ApplicationController
   def load_student
     @student = Student.find(current_user.id)
   end
-
-
 end
