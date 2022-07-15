@@ -1,12 +1,12 @@
 class HomeController < ApplicationController
   before_action :authorize_controller, except: :unauthorized
   skip_authorization_check
-  
+
   def index
     if current_user.is_a? Student
       redirect_to student_view_index_url
     else
-            
+
       case params[:which]
       when Thesis::UNDER_REVIEW
         @theses = Thesis.under_review
@@ -18,18 +18,17 @@ class HomeController < ApplicationController
         @theses = Thesis.open + Thesis.returned
         @which = Thesis::OPEN
       end
-      
-      
       render :index
     end
-  end  
-  
-  def unauthorized   
-    render layout: "simple"
   end
-  
+
+  def unauthorized
+    render layout: 'simple'
+  end
+
   private
+
   def authorize_controller
-      authorize! :show, :home
+    authorize! :show, :home
   end
 end

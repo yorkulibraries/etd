@@ -6,7 +6,7 @@ class CreateUsers < ActiveRecord::Migration[5.0]
       t.string :type
       t.string :email
       t.integer :created_by_id
-      t.boolean :blocked, :default => false
+      t.boolean :blocked, default: false
       t.string :role
       t.string :sisid
       t.timestamps

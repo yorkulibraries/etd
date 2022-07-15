@@ -14,13 +14,12 @@
 //= require jquery_ujs
 //= require jquery-ui
 //= require jquery-tablesorter
-//= require twitter/bootstrap
 //= require chosen-jquery
 //= require_self
 //= require_tree .
 
 
-$(document).ready(function() {
+$(document).ready(function () {
 	//$("input[placeholder], textarea[placeholder]").enablePlaceholder({"withPlaceholderClass": "light-text"});
 
 	$('.dropdown-toggle').dropdown();
@@ -30,10 +29,10 @@ $(document).ready(function() {
 
 
 	$('.theses .options a').click(function (e) {
-    	e.preventDefault();
-    	$(this).tab('show');
+		e.preventDefault();
+		$(this).tab('show');
 		$(".theses .options a").removeClass("active")
 		$(this).addClass("active")
-    })
+	})
 
 });

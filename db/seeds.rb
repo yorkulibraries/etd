@@ -7,9 +7,7 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 # admin user
 
-if Rails.env != 'test' and LocSubject.all.count == 0
-  LocSubject.load_from_file("lib/loc_subjects.txt")
-end
+LocSubject.load_from_file('lib/loc_subjects.txt') if Rails.env != 'test' and LocSubject.all.count == 0
 
 if Rails.env != 'test' and User.all.count == 0
   [User::ADMIN, User::MANAGER, User::STAFF].each do |role|

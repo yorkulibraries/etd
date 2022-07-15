@@ -1,15 +1,12 @@
 module ThesesHelper
-
-  def format(field, simple_format = false, message = "Not filled in...")
+  def format(field, simple_format = false, message = 'Not filled in...')
     # If field is blank, print out blank message
     if field.blank?
-      content_tag(:span, message, class: "empty-field")
+      content_tag(:span, message, class: 'empty-field')
+    elsif field.is_a? Date
+      field.strftime('%B %d, %Y')
     else
-      if field.is_a? Date
-        field.strftime("%B %d, %Y")
-      else
-        simple_format ? simple_format(field) : field
-      end
+      simple_format ? simple_format(field) : field
     end
   end
 
@@ -29,12 +26,11 @@ module ThesesHelper
     end
   end
 
-
   def publish_on_dates(start = 1.year)
-    dates = Array.new
+    dates = []
     ((Date.today - start)..(Date.today + 4.years)).each do |date|
       if (date.month == 11 || date.month == 7 || date.month == 3) && date.day == 1
-        dates.push([date.strftime("%b %e, %Y"), date.strftime("%Y-%m-%d")])
+        dates.push([date.strftime('%b %e, %Y'), date.strftime('%Y-%m-%d')])
       end
     end
 
