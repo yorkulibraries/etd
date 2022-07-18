@@ -34,6 +34,7 @@ gem 'exception_notification', '~> 4.4', '>= 4.4.1'
 gem 'sword2ruby', git: 'https://github.com/yorkulcs/sword2ruby.git'
 
 ## OTHER TOOLS AND UTILITIES ##
+gem 'devise', '~> 4.8', '>= 4.8.1'
 gem 'cancancan', '~> 3.4'
 gem 'carrierwave', '~> 2.2', '>= 2.2.2'
 gem 'json' # , '1.8.3'
