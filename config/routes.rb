@@ -29,6 +29,11 @@ Rails.application.routes.draw do
     # get :acquisition_requests
   end
 
+  devise_for :users
+  devise_scope :user do
+    get 'users/ppy_login', to: 'sessions#new'
+  end
+
   resources :users do
     get :activity, on: :member
     post :block, on: :member

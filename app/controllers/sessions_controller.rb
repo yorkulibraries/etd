@@ -1,38 +1,12 @@
 class SessionsController < ApplicationController
-  skip_authorization_check
+  before_action :authenticate_user!
 
   def new
-    if Rails.env.development?
-      @username = if params[:as].nil?
-                    User::ADMIN
-                  else
-                    params[:as]
-                  end
+    if current_user && current_user.is_a?(Student)
+      redirect_to student_view_index_url, notice: 'Logged In!'
+    elsif current_user
+      redirect_to root_url, notice: 'Logged in!'
     else
-      @username = request.headers['HTTP_PYORK_USER']
-      @username_alt = request.headers['HTTP_PYORK_CYIN']
-    end
-
-    users = User.active.where('username = ? OR sisid = ?', @username, @username_alt)
-    if users.size == 1
-
-      user = users.first
-
-      session[:user_id] = user.id
-      if user.is_a? Student
-
-        # update the username, if it is not set
-
-        if user.username == user.sisid && request.headers['HTTP_PYORK_USER']
-          user.update_attribute(:username, request.headers['HTTP_PYORK_USER'])
-        end
-
-        redirect_to student_view_index_url, notice: 'Logged In!'
-      else
-        redirect_to root_url, notice: 'Logged in!'
-      end
-    else
-
       redirect_to invalid_login_url, alert: 'Invalid username or password'
     end
   end
