@@ -19,6 +19,8 @@ class ActiveSupport::TestCase
 
   # Add more helper methods to be used by all tests here...
   include FactoryGirl::Syntax::Methods
+  include Warden::Test::Helpers
+  Warden.test_mode!
 end
 
 class ActionController::TestCase

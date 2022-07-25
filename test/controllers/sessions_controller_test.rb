@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class SessionsControllerTest < ActionController::TestCase
+  include Warden::Test::Helpers
+  include Devise::Test::ControllerHelpers
+
   should 'create a new session information if user logs in' do
     user = create(:user, username: 'test')
     @request.env['HTTP_PYORK_USER'] = user.username
@@ -53,7 +56,7 @@ class SessionsControllerTest < ActionController::TestCase
     @request.env['HTTP_PYORK_USER'] = 'invalid_user_name'
 
     get :new
-    assert_redirected_to invalid_login_url, 'Shold redirect to invalid login url'
+    assert_redirected_to invalid_login_url, 'Should redirect to invalid login url'
   end
 
   should 'destroy session information when logout is present' do
