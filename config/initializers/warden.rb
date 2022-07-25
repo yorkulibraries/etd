@@ -17,8 +17,13 @@ Warden::Strategies.add(:ppy_devise) do
 
   def authenticate!
     if valid?
-      resource = User.find_by('sisid = ? OR username = ?', request.headers[CAS_UID], request.headers[CAS_USERNAME])
-      success!(resource)
+      resource = User.find_by('sisid = ? OR username = ?', request.headers[CAS_UID],
+                              request.headers[CAS_USERNAME])
+      if resource.present?
+        success!(resource)
+      else
+        fail!('Missing ppy headers')
+      end
     else
       fail!('Missing ppy headers')
     end
