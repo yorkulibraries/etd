@@ -35,6 +35,7 @@ Rails.application.routes.draw do
     post :unblock, on: :member
     get :blocked, on: :collection
   end
+  devise_for :users
 
   resources :gem_records, except: %i[new edit create update destroy]
 

@@ -1,38 +1,19 @@
 class SessionsController < ApplicationController
+  before_action :authenticate_user!, except: :destroy
   skip_authorization_check
 
   def new
-    if Rails.env.development?
-      @username = if params[:as].nil?
-                    User::ADMIN
-                  else
-                    params[:as]
-                  end
-    else
-      @username = request.headers['HTTP_PYORK_USER']
-      @username_alt = request.headers['HTTP_PYORK_CYIN']
-    end
-
-    users = User.active.where('username = ? OR sisid = ?', @username, @username_alt)
-    if users.size == 1
-
-      user = users.first
-
-      session[:user_id] = user.id
-      if user.is_a? Student
-
-        # update the username, if it is not set
-
-        if user.username == user.sisid && request.headers['HTTP_PYORK_USER']
-          user.update_attribute(:username, request.headers['HTTP_PYORK_USER'])
-        end
-
-        redirect_to student_view_index_url, notice: 'Logged In!'
-      else
-        redirect_to root_url, notice: 'Logged in!'
+    current_user = request.env['warden'].authenticate!
+    session[:user_id] = current_user.id if current_user
+    if current_user && current_user.is_a?(Student)
+      if current_user.username == current_user.sisid && request.headers['HTTP_PYORK_USER']
+        current_user.update_attribute(:username,
+                                      request.headers['HTTP_PYORK_USER'])
       end
+      redirect_to student_view_index_url, notice: 'Logged In!'
+    elsif current_user
+      redirect_to root_url, notice: 'Logged in!'
     else
-
       redirect_to invalid_login_url, alert: 'Invalid username or password'
     end
   end
@@ -43,6 +24,7 @@ class SessionsController < ApplicationController
 
   def destroy
     session[:user_id] = nil
+    request.env['warden'] = nil if request.env['warden'].present?
 
     cookies.delete('mayaauth', domain: 'yorku.ca')
     cookies.delete('pybpp', domain: 'yorku.ca')

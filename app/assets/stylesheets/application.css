@@ -8,6 +8,7 @@
  *= require jquery-tablesorter/theme.default
  *= require jquery-tablesorter/theme.dark
  *= require jquery-tablesorter/theme.jui
+ *= require font-awesome
  *= require_tree .
  *= require_self
  */
