@@ -9,13 +9,10 @@ class ApplicationController < ActionController::Base
   end
   helper_method :current_user
 
-  def logged_in?
-    current_user
-  end
-
   def login_required
-    unless logged_in? || controller_name == 'sessions'
-      redirect_to login_url, alert: 'You must login before accessing this page'
+    unless current_user || controller_name == 'sessions'
+      redirect_to login_url,
+                  alert: 'You must login before accessing this page'
     end
   end
 

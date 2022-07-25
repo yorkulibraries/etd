@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   audited
+  devise :registerable
 
   before_save :default_values
 
