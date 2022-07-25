@@ -170,8 +170,8 @@ GEM
     faker (2.21.0)
       i18n (>= 1.8.11, < 2)
     ffi (1.15.5)
-    font-awesome-sass (6.1.1)
-      sassc (~> 2.0)
+    font-awesome-rails (4.7.0.8)
+      railties (>= 3.2, < 8.0)
     formatador (1.1.0)
     globalid (1.0.0)
       activesupport (>= 5.0)
@@ -419,7 +419,7 @@ DEPENDENCIES
   exception_notification (~> 4.4, >= 4.4.1)
   factory_girl_rails (= 4.5.0)
   faker
-  font-awesome-sass (~> 6.1, >= 6.1.1)
+  font-awesome-rails (~> 4.7)
   guard-bundler (~> 3.0)
   guard-livereload
   guard-minitest (= 2.4.6)

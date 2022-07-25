@@ -18,7 +18,7 @@ gem 'uglifier' # , '>= 1.3.0'
 
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
 gem 'chosen-rails', '~> 1.10'
-gem 'font-awesome-sass', '~> 6.1', '>= 6.1.1'
+gem 'font-awesome-rails', '~> 4.7'
 gem 'simple_form', '~> 5.1'
 
 ## AUDITS ##
