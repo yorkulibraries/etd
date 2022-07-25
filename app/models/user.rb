@@ -1,6 +1,6 @@
 class User < ApplicationRecord
   audited
-  devise :ppy_authenticatable
+  devise :registerable
 
   before_save :default_values
 

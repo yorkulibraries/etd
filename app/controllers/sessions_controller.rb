@@ -1,8 +1,15 @@
 class SessionsController < ApplicationController
   before_action :authenticate_user!
+  skip_authorization_check
 
   def new
+    current_user = request.env['warden'].authenticate!
+    session[:user_id] = current_user.id if current_user
     if current_user && current_user.is_a?(Student)
+      if current_user.username == current_user.sisid && request.headers['HTTP_PYORK_USER']
+        current_user.update_attribute(:username,
+                                      request.headers['HTTP_PYORK_USER'])
+      end
       redirect_to student_view_index_url, notice: 'Logged In!'
     elsif current_user
       redirect_to root_url, notice: 'Logged in!'
