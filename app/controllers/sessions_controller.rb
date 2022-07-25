@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_user!, except: :destroy
   skip_authorization_check
 
   def new
@@ -24,6 +24,7 @@ class SessionsController < ApplicationController
 
   def destroy
     session[:user_id] = nil
+    request.env['warden'] = nil if request.env['warden'].present?
 
     cookies.delete('mayaauth', domain: 'yorku.ca')
     cookies.delete('pybpp', domain: 'yorku.ca')
