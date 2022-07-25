@@ -19,7 +19,7 @@ gem 'uglifier' # , '>= 1.3.0'
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
 gem 'chosen-rails', '~> 1.10'
 gem 'font-awesome-sass', '~> 6.1', '>= 6.1.1'
-gem 'simple_form', '4.0.0'
+gem 'simple_form', '~> 5.1'
 
 ## AUDITS ##
 gem 'audited', '~> 5.0'
@@ -42,7 +42,7 @@ gem 'kaminari' # , "0.17.0"
 gem 'liquid' # , '3.0.6'
 gem 'nokogiri' # , '1.6.7.2'
 gem 'rexml', '~> 3.2', '>= 3.2.5'
-gem 'rubyzip', '~> 1.2.2'
+gem 'rubyzip', '~> 1.3.0'
 gem 'unicode' # , "0.4.4"
 gem 'validates_timeliness', github: 'mitsuru/validates_timeliness', branch: 'rails7'
 
