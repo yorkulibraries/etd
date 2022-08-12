@@ -1,6 +1,6 @@
 <% title "Update DSpace Export - Settings" %>
 
-<%= simple_form_for AppSettings, url: settings_path, method: :patch, html: { class: "settings" } do |f| %>
+<%= simple_form_for AppSettings.new, url: settings_path, method: :patch, html: { class: "settings" } do |f| %>
 
 	<h5 style="padding-bottom: 10px;">Test Server Settings</h5>
 	<div class="row">
