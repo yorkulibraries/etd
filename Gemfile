@@ -47,8 +47,8 @@ gem 'unicode' # , "0.4.4"
 gem 'validates_timeliness', github: 'mitsuru/validates_timeliness', branch: 'rails7'
 
 ## EXEL EXPORT ##
-gem 'axlsx', git: 'https://github.com/randym/axlsx.git'
-gem 'axlsx_rails', '0.5.1'
+gem 'caxlsx', '3.2.0'
+gem 'caxlsx_rails', '0.6.3'
 gem 'roo' # , "1.13.2"
 gem 'zip-zip', '~> 0.3'
 
