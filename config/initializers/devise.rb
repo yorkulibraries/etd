@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require Rails.root.join('lib/custompath')
 # Assuming you have not yet modified this file, each configuration option below
 # is set to its default value. Note that some are commented out while others
 # are not: uncommented lines are intended to protect your configuration from
@@ -311,6 +310,6 @@ Devise.setup do |config|
   # config.sign_in_after_change_password = true
   config.warden do |manager|
     manager.default_strategies(scope: :user).unshift :ppy_devise
-    manager.failure_app = CustomPath
+    manager.failure_app = Custompath
   end
 end
