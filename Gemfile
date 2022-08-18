@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 ruby '3.1.2'
 gem 'rack', '2.2.3.1'
 
-gem 'rails', '~> 7.0', '>= 7.0.3'
+gem 'rails', '~> 7.0', '>= 7.0.3.1'
 
 ## DATABASES ##
 gem 'mysql2', '0.5.3', group: :production
