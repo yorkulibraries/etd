@@ -27,11 +27,11 @@ class DocumentTest < ActiveSupport::TestCase
 
   should 'only allow one primary file per thesis, and it should ignore deleted' do
     thesis = create(:thesis)
-    create(:document, thesis: thesis, supplemental: false)
+    create(:document, thesis:, supplemental: false)
 
-    assert !build(:document, thesis: thesis, supplemental: false).valid?,
+    assert !build(:document, thesis:, supplemental: false).valid?,
            'Already have one primary, so it should fails'
-    assert build(:document, thesis: thesis, supplemental: false, deleted: true).valid?,
+    assert build(:document, thesis:, supplemental: false, deleted: true).valid?,
            'If its a deleted file it should be ok'
   end
 
