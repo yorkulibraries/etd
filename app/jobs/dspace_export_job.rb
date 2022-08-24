@@ -45,7 +45,7 @@ class DspaceExportJob < ActiveJob::Base
           entry = thesis_to_atom_entry(thesis)
           files = extract_thesis_filepaths(thesis)
 
-          receipt = @exporter.deposit(entry: entry, files: files, zipped: true, complete: @export_log.complete_thesis?)
+          receipt = @exporter.deposit(entry:, files:, zipped: true, complete: @export_log.complete_thesis?)
 
           log "Receipt Status: #{receipt.status_code}"
           log "Receipt Message: #{receipt.status_message}"

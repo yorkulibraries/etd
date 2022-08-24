@@ -14,7 +14,7 @@ module Sword2Ruby
       defaults = {
         entry: nil,
         slug: nil,
-        collection_uri: collection_uri,
+        collection_uri:,
         in_progress: nil,
         on_behalf_of: nil,
         connection: @http

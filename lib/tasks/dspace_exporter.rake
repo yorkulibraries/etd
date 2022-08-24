@@ -46,7 +46,7 @@ namespace :dspace do
         entry = thesis_to_atom_entry(thesis)
         files = extract_thesis_filepaths(thesis)
 
-        receipt = exporter.deposit(entry: entry, files: files, zipped: zipped, complete: complete_thesis?)
+        receipt = exporter.deposit(entry:, files:, zipped:, complete: complete_thesis?)
 
         log("Deposited: #{receipt.status_code}: #{receipt.status_message}")
 
