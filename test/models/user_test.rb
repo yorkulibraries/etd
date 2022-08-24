@@ -119,7 +119,7 @@ class UserTest < ActiveSupport::TestCase
     student = create(:student, sisid: '123123123')
     user = create(:user, username: 'username')
 
-    assert_equal nil, User.find_active_user(nil), 'Returns nil if criteria is nil'
+    assert_nil User.find_active_user(nil), 'Returns nil if criteria is nil'
 
     s = User.find_active_user('123123123')
 

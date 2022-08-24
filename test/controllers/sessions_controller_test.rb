@@ -62,7 +62,7 @@ class SessionsControllerTest < ActionController::TestCase
   should 'destroy session information when logout is present' do
     get :destroy
 
-    assert_equal nil, session[:user_id]
+    assert_nil session[:user_id]
     assert_redirected_to 'http://www.library.yorku.ca'
   end
 end
