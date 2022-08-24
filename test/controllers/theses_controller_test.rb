@@ -44,10 +44,10 @@ class ThesesControllerTest < ActionController::TestCase
 
     should 'load documents separately, as primary and non primary. All must be not_deleted' do
       thesis = create(:thesis, student: @student)
-      create_list(:document, 1, supplemental: false, thesis: thesis, user: @student)
-      create_list(:document, 3, supplemental: true, thesis: thesis, user: @student)
-      create(:document, supplemental: true, deleted: true, thesis: thesis, user: @student)
-      create(:document, supplemental: false, deleted: true, thesis: thesis, user: @student)
+      create_list(:document, 1, supplemental: false, thesis:, user: @student)
+      create_list(:document, 3, supplemental: true, thesis:, user: @student)
+      create(:document, supplemental: true, deleted: true, thesis:, user: @student)
+      create(:document, supplemental: false, deleted: true, thesis:, user: @student)
 
       get :show, params: { id: thesis.id, student_id: @student.id }
 
@@ -66,7 +66,7 @@ class ThesesControllerTest < ActionController::TestCase
       thesis = assigns(:thesis)
       assert thesis, 'Make sure we get a thesis instance'
       assert_equal @student.name, thesis.author, "Author's name should be Student's name"
-      assert_equal nil, thesis.id, 'Make sure its a blank Thesis object'
+      assert_nil thesis.id, 'Make sure its a blank Thesis object'
 
       assert_template 'new'
 

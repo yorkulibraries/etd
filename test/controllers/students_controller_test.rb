@@ -28,7 +28,7 @@ class StudentsControllerTest < ActionController::TestCase
 
       student = assigns(:student)
       assert student, "Student can't be nil"
-      assert_equal nil, student.id, 'ID should not be set'
+      assert_nil student.id, 'ID should not be set'
 
       assert_select 'form#new_student', 1, 'An HTML Form should be present'
       assert_select 'select#student_role', 0, 'Role select dropdown should not be there'
@@ -250,7 +250,7 @@ class StudentsControllerTest < ActionController::TestCase
 
     should 'display audit trail for this student, including theses and documents' do
       student = create(:student)
-      thesis = create(:thesis, student: student)
+      thesis = create(:thesis, student:)
 
       get :audit_trail, params: { id: student.id }
 
@@ -260,7 +260,7 @@ class StudentsControllerTest < ActionController::TestCase
 
     should 'send an invitation email' do
       student = create(:student)
-      thesis = create(:thesis, student: student)
+      thesis = create(:thesis, student:)
 
       get :send_invite, params: { id: student.id }
 
@@ -287,8 +287,8 @@ class StudentsControllerTest < ActionController::TestCase
 
     should 'remove student completly if current user is manager' do
       student = create(:student)
-      thesis = create(:thesis, student: student)
-      document = create(:document, thesis: thesis)
+      thesis = create(:thesis, student:)
+      document = create(:document, thesis:)
 
       assert_difference ['Student.count', 'Thesis.count', 'Document.count'], -1 do
         post :destroy, params: { id: student.id }

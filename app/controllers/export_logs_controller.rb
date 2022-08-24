@@ -76,7 +76,7 @@ class ExportLogsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { redirect_to export_logs_path, notice: notice }
+      format.html { redirect_to export_logs_path, notice: }
       format.js
     end
   end
