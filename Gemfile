@@ -2,6 +2,7 @@ source 'http://rubygems.org'
 ruby '3.1.2'
 gem 'rack', '2.2.3.1'
 
+gem 'puma', '~> 5.6', '>= 5.6.5'
 gem 'rails', '~> 7.0', '>= 7.0.3.1'
 
 ## DATABASES ##
@@ -12,8 +13,8 @@ gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails' # "4.0.5"
 gem 'jquery-tablesorter' # , "1.21.1"
 gem 'jquery-ui-rails' # "5.0.5"
-gem 'mini_racer', '~> 0.6.2'
-gem 'sass-rails' # '~> 4.0.0'
+gem 'mini_racer', '~> 0.6.3'
+gem 'sass-rails', '~> 6.0'
 gem 'uglifier' # , '>= 1.3.0'
 
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
@@ -22,13 +23,13 @@ gem 'font-awesome-rails', '~> 4.7'
 gem 'simple_form', '~> 5.1'
 
 ## AUDITS ##
-gem 'audited', '~> 5.0'
+gem 'audited', '~> 5.0', '>= 5.0.2'
 
 ## APP SETTINGS ##
 gem 'rails-settings-cached', '~> 2.8', '>= 2.8.2'
 
 ## EXCEPTION NOTIFICATIONS ##
-gem 'exception_notification', '~> 4.4', '>= 4.4.1'
+gem 'exception_notification', '~> 4.5'
 
 # SWORD API SUPPORT - Modified LCS version ##
 gem 'sword2ruby', git: 'https://github.com/yorkulcs/sword2ruby.git'
@@ -37,10 +38,10 @@ gem 'sword2ruby', git: 'https://github.com/yorkulcs/sword2ruby.git'
 gem 'cancancan', '~> 3.4'
 gem 'carrierwave', '~> 2.2', '>= 2.2.2'
 gem 'devise', '~> 4.8', '>= 4.8.1'
-gem 'json' # , '1.8.3'
-gem 'kaminari' # , "0.17.0"
-gem 'liquid' # , '3.0.6'
-gem 'nokogiri' # , '1.6.7.2'
+gem 'json', '~> 2.6', '>= 2.6.2'
+gem 'kaminari', '~> 1.2', '>= 1.2.2'
+gem 'liquid', '~> 5.4'
+gem 'nokogiri', '~> 1.13', '>= 1.13.8'
 gem 'rexml', '~> 3.2', '>= 3.2.5'
 gem 'rubyzip', '~> 1.3.0'
 gem 'unicode' # , "0.4.4"
@@ -49,39 +50,32 @@ gem 'validates_timeliness', github: 'mitsuru/validates_timeliness', branch: 'rai
 ## EXEL EXPORT ##
 gem 'caxlsx', '3.2.0'
 gem 'caxlsx_rails', '0.6.3'
-gem 'roo' # , "1.13.2"
+gem 'roo', '~> 2.9'
 gem 'zip-zip', '~> 0.3'
 
 ## TESTING && DEVELOPMENT ##
 
 group :development do
-  gem 'bullet', '~> 7.0', '>= 7.0.2'
-  gem 'nifty-generators', '0.4.6'
   gem 'populator', git: 'https://github.com/ryanb/populator.git'
-  gem 'rack-livereload'
-  gem 'web-console', '~> 2.0'
+  gem 'web-console', '~> 4.2'
 end
 
 group :development, :test do
   gem 'guard-bundler', '~> 3.0'
-  gem 'guard-livereload', require: false
-  gem 'sqlite3'
+  gem 'guard-livereload', '~> 2.5', '>= 2.5.2', require: false
+  gem 'sqlite3', '~> 1.4', '>= 1.4.4'
 end
 
 group :test do
-  gem 'byebug'
-  gem 'capybara', '2.1.0'
-  gem 'database_cleaner', '1.5.2'
-  gem 'factory_girl_rails', '4.5.0'
-  gem 'faker'
+  gem 'byebug', '~> 11.1', '>= 11.1.3'
+  gem 'database_cleaner', '~> 2.0', '>= 2.0.1'
+  gem 'factory_girl_rails', '4.8.0'
+  gem 'faker', '~> 2.22'
   gem 'guard-minitest', '2.4.6'
-  gem 'minitest', '5.6.1'
+  gem 'minitest', '~> 5.16', '>= 5.16.3'
   gem 'mocha', '0.14', require: false
   gem 'rails-controller-testing', '~> 1.0', '>= 1.0.5'
-  gem 'shoulda-context'
+  gem 'shoulda-context', '~> 2.0'
   gem 'shoulda-matchers', '~> 5.1'
   gem 'spring' # , "1.3.6"
-  gem 'webrat', '0.7.3'
 end
-
-gem 'puma'
