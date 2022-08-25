@@ -9,7 +9,7 @@ class SettingsController < ApplicationController
     settings = params[:app_settings]
 
     settings.each do |key, value|
-      AppSettings[key] = value
+      AppSettings.send("#{key}=", value)
     end
 
     case params[:return_to]
