@@ -10,7 +10,7 @@ gem 'mysql2', '0.5.3', group: :production
 ## CSS AND JAVASCRIPT ##
 gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails', '4.5.0'
-gem 'jquery-tablesorter', '1.27.2'
+gem 'jquery-tablesorter', '~> 1.27', '>= 1.27.2'
 gem 'jquery-ui-rails', '6.0.1'
 gem 'mini_racer', '~> 0.6.3'
 gem 'sass-rails', '~> 6.0'
