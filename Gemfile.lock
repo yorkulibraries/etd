@@ -233,6 +233,8 @@ GEM
     mini_racer (0.6.3)
       libv8-node (~> 16.10.0.0)
     minitest (5.16.3)
+    minitest-around (0.5.0)
+      minitest (~> 5.0)
     mocha (0.14.0)
       metaclass (~> 0.0.1)
     multi_json (1.15.0)
@@ -387,13 +389,14 @@ DEPENDENCIES
   guard-bundler (~> 3.0)
   guard-livereload (~> 2.5, >= 2.5.2)
   guard-minitest (= 2.4.6)
-  jquery-rails
-  jquery-tablesorter
-  jquery-ui-rails
+  jquery-rails (= 4.5.0)
+  jquery-tablesorter (= 1.27.2)
+  jquery-ui-rails (= 6.0.1)
   kaminari (~> 1.2, >= 1.2.2)
   liquid (~> 5.4)
   mini_racer (~> 0.6.3)
   minitest (~> 5.16, >= 5.16.3)
+  minitest-around (~> 0.5.0)
   mocha (= 0.14)
   mysql2 (= 0.5.3)
   nokogiri (~> 1.13, >= 1.13.8)
@@ -412,8 +415,8 @@ DEPENDENCIES
   spring
   sqlite3 (~> 1.4, >= 1.4.4)
   sword2ruby!
-  uglifier
-  unicode
+  uglifier (~> 4.2)
+  unicode (~> 0.4.4.4)
   validates_timeliness!
   web-console (~> 4.2)
   zip-zip (~> 0.3)
