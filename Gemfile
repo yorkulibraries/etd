@@ -1,6 +1,5 @@
 source 'http://rubygems.org'
 ruby '3.1.2'
-gem 'rack', '2.2.3.1'
 
 gem 'puma', '~> 5.6', '>= 5.6.5'
 gem 'rails', '~> 7.0', '>= 7.0.3.1'
@@ -10,12 +9,12 @@ gem 'mysql2', '0.5.3', group: :production
 
 ## CSS AND JAVASCRIPT ##
 gem 'coffee-rails', '~> 4.2'
-gem 'jquery-rails' # "4.0.5"
-gem 'jquery-tablesorter' # , "1.21.1"
-gem 'jquery-ui-rails' # "5.0.5"
+gem 'jquery-rails', '4.5.0'
+gem 'jquery-tablesorter', '~> 1.27', '>= 1.27.2'
+gem 'jquery-ui-rails', '6.0.1'
 gem 'mini_racer', '~> 0.6.3'
 gem 'sass-rails', '~> 6.0'
-gem 'uglifier' # , '>= 1.3.0'
+gem 'uglifier', '~> 4.2'
 
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
 gem 'chosen-rails', '~> 1.10'
@@ -38,13 +37,12 @@ gem 'sword2ruby', git: 'https://github.com/yorkulcs/sword2ruby.git'
 gem 'cancancan', '~> 3.4'
 gem 'carrierwave', '~> 2.2', '>= 2.2.2'
 gem 'devise', '~> 4.8', '>= 4.8.1'
-gem 'json', '~> 2.6', '>= 2.6.2'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'liquid', '~> 5.4'
 gem 'nokogiri', '~> 1.13', '>= 1.13.8'
 gem 'rexml', '~> 3.2', '>= 3.2.5'
 gem 'rubyzip', '~> 1.3.0'
-gem 'unicode' # , "0.4.4"
+gem 'unicode', '~> 0.4.4.4'
 gem 'validates_timeliness', github: 'mitsuru/validates_timeliness', branch: 'rails7'
 
 ## EXEL EXPORT ##
@@ -56,13 +54,14 @@ gem 'zip-zip', '~> 0.3'
 ## TESTING && DEVELOPMENT ##
 
 group :development do
-  gem 'populator', git: 'https://github.com/ryanb/populator.git'
   gem 'web-console', '~> 4.2'
 end
 
 group :development, :test do
+  gem 'faker', '~> 2.22'
   gem 'guard-bundler', '~> 3.0'
   gem 'guard-livereload', '~> 2.5', '>= 2.5.2', require: false
+  gem 'populator', git: 'https://github.com/ryanb/populator.git'
   gem 'sqlite3', '~> 1.4', '>= 1.4.4'
 end
 
@@ -70,9 +69,9 @@ group :test do
   gem 'byebug', '~> 11.1', '>= 11.1.3'
   gem 'database_cleaner', '~> 2.0', '>= 2.0.1'
   gem 'factory_girl_rails', '4.8.0'
-  gem 'faker', '~> 2.22'
   gem 'guard-minitest', '2.4.6'
   gem 'minitest', '~> 5.16', '>= 5.16.3'
+  gem 'minitest-around', '~> 0.5.0'
   gem 'mocha', '0.14', require: false
   gem 'rails-controller-testing', '~> 1.0', '>= 1.0.5'
   gem 'shoulda-context', '~> 2.0'
