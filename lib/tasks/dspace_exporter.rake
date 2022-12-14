@@ -28,7 +28,7 @@ namespace :dspace do
 
     # 1) get unpublished theses, that don't have embargo placed on them.
     if ENV["THESIS"] != nil
-      theses = Thesis.without_embargo.where(id: ENV["THESIS"])
+      theses = Thesis.accepted.without_embargo.where(id: ENV["THESIS"])
     elsif ENV["THESIS_ANY"] != nil
       theses = Thesis.where(id: ENV["THESIS_ANY"])
     else
