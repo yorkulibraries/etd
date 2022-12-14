@@ -9,16 +9,16 @@ OPTIONS = {
 }
 
 namespace :dspace do
-  desc 'Deposit to YorkSpace'
+  desc "Deposit to YorkSpace"
 
   task export: :environment do
-    log 'Exporting to DSPACE'
+    log "Exporting to DSPACE"
     log "COMPLETE_THESIS: #{ENV['COMPLETE_THESIS']}  PUBLISH_DATE: #{ENV['PUBLISH_DATE']}"
 
-    zipped = ENV['ZIPPED']
+    zipped = ENV['ZIPPED']=='true'
 
-    failed_deposits = []
-    options = get_options
+    failed_deposits = Array.new
+    options = get_options()
     log options
 
     exporter = ETD::Exporter.new options
@@ -27,18 +27,19 @@ namespace :dspace do
     # three things to do
 
     # 1) get unpublished theses, that don't have embargo placed on them.
-    theses = if !ENV['THESIS'].nil?
-               Thesis.accepted.without_embargo.where(id: ENV['THESIS'])
-             elsif !ENV['THESIS_ANY'].nil?
-               Thesis.where(id: ENV['THESIS_ANY'])
-             else
-               Thesis.accepted.without_embargo.where(published_date: publish_date)
-             end
+    if ENV["THESIS"] != nil
+      theses = Thesis.accepted.without_embargo.where(id: ENV["THESIS"])
+    elsif ENV["THESIS_ANY"] != nil
+      theses = Thesis.where(id: ENV["THESIS_ANY"])
+    else
+      theses = Thesis.accepted.without_embargo.where(published_date: publish_date)
+    end
 
     log "FOUND: #{theses.size} theses"
 
     # 2) publish each thesis and its files, while mapping thesis to Atom Entry
     theses.each_with_index do |thesis, index|
+
       begin
         log "\n========== Depositing ========="
         log "#{index + 1} of #{theses.size} [Thesis ID: #{thesis.id}, Student ID: #{thesis.student.id}]"
@@ -46,83 +47,92 @@ namespace :dspace do
         entry = thesis_to_atom_entry(thesis)
         files = extract_thesis_filepaths(thesis)
 
-        receipt = exporter.deposit(entry:, files:, zipped:, complete: complete_thesis?)
+        receipt = exporter.deposit(entry: entry, files: files, zipped: zipped, complete: complete_thesis?)
 
         log("Deposited: #{receipt.status_code}: #{receipt.status_message}")
 
         # 3) set status of each thesis to publish after it has been published
-        thesis.publish if !receipt.nil? && publish_thesis?
+        if (receipt != nil)
+          thesis.publish if publish_thesis?
+        end
 
-        log '======================'
+        log "======================"
       rescue Exception => e
-        log("Error: #{e}")
-        puts e.backtrace
+        log ("Error: #{e}")
+	puts e.backtrace
         failed_deposits.push(thesis)
         error(thesis, e)
       end
 
       STDOUT.write "\rProcessed: #{index + 1} of #{theses.size}. \nFailed: #{failed_deposits.size}"
 
-      log(entry.to_s) if ENV['OUTPUT_XML']
+      if ENV["OUTPUT_XML"]
+        log(entry.to_s)
+      end
 
       sleep(5)
     end
 
-    warn("\n\nFailed: #{failed_deposits.size}, see logged output.") if failed_deposits.size > 0
+    if failed_deposits.size > 0
+      STDERR.puts("\n\nFailed: #{failed_deposits.size}, see logged output.")
+    end
 
     ## Run Temp file clean up
     Dir.glob('/tmp/etd-*.zip').each { |f| File.delete(f) }
+
   end
 
   # Maps thesis to atom entry
   def thesis_to_atom_entry(thesis)
     entry = Atom::Entry.new
-    entry.add_dublin_core_extension!('title', thesis.title)
-    entry.add_dublin_core_extension!('creator', thesis.author)
-    entry.add_dublin_core_extension!('supervisor', thesis.supervisor)
+    entry.add_dublin_core_extension!("title", thesis.title)
+    entry.add_dublin_core_extension!("creator", thesis.author)
+    entry.add_dublin_core_extension!("supervisor", thesis.supervisor)
+
 
     thesis.loc_subjects.each do |subject|
-      entry.add_dublin_core_extension!('subject', subject.name)
+      entry.add_dublin_core_extension!("subject", subject.name)
     end
 
-    unless thesis.keywords.nil?
-      thesis.keywords.split(',').each do |keyword|
-        entry.add_dublin_core_extension!('relationSubjectKeywords', keyword.strip)
+    if thesis.keywords != nil
+      thesis.keywords.split(",").each do |keyword|
+        entry.add_dublin_core_extension!("relationSubjectKeywords", keyword.strip)
       end
     end
 
-    entry.add_dublin_core_extension!('abstract', thesis.abstract)
-    entry.add_dublin_core_extension!('language', language_to_iso(thesis.language))
-    entry.add_dublin_core_extension!('name', Thesis::DEGREENAME_FULL[thesis.degree_name])
-    entry.add_dublin_core_extension!('level', thesis.degree_level)
+    entry.add_dublin_core_extension!("abstract", thesis.abstract)
+    entry.add_dublin_core_extension!("language", language_to_iso(thesis.language))
+    entry.add_dublin_core_extension!("name", Thesis::DEGREENAME_FULL[thesis.degree_name])
+    entry.add_dublin_core_extension!("level", thesis.degree_level)
 
-    entry.add_dublin_core_extension!('discipline', short_program_name(thesis.program))
-    entry.add_dublin_core_extension!('issued', Date.current.strftime('%Y-%m-%d'))
-    entry.add_dublin_core_extension!('dateCopyrighted', thesis.exam_date.strftime('%Y-%m-%d'))
+    entry.add_dublin_core_extension!("discipline", short_program_name(thesis.program))
+    entry.add_dublin_core_extension!("issued", Date.current.strftime("%Y-%m-%d"))
+    entry.add_dublin_core_extension!("dateCopyrighted", thesis.exam_date.strftime("%Y-%m-%d"))
 
-    entry.add_dublin_core_extension!('type', 'Electronic Thesis or Dissertation')
-    entry.add_dublin_core_extension!('rights',
-                                     'Author owns copyright, except where explicitly noted. Please contact the author directly with licensing requests.')
+    entry.add_dublin_core_extension!("type", "Electronic Thesis or Dissertation")
+    entry.add_dublin_core_extension!("rights", "Author owns copyright, except where explicitly noted. Please contact the author directly with licensing requests.")
 
-    entry
+    return entry
   end
 
   def language_to_iso(language)
-    language = '' if language.blank?
+    language = "" if language.blank?
 
-    case language.downcase
-    when 'en', 'english', 'eng'
-      'en'
-    when 'fr', 'french'
-      'fr'
+    iso = case language.downcase
+    when "en", "english", "eng"
+       "en"
+    when "fr", "french"
+      "fr"
     else
-      'other'
+      "other"
     end
+
+    return iso
   end
 
   def short_program_name(program)
-    if !program.nil? && program.is_a?(String)
-      program.split('.,').last.strip
+    if program != nil && program.is_a?(String)
+      program.split(".,").last.strip
     else
       program
     end
@@ -130,7 +140,7 @@ namespace :dspace do
 
   # Go through documents and get the file paths
   def extract_thesis_filepaths(thesis)
-    return [] if thesis.nil?
+    return [] if thesis == nil
 
     files = []
     thesis.documents.primary.not_deleted.each do |document|
@@ -138,52 +148,61 @@ namespace :dspace do
       files.push document.file.path
     end
 
-    unless ENV['PRIMARY_FILES_ONLY'] == 'true'
+    unless ENV["PRIMARY_FILES_ONLY"] == "true"
       thesis.documents.supplemental.not_deleted.each do |document|
         log "       #{document.file.path}"
         files.push document.file.path
       end
     end
 
-    files
+    # plus license file [ NOT REQUIRED ANYMORE]
+    # files.push Rails.root.join('lib', 'tasks', 'YorkU_ETDlicense.txt').to_s
+
+    return files
   end
 
   # Which options to load
-  def get_options
-    OPTIONS
+  def get_options()
+      return OPTIONS
   end
 
   def complete_thesis?
     # Allow thesis to be marked as completed or not
 
-    ENV['COMPLETE_THESIS'] == 'true'
+    if ENV['COMPLETE_THESIS'] == "true"
+      true
+    else
+      false
+    end
   end
 
   def publish_thesis?
-    ENV['PUBLISH'] == 'true'
+    if ENV["PUBLISH"] == "true"
+      true
+    else
+      false
+    end
   end
 
   def publish_date
-    if ENV['PUBLISH_DATE'].nil?
-      Time.now.strftime('%Y-%m-%d')
+    if ENV['PUBLISH_DATE'] == nil
+      Time.now.strftime("%Y-%m-%d")
     else
-      ENV['PUBLISH_DATE']
+      ENV["PUBLISH_DATE"]
     end
   end
 
   # Crude logging
   def log(string)
-    puts string unless ENV['DEBUG'].nil?
+    if ENV['DEBUG'] != nil
+      puts string
+    end
   end
 
   def error(thesis, exception)
-    warn '======= DEPOSIT ERROR ======='
-    begin
-      warn "TID: #{thesis.id}   UID: #{thesis.student.id}  Error: #{exception.message}"
-    rescue StandardError
-      nil
-    end
-    warn exception
-    warn "=============================\n"
+    STDERR.puts "======= DEPOSIT ERROR ======="
+    STDERR.puts "TID: #{thesis.id}   UID: #{thesis.student.id}  Error: #{exception.message}" rescue nil
+    STDERR.puts exception
+    STDERR.puts "=============================\n"
   end
 end
