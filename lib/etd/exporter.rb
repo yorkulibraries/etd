@@ -96,7 +96,6 @@ module ETD
       # 1) Deposit Entry, by default always keep submission in progress, it will be completed in step 3 if required
       deposit_receipt = @collection.post!(entry: options.entry, in_progress: true, on_behalf_of: options.on_behalf_of)
 
-
       # 2) Deposit Media if any (zip first if required)
       if options.files.size > 0 && deposit_receipt.status_code.to_i >= 200
         if options.zipped
@@ -115,13 +114,14 @@ module ETD
       # 3) Send a completed signal if required
       if options.complete && deposit_receipt.status_code.to_i >= 200
         # send a completion flag
-        deposit_receipt.entry.put!(in_progress: false)
+	headers = {"In-Progress" => "false" }
+	@connection.post(deposit_receipt.location, nil, headers)
       end
 
       # 4) Delete the tmp file if it exits      
       if @zipped_file != nil && File.exist?(@zipped_file)
         puts "DELETING #{@zipped_file}"
-        #File.delete(@zipped_file)
+        File.delete(@zipped_file)
       end
 
       return deposit_receipt

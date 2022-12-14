@@ -15,7 +15,7 @@ namespace :dspace do
     log "Exporting to DSPACE"
     log "COMPLETE_THESIS: #{ENV['COMPLETE_THESIS']}  PUBLISH_DATE: #{ENV['PUBLISH_DATE']}"
 
-    zipped = ENV['ZIPPED']
+    zipped = ENV['ZIPPED']=='true'
 
     failed_deposits = Array.new
     options = get_options()
@@ -28,7 +28,7 @@ namespace :dspace do
 
     # 1) get unpublished theses, that don't have embargo placed on them.
     if ENV["THESIS"] != nil
-      theses = Thesis.accepted.without_embargo.where(id: ENV["THESIS"])
+      theses = Thesis.without_embargo.where(id: ENV["THESIS"])
     elsif ENV["THESIS_ANY"] != nil
       theses = Thesis.where(id: ENV["THESIS_ANY"])
     else
@@ -154,6 +154,9 @@ namespace :dspace do
         files.push document.file.path
       end
     end
+
+    # plus license file [ NOT REQUIRED ANYMORE]
+    # files.push Rails.root.join('lib', 'tasks', 'YorkU_ETDlicense.txt').to_s
 
     return files
   end
