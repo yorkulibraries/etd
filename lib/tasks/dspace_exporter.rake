@@ -87,8 +87,10 @@ namespace :dspace do
     entry = Atom::Entry.new
     entry.add_dublin_core_extension!("title", thesis.title)
     entry.add_dublin_core_extension!("creator", thesis.author)
-    entry.add_dublin_core_extension!("supervisor", thesis.supervisor)
 
+    thesis.supervisor.split("/").map(&:strip).each do | supervisor |
+      entry.add_dublin_core_extension!("supervisor", supervisor)
+    end
 
     thesis.loc_subjects.each do |subject|
       entry.add_dublin_core_extension!("subject", subject.name)
