@@ -3,8 +3,8 @@ require 'ostruct'
 
 OPTIONS = {
   username: "#{ENV['USERNAME']}", password: "#{ENV['PASSWORD']}",
-  service_document_url: "#{ENV['DSPACE']}/swordv2/servicedocument",
-  collection_uri: "#{ENV['DSPACE']}/swordv2/collection/#{ENV['HANDLE']}",
+  service_document_url: "#{ENV['DSPACE']}/server/swordv2/servicedocument",
+  collection_uri: "#{ENV['DSPACE']}/server/swordv2/collection/#{ENV['HANDLE']}",
   collection_title: "#{ENV['COLLECTION']}"
 }
 
@@ -87,7 +87,10 @@ namespace :dspace do
     entry = Atom::Entry.new
     entry.add_dublin_core_extension!("title", thesis.title)
     entry.add_dublin_core_extension!("creator", thesis.author)
-    entry.add_dublin_core_extension!("supervisor", thesis.supervisor)
+
+    thesis.supervisor.split("/").map(&:strip).each do | supervisor |
+      entry.add_dublin_core_extension!("supervisor", supervisor)
+    end
 
 
     thesis.loc_subjects.each do |subject|
@@ -154,9 +157,6 @@ namespace :dspace do
         files.push document.file.path
       end
     end
-
-    # plus license file [ NOT REQUIRED ANYMORE]
-    # files.push Rails.root.join('lib', 'tasks', 'YorkU_ETDlicense.txt').to_s
 
     return files
   end
