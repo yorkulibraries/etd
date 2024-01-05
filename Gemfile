@@ -5,16 +5,15 @@ gem 'puma', '~> 5.6', '>= 5.6.5'
 gem 'rails', '~> 7.0', '>= 7.0.3.1'
 
 ## DATABASES ##
-gem 'mysql2', '0.5.3', group: :production
+gem 'mysql2', '0.5.3'
 
 ## CSS AND JAVASCRIPT ##
 gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails', '4.5.0'
 gem 'jquery-tablesorter', '~> 1.27', '>= 1.27.2'
 gem 'jquery-ui-rails', '6.0.1'
-gem 'mini_racer', '~> 0.6.3'
 gem 'sass-rails', '~> 6.0'
-gem 'uglifier', '~> 4.2'
+gem 'terser', '~> 1.1', '>= 1.1.20'
 
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
 gem 'chosen-rails', '~> 1.10'
@@ -62,7 +61,6 @@ group :development, :test do
   gem 'guard-bundler', '~> 3.0'
   gem 'guard-livereload', '~> 2.5', '>= 2.5.2', require: false
   gem 'populator', git: 'https://github.com/ryanb/populator.git'
-  gem 'sqlite3', '~> 1.4', '>= 1.4.4'
 end
 
 group :test do
