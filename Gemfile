@@ -16,6 +16,7 @@ gem 'sass-rails', '~> 6.0'
 gem 'terser', '~> 1.1', '>= 1.1.20'
 
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
+gem 'bootstrap', '~> 5.3', '>= 5.3.2'
 gem 'chosen-rails', '~> 1.10'
 gem 'font-awesome-rails', '~> 4.7'
 gem 'simple_form', '~> 5.1'
