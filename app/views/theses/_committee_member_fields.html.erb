@@ -7,7 +7,7 @@
 			<div class="span2">
 				<%= f.input :role, label: "Choose a Role:", required: false, collection: CommitteeMember::ROLES%>
 			</div>
-			<div class="span1 float-right strong" style="font-size: 20px; padding-top: 6px; ">
+			<div class="span1 float-end strong" style="font-size: 20px; padding-top: 6px; ">
 			 <%= link_to '#', class: "remove_fields red", title: "Remove Committee Member" do %>
 			 	&times;
 			 <% end %>
