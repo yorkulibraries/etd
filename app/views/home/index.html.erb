@@ -4,7 +4,7 @@
 
 	<ul class="nav nav-tabs">
 		<li class="nav-item">
-			<%= active_link_to 'Open', root_path(which: Thesis::OPEN), active: /open/, class:"nav-link" %>
+			<%= active_link_to 'Open', root_path, active: /\A\/\z/, class:"nav-link" %>
 		</li>
 		<li class="nav-item">
 			<%= active_link_to 'Under Review', root_path(which: Thesis::UNDER_REVIEW), active: /under_review/, class:"nav-link" %>
