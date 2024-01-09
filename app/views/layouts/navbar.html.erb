@@ -1,14 +1,11 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary rounded" aria-label="Eleventh navbar example">
+<nav class="navbar navbar-expand-lg bg-body-tertiary rounded">
 	<div class="container-fluid">
-		<%= link_to root_path, {title:"Electronic Thesis Dissertation Submission Program", class:"bg-secondary"} do %>
-			<%= image_tag("logo.png")%>
-		<% end %>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample09" aria-controls="navbarsExample09" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
 		<div class="collapse navbar-collapse" id="navbarsExample09">
-		<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+		<ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-underline">
 			<% if can? :create, Thesis %>
 				<li class="nav-item">
 					<%= active_link_to 'Overview', root_path, active: /\A\/\z|(\/\?which=+)/, class:"nav-link" %>
@@ -26,7 +23,7 @@
 			<% end %>
 			<% if @current_user.role == User::ADMIN || @current_user.role == User::MANAGER %>
 				<li class="nav-item">
-					<%= active_link_to "Reports", reports_dashboard_path, class:"nav-link" %>
+					<%= active_link_to "Reports", reports_dashboard_path, class:"nav-link", active: /(by_status\?status)|dashboard/ %>
 				</li>
 			<% end %>
 			<% if @current_user.role == User::STUDENT %>
