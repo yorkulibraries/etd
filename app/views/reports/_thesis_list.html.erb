@@ -33,6 +33,6 @@
   </tbody>
 </table>
 
-<a href="<%= reports_by_status_path(status: @status, date: @date, order: @order, format: "xlsx") %>">
-  <span class="fa fa-th"></span> Download Exel
+<a class="btn btn-primary" href="<%= reports_by_status_path(status: @status, date: @date, order: @order, format: "xlsx") %>">
+  <span class="fa fa-th"></span> Download Excel
 </a>
