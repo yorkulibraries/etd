@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 class UsersController < ApplicationController
   authorize_resource
 
   def index
     @users = User.active.not_students
-    @user_groups = @users.group_by { |u| u.role }
+    @user_groups = @users.group_by(&:role)
   end
 
   def blocked
     @users = User.blocked.not_students
-    @user_groups = @users.group_by { |u| u.role }
+    @user_groups = @users.group_by(&:role)
     render 'index'
   end
 

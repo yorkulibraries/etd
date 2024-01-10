@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase
@@ -85,7 +87,7 @@ class UserTest < ActiveSupport::TestCase
     assert !user.blocked?, 'User should not be blocked'
     user.block
 
-    u = User.find(user.id)
+    User.find(user.id)
     assert user.blocked?, 'User should be blocked'
   end
 

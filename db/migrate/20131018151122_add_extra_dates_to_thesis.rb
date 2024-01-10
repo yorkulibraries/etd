@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddExtraDatesToThesis < ActiveRecord::Migration[5.0]
   def change
     add_column :theses, :student_accepted_terms_at, :date

@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 class StudentMailer < ApplicationMailer
   default from: 'noreply@etd.library.yorku.ca'
 
   def invitation_email(student)
-    @template = Liquid::Template.parse(AppSettings.email_welcome_body)  # Parses and compiles the template
+    @template = Liquid::Template.parse(AppSettings.email_welcome_body) # Parses and compiles the template
 
     ## setup variables
     @date = Date.today.strftime('%b %e, %Y')
@@ -17,7 +19,7 @@ class StudentMailer < ApplicationMailer
   end
 
   def status_change_email(student, thesis, old_status, new_status, additional_recipients = [], custom_message = nil)
-    @template = Liquid::Template.parse(AppSettings.email_status_change_body)  # Parses and compiles the template
+    @template = Liquid::Template.parse(AppSettings.email_status_change_body) # Parses and compiles the template
 
     @student = student
     @thesis = thesis

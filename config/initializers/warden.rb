@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Devise YorkU Strategy for Passport York Authentication
 Warden::Strategies.add(:ppy_devise) do
   # it must have a `valid?` method to check if it is appropriate to use

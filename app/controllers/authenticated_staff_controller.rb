@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AuthenticatedStaffController < ApplicationController
   before_action :redirect_if_not_staff
 

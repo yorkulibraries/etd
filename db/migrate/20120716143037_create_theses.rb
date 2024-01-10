@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateTheses < ActiveRecord::Migration[5.0]
   def self.up
     create_table :theses do |t|

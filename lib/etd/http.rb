@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'net/http'
 
 # Lengthen timeout in Net::HTTP
@@ -7,7 +9,7 @@ module Net
 
     def initialize(*args)
       old_initialize(*args)
-      @read_timeout = 60 * 60     # 60 minutes
+      @read_timeout = 60 * 60 # 60 minutes
     end
   end
 end

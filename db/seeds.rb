@@ -1,10 +1,12 @@
-# rails db:seed
-LocSubject.load_from_file('lib/loc_subjects.txt') if Rails.env != 'test' and LocSubject.all.count == 0
+# frozen_string_literal: true
 
-if Rails.env != 'test' and User.all.count == 0
+# rails db:seed
+LocSubject.load_from_file('lib/loc_subjects.txt') if (Rails.env != 'test') && LocSubject.all.count.zero?
+
+if (Rails.env != 'test') && User.all.count.zero?
   [User::ADMIN, User::MANAGER, User::STAFF].each do |role|
     user = User.new
-    user.username = "#{role}"
+    user.username = role.to_s
     user.email = "#{role}@me.ca"
     user.name = "#{role} User"
     user.role = role

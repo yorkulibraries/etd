@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CommitteeMember < ApplicationRecord
   # attr_accessible :name, :role, :thesis_id
 
@@ -9,7 +11,7 @@ class CommitteeMember < ApplicationRecord
   DEANS_REPRESENTATIVE = "Dean's Representative"
   EXTERNAL_EXAMINER = 'External Examiner'
 
-  ROLES = [CHAIR, COMMITTEE_MEMBER, OUTSIDE_MEMBER, DEANS_REPRESENTATIVE, EXTERNAL_EXAMINER]
+  ROLES = [CHAIR, COMMITTEE_MEMBER, OUTSIDE_MEMBER, DEANS_REPRESENTATIVE, EXTERNAL_EXAMINER].freeze
 
   ## RELATIONS ##
   belongs_to :thesis

@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class StudentsController < ApplicationController
   authorize_resource
 
   def gem_search
     if params[:sisid]
       @students = Student.find_by_sisid_or_name(params[:sisid])
-      if @students.size > 0
+      if @students.size.positive?
         if @students.size == 1
           @student = @students.first
           redirect_to @student
@@ -18,7 +20,7 @@ class StudentsController < ApplicationController
         if records.size == 1
           @gem_record = records.first
           redirect_to @gem_record, notice: "This is still a Gem Record, it hasn't been converted to an ETD Record."
-        elsif records.size == 0
+        elsif records.empty?
           redirect_to gem_records_path, alert: 'Student was not found. The student must exist in the Gem database.'
         else
           @search_result = "Results for '#{params[:sisid]}' search"
@@ -57,7 +59,7 @@ class StudentsController < ApplicationController
 
   def audit_trail
     @student = Student.find(params[:id])
-    @audits = @student.audits | @student.associated_audits | @student.theses.collect { |t| t.associated_audits }.flatten
+    @audits = @student.audits | @student.associated_audits | @student.theses.collect(&:associated_audits).flatten
     @audits.sort! { |a, b| a.created_at <=> b.created_at }
 
     @audits_grouped = @audits.reverse.group_by { |a| a.created_at.at_beginning_of_day }
@@ -69,9 +71,9 @@ class StudentsController < ApplicationController
     redirect_to student_view_index_path if current_user.role == User::STUDENT
 
     @current_theses = @student.theses
-    gem_record_event_ids = @current_theses.collect { |t| t.gem_record_event_id }
+    gem_record_event_ids = @current_theses.collect(&:gem_record_event_id)
 
-    @available_theses = if gem_record_event_ids.count > 0
+    @available_theses = if gem_record_event_ids.count.positive?
                           GemRecord.where(sisid: @student.sisid).where('seqgradevent not in (?)', gem_record_event_ids)
                         else
                           GemRecord.where(sisid: @student.sisid)
@@ -81,22 +83,20 @@ class StudentsController < ApplicationController
   def new
     @student = Student.new
 
-    if params[:sisid]
+    return unless params[:sisid]
 
-      record = GemRecord.find_by_sisid(params[:sisid])
-      if record
-        @student.sisid = record.sisid
-        @student.username = record.sisid.to_s
-        @student.name = record.studentname
-        @student.email = record.emailaddress
-        @student.created_by = current_user
-        @student.blocked = true
-        @student.role = User::STUDENT
+    record = GemRecord.find_by_sisid(params[:sisid])
+    return unless record
 
-        redirect_to @student, notice: "Converted #{@student.name} record from Gem." if @student.save
+    @student.sisid = record.sisid
+    @student.username = record.sisid.to_s
+    @student.name = record.studentname
+    @student.email = record.emailaddress
+    @student.created_by = current_user
+    @student.blocked = true
+    @student.role = User::STUDENT
 
-      end
-    end
+    redirect_to @student, notice: "Converted #{@student.name} record from Gem." if @student.save
   end
 
   def create

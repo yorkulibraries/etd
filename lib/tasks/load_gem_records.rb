@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ##
 # Function to load gem records from a text file, delimited by __ETD_COLSEP__
 ##
@@ -5,7 +7,7 @@ class LoadGemRecords
   def load_stdin
     count = 0
 
-    STDIN.each_line do |line|
+    $stdin.each_line do |line|
       tokens = line.split('__ETD_COLSEP__')
       seqgradevent = tokens[0].strip
 
@@ -39,10 +41,9 @@ class LoadGemRecords
         end
 
       end
-
     rescue StandardError => e
-      warn('ERROR: ' + e.to_s)
+      warn("ERROR: #{e}")
       warn('Hint: Possible Bad File if strip nil')
-    end # STDIN
+    end
   end
-end # class
+end
