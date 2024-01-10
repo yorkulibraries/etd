@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ThesesHelper
   def format(field, simple_format = false, message = 'Not filled in...')
     # If field is blank, print out blank message

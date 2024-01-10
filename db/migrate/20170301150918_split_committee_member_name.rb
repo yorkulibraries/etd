@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SplitCommitteeMemberName < ActiveRecord::Migration[5.0]
   def change
     add_column :committee_members, :first_name, :string

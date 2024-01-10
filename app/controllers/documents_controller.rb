@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DocumentsController < ApplicationController
   authorize_resource
   before_action :load_student_and_thesis

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :gem_record do
     studentname   { FactoryGirl.generate(:random_name) }

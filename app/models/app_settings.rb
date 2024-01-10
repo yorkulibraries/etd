@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # RailsSettings Model
 class AppSettings < RailsSettings::Base
   cache_prefix { 'v1' }

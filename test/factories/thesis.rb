@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :thesis do
     gem_record_event_id { FactoryGirl.generate(:random_seqgradevent) }

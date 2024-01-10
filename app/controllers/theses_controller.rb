@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ThesesController < ApplicationController
   load_and_authorize_resource :student
   authorize_resource :thesis, through: :student
@@ -20,19 +22,18 @@ class ThesesController < ApplicationController
 
     @thesis.author = @student.name
     @thesis.published_date = 1.year.from_now
-    if params[:gem_record]
-      record = GemRecord.find(params[:gem_record])
+    return unless params[:gem_record]
 
-      if record && record.sisid.to_i == @student.sisid.to_i
-        @thesis.title = record.title
-        @thesis.gem_record_event_id = record.seqgradevent
-        @thesis.supervisor = record.superv
-        @thesis.exam_date = record.examdate
-        @thesis.program = record.program
-        @thesis.assign_degree_name_and_level
+    record = GemRecord.find(params[:gem_record])
 
-      end
-    end
+    return unless record && record.sisid.to_i == @student.sisid.to_i
+
+    @thesis.title = record.title
+    @thesis.gem_record_event_id = record.seqgradevent
+    @thesis.supervisor = record.superv
+    @thesis.exam_date = record.examdate
+    @thesis.program = record.program
+    @thesis.assign_degree_name_and_level
   end
 
   def create
@@ -120,7 +121,7 @@ class ThesesController < ApplicationController
         StudentMailer.status_change_email(@student, @thesis, old_status, @thesis.status, additional_recipients,
                                           custom_message).deliver_later
         additional_recipients << @student.email
-        @email_sent = 'Sent to ' + additional_recipients.join(', ')
+        @email_sent = "Sent to #{additional_recipients.join(', ')}"
       end
 
     else

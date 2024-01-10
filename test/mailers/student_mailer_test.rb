@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class StudentMailerTest < ActionMailer::TestCase
@@ -42,10 +44,10 @@ class StudentMailerTest < ActionMailer::TestCase
       AppSettings.email_welcome_allow = false
       AppSettings.email_status_change_allow = false
 
-      mail = StudentMailer.status_change_email(@student, Thesis.new, Thesis::OPEN, Thesis::UNDER_REVIEW).deliver_now
+      StudentMailer.status_change_email(@student, Thesis.new, Thesis::OPEN, Thesis::UNDER_REVIEW).deliver_now
       assert ActionMailer::Base.deliveries.empty?, 'should not work'
 
-      mail = StudentMailer.invitation_email(@student).deliver_now
+      StudentMailer.invitation_email(@student).deliver_now
       assert ActionMailer::Base.deliveries.empty?, 'should not work'
     end
   end
