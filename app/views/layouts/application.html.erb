@@ -31,13 +31,10 @@
 			<div class="row align-items-center shadow-lg rounded-3 border">
 				<div class="workspace">
 					<% flash.each do |name, msg| %>
-						<div class="alert alert-<%= name == " notice" ? "success" : "error" %>">
-							<a class="close" data-dismiss="alert">×</a>
-							<strong>
-								<%= name.capitalize %>:
-							</strong>
-							<%= msg %>
-						</div>
+						<div class="alert alert-<%= name == :notice ? "success" : "error" %>" role="alert">
+							<strong><%= name.capitalize %>:</strong><%= msg %>
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			  			</div>
 					<% end %>
 					<div class="page-header">
 						<%= content_tag :h1, yield(:title) if show_title? && !content_for?(:title_html) %>

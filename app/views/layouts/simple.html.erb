@@ -11,9 +11,9 @@
 
 			<% flash.each do |name, msg| %>
 			  <div class="push-down"></div>
-			  <div class="alert alert-<%= name == :notice ? "success" : "error" %>">
-			    <a class="close" data-dismiss="alert">×</a>
-			    <%= msg %>
+			  <div class="alert alert-<%= name == :notice ? "success" : "error" %>" role="alert">
+				<%= msg %>
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 			  </div>
 			<% end %>
 
