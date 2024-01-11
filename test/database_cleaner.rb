@@ -12,9 +12,3 @@ class Minitest::Spec
   end
 end
 
-# with the minitest-around gem, this may be used instead:
-class Minitest::Spec
-  around do |tests|
-    DatabaseCleaner.cleaning(&tests)
-  end
-end
