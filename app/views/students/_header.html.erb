@@ -19,15 +19,15 @@
 					<span class="trivial">all actions</span>
 			</td>
 			<td width="14%">
-				<%= link_to "Make changes", edit_student_path(@student), class: "green" %><br/>
+				<%= link_to "Make changes", edit_student_path(@student), class: "text-success" %><br/>
 				<span class="trivial">to student details</span>
 			</td>
 			<td width="12%">
 				<% if @student.blocked? %>
-					<%= link_to "Unblock student",  unblock_student_path(@student), method: :post, :data => { :confirm => 'Are you sure?'}, :class => "red"  %><br/>
+					<%= link_to "Unblock student",  unblock_student_path(@student), method: :post, :data => { :confirm => 'Are you sure?'}, :class => "text-danger"  %><br/>
 					<span class="trivial">allow access</span>
 				<% else %>
-					<%= link_to "Block student",  block_student_path(@student), :data => { :confirm => 'Are you sure?'} , :method => :post, :class => "red" %><br/>
+					<%= link_to "Block student",  block_student_path(@student), :data => { :confirm => 'Are you sure?'} , :method => :post, :class => "text-danger" %><br/>
 					<span class="trivial">disable access</span>
 				<% end %>
 
