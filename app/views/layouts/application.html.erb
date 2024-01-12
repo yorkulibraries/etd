@@ -28,11 +28,11 @@
 			</div>
 		</div>
 		<div class="container my-3">
-			<div class="row align-items-center shadow-lg rounded-3 border">
+			<div class="row align-items-center shadow-lg rounded-3 border pt-3 pb-3">
 				<div class="workspace">
 					<% flash.each do |name, msg| %>
-						<div class="alert alert-<%= name == :notice ? "success" : "error" %>" role="alert">
-							<strong><%= name.capitalize %>:</strong><%= msg %>
+						<div class="alert alert-dismissible fade show alert-<%= name == " notice" ? "success" : "warning" %>" role="alert">
+							<strong><%= name.capitalize %>:</strong> <%= msg %>
 							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 			  			</div>
 					<% end %>
