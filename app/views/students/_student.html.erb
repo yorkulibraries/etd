@@ -1,14 +1,16 @@
-<div class="student">
-	<table width="100%">
-		<tr>
-			<td class="avatar"><i class=" fa fa-graduation-cap"></i></td>
-			<td class="meat">
-				<h3><%= link_to student.name, student %></h3>
-				<p class="blend">created by <%= student.created_by.name %> on <%= student.created_at.strftime("%B %d, %Y") %></p>
-			</td>
-			<td class="extra">
-				<span class="strong"><%= student.sisid %> </span>
-			</td>
-		</tr>
-	</table>
+<div class="card mb-3">
+  <div class="row">
+    <div class="col-md-1">
+      <%= fa_stacked_icon "graduation-cap",base: "none", class: "fa-4x" %>
+    </div>
+    <div class="col-md-9 my-auto">
+      <div class="card-body">
+		<h5 class="card-title"><%= link_to student.name, student %></h5>
+		<p class="card-text">created by <%= student.created_by.name %> on <%= student.created_at.strftime("%B %d, %Y") %></p>
+      </div>
+    </div>
+	<div class="col-md-2 my-auto">
+		<div class="float-end pe-4"><%= student.sisid %></div>
+    </div>
+  </div>
 </div>
