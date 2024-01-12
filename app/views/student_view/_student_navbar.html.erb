@@ -1,7 +1,6 @@
-<li class="<%= "active" if controller_name == "student_view" && action_name !="details" %>">
-	<a href="<%= student_view_index_path %>">My ETD Submission</a>
+<li class="nav-item">
+	<%= active_link_to "My ETD Submission", student_view_index_path, active: /\A\/my\z/, class:"nav-link" %>
 </li>
-<li class="<%= "active" if controller_name == "student_view" && action_name =="details"%>">
-	<a href="<%= student_view_details_path %>">My Details</a>
-</li>	
-
+<li class="nav-item">
+	<%= active_link_to "My Details", student_view_details_path, active: /\/details/, class:"nav-link" %>
+</li>
