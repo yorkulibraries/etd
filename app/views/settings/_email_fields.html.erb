@@ -1,14 +1,19 @@
-<ul class="nav nav-tabs" role="tablist">
-  <li class="active">
-		<a href="#general_email_settings" role="tab" data-toggle="tab">General</a>
-	</li>
-  <li><a href="#welcome_email_settings" role="tab" data-toggle="tab">Welcome Email</a></li>
-  <li><a href="#status_change_email_settings" role="tab" data-toggle="tab">Status Change Email</a></li>
-  <li><a href="#helpful_tags_settings" role="tab" data-toggle="tab">Helpful Tags</a></li>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#general_email_settings" type="button" role="tab" aria-selected="true">General</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#welcome_email_settings" type="button" role="tab" aria-selected="false">Welcome Email</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#status_change_email_settings" type="button" role="tab" aria-selected="false">Status Change Email</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#helpful_tags_settings" type="button" role="tab" aria-selected="false">Helpful Tags</button>
+  </li>
 </ul>
-<!-- Tab panes -->
-<div class="tab-content">
-  <div class="tab-pane active" id="general_email_settings">
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active" id="general_email_settings" role="tabpanel" tabindex="0">
     <div class="row">
       <div class="span4">
         <%= f.input :email_allow, as: :radio_buttons, label: "Enable Email Communication?" %>
@@ -17,26 +22,26 @@
         <%= f.input :email_from, label: "From Address", input_html: { class: "input-block-level"} %>
       </div>
     </div>
-
-
   </div>
-  <div class="tab-pane" id="welcome_email_settings">
-		<h4>Welcome Email</h4>
+
+  <div class="tab-pane fade" id="welcome_email_settings" role="tabpanel" tabindex="0">
+    <h4>Welcome Email</h4>
     <%= f.input :email_welcome_allow, as: :radio_buttons, label: "Allow Welcome Email?" %>
 		<%= f.input :email_welcome_subject, label: "Subject", input_html: { class: "span8" } %>
 		<%= f.input :email_welcome_body, as: :text, label: "Body", input_html: { rows: 20, class: "span8" } %>
 		<p class="help-block">Available Tags: {{student_name}} | {{date}} | {{date-short}} | {{application_url}} </p>
   </div>
-  <div class="tab-pane" id="status_change_email_settings">
-			<h4>Status Change Email</h4>
-      <%= f.input :email_status_change_allow, as: :radio_buttons, label: "Allow Status Change Email?" %>
-			<%= f.input :email_status_change_subject, label: "Subject", input_html: { class: "span8" } %>
-			<%= f.input :email_status_change_body, as: :text, label: "Body", input_html: { rows: 20, class: "span8" } %>
-			<p class="help-block">Available Tags:
-				{{thesis_title}} | {{student_name}} | {{custom_message}} | {{old_status}} | {{new_status}} | {{date}} | {{date-short}}| {{application_url}} </p>
+
+  <div class="tab-pane fade" id="status_change_email_settings" role="tabpanel" tabindex="0">
+    <h4>Status Change Email</h4>
+    <%= f.input :email_status_change_allow, as: :radio_buttons, label: "Allow Status Change Email?" %>
+    <%= f.input :email_status_change_subject, label: "Subject", input_html: { class: "span8" } %>
+    <%= f.input :email_status_change_body, as: :text, label: "Body", input_html: { rows: 20, class: "span8" } %>
+    <p class="help-block">Available Tags:
+      {{thesis_title}} | {{student_name}} | {{custom_message}} | {{old_status}} | {{new_status}} | {{date}} | {{date-short}}| {{application_url}} </p>
   </div>
-  <div class="tab-pane" id="helpful_tags_settings">
-		<h4>Useful Tags For Email Text</h4>
+  <div class="tab-pane fade" id="helpful_tags_settings" role="tabpanel" tabindex="0">
+    <h4>Useful Tags For Email Text</h4>
 		<p>These tags will be processed and replace with the actual value before the email is sent out.</p>
 
 		<ul>
