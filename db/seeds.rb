@@ -15,4 +15,6 @@ if (Rails.env != 'test') && User.all.count.zero?
   end
 end
 
-10.times { |i| Student.create(username: "username#{i}" , name: "name#{i}", email: "email#{i}@domain.com", created_by_id: 1, blocked: false, role: User::STUDENT, sisid: "10000000#{i}") } if Rails.env.development?
+for i in 10..25
+  Student.create(username: "username#{i}" , name: "name#{i}", email: "email#{i}@domain.com", created_by_id: 1, blocked: false, role: User::STUDENT, sisid: "1000000#{i}") if Rails.env.development?
+end

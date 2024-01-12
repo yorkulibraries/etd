@@ -10,8 +10,8 @@
 <% end %>
 
 <div class="pull-right fitted">
-	<%= link_to_if params[:oldest], "Newest", students_path(newest: true) %> | 
-	<%= link_to_unless params[:oldest], "Oldest", students_path(oldest: true) %>	
+	<%= link_to_if params[:oldest], "Newest", students_path(newest: true), class: "btn btn-outline-secondary" %> | 
+	<%= link_to_unless params[:oldest], "Oldest", students_path(oldest: true),class: "btn btn-outline-secondary" %>	
 </div>
 <div class="pagination">
 	<%= paginate @students %>
