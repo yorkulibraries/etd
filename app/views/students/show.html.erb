@@ -5,13 +5,13 @@
 <% end %>
 
 <% if @student.blocked %>
-	<div class="alert alert-warning fade show fitted" role="alert">
+	<div class="alert alert-warning alert-dismissible fitted" role="alert">
 		<strong>This student is blocked from accessing this record.</strong>
 		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 	</div>
 <% end %>
 
-<div class="student fitted">
+<div class="table table-striped">
 	<table cellpadding="5">
 		<tr>
 			<td class="blend" width="10%">username</td>
