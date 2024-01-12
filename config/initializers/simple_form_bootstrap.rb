@@ -24,7 +24,7 @@ SimpleForm.setup do |config|
   config.label_text = ->(label, required, _explicit_label) { "#{label} #{required}" }
 
   # Define the way to render check boxes / radio buttons with labels.
-  config.boolean_style = :inline
+  config.boolean_style = :nested
 
   # You can wrap each item in a collection of radio/check boxes with a tag
   config.item_wrapper_tag = :div
@@ -34,7 +34,7 @@ SimpleForm.setup do |config|
   config.include_default_input_wrapper_class = false
 
   # CSS class to add for error notification helper.
-  config.error_notification_class = 'alert alert-danger'
+  config.error_notification_class = '©danger'
 
   # Method used to tidy up errors. Specify any Rails Array method.
   # :first lists the first message for each field.
@@ -81,11 +81,11 @@ SimpleForm.setup do |config|
                                         tag: 'fieldset', class: 'form-group', error_class: 'form-group-invalid', valid_class: 'form-group-valid' do |b|
     b.use :html5
     b.optional :readonly
-    b.wrapper :legend_tag, tag: 'legend', class: 'col-form-label pt-0' do |ba|
+    b.wrapper :legend_tag, tag: 'legend', class: 'col-form-label pt-0 d-block' do |ba|
       ba.use :label_text
     end
     b.use :input, class: 'form-check-input', error_class: 'is-invalid', valid_class: 'is-valid'
-    b.use :full_error, wrap_with: { tag: 'div', class: 'invalid-feedback d-block' }
+    b.use :full_error, wrap_with: { tag: 'div', class: 'invalid-feedback' }
     b.use :hint, wrap_with: { tag: 'small', class: 'form-text text-muted' }
   end
 
