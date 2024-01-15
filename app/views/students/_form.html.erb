@@ -12,6 +12,9 @@
 	</div>
 </p>
 	<% if can? :destroy, Student %>
+		<p class="alert alert-danger fitted" id="delete_student_promt">
+			<a href="#" onclick="$('#delete_student').show(); $(this).parent().hide();" class="link-danger"><i class="fa fa-trash"></i> Delete Student Record?</a>
+		</p>
 
 		<div class="alert alert-warning fitted hide" id="delete_student">
 			<p>You can delete this student from the system completely. </p>
