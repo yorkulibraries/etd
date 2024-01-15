@@ -1,11 +1,9 @@
 <% title "DSpace Export" %>
 <% title_html do %>
 	<h1>DSpace Export</h1>
-	<div class="float-end"><p><%= link_to "+ DSpace Export", new_export_log_path, remote: true %></p></div>
 <% end %>
+	<div class="float-end"><%= link_to "+ DSpace Export", new_export_log_path, class: "btn btn-secondary", remote: true %></div><br />
 
-<div class="home fitted">
-	<div id="reports">
 		<ul class="nav nav-tabs">
 			<li><%= active_link_to "Open", export_logs_path(which: 'open'), class:"nav-link", active: /\A\/exports\z|open/ %></li>
 			<li><%= active_link_to "Running", export_logs_path(which: 'running'), class:"nav-link", active: /running/ %></li>
@@ -16,5 +14,3 @@
 		<div id="export_logs_list">
 			<%= render partial: "export_logs_list" %>
 		</div>
-	</div>
-</div>
