@@ -12,24 +12,8 @@
 
 <body>
 	<main>
-		<div class="container my-3">
-			<div class="row align-items-center shadow-lg rounded-3 border">
-				<div class="container">
-					<div class="york_header">
-						<%= image_tag("yorklogo.gif", alt: "York University - Graduate Studies" )%>
-							<h4 class="float-end pt-2">Faculty of Graduate Studies</h4>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="container my-3">
-			<div class="row align-items-center shadow-lg rounded-3 border">
-				<%= render :template=> "layouts/navbar" %>
-			</div>
-		</div>
-
 		<% if AppSettings.app_maintenance=="true" %>
-			<div class="container">
+			<div class="container pt-4">
 				<div class="row">
 					<div class="alert alert-warning">
 						<h3>Attention!</h3>
@@ -38,10 +22,18 @@
 				</div>
 			</div>
 		<% end %>
-
 		<div class="container my-3">
-			<div class="row align-items-center shadow-lg rounded-3 border pt-3 pb-3">
-				<div class="workspace">
+			<div class="row align-items-center shadow-lg rounded-3 border">
+				<div class="container">
+					<div class="york_header">
+						<%= image_tag("yorklogo.gif", alt: "York University - Graduate Studies" )%>
+							<h4 class="float-end pt-2">Faculty of Graduate Studies</h4>
+					</div>
+				</div>
+
+				<%= render :template=> "layouts/navbar" %>
+	
+				<div class="workspace pt-3 pb-3">
 					<% flash.each do |name, msg| %>
 						<div class="alert alert-dismissible fade show alert-<%= name.strip == "notice" ? "success" : "warning" %>" role="alert">
 							<strong><%= name.capitalize %>:</strong> <%= msg %>
@@ -65,8 +57,7 @@
 					</div>
 				</div>
 			</div>
-			<section class="weak push-down">Electronic Thesis Dissertation Submission Program (ETD) - York University Libraries - v.<%= app_version %>
-			</section>
+			<section class="weak push-down">Electronic Thesis Dissertation Submission Program (ETD) - York University Libraries - v.<%= app_version %></section>
 		</div>
 	</main>
 </body>
