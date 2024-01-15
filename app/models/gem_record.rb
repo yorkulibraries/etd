@@ -37,6 +37,6 @@ class GemRecord < ApplicationRecord
 
   ### FINDERS ###
   def self.find_by_sisid_or_name(query)
-    where('sisid = ? OR studentname LIKE ? ', query, "%#{query}%")
+    where('sisid = ? OR studentname LIKE %?% ', query, query)
   end
 end
