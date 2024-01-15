@@ -2,80 +2,94 @@
 
 <%= render "nav" %>
 
-<div class="reports fitted">
-	<h4><i>Report on Theses</i></h4>
-
-
-		<table class="table table-striped" >
-			<tr>
-				<td class="span4">Currently Open</td>
-				<td class="strong span2" align="right"><%= @theses_open_count %></td>
-			</tr>
-			<tr>
-				<td class="span4">Currently Under Review</td>
-				<td class="strong span2"><%= @theses_under_review_count %></td>
-			</tr>
-			<tr>
-				<td class="span4">Currently Rejected</td>
-				<td class="strong span2"><%= @theses_rejected_count %></td>
-			</tr>
-			<tr>
-				<td class="span4">Currently Accepted</td>
-				<td class="strong span2"><%= @theses_accepted_count %></td>
-			</tr>
-			<tr>
-				<td class="span4">Currently Permanently Embargoed</td>
-				<td class="strong span2"><%= @theses_embargoed_count %></td>
-			</tr>
-			<tr>
-				<td class="span4">Currently Published</td>
-				<td class="strong span2"><%= @theses_published_count %></td>
-			</tr>
-			<tr>
-				<td class="span4">Total Theses</td>
-				<td class="strong span2"><%= @theses_count %></td>
-			</tr>
-
-		</table>
-
-		<hr/>
-
-	<h4><i>Report on Students</i></h4>
-
-		<table class="table table-striped">
-			<tr>
-				<td class="span4">Total Students</td>
-				<td class="strong span2"><%= @total_students %></td>
-			</tr>
-		</table>
-
-
-	<h4><i>Report on Gem Records</i></h4>
-
-		<table class="table table-striped ">
-			<tr>
-				<td class="span4">Total Gem Records</td>
-				<td class="strong span2"><%= @total_gem_records %></td>
-			</tr>
-		</table>
-
-	<h4><i>Report on Users</i></h4>
-
-		<table class="table table-striped ">
-			<tr>
-				<td class="span4">Total Users</td>
-				<td class="strong span2"><%= @total_users %></td>
-			</tr>
-		</table>
-
-
-	<h4><i>Report on LOC Subjects</i></h4>
-
-		<table class="table table-striped ">
-			<tr>
-				<td class="span4">Total Loc Subjects</td>
-				<td class="strong span2"><%= @total_loc_subjects %></td>
-			</tr>
-		</table>
-
+<div class="container">
+  <div class="row">
+    <div class="col-md-auto">
+		<h4><i>Report on Theses</i></h4>
+     </div>
+  </div>
+  <div class="row">
+    <table class="table table-striped">
+	  <tr>
+		<td class="col-md-10">Currently Open</td>
+		<td class="col-md-2"><%= @theses_open_count %></td>
+	  </tr>
+	  <tr>
+		<td class="col-md-10">Currently Under Review</td>
+		<td class="col-md-2"><%= @theses_under_review_count %></td>
+	  </tr>
+	  <tr>
+		<td class="col-md-10">Currently Rejected</td>
+		<td class="col-md-2"><%= @theses_rejected_count %></td>
+	  </tr>
+	  <tr>
+		<td class="col-md-10">Currently Accepted</td>
+		<td class="col-md-2"><%= @theses_accepted_count %></td>
+	  </tr>
+	  <tr>
+		<td class="col-md-10">Currently Published</td>
+		<td class="col-md-2"><%= @theses_embargoed_count %></td>
+	  </tr>
+	  <tr>
+		<td class="col-md-10">Currently Permanently Embargoed</td>
+		<td class="col-md-2"><%= @theses_published_count %></td>
+	  </tr>
+	  <tr>
+		<td class="col-md-10">Total Theses</td>
+		<td class="col-md-2"><%= @theses_count %></td>
+	  </tr>
+	</table>
+  </div>
+  <div class="row">
+	<div class="col-md-auto">
+		<h4><i>Report on Students</i></h4>
+	</div>
+  </div>
+  <div class="row">
+    <table class="table table-striped">
+	  <tr>
+		<td class="col-md-10">Total Students</td>
+		<td class="col-md-2"><%= @total_students %></td>
+	  </tr>
+	</table>
+  </div>
+  <div class="row">
+	<div class="col-md-auto">
+		<h4><i>Report on Gem Records</i></h4>
+	</div>
+  </div>
+  <div class="row">
+    <table class="table table-striped">
+	  <tr>
+		<td class="col-md-10">Total Gem Records</td>
+		<td class="col-md-2"><%= @total_gem_records %></td>
+	  </tr>
+	</table>
+  </div>
+  <div class="row">
+	<div class="col-md-auto">
+		<h4><i>Report on Users</i></h4>
+	</div>
+  </div>
+  <div class="row">
+    <table class="table table-striped">
+	  <tr>
+		<td class="col-md-10">Total Users</td>
+		<td class="col-md-2"><%= @total_users %></td>
+	  </tr>
+	</table>
+  </div>
+  <div class="row">
+	<div class="col-md-auto">
+		<h4><i>Report on LOC Subjects</i></h4>
+	</div>
+  </div>
+  <div class="row">
+    <table class="table table-striped">
+	  <tr>
+		<td class="col-md-10">Total Loc Subjects</td>
+		<td class="col-md-2"><%= @total_loc_subjects %></td>
+	  </tr>
+	</table>
+  </div>
 </div>
