@@ -32,7 +32,7 @@
 		</ul>
 		<% if can? :manage, Thesis %>
 			<%= form_tag gem_search_students_path, class: "navbar-form pull-left", method: "post " do |f| %>
-				<input name="sisid" class="form-control" placeholder="Enter SISID or Name ...">
+				<input name="sisid" class="form-control" placeholder="Enter SISID or Name">
 			<% end %>
 		<% end %>
 		<ul class="navbar-nav mt-2 mt-md-0">
