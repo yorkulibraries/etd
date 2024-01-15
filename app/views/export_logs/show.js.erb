@@ -4,6 +4,9 @@ $("#full_info_export_log_holder").empty();
 $("#full_info_export_log_holder").remove();
 
 $("body").append("<div id='full_info_export_log_holder'></div>");
-$('#full_info_export_log_holder').prepend('<%=escape_javascript render("export_logs/full_info") %>');
 
-$("#full_info_export_log").modal('show');
+$("#full_info_export_log_holder").append('<%= j render("export_logs/full_info") %>');
+var myModal = new bootstrap.Modal(document.getElementById('full_info_export_log'), {
+    backdrop: 'static'
+});
+myModal.show();
