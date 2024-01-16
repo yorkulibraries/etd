@@ -9,12 +9,14 @@
 	<h4> Students </h4>
 <% end %>
 
-<div class="pull-right fitted">
-	<%= link_to_if params[:oldest], "Newest", students_path(newest: true), class: "btn btn-outline-secondary" %> | 
-	<%= link_to_unless params[:oldest], "Oldest", students_path(oldest: true),class: "btn btn-outline-secondary" %>	
-</div>
-<div class="pagination">
-	<%= paginate @students %>
+<div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+  <div class="btn-group" role="group" aria-label="First group">
+		<%= paginate @students %>
+  </div>
+  <div class="input-group">
+		<%= link_to_if params[:oldest], "Newest", students_path(newest: true), class: "btn btn-outline-secondary" %>
+		<%= link_to_unless params[:oldest], "Oldest", students_path(oldest: true),class: "btn btn-outline-secondary" %>	
+  </div>
 </div>
 
 <div class="students mt-4">
