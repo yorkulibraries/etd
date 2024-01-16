@@ -3,8 +3,6 @@
 class GemRecord < ApplicationRecord
   audited
 
-  # attr_accessible :studentname, :sisid, :emailaddress, :eventtype, :eventdate, :examresult, :title, :program, :superv
-
   validates_presence_of :studentname, :sisid, :emailaddress, :eventtype, :eventdate, :examresult, :title, :program,
                         :superv
 

@@ -15,7 +15,7 @@
 		 Go To Student Record <i class="fa  fa-chevron-right"></i>
 	<% end %>
 <% else %>
-	<%= link_to new_student_path(sisid: @gem_record.sisid), method: :get, data: { confirm: "Are you sure?" }, class: "btn btn-inverse" do %>
-		 Create ETD Student Record <i class="fa fa-plus"></i>
+	<%= link_to new_student_path(sisid: @gem_record.sisid), method: :get, data: { confirm: "Are you sure?" }, class: "btn btn-outline-primary" do %>
+		Create ETD Student Record <i class="fa fa-plus"></i>
 	<% end %>
 <% end %>
