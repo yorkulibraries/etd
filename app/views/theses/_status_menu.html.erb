@@ -6,7 +6,7 @@
 
 <div id="status_menu">
 	<button type="button" class="btn btn-light" id="status_change_link"
-			data-bs-toggle="popover" data-bs-placement="right"
+			data-bs-toggle="popover" data-bs-placement="bottom"
 			data-bs-custom-class="custom-popover"
 			data-bs-title="Change Thesis Status">
 		Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span> &nbsp;<span class="caret"></span>
@@ -15,10 +15,17 @@
 	<div id="status_change" class="d-none">
 		<%= form_tag update_status_student_thesis_path(@student, @thesis) do %>
 			<div class="statuses">
-				<% statuses.each do |status |%>
-					<span class="status status-<%= status %>">
-						<input type="radio" name="status" value="<%= status %>"><%= Thesis::STATUS_ACTIONS[status]%>
-					</span>
+				<% statuses.each_with_index do |status, index |%>
+					<% classes = if index == 0 %>
+						<% 'bg-primary' %>
+					<% elsif index == 1 %>
+						<% 'bg-secondary' %>
+					<% elsif index == 2 %>
+						<% 'bg-success' %>
+					<% end %>
+					<div class="p-1 mb-2 rounded <%= classes %> text-white fw-bold">
+						<input type="radio" name="status" value="<%= status %>" class="me-2"><%= Thesis::STATUS_ACTIONS[status]%>
+					</div>
 				<% end %>
 			</div>
 			<hr>
@@ -37,12 +44,12 @@
 					<input type="checkbox" checked="checked" id="notify_current_user" name="notify_current_user" value="true"/> <%= current_user.name %> <strong>(Me)</strong>
 				</div>
 				<hr/>
-				<textarea rows="2" cols="10" name="custom_message" placeholder="Custom message..."></textarea>
+				<textarea class="form-control" rows="2" cols="10" name="custom_message" placeholder="Custom message..."></textarea>
 				<br/><br/>
 
 			</div>
 
-			<input type="submit" value="Change Status" id="status_change_button"/> or <a href="#" onclick="$('#status_change_link').popover('hide');">Cancel</a>
+			<input type="submit" class="btn btn-outline-secondary" value="Change Status" id="status_change_button"/> or <a href="#" onclick="$('#status_change_link').popover('hide');">Cancel</a>
 		<% end %>
 	</div>
 </div>
