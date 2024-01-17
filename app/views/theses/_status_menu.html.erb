@@ -9,7 +9,7 @@
 			data-bs-toggle="popover" data-bs-placement="bottom"
 			data-bs-custom-class="custom-popover"
 			data-bs-title="Change Thesis Status">
-		Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span> &nbsp;<span class="caret"></span>
+		Status: <span class="badge bg-primary"><%= @thesis.status.humanize %></span> &nbsp;<span class="caret"></span>
 	</button>
 
 	<div id="status_change" class="d-none">
