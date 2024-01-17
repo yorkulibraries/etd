@@ -11,7 +11,7 @@
 	<hr class="fitted"/>
 	
 	<div class="action controls">
-		<%= f.button :submit %>  or <%= link_to "Cancel",  @thesis.new_record? ? @student :  [@student, @thesis] %>
+		<%= f.button :submit, class: "btn btn-light" %>  or <%= link_to "Cancel",  @thesis.new_record? ? @student :  [@student, @thesis] %>
 	</div>
 
 	<div class="hide error_messages">
