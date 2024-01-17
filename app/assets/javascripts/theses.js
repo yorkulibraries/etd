@@ -6,15 +6,12 @@ $(document).ready(function(){
   $('#thesis_exam_date').datepicker({ dateFormat: 'yy-mm-dd' });
 	
 	/** STATUS NOTIFICATIONS **/
-  $("#status_change_link").popover( { 
-		title: "Change Thesis Status", 
-		placement: "bottom",
-		html: true,
-		content: $("#status_change").html(),
-		trigger: "click"
-		
-	});
-	
+  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+  const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl, {
+	  content: $("#status_change").html(),
+	  html: true,
+	  sanitize: false,
+  }));
 	
 	/* ReadOnly Field View */
 	$(".readonly-field a").click(function() {
