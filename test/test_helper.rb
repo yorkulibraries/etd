@@ -9,6 +9,11 @@ require 'factory_girl_rails'
 require 'minitest/unit'
 require 'mocha/minitest'
 require 'database_cleaner/active_record'
+require 'capybara/rails'
+require 'capybara/minitest'
+
+Capybara.server_host = '0.0.0.0'
+Capybara.app_host = "http://#{Socket.gethostname}:#{Capybara.server_port}"
 
 include ActionDispatch::TestProcess
 
@@ -25,6 +30,15 @@ module ActiveSupport
     include FactoryGirl::Syntax::Methods
     include Warden::Test::Helpers
     Warden.test_mode!
+
+    # Make the Capybara DSL available in all integration tests
+    include Capybara::DSL
+    # Make `assert_*` methods behave like Minitest assertions
+    include Capybara::Minitest::Assertions
+    teardown do
+      Capybara.reset_sessions!
+      Capybara.use_default_driver
+    end
   end
 end
 

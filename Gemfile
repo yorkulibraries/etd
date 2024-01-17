@@ -68,6 +68,8 @@ group :development, :test do
 end
 
 group :test do
+  gem 'capybara', '~> 3.39', '>= 3.39.2'
+  gem 'selenium-webdriver', '~> 4.15'
   gem 'byebug', '~> 11.1', '>= 11.1.3'
   gem 'database_cleaner-active_record'
   gem 'factory_girl_rails', '4.8.0'
