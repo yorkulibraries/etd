@@ -23,7 +23,6 @@
 
 
 $(document).ready(function () {
-	//$("input[placeholder], textarea[placeholder]").enablePlaceholder({"withPlaceholderClass": "light-text"});
 
 	$('.dropdown-toggle').dropdown();
 

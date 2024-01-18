@@ -8,7 +8,7 @@ class AppSettings < RailsSettings::Base
   field :app_owner, default: ENV['app_owner'] || 'York University Libraries'
   field :app_maintenance, default: ENV['app_maintenance'] || false
   field :app_maintenance_message,
-        default: ENV['app_maintenance_message'] || 'ETD Application will be taken down for maintenance today from 12pm to 1pm.  We appologize for any inconvenience this may have caused.'
+        default: ENV['app_maintenance_message'] || 'ETD Application will be taken down for maintenance today from 12pm to 1pm.  We apologize for any inconvenience this may have caused.'
   field :email_allow, default: ENV['email_allow'] || true
   field :email_from, default: ENV['email_from'] || 'noreply@library.yorku.ca'
   field :email_welcome_subject,
@@ -23,11 +23,6 @@ class AppSettings < RailsSettings::Base
   field :errors_email_from,
         default: ENV['errors_email_from'] || "'ETD Notifier' <etd-errors@your-instituttion.website>"
   field :errors_email_to, default: ENV['errors_email_to'] || 'your.email@your-instituttion.email'
-  field :dspace_test_username, default: ENV['dspace_test_username'] || ''
-  field :dspace_test_password, default: ENV['dspace_test_password'] || ''
-  field :dspace_test_service_document_url, default: ENV['dspace_test_service_document_url'] || ''
-  field :dspace_test_collection_uri, default: ENV['dspace_test_collection_uri'] || ''
-  field :dspace_test_collection_title, default: ENV['dspace_test_collection_title'] || ''
   field :dspace_live_username, default: ENV['dspace_live_username'] || ''
   field :dspace_live_password, default: ENV['dspace_live_password'] || ''
   field :dspace_live_service_document_url, default: ENV['dspace_live_service_document_url'] || ''

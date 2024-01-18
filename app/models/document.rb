@@ -4,8 +4,6 @@ class Document < ApplicationRecord
   mount_uploader :file, DocumentUploader
   audited associated_with: :thesis
 
-  # attr_accessible :supplemental, :name, :file
-
   ### RELATIONS
   belongs_to :thesis
   belongs_to :user

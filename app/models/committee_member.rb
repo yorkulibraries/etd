@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class CommitteeMember < ApplicationRecord
-  # attr_accessible :name, :role, :thesis_id
-
   ## CONSTANTS
 
   CHAIR = 'Chair'

@@ -158,22 +158,13 @@ class DspaceExportJob < ActiveJob::Base
   end
 
   ## UTIL FUNCTIONS
-  def settings(production)
-    if production
-      {
-        username: AppSettings.dspace_live_username, password: AppSettings.dspace_live_password,
-        service_document_url: AppSettings.dspace_live_service_document_url,
-        collection_uri: AppSettings.dspace_live_collection_uri,
-        collection_title: AppSettings.dspace_live_collection_title
-      }
-    else
-      {
-        username: AppSettings.dspace_test_username, password: AppSettings.dspace_test_password,
-        service_document_url: AppSettings.dspace_test_service_document_url,
-        collection_uri: AppSettings.dspace_test_collection_uri,
-        collection_title: AppSettings.dspace_test_collection_title
-      }
-    end
+  def settings(_production)
+    {
+      username: AppSettings.dspace_live_username, password: AppSettings.dspace_live_password,
+      service_document_url: AppSettings.dspace_live_service_document_url,
+      collection_uri: AppSettings.dspace_live_collection_uri,
+      collection_title: AppSettings.dspace_live_collection_title
+    }
   end
 
   def log(string)

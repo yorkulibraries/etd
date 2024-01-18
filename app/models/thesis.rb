@@ -3,12 +3,6 @@
 class Thesis < ApplicationRecord
   attr_accessor :current_user
 
-  # attr_accessible :title, :gem_record_event_id, :author, :supervisor, :student,
-  #                 :keywords, :embargo, :language, :degree_name, :degree_level, :program, :published_date,
-  #                 :exam_date, :student_id, :committee, :abstract, :loc_subject_ids, :assigned_to_id, :assigned_to,
-  #                 :student_accepted_terms_at, :under_review_at, :accepted_at, :published_at, :returned_at,
-  #                 :committee_members_attributes, :embargoed, embargoed_at, embargoed_by_id
-
   ##### VALIDATIONS ######
 
   validates_presence_of :title, :author, :supervisor, :degree_name, :degree_level, :program, :gem_record_event_id,
