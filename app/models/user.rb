@@ -6,8 +6,6 @@ class User < ApplicationRecord
 
   before_save :default_values
 
-  # attr_accessible :username, :name, :email, :role
-
   validates_presence_of :username, :name, :email, :role
   validates_uniqueness_of :username, :email
   validates_format_of :username, with: /^[-\w._]+$/i, multiline: true, allow_blank: false,

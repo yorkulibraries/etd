@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Student < User
-  # attr_accessible :name, :email, :username, :sisid, :invitation_sent_at
 
   belongs_to :created_by, foreign_key: 'created_by_id', class_name: 'User'
 

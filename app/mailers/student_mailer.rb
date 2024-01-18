@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class StudentMailer < ApplicationMailer
-  default from: 'noreply@etd.library.yorku.ca'
-
   def invitation_email(student)
     @template = Liquid::Template.parse(AppSettings.email_welcome_body) # Parses and compiles the template
 
