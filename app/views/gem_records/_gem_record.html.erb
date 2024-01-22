@@ -1,27 +1,69 @@
-<div class="gem_record">
-	<% unless @gem_record %>
-		<h3><%= link_to gem_record.studentname, gem_record %></h3>
-		<h4><%= gem_record.title %></h4>		
-	<% end %>
+<div class="gem_record ">
+  <% unless @gem_record %>
+   <div class="py-3">
+	<div class="card">
+	  <h5 class="card-header"><%= link_to gem_record.studentname, gem_record %></h5>
+	  <div class="card-body">
+	    <h5 class="card-title"><%= gem_record.title %></h5>
+		<div class="row">
+		  <div class="col-6">
+			<div class="row">
+			  <div class="col-4">student id </div>
+			  <div class="col fw-bold"><%= gem_record.sisid%></div>
+			</div>
+		  </div>
+		  <div class="col-6">
+		    <div class="row">
+			  <div class="col-4">email address</div>
+			  <div class="col fw-bold"><%= gem_record.emailaddress %></div>
+			</div>
+		  </div>
+		</div>
+		<div class="row">
+		  <div class="col-6">
+			<div class="row">
+			  <div class="col-4">supervisor</div>
+			  <div class="col fw-bold"><%= gem_record.superv%></div>
+			</div>
+		  </div>
+		  <div class="col-6">
+		    <div class="row">
+			  <div class="col-4">program</div>
+			  <div class="col fw-bold"><%= gem_record.program %></div>
+			</div>
+		  </div>
+		</div>
+		<div class="row">
+		  <div class="col-6">
+			<div class="row">
+			  <div class="col-4">event type</div>
+			  <div class="col fw-bold"><%= gem_record.eventtype%></div>
+			</div>
+		  </div>
+		  <div class="col-6">
+		    <div class="row">
+			  <div class="col-4">event date</div>
+			  <div class="col fw-bold"><%= gem_record.eventdate.to_date.strftime("%B %d, %Y") %></div>
+			</div>
+		  </div>
+		</div>
+		<div class="row">
+		  <div class="col-6">
+			<div class="row">
+			  <div class="col-4">exam result</div>
+			  <div class="col fw-bold"><%= gem_record.examresult%></div>
+			</div>
+		  </div>
+		  <div class="col-6">
+		    <div class="row">
+			  <div class="col-4">exam date</div>
+			  <div class="col fw-bold"><%= gem_record.examdate.to_date.strftime("%B %d, %Y") rescue nil %></div>
+			</div>
+		  </div>
+		</div>
 
-	<table class="table table-striped">
-		<tr>
-			<td class="blend">student id</td><td class="strong"><%= gem_record.sisid%></td>
-			<td class="blend">email address</td><td class="strong"><%= gem_record.emailaddress %></td>
-		</tr>
-		<tr>
-			<td class="blend">supervisor</td><td class="strong"><%= gem_record.superv%></td>
-			<td class="blend">program</td><td class="strong"><%= gem_record.program %></td>
-	
-		</tr>
-		<tr>
-			<td class="blend">event type</td><td class="strong"><%= gem_record.eventtype %></td>
-			<td class="blend">event date</td><td class="strong"><%= gem_record.eventdate.to_date.strftime("%B %d, %Y") %></td>	
-		</tr>
-		<tr>			
-			<td class="blend">exam result</td><td class="strong"><%= gem_record.examresult %></td>
-			<td class="blend">exam date</td><td class="strong"><%= gem_record.examdate.to_date.strftime("%B %d, %Y") rescue nil %></td>
-
-		</tr>
-	</table>
+	  </div>
+	</div>
+   </div>
+  <% end %>
 </div>
