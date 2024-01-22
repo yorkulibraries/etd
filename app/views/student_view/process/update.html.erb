@@ -77,14 +77,14 @@
 
 	<%= render partial: "theses/form_student_editable", locals: { f: f } %>
 
-	<input type="submit" name="Save Details" value="" class="hidden" aria-label="Save Details">
+	<input type="submit" name="Save Details" value="" class="d-none" aria-label="Save Details">
 	<hr/>
 
 	<div class="process-nav float-end">
-		<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_BEGIN) %>" class="next-btn back" title="Begin Submission">
+		<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_BEGIN) %>" class="next-btn back btn btn-primary" title="Begin Submission">
 			<i class="fa fa-angle-double-left"></i></a>
 
-			<a href="#" class="next-btn save" title="Save Details and Continue" onclick="$(this).closest('form').submit(); return false">
+			<a href="#" class="next-btn save btn btn-success" title="Save Details and Continue" onclick="$(this).closest('form').submit(); return false">
 				<i class='fa fa-angle-double-right'></i> Save Details
 			</a>
 	</div>

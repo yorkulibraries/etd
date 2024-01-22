@@ -1,16 +1,14 @@
-<div class="card mb-3">
+<div class="container pb-4">
   <div class="row">
-    <div class="col-md-1">
-      <%= fa_stacked_icon "graduation-cap",base: "none", class: "fa-4x", style:"color:grey" %>
+    <div class="col-lg-1">
+      <%= fa_stacked_icon "graduation-cap",base: "none", class: "fa-2x border rounded", style:"color:grey" %>
     </div>
-    <div class="col-md-9 my-auto">
-      <div class="card-body">
-		<h5 class="card-title"><%= link_to student.name, student %></h5>
-		<p class="card-text">created by <%= student.created_by.name %> on <%= student.created_at.strftime("%B %d, %Y") %></p>
-      </div>
+    <div class="col-lg-9 my-auto">
+      <h5><%= link_to student.name, student %></h5>
+      <p class="card-text">created by <%= student.created_by.name %> on <%= student.created_at.strftime("%B %d, %Y") %></p>
     </div>
-	<div class="col-md-2 my-auto">
-		<div class="float-end pe-4"><%= student.sisid %></div>
+    <div class="col-lg-2">
+      <%= student.sisid %>
     </div>
   </div>
 </div>

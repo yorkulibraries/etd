@@ -14,8 +14,10 @@
 		<%= paginate @students %>
   </div>
   <div class="input-group">
-		<%= link_to_if params[:oldest], "Newest", students_path(newest: true), class: "btn btn-outline-secondary" %>
-		<%= link_to_unless params[:oldest], "Oldest", students_path(oldest: true),class: "btn btn-outline-secondary" %>	
+		<p class="my-auto">
+			<%= link_to_if params[:oldest], "Newest", students_path(newest: true), class: "btn btn-outline-secondary  my-auto" %>
+			<%= link_to_unless params[:oldest], "Oldest", students_path(oldest: true),class: "btn btn-outline-secondary" %>	
+		</p>
   </div>
 </div>
 

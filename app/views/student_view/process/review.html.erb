@@ -96,10 +96,10 @@
 
 		<hr/>
 		<div class="process-nav float-end">
-			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD) %>" class="next-btn back" title="Upload Thesis Files">
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD) %>" class="next-btn back btn btn-primary" title="Upload Thesis Files">
 				<i class="fa fa-angle-double-left"></i></a>
 			<%= link_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), title: "Submit Thesis For Review",
-					 	class: "next-btn", data: { confirm: "Have you completed all thesis details and uploaded all files?" } do %>
+					 	class: "next-btn btn btn-success", data: { confirm: "Have you completed all thesis details and uploaded all files?" } do %>
 						<i class="fa fa-angle-double-right"></i> Submit For Review
 			<% end %>
 		</div>
