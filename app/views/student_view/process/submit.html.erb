@@ -40,11 +40,11 @@
 
 
 		<div class="process-nav">
-			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn back" title="Review Thesis Details">
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn back btn btn-primary" title="Review Thesis Details">
 				<i class="fa fa-angle-double-left"></i></a>
 
 			<%= link_to "I accept and send for review", submit_for_review_student_thesis_path(@current_user, @thesis), method: :post, title: "Accept and send for review",
-			 	class: "next-btn send", data: { confirm: "Are you sure? You will not be able to make further changes." } %></div>
+			 	class: "next-btn send btn btn-success", data: { confirm: "Are you sure? You will not be able to make further changes." } %></div>
 		</div>
 
 

@@ -68,9 +68,9 @@
 	<%  unless block_thesis_changes?(@thesis) %>
 		<hr/>
 		<div class="process-nav float-end">
-			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="next-btn back" title="Update Details">
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="next-btn back btn btn-primary" title="Update Details">
 				<i class="fa fa-angle-double-left"></i></a>
-			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn" title="Continue to Review Details">
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn btn btn-success" title="Continue to Review Details">
 	 			<i class="fa fa-angle-double-right"></i> Review Details
 			</a>
 		</div>
