@@ -1,14 +1,17 @@
-<div class="container pb-4">
+<div class="container py-3">
   <div class="row">
-    <div class="col-lg-1">
+    <div class="col-lg-1 d-none d-lg-block">
       <%= fa_stacked_icon "graduation-cap",base: "none", class: "fa-2x border rounded", style:"color:grey" %>
     </div>
     <div class="col-lg-9 my-auto">
       <h5><%= link_to student.name, student %></h5>
       <p class="card-text">created by <%= student.created_by.name %> on <%= student.created_at.strftime("%B %d, %Y") %></p>
     </div>
-    <div class="col-lg-2">
+    <div class="col-lg-2 my-auto">
       <%= student.sisid %>
     </div>
+  </div>
+  <div class="text-secondary">
+    <hr>
   </div>
 </div>

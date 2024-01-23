@@ -11,33 +11,58 @@
 	</div>
 <% end %>
 
-<div>
-	<table cellpadding="5" class="table table-striped">
-		<tr>
-			<td class="blend" width="10%">username</td>
-			<td class="strong"><%= @student.username%></td>
-			<td class="blend"  width="10%">SISID</td>
-			<td class="strong"><%= @student.sisid %></td>
-		</tr>
-		<tr>
-			<td class="blend">email</td>
-			<td class="strong"><%= @student.email %></td>
-			<td class="blend">joined on</td>
-			<td class="strong"><%= @student.created_at.strftime("%B %d, %Y")%></td>
-		</tr>
-		<tr>
-			<td class="blend" width="10%">invitation</td>
-			<td class="strong">
-				<% if @student.invitation_sent_at.nil? %>
-					<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", send_invite_student_path(@student) %>
-				<% else %>
-					Sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>
-					<span class="soft weak">(<%= link_to_if AppSettings.email_welcome_allow, "Send Again", send_invite_student_path(@student), class: "soft weak"%>)</span>
-				<% end %>
-			</td>
-		</tr>
-	</table>
 
+<div class="card">
+  <div class="card-header">
+		<h5 class="trivial">Created by <%= @student.created_by.name%>
+			<% if can?(:login_as, :student) && is_controller_and_action?("students", "show") %>
+			- <%= link_to "Login as this student", login_as_student_path(id: @student.id) %>
+			<% end %>
+		</h5>
+  </div>
+  <div class="card-body">
+		<div class="row">
+			<div class="col">
+				<div class="row">
+					<div class="col-4">Username</div>
+					<div class="col fw-bold"><%= @student.username%></div>
+				</div>
+				<div class="row">
+					<div class="col-4">Email</div>
+					<div class="col fw-bold"><%= @student.email%></div>
+				</div>
+				<div class="row">
+					<div class="col-4">Invitation</div>
+					<div class="col fw-bold">
+						<% if @student.invitation_sent_at.nil? %>
+							<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", send_invite_student_path(@student) %>
+						<% else %>
+							Sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>
+							<span class="soft weak">(<%= link_to_if AppSettings.email_welcome_allow, "Send Again", send_invite_student_path(@student), class: "soft weak"%>)</span>
+						<% end %>
+					</div>
+				</div>
+
+			</div>
+			<div class="col">
+				<div class="row">
+					<div class="col-4">SISID</div>
+					<div class="col fw-bold"><%= @student.sisid %></div>
+				</div>
+				<div class="row">
+					<div class="col-4">Joined on</div>
+					<div class="col fw-bold"><%= @student.created_at.strftime("%B %d, %Y")%></div>
+				</div>
+
+			</div>
+		</div>
+
+
+
+  </div>
+</div>
+
+<div>
 	<section class="theses">
 
 		<% if @current_theses.size > 0 %>

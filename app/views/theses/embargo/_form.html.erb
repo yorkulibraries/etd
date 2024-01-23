@@ -1,29 +1,28 @@
 <% remote = request.xhr? ? true : false %>
-<%= simple_form_for [@student, @thesis], url: student_thesis_embargo_path(@student, @thesis), method: :post, remote: remote do |f| %>
-	<div class="modal-header">
-		<% if request.xhr? %>
-			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		<% end %>
-
-		<h3>Place Permanent Embargo</h3>
-	</div>
-
-	<div class="modal-body">
-		<div class="row">
-			<div class="span6">
-				<p>Placing permanent embargo will disallow this thesis to be published to YorkSpace forever.</p>
-				<p>Permanent embargo can not be removed, and an explanation is required.</p>
-				<%= render partial: "theses/perma_embargo", locals: { f: f } %>
-			</div>
-		</div>
-	</div>
-
-	<div class="modal-footer">
-		<% if request.xhr? %>
-			<a href="#" class="btn"  data-dismiss="modal" aria-hidden="true">Close</a>
-		<% else %>
-			<%= link_to "Cancel", :back, class: "btn" %>
-		<% end %>
-		<%= f.button :submit, "Place Embargo", class: "btn btn-primary", data: { confirm: "Are you sure? This action is permanent."} %>
-	</div>
-<% end %>
+<div class="modal" tabindex="-1" id="permanent_embargo_holder_modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Place Permanent Embargo</h5>
+				<% if request.xhr? %>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<% end %>
+      </div>
+			<%= simple_form_for [@student, @thesis], url: student_thesis_embargo_path(@student, @thesis), method: :post, remote: remote do |f| %>
+				<div class="modal-body">
+					<p>Placing permanent embargo will disallow this thesis to be published to YorkSpace forever.</p>
+					<p>Permanent embargo can not be removed, and an explanation is required.</p>
+					<%= render partial: "theses/perma_embargo", locals: { f: f } %>
+				</div>
+				<div class="modal-footer">
+					<% if request.xhr? %>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<% else %>
+						<%= link_to "Cancel", :back, class: "btn btn-secondary" %>
+					<% end %>
+					<%= f.button :submit, "Place Embargo", class: "btn btn-primary", data: { confirm: "Are you sure? This action is permanent."} %>
+				</div>
+			<% end %>
+    </div>
+  </div>
+</div>
