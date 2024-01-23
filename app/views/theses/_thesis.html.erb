@@ -1,32 +1,44 @@
-<div class="thesis">
-
-	<div class="span9 no-space">
-		
-		<% unless @student %>
-			<p class="author trivial" title="student id: <%= thesis.student.sisid %>">By <%= thesis.student.name %></p>
-	 	<% end %>
-
-		<h3 class="title clearfix" title="title">
+<div class="thesis py-3">
+	<div class="card">
+		<h5 class="card-header">
 			<div class="pull-right">
-				<%= render partial: "theses/assigned_to", locals: { thesis: thesis }%>
-				<span class="label status status-<%= thesis.status %>"><%= thesis.status.humanize %></span>
+				<span class="badge rounded-pill text-bg-secondary label status status-<%= thesis.status %>"><%= thesis.status.humanize %></span>
 			</div>
 			<%= link_to thesis.title, student_thesis_path(thesis.student, thesis) %> 						
-		</h3>
-	
-	</div>
-	
-	
-	<div class="span4 no-space">
-		<p class="supervisor" title="supervisor"><label>supervisor</label> <%=  thesis.supervisor %></p>
-		<p class="exam_date" title="exam date"><label>exam date</label> <%= thesis.exam_date.strftime("%B %d, %Y") %></p>
-	</div>
-	
-	<div class="span5 ">
-		<p class="degree_level"><label>Degree Name and Level</label><%= format thesis.degree_name %> - <%= format thesis.degree_level %></p>
-		<p class="program"><label>Program</label><%= format thesis.program %></p>			
-	</div>
+		</h5>
+		<div class="card-body">
+			<h5 class="card-title">
+				<% unless @student %>
+					<p class="author trivial" title="student id: <%= thesis.student.sisid %>">By <%= thesis.student.name %></p>
+				<% end %>
+			</h5>
+			<div class="row">
+				<div class="col">
+					<div class="row">
+						<div class="col-4">Supervisor</div>
+						<div class="col fw-bold"><%= thesis.supervisor %></div>
+					</div>
+					<div class="row">
+						<div class="col-4">Exam date</div>
+						<div class="col fw-bold"><%= thesis.exam_date.strftime("%B %d, %Y") %></div>
+					</div>
 
-	<hr class="clear fitted"/>	
+					<div class="row">
+						<div class="col-4">Degree Name and Level</div>
+						<div class="col fw-bold"><%= format thesis.degree_name %> - <%= format thesis.degree_level %></div>
+					</div>
+					<div class="row">
+						<div class="col-4">Program</div>
+						<div class="col fw-bold"><%= format thesis.program %></div>
+					</div>
+				</div>
+				<div class="col-2">
+					<div class="pull-right">
+						<%= render partial: "theses/assigned_to", locals: { thesis: thesis }%>
+					</div>
+				</div>
+			</div>
 
+		</div>
+	</div>
 </div>

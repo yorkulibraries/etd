@@ -5,9 +5,8 @@
 <% statuses = [] if Thesis::PUBLISHED == @thesis.status %>
 
 <div id="status_menu">
-	<button type="button" class="btn btn-light dropdown-toggle" id="status_change_link"
+	<button type="button" class="btn btn-light" id="status_change_link"
 			data-bs-toggle="popover" data-bs-placement="bottom"
-			data-bs-custom-class="custom-popover"
 			data-bs-title="Change Thesis Status">
 		Status: <span class="badge bg-primary"><%= @thesis.status.humanize %></span> &nbsp;<span class="caret"></span>
 	</button>

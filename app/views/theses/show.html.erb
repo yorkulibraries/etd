@@ -44,7 +44,7 @@
 			<% if @thesis.status != Thesis::PUBLISHED %>
 				<tr class="link_section">
 					<td class="add_link" colspan="3">
-						<%= link_to "+ Add committee member", new_student_thesis_committee_member_path(@student, @thesis), remote: true %>
+						<%= link_to "+ Add committee member", new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success"} %>
 					</td>
 				</tr>
 			<% end %>

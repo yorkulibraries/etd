@@ -1,4 +1,7 @@
 $("#permanent_embargo_holder").remove();
-$("body").append("<div class='modal hide fade' id='permanent_embargo_holder'></div>");
+$("body").append("<div id='permanent_embargo_holder'></div>");
 $("#permanent_embargo_holder").append("<%= j render "form" %>");
-$("#permanent_embargo_holder").modal('show');
+var myModal = new bootstrap.Modal(document.getElementById('permanent_embargo_holder_modal'), {
+    backdrop: 'static'
+});
+myModal.show();
