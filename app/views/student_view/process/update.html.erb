@@ -13,62 +13,44 @@
 	<p>If there are any errors or changes required to this information, please contact a Thesis Coordinator at gsthesis@yorku.ca.</p>
 	<p>Please include your student number in all communications.</p>
 
-	<table class="thesis well" id="thesis">
-		<tr>
-			<td colspan="2" class="thesis_title span6">
-				<label>title</label>
-				<span id="thesis_title"><%= @thesis.title %></span>
-			</td>
-			<td id="thesis_authdor">
-				<label>author</label>
-				<span id="thesis_author"><%= @student.name %></span>
-			</td>
-		</tr>
-		<tr>
-			<td class="exam_date">
-				<label>exam date</label>
-				<span id="thesis_examdate">	<%= @thesis.exam_date.strftime("%B %d, %Y") %></span>
-			</td>
-			<td  class="supervisor" >
-				<label>supervisor</label>
-				<span id="thesis_supervisor"><%= format @thesis.supervisor %></span>
-			</td>
-			<td class="published_date">
-				<label>Publish On</label>
-				<span id="thesis_publishdate">
-					<%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %>
-			  </span>
-			</td>
-		</tr>
-		<tr>
-			<td class="supervising_committee" colspan="3">
-				<label>examination committee members</label>
-				<div class="row">
-				<span id="thesis_supervising_committee">
 
-						<% @thesis.committee_members.each do |committee_member| %>
-							<div class="span2" style="margin-bottom: 10px;">
-								<span class="empty-field"><%= committee_member.role %></span><br/>
-								<%= committee_member.name %>
-							</div>
-						<% end %>
+<div class="card">
+  <div class="card-body">
+		<div class="row">
+			<div class="col-4">
+				<span class="badge text-bg-light">Title</span>
+				<p><%= @thesis.title %></p>
+				<span class="badge text-bg-light">Author</span>
+				<p><%= @student.name %></p>
+				</div>
+				<div class="col-4">
+				<span class="badge text-bg-light">Exam date</span>
+				<p><%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
+				<span class="badge text-bg-light">Supervisor</span>
+				<p><%= format @thesis.supervisor %></p>
+				<span class="badge text-bg-light">Publish On</span>
+				<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
+			</div>
+			<div class="col-4">
+				<span class="badge text-bg-light">Program</span>
+				<p><%= format @thesis.program %></p>
+				<span class="badge text-bg-light">Degree Name and Level</span>
+				<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+			</div>
+		</div>
 
-				 	</span>
-					</div>
-			</td>
-		</tr>
-		<tr>
-			<td class="degree_level">
-				<label>Degree Name and Level</label>
-				<span id="thesis_degree_name_and_level"><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></span>
-			</td>
-			<td class="program span6" colspan="2">
-				<label>Program</label>
-				<span id="thesis_program"><%= format @thesis.program %></span>
-			</td>
-		</tr>
-	</table>
-
+		<div class="row">
+			<span class='badge text-bg-light'>Examination committee members</span>
+			<% @thesis.committee_members.each do |committee_member| %>
+				<div class="col-3 border border-primary rounded p-1 m-1">
+					<p><%= committee_member.role %><br />
+					<span class="fw-bold"><%= committee_member.name %></span></p>
+				</div>
+			<% end %>
+		</div>
+  </div>
+</div>
+	
 
 <p>Please provide the information requested in the following fields. </p>
 
