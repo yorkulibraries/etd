@@ -10,9 +10,13 @@
       </div>
 			<%= simple_form_for [@student, @thesis, @committee_member], remote: remote do |f| %>
 				<div class="modal-body">
-					<p><%= f.input :first_name, label: "Committee Member:", required: false, placeholder: "First Name ..."%></p>
-					<p><%= f.input :last_name, label: false, placeholder: "Last name ..."%></p>
-					<%= f.input :role, label: "Choose a Role:", required: false, collection: CommitteeMember::ROLES, as: :radio_buttons %>
+					<p id="member_first_name">
+						<%= f.input :first_name, label: "First Name", required: false %>
+					</p>
+					<p id="member_last_name">
+						<%= f.input :last_name, label: "Last Name" %>
+					</p>
+					<%= f.input :role, label: "Choose a Role:", required: true, collection: CommitteeMember::ROLES, as: :radio_buttons %>
 				</div>
 				<div class="modal-footer">
 					<% if request.xhr? %>

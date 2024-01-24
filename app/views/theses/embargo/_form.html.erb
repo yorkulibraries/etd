@@ -12,7 +12,10 @@
 				<div class="modal-body">
 					<p>Placing permanent embargo will disallow this thesis to be published to YorkSpace forever.</p>
 					<p>Permanent embargo can not be removed, and an explanation is required.</p>
-					<%= render partial: "theses/perma_embargo", locals: { f: f } %>
+					<div id="embargo_modal_textfield">
+						<%= f.input :embargo, input_html: { class: "form-control", rows: "4" },
+							label: "Embargo Explanation", readonly: read_only_if_student("embargo")   %>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<% if request.xhr? %>

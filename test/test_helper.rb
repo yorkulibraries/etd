@@ -14,6 +14,7 @@ require 'capybara/minitest'
 
 Capybara.server_host = '0.0.0.0'
 Capybara.app_host = "http://#{Socket.gethostname}:#{Capybara.server_port}"
+Capybara.save_path = Rails.root.to_s
 
 include ActionDispatch::TestProcess
 
