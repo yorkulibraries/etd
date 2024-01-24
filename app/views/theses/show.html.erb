@@ -3,113 +3,124 @@
 	<%= render partial: "students/header" %>
 <% end %>
 
-
-<div class="thesis fitted">
-	<div class="span7 no-space">
-
-		<h5 class="author" title="author">By <%= @thesis.author %>
-			| <span class="red"><%= number_with_delimiter(@thesis.student.sisid, delimiter: " ") %></span></h5>
-		<h3 class="title" title="title"><%= @thesis.title %></h3>
-	</div>
-	<div class="span">
-			<% if @thesis.status == Thesis::PUBLISHED %>
-				<div id="status_menu">
-					<button id="" class="btn" title="Change Thesis Status">
-					Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span>
-				  </button>
-				</div>
-
-			<% else%>
-				<%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success" %>
-				<br/>	<br/>
-				<%= render partial: "status_menu"%>
-				<%= render partial: "assigned_to", locals: { thesis: @thesis }%>
-			<% end %>
-	</div>
-
-	<div class="clear abstract" title="abstract"><label>abstract</label> <%= format @thesis.abstract, true %></div>
-
-	<div class="span4 no-space">
-		<p class="supervisor" title="supervisor"><label>supervisor</label> <%=  @thesis.supervisor %></p>
-		<p class="exam_date" title="exam date"><label>exam date</label>
-			<%= @thesis.exam_date ? @thesis.exam_date.strftime("%B %d, %Y") : format(@thesis.exam_date)  %></p>
-	</div>
-
-	<div class="span5 committee" title="examining committee">
-		<label>examining committee</label>
-		<table class="committee_members" id="committee_members">
-			<% @thesis.committee_members.each do |committee_member| %>
-				<%= render partial: committee_member %>
-			<% end %>
-			<% if @thesis.status != Thesis::PUBLISHED %>
-				<tr class="link_section">
-					<td class="add_link" colspan="3">
-						<%= link_to "+ Add committee member", new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success"} %>
-					</td>
-				</tr>
-			<% end %>
-		</table>
-	</div>
-
-	<hr class="fitted clear"/>
-
-	<div class="span4 no-space">
-		<p class="published_date"><label>Publish On</label>
-			<% if @thesis.embargoed == true %>
-				<p>Never</p>
-			<% else %>
-				<%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %>
-			<% end %>
-		</p>
-
-
-		<div class="embargo">
-			<label>Permanent Embargo</label>
-				<% if @thesis.embargoed == true %>
-
-					<p class="alert alert-danger">This thesis has been placed under permanent embargo. It will not be published.</p>
-
-				<hr/>
-				<%= format @thesis.embargo, true, "Embargo explanation was not filled in..." %>
-			<% else  %>
-				<div id="place_under_embargo_button">
-					<%= link_to new_student_thesis_embargo_path(@student, @thesis), class: "btn btn-warning", data: { remote: true } do %>
-						Place under permanent embargo?
+<div class="container">
+	<div class="row">
+		<div class="col-6">
+			<div class="row p-1">
+				<span class="badge text-bg-light">Author</span>
+				<p><%= @thesis.author %> <%= number_with_delimiter(@thesis.student.sisid, delimiter: " ") %></p>
+				<span class="badge text-bg-light">Title</span>
+				<p><%= @thesis.title %></p>
+				<span class="badge text-bg-light">Abstract</span>
+				<p><%= format @thesis.abstract, true %></p>
+				<span class="badge text-bg-light">Supervisor</span>
+				<p><%=  @thesis.supervisor %></p>
+				<span class="badge text-bg-light">Exam date</span>
+				<p><%= @thesis.exam_date ? @thesis.exam_date.strftime("%B %d, %Y") : format(@thesis.exam_date)  %></p>
+				<%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success" unless @thesis.status == Thesis::PUBLISHED %>			
+			</div>
+		</div>
+		<div class="col">
+			<div class="row p-1">
+				<span class="badge text-bg-light">Examining committee</span>
+				
+				<div class="committee_members" id="committee_members">
+					<% @thesis.committee_members.each do |committee_member| %>
+						<%= render partial: committee_member %>
+					<% end %>
+					<% if @thesis.status != Thesis::PUBLISHED %>
+						<div class="link_section">
+							<div class="add_link" colspan="3">
+								<%= link_to "+ Add committee member", new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success pull-right"} %>
+							</div>
+						</div>
 					<% end %>
 				</div>
-			<% end %>
+			</div>
 		</div>
-
-
 	</div>
+</div>
 
-	<div class="span5 ">
-		<p class="degree_level"><label>Degree Name and Level</label><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
-		<p class="program"><label>Program</label><%= format @thesis.program %></p>
+<hr />
+
+<div class="container">
+	<div class="row">
+		<div class="col-4">
+			<div class="row p-1">
+				<span class="badge text-bg-light">Publish On</span>
+				<p class="published_date">
+					<% if @thesis.embargoed == true %>
+						Never
+					<% else %>
+						<%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %>
+					<% end %>
+				</p>
+				<span class="badge text-bg-light">Degree Name and Level</span>
+				<p class="degree_level"><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+				<span class="badge text-bg-light">Program</span>
+				<p class="program"><%= format @thesis.program %></p>
+		
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="row p-1">
+				<span class="badge text-bg-light">Language</span>
+				<p class="language"><%= format @thesis.language %></p>
+				<span class="badge text-bg-light">Student Accepted Terms On</span>
+				<p class="language"><%= format @thesis.student_accepted_terms_at %></p>
+				<span class="badge text-bg-light">Subjects</span>
+				<p class="subjects"><%= format @thesis.loc_subjects.map(&:name).join ', ' %></p>
+				<span class="badge text-bg-light">Keywords</span>
+				<p class="keywords"><%= format @thesis.keywords%></p>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="row p-1">
+				<span class="badge text-bg-light">Permanent Embargo</span>
+				<% if @thesis.embargoed == true %>
+				<div class="alert alert-danger" role="alert">This thesis has been placed under permanent embargo. It will not be published.
+					<hr />
+					<%= format @thesis.embargo, true, "Embargo explanation was not filled in..." %>
+				</div>
+				<% else  %>
+					<div id="place_under_embargo_button">
+						<%= link_to new_student_thesis_embargo_path(@student, @thesis), class: "btn btn-warning pull-right", data: { remote: true } do %>
+							Place under permanent embargo?
+						<% end %>
+					</div>
+				<% end %>
+
+
+
+					<% if @thesis.status == Thesis::PUBLISHED %>
+						<div id="status_menu">
+							<button id="" class="btn" title="Change Thesis Status">
+							Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span>
+							</button>
+						</div>
+
+					<% else%>
+						
+					<span class="badge text-bg-light">Change status</span>
+						<%= render partial: "status_menu"%>
+						<span class="badge text-bg-light">Assign to</span>
+						<div class="span">
+							<%= render partial: "assigned_to", locals: { thesis: @thesis }%>
+						</div>
+					<% end %>
+			</div>
+		</div>
 	</div>
-
-	<hr class="fitted clear"/>
-
-	<div class="span4 no-space">
-			<p class="language"><label>Language</label> <%= format @thesis.language %></p>
-			<p class="language"><label>Student Accepted Terms On</label>	<%= format @thesis.student_accepted_terms_at %>
-	</div>
-
-	<div class="span5">
-		<p class="subjects"><label>Subjects</label> <%= format @thesis.loc_subjects.map(&:name).join ', ' %></p>
-		<p class="keywords"><label>Keywords</label> <%= format @thesis.keywords%></p>
-	</div>
-
 </div>
 
 <hr class="fitted clear"/>
 <div class="row">
-	<div class="span2 distinct strong"><span class="green soft">Last Under Review: </span> <br/><%= format @thesis.under_review_at %></div>
-	<div class="span2 distinct strong"><span class="green soft">Last Returned: </span> <br/><%= format @thesis.returned_at %></div>
-	<div class="span2 distinct strong"><span class="green soft">Thesis Accepted: </span> <br/><%= format @thesis.accepted_at %></span></div>
-	<div class="span2 distinct strong"><span class="green soft">Published: </span> <br/><%= format @thesis.published_at %></div>
+	<div class="col-3 span2 distinct strong"><span class="badge text-bg-light">Last Under Review: </span> <br/><%= format @thesis.under_review_at %></div>
+	<div class="col-3 span2 distinct strong"><span class="badge text-bg-light">Last Returned: </span> <br/><%= format @thesis.returned_at %></div>
+	<div class="col-3 span2 distinct strong"><span class="badge text-bg-light">Thesis Accepted: </span> <br/><%= format @thesis.accepted_at %></span></div>
+	<div class="col-3 span2 distinct strong"><span class="badge text-bg-light">Published: </span> <br/><%= format @thesis.published_at %></div>
 </div>
-
+<hr />
 <div class="documents fitted">
 
 	<h3>Thesis Files and Documents</h3>
