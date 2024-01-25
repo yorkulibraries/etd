@@ -1,12 +1,12 @@
-<div class="document clearfix">
-	<div class="thumb">
-		<%= link_to_unless_current edit_student_thesis_document_path(@student, @thesis, document) do %>
-			<i class="fa fa-file"></i>
+<div class="row">
+  <div class="col-1 my-auto">
+	<%= link_to_unless_current edit_student_thesis_document_path(@student, @thesis, document) do %>
+			<i class="fa fa-file fa-4x"></i>
 		<% end %>
-	</div>
-	<div class="details">
-		<p class="name <%= "suplemental" if document.supplemental? %>" title="<%= File.basename(document.file_url) %>">
-			<%= truncate File.basename(document.file_url), length: 60 %>
+  </div>
+  <div class="col">
+	<p class="name <%= "suplemental" if document.supplemental? %>" title="<%= File.basename(document.file_url) %>">
+			<%= File.basename(document.file_url) %>
 		</p>
 		<p class="file_path" >
 		  <% if document.name %>
@@ -21,5 +21,5 @@
 			<a href="<%= document.file_url %>" class="download" title="Download file"><i class="fa fa-download"></i> Download</a>
 		  <span class="weak small">[<%=number_to_human_size document.file.file.size rescue nil%>]</span>
 		</p>
-	</div>
+  </div>
 </div>
