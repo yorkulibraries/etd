@@ -1,6 +1,6 @@
 require 'application_system_test_case'
 
-class ThesisTest < ApplicationSystemTestCase
+class ThesesTest < ApplicationSystemTestCase
   setup do
     FactoryGirl.create(:user, role: User::ADMIN)
     FactoryGirl.create(:user, role: User::MANAGER)
