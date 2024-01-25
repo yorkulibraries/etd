@@ -1,4 +1,4 @@
-<div class="border border-primary rounded p-1 m-1" id="committee_member_<%= committee_member.id %>">
+<div class="border border-secondary rounded p-1 m-1" id="committee_member_<%= committee_member.id %>">
 	<%= committee_member.role %>: <span class="fw-bold"><%= committee_member.name %></span>
 	<% if can?(:manage, committee_member) && @thesis.status != Thesis::PUBLISHED  %>
 	
