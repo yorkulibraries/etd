@@ -1,4 +1,4 @@
-  <button type="button" class="btn btn-warning dropdown-toggle assign_to pull-right" data-bs-toggle="dropdown" aria-expanded="false">
+  <button type="button" class="btn btn-warning dropdown-toggle assign_to position-relative start-50 translate-middle-x" data-bs-toggle="dropdown" aria-expanded="false">
     <% if thesis.assigned? %>
 		<% name = (thesis.assigned_to.id == current_user.id) ? "I'm working on it" : thesis.assigned_to.name %>
 		<span  id="assigned_name_<%= thesis.id %>" title="name"><%= truncate(name, length: 25) %></span>

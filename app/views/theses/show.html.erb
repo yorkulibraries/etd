@@ -84,7 +84,7 @@
 				</div>
 				<% else  %>
 					<div id="place_under_embargo_button">
-						<%= link_to new_student_thesis_embargo_path(@student, @thesis), class: "btn btn-warning pull-right", data: { remote: true } do %>
+						<%= link_to new_student_thesis_embargo_path(@student, @thesis), class: "btn btn-warning position-relative start-50 translate-middle-x", data: { remote: true } do %>
 							Place under permanent embargo?
 						<% end %>
 					</div>
