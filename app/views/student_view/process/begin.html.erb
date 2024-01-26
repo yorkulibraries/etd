@@ -22,9 +22,7 @@
 
 
 	<div class="thesis row">
-			<div class="">
-				<h4 class="title" title="title"><%= link_to @thesis.title, student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE), title: "Update Thesis Details" %></h4>
-			</div>
+			<h4 class="title" title="title"><%= link_to @thesis.title, student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE), title: "Update Thesis Details" %></h4>
 
 			<div class="col-4">
 				<span class="badge text-bg-light">Supervisor</span>
