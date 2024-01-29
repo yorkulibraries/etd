@@ -6,62 +6,45 @@
 	  <div class="card-body">
 	    <h5 class="card-title"><%= gem_record.title %></h5>
 		<div class="row">
-		  <div class="col-sm-12 col-md-6">
+		  <div class="col-md-12 col-lg-5">
 			<div class="row">
 			  <div class="col-4">student id </div>
 			  <div class="col fw-bold"><%= gem_record.sisid%></div>
 			</div>
-		  </div>
-		  <div class="col-sm-12 col-md-6">
-		    <div class="row">
-			  <div class="col-4">email address</div>
-			  <div class="col fw-bold"><%= gem_record.emailaddress %></div>
-			</div>
-		  </div>
-		</div>
-		<div class="row">
-		  <div class="col-6">
 			<div class="row">
 			  <div class="col-4">supervisor</div>
 			  <div class="col fw-bold"><%= gem_record.superv%></div>
 			</div>
-		  </div>
-		  <div class="col-6">
-		    <div class="row">
-			  <div class="col-4">program</div>
-			  <div class="col fw-bold"><%= gem_record.program %></div>
-			</div>
-		  </div>
-		</div>
-		<div class="row">
-		  <div class="col-6">
 			<div class="row">
 			  <div class="col-4">event type</div>
 			  <div class="col fw-bold"><%= gem_record.eventtype%></div>
 			</div>
-		  </div>
-		  <div class="col-6">
-		    <div class="row">
-			  <div class="col-4">event date</div>
-			  <div class="col fw-bold"><%= gem_record.eventdate.to_date.strftime("%B %d, %Y") %></div>
-			</div>
-		  </div>
-		</div>
-		<div class="row">
-		  <div class="col-6">
 			<div class="row">
 			  <div class="col-4">exam result</div>
 			  <div class="col fw-bold"><%= gem_record.examresult%></div>
 			</div>
 		  </div>
-		  <div class="col-6">
+		  <div class="col-lg-2 d-none d-lg-block">
+		  </div>
+		  <div class="col-md-12 col-lg-5">
+		    <div class="row">
+			  <div class="col-4">email address</div>
+			  <div class="col fw-bold"><%= gem_record.emailaddress %></div>
+			</div>
+		    <div class="row">
+			  <div class="col-4">program</div>
+			  <div class="col fw-bold"><%= gem_record.program %></div>
+			</div>
+		    <div class="row">
+			  <div class="col-4">event date</div>
+			  <div class="col fw-bold"><%= gem_record.eventdate.to_date.strftime("%B %d, %Y") %></div>
+			</div>
 		    <div class="row">
 			  <div class="col-4">exam date</div>
 			  <div class="col fw-bold"><%= gem_record.examdate.to_date.strftime("%B %d, %Y") rescue nil %></div>
 			</div>
 		  </div>
 		</div>
-
 	  </div>
 	</div>
    </div>

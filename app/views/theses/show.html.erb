@@ -4,11 +4,11 @@
 <% end %>
 <hr />
 <div class="row">
-	<div class="col-sm-12 col-lg-4">
+	<div class="col-sm-12 col-lg-5">
 		<h5 class="author" title="author">By <%= @thesis.author %> | <%= number_with_delimiter(@thesis.student.sisid, delimiter: " ") %></h5>
 		<h3 class="title" title="title"><%= @thesis.title %></h3>
 	</div>
-	<div class="col-lg-3 d-none d-lg-block"></div>
+	<div class="col-lg-2 d-none d-lg-block"></div>
 	<div class="col-sm-12 col-lg">
 	  <div class="row">
 		<div class="col">
@@ -65,7 +65,7 @@
 					<% if @thesis.status != Thesis::PUBLISHED %>
 						<div class="link_section">
 							<div class="add_link" colspan="3">
-								<%= link_to "+ Add committee member", new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success pull-right"} %>
+								<%= link_to "+ Add committee member", new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success"} %>
 							</div>
 						</div>
 					<% end %>

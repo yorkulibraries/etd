@@ -17,13 +17,13 @@
 <div class="card">
   <div class="card-body">
 		<div class="row">
-			<div class="col-4">
+			<div class="col-md-12 col-lg-4">
 				<span class="badge text-bg-light">Title</span>
 				<p><%= @thesis.title %></p>
 				<span class="badge text-bg-light">Author</span>
 				<p><%= @student.name %></p>
-				</div>
-				<div class="col-4">
+			</div>
+			<div class="col-md-6 col-lg-4">
 				<span class="badge text-bg-light">Exam date</span>
 				<p><%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
 				<span class="badge text-bg-light">Supervisor</span>
@@ -31,7 +31,7 @@
 				<span class="badge text-bg-light">Publish On</span>
 				<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
 			</div>
-			<div class="col-4">
+			<div class="col-md-6 col-lg-4">
 				<span class="badge text-bg-light">Program</span>
 				<p><%= format @thesis.program %></p>
 				<span class="badge text-bg-light">Degree Name and Level</span>
@@ -40,13 +40,17 @@
 		</div>
 
 		<div class="row">
-			<span class='badge text-bg-light'>Examination committee members</span>
+		  <span class='badge text-bg-light mb-3'>Examination committee members</span>
+		  <div class="row">
 			<% @thesis.committee_members.each do |committee_member| %>
-				<div class="col-3 border border-secondary rounded p-1 m-1">
+				<div class="col-md-12 col-lg-3">
+				  <div class="border border-secondary rounded p-1 my-1">
 					<p><%= committee_member.role %><br />
 					<span class="fw-bold"><%= committee_member.name %></span></p>
+				  </div>
 				</div>
 			<% end %>
+		  </div>
 		</div>
   </div>
 </div>
