@@ -2,26 +2,60 @@
 <% title_html do %>
 	<%= render partial: "students/header" %>
 <% end %>
+<hr />
+<div class="row">
+	<div class="col-sm-12 col-lg-4">
+		<h5 class="author" title="author">By <%= @thesis.author %> | <%= number_with_delimiter(@thesis.student.sisid, delimiter: " ") %></h5>
+		<h3 class="title" title="title"><%= @thesis.title %></h3>
+	</div>
+	<div class="col-lg-2 d-none d-lg-block"></div>
+	<div class="col-sm-12 col-lg">
+	  <div class="row">
+		<div class="col">
+			<% if @thesis.status == Thesis::PUBLISHED %>
+				<div id="status_menu">
+					<button id="" class="btn" title="Change Thesis Status">
+					Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span>
+					</button>
+				</div>
+			<% else%>
+				<span class="badge text-bg-light">Change status</span>
+				<%= render partial: "status_menu"%>
+			<% end %>
+		</div>
+		<div class="col">
+			<% unless @thesis.status == Thesis::PUBLISHED %>
+				<span class="badge text-bg-light">Assign to</span>
+				<div class="span">
+					<%= render partial: "assigned_to", locals: { thesis: @thesis }%>
+				</div>
+			<% end %>
+		</div>
+		<div class="col">
+			<span class="badge text-bg-light">Edit thesis</span>
+			<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success" unless @thesis.status == Thesis::PUBLISHED %></div>
+		</div>
+	  </div>
+	</div>
+</div>
 
 <div class="container">
+	
+		<span class="badge text-bg-light">Abstract</span>
+		<p><%= format @thesis.abstract, true %></p>
+	
 	<div class="row">
-		<div class="col-6">
-			<div class="row p-1">
-				<span class="badge text-bg-light">Author</span>
-				<p><%= @thesis.author %> <%= number_with_delimiter(@thesis.student.sisid, delimiter: " ") %></p>
-				<span class="badge text-bg-light">Title</span>
-				<p><%= @thesis.title %></p>
-				<span class="badge text-bg-light">Abstract</span>
-				<p><%= format @thesis.abstract, true %></p>
+		<div class="col-sm-12 col-md-4">
+			
 				<span class="badge text-bg-light">Supervisor</span>
 				<p><%=  @thesis.supervisor %></p>
 				<span class="badge text-bg-light">Exam date</span>
 				<p><%= @thesis.exam_date ? @thesis.exam_date.strftime("%B %d, %Y") : format(@thesis.exam_date)  %></p>
-				<%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success" unless @thesis.status == Thesis::PUBLISHED %>			
-			</div>
+				
+			
 		</div>
-		<div class="col">
-			<div class="row p-1">
+		<div class="col-sm-12 col-md-4">
+			
 				<span class="badge text-bg-light">Examining committee</span>
 				
 				<div class="committee_members" id="committee_members">
@@ -36,7 +70,9 @@
 						</div>
 					<% end %>
 				</div>
-			</div>
+			
+		</div>
+		<div class="col-lg-4 d-none d-lg-block">
 		</div>
 	</div>
 </div>
@@ -92,22 +128,6 @@
 
 
 
-					<% if @thesis.status == Thesis::PUBLISHED %>
-						<div id="status_menu">
-							<button id="" class="btn" title="Change Thesis Status">
-							Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span>
-							</button>
-						</div>
-
-					<% else%>
-						
-					<span class="badge text-bg-light">Change status</span>
-						<%= render partial: "status_menu"%>
-						<span class="badge text-bg-light">Assign to</span>
-						<div class="span">
-							<%= render partial: "assigned_to", locals: { thesis: @thesis }%>
-						</div>
-					<% end %>
 			</div>
 		</div>
 	</div>
