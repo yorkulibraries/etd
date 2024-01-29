@@ -8,9 +8,13 @@
 		<h5 class="author" title="author">By <%= @thesis.author %> | <%= number_with_delimiter(@thesis.student.sisid, delimiter: " ") %></h5>
 		<h3 class="title" title="title"><%= @thesis.title %></h3>
 	</div>
-	<div class="col-lg-2 d-none d-lg-block"></div>
+	<div class="col-lg-3 d-none d-lg-block"></div>
 	<div class="col-sm-12 col-lg">
 	  <div class="row">
+		<div class="col">
+			<span class="badge text-bg-light">Edit thesis</span>
+			<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success" unless @thesis.status == Thesis::PUBLISHED %></div>
+		</div>
 		<div class="col">
 			<% if @thesis.status == Thesis::PUBLISHED %>
 				<div id="status_menu">
@@ -30,10 +34,6 @@
 					<%= render partial: "assigned_to", locals: { thesis: @thesis }%>
 				</div>
 			<% end %>
-		</div>
-		<div class="col">
-			<span class="badge text-bg-light">Edit thesis</span>
-			<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success" unless @thesis.status == Thesis::PUBLISHED %></div>
 		</div>
 	  </div>
 	</div>
