@@ -20,40 +20,57 @@
 
 		<p>Please review all of the information on this page for accuracy and completeness and ensure all files are uploaded. If you are satisfied with the information you have provided, click "Submit for Review".</p>
 	</div>
+
+	<span class="badge text-bg-light">Abstract</span>
+	<p><%= format @thesis.abstract, true %></p>
 	<div class="row">
-	  <div class="col-4">
-	  	<span class="badge text-bg-light">Abstract</span>
-		<p><%= format @thesis.abstract, true %></p>
+	  <div class="col-md-12 col-lg-4">
 	  	<span class="badge text-bg-light">Supervisor</span>
 		<p><%= format @thesis.supervisor %></p>
-	  </div>
-	  <div class="col-4">
 	  	<span class="badge text-bg-light">Exam date</span>
 		<p><%= @thesis.exam_date.strftime("%B %d, %Y") rescue nil %></p>
-	  	<span class="badge text-bg-light">Publish on</span>
+		<span class="badge text-bg-light">Publish on</span>
 		<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
-	  	<span class="badge text-bg-light">Degree Name and Level</span>
+	  </div>
+	  <div class="col-md-12 col-lg-4">
+	  	<div class="span5 committee" title="examining committee">
+			<span class="badge text-bg-light">Examining committee</span>
+			<table class="committee_members" id="committee_members">
+				<% @thesis.committee_members.each do |committee_member| %>
+					<%= render partial: committee_member %>
+				<% end %>
+			</table>
+		</div>
+	  </div>
+	  <div class="col-lg-4 d-none d-lg-block"></div>
+	</div>
+	<hr />
+
+	<div class="row">
+	  <div class="col-md-12 col-lg-4">
+		<span class="badge text-bg-light">Degree Name and Level</span>
 		<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+	  </div>
+	  <div class="col-md-12 col-lg-4">
 	  	<span class="badge text-bg-light">Program</span>
 		<p><%= format @thesis.program %></p>
 	  </div>
-	  <div class="col-4">
-	  	<span class="badge text-bg-light">Language</span>
+	  <div class="col-lg-4 d-none d-lg-block"></div>
+	</div>
+	<hr />
+
+	<div class="row">
+	  <div class="col-md-12 col-lg-4">
+		<span class="badge text-bg-light">Language</span>
 		<p><%= format @thesis.language %></p>
 	  	<span class="badge text-bg-light">Subjects</span>
 		<p><%= format @thesis.loc_subjects.map(&:name).join ', ' %></p>
-	  	<span class="badge text-bg-light">Keywords</span>
+	  </div>
+	  <div class="col-md-12 col-lg-4">
+		<span class="badge text-bg-light">Keywords</span>
 		<p><%= format @thesis.keywords%></p>
 	  </div>
-	</div>
-
-	<div class="span5 committee" title="examining committee">
-		<span class="badge text-bg-light">Examining committee</span>
-		<table class="committee_members" id="committee_members">
-			<% @thesis.committee_members.each do |committee_member| %>
-				<%= render partial: committee_member %>
-			<% end %>
-		</table>
+	  <div class="col-lg-4 d-none d-lg-block"></div>
 	</div>
 </div>
 

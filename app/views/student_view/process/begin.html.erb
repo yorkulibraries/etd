@@ -24,19 +24,20 @@
 	<div class="thesis row">
 			<h4 class="title" title="title"><%= link_to @thesis.title, student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE), title: "Update Thesis Details" %></h4>
 
-			<div class="col-4">
+			<div class="col-md-12 col-lg-4">
 				<span class="badge text-bg-light">Supervisor</span>
 				<p><%= format @thesis.supervisor %></p>
 				<span class="badge text-bg-light">Exam date</span>
 				<p><%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
 			</div>
 
-			<div class="col-4">
+			<div class="col-md-12 col-lg-4">
 				<span class="badge text-bg-light">Degree Name and Level</span>
 				<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
 				<span class="badge text-bg-light">Program</span>
 				<p><%= format @thesis.program %></p>
 			</div>
+			<div class="col-lg-4 d-none d-lg-block"></div>
 	</div>
 
 	<hr/>
