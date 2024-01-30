@@ -11,7 +11,7 @@
 			<%= simple_form_for [@student, @thesis, @committee_member], remote: remote do |f| %>
 				<div class="modal-body">
 					<p id="member_first_name">
-						<%= f.input :first_name, label: "First Name", required: false %>
+						<%= f.input :first_name, label: "First Name", required: true %>
 					</p>
 					<p id="member_last_name">
 						<%= f.input :last_name, label: "Last Name" %>

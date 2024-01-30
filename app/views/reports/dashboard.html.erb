@@ -4,92 +4,42 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-md-auto">
-		<h4><i>Report on Theses</i></h4>
-     </div>
-  </div>
-  <div class="row">
-    <table class="table table-striped">
-	  <tr>
-		<td class="col-md-10">Currently Open</td>
-		<td class="col-md-2"><%= @theses_open_count %></td>
-	  </tr>
-	  <tr>
-		<td class="col-md-10">Currently Under Review</td>
-		<td class="col-md-2"><%= @theses_under_review_count %></td>
-	  </tr>
-	  <tr>
-		<td class="col-md-10">Currently Rejected</td>
-		<td class="col-md-2"><%= @theses_rejected_count %></td>
-	  </tr>
-	  <tr>
-		<td class="col-md-10">Currently Accepted</td>
-		<td class="col-md-2"><%= @theses_accepted_count %></td>
-	  </tr>
-	  <tr>
-		<td class="col-md-10">Currently Published</td>
-		<td class="col-md-2"><%= @theses_embargoed_count %></td>
-	  </tr>
-	  <tr>
-		<td class="col-md-10">Currently Permanently Embargoed</td>
-		<td class="col-md-2"><%= @theses_published_count %></td>
-	  </tr>
-	  <tr>
-		<td class="col-md-10">Total Theses</td>
-		<td class="col-md-2"><%= @theses_count %></td>
-	  </tr>
-	</table>
-  </div>
-  <div class="row">
-	<div class="col-md-auto">
-		<h4><i>Report on Students</i></h4>
+    <div class="col-12">
+			<h4><i>Report on Theses</i></h4>
+    </div>
+		<div class="col-11 bg-body-secondary">Currently Open</div>
+		<div class="col-1 bg-body-secondary"><%= @theses_open_count %></div>
+		<div class="col-11">Currently Under Review</div>
+		<div class="col-1"><%= @theses_under_review_count %></div>
+		<div class="col-11 bg-body-secondary">Currently Rejected</div>
+		<div class="col-1 bg-body-secondary"><%= @theses_rejected_count %></div>
+		<div class="col-11">Currently Accepted</div>
+		<div class="col-1"><%= @theses_accepted_count %></div>
+		<div class="col-11 bg-body-secondary">Currently Published</div>
+		<div class="col-1 bg-body-secondary"><%= @theses_embargoed_count %></div>
+		<div class="col-11">Currently Permanently Embargoed</div>
+		<div class="col-1"><%= @theses_published_count %></div>
+		<div class="col-11 bg-body-secondary">Total Theses</div>
+		<div class="col-1 bg-body-secondary"><%= @theses_count %></div>
+		<div class="col-12">
+			<h4><i>Report on Students</i></h4>
+		</div>
+		<div class="col-11 bg-body-secondary">Total Students</div>
+		<div class="col-1 bg-body-secondary"><%= @total_students %></div>
+		<div class="col-12">
+			<h4><i>Report on Gem Records</i></h4>
+		</div>
+		<div class="col-11 bg-body-secondary">Total Gem Records</div>
+		<div class="col-1 bg-body-secondary"><%= @total_gem_records %></div>
+		<div class="col-12">
+			<h4><i>Report on Users</i></h4>
+		</div>
+		<div class="col-11 bg-body-secondary">Total Users</div>
+		<div class="col-1 bg-body-secondary"><%= @total_users %></div>
+		<div class="col-12">
+			<h4><i>Report on LOC Subjects</i></h4>
+		</div>
+		<div class="col-11 bg-body-secondary">Total Loc Subjects</div>
+		<div class="col-1 bg-body-secondary"><%= @total_loc_subjects %></div>
 	</div>
-  </div>
-  <div class="row">
-    <table class="table table-striped">
-	  <tr>
-		<td class="col-md-10">Total Students</td>
-		<td class="col-md-2"><%= @total_students %></td>
-	  </tr>
-	</table>
-  </div>
-  <div class="row">
-	<div class="col-md-auto">
-		<h4><i>Report on Gem Records</i></h4>
-	</div>
-  </div>
-  <div class="row">
-    <table class="table table-striped">
-	  <tr>
-		<td class="col-md-10">Total Gem Records</td>
-		<td class="col-md-2"><%= @total_gem_records %></td>
-	  </tr>
-	</table>
-  </div>
-  <div class="row">
-	<div class="col-md-auto">
-		<h4><i>Report on Users</i></h4>
-	</div>
-  </div>
-  <div class="row">
-    <table class="table table-striped">
-	  <tr>
-		<td class="col-md-10">Total Users</td>
-		<td class="col-md-2"><%= @total_users %></td>
-	  </tr>
-	</table>
-  </div>
-  <div class="row">
-	<div class="col-md-auto">
-		<h4><i>Report on LOC Subjects</i></h4>
-	</div>
-  </div>
-  <div class="row">
-    <table class="table table-striped">
-	  <tr>
-		<td class="col-md-10">Total Loc Subjects</td>
-		<td class="col-md-2"><%= @total_loc_subjects %></td>
-	  </tr>
-	</table>
-  </div>
 </div>
