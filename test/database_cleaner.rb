@@ -2,13 +2,14 @@
 
 DatabaseCleaner.strategy = :transaction
 
-class Minitest::Spec
-  before :each do
-    DatabaseCleaner.start
-  end
+module Minitest
+  class Spec
+    before :each do
+      DatabaseCleaner.start
+    end
 
-  after :each do
-    DatabaseCleaner.clean
+    after :each do
+      DatabaseCleaner.clean
+    end
   end
 end
-
