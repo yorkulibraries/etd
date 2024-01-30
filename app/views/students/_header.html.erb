@@ -1,38 +1,40 @@
-<h4 class="blend soft">Student Record</h4>
-<table width="100%">
-	<tr>
-		<td>
+<h4>Student Record</h4>
+
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12 col-lg-7">
 			<h1 title="<%= @student.sisid %>">
 				<%= link_to_unless controller.controller_name == "students" && controller.action_name == "show", @student.name, @student, title: @student.sisid %>
-				<% if @student.blocked? %><i class="fa fa-ban red" title="blocked"></i><% end %>
+				<% if @student.blocked? %><i class="fa fa-ban" title="blocked", style:"color:red"></i><% end %>
 			</h1>
-		</td>
-
-		<% if controller_name == "students" && action_name == "show" %>
-			<td width="10%">
+		</div>
+		<div class="col-sm-12 col-lg">
+			<div class="row justify-content-end">
+			 <% if controller_name == "students" && action_name == "show" %>
+				<div class="col">
 					<%= link_to "Audit trail", audit_trail_student_path(@student) %><br/>
 					<span class="trivial">all actions</span>
-			</td>
-			<td width="14%">
-				<%= link_to "Make changes", edit_student_path(@student), class: "text-success" %><br/>
-				<span class="trivial">to student details</span>
-			</td>
-			<td width="12%">
-				<% if @student.blocked? %>
-					<%= link_to "Unblock student",  unblock_student_path(@student), method: :post, :data => { :confirm => 'Are you sure?'}, :class => "text-danger"  %><br/>
-					<span class="trivial">allow access</span>
-				<% else %>
-					<%= link_to "Block student",  block_student_path(@student), :data => { :confirm => 'Are you sure?'} , :method => :post, :class => "text-danger" %><br/>
-					<span class="trivial">disable access</span>
-				<% end %>
-
-			</td>
-		<% else %>
-			<td width="14%">
-				<%= link_to "Student Details", student_path(@student), class: "green" %><br/>
-				<span class="trivial">and thesis</span>
-			</td>
-		<% end %>
-	</tr>
-
-</table>
+				</div>
+				<div class="col">
+					<%= link_to "Make changes", edit_student_path(@student), class: "text-success" %><br/>
+					<span class="trivial">to student details</span>	
+				</div>
+				<div class="col">
+					<% if @student.blocked? %>
+						<%= link_to "Unblock student",  unblock_student_path(@student), method: :post, :data => { :confirm => 'Are you sure?'}, :class => "text-danger"  %><br/>
+						<span class="trivial">allow access</span>
+					<% else %>
+						<%= link_to "Block student",  block_student_path(@student), :data => { :confirm => 'Are you sure?'} , :method => :post, :class => "text-danger" %><br/>
+						<span class="trivial">disable access</span>
+					<% end %>
+				</div>
+			<% else %>
+				<div class="col-sm-12 col-lg-4">
+					<%= link_to "Student Details", student_path(@student), class: "green" %><br/>
+					<span class="trivial">and thesis</span>
+				</div>
+			 <% end %>
+			</div>
+		</div>
+	</div>
+</div>
