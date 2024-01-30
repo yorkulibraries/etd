@@ -20,15 +20,8 @@ class StudentsTest < ApplicationSystemTestCase
     @thesis = FactoryGirl.create(:thesis)
     login_as(@thesis.student)
     visit root_url
-    page.save_screenshot('example01.png')
     click_link('Update details')
-    page.save_screenshot('example02-a.png', full: true)
-    page.execute_script 'window.scrollBy(0,2000)'
-    sleep 1
-    page.save_screenshot('example02-b.png', full: true)
     click_link('Upload files')
-    page.save_screenshot('example03.png')
     click_link('Review details')
-    page.save_screenshot('example04.png')
   end
 end

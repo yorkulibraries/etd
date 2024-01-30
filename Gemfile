@@ -16,6 +16,9 @@ gem 'jquery-tablesorter', '~> 1.27', '>= 1.27.2'
 gem 'jquery-ui-rails', '6.0.1'
 gem 'sass-rails', '~> 6.0'
 gem 'terser', '~> 1.1', '>= 1.1.20'
+source 'https://rails-assets.org' do
+  gem 'rails-assets-chosen-bootstrap-theme'
+end
 
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
 gem 'active_link_to', '~> 1.0', '>= 1.0.5'
