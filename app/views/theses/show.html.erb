@@ -11,30 +11,30 @@
 	<div class="col-lg-2 d-none d-lg-block"></div>
 	<div class="col-sm-12 col-lg">
 	  <div class="row">
-		<div class="col">
-			<span class="badge text-bg-light">Edit thesis</span>
-			<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success" unless @thesis.status == Thesis::PUBLISHED %></div>
-		</div>
-		<div class="col">
-			<% if @thesis.status == Thesis::PUBLISHED %>
-				<div id="status_menu">
-					<button id="" class="btn" title="Change Thesis Status">
-					Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span>
-					</button>
-				</div>
-			<% else%>
-				<span class="badge text-bg-light">Change status</span>
-				<%= render partial: "status_menu"%>
-			<% end %>
-		</div>
-		<div class="col">
-			<% unless @thesis.status == Thesis::PUBLISHED %>
-				<span class="badge text-bg-light">Assign to</span>
-				<div class="span">
-					<%= render partial: "assigned_to", locals: { thesis: @thesis }%>
-				</div>
-			<% end %>
-		</div>
+			<div class="col">
+				<span class="badge text-bg-light">Edit thesis</span>
+				<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success" unless @thesis.status == Thesis::PUBLISHED %></div>
+			</div>
+			<div class="col">
+				<% if @thesis.status == Thesis::PUBLISHED %>
+					<div id="status_menu">
+						<button id="" class="btn" title="Change Thesis Status">
+						Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span>
+						</button>
+					</div>
+				<% else%>
+					<span class="badge text-bg-light">Change status</span>
+					<%= render partial: "status_menu"%>
+				<% end %>
+			</div>
+			<div class="col">
+				<% unless @thesis.status == Thesis::PUBLISHED %>
+					<span class="badge text-bg-light">Assign to</span>
+					<div class="span">
+						<%= render partial: "assigned_to", locals: { thesis: @thesis }%>
+					</div>
+				<% end %>
+			</div>
 	  </div>
 	</div>
 </div>
@@ -107,6 +107,7 @@
 				<p class="keywords"><%= format @thesis.keywords%></p>
 		</div>
 		<div class="col-4">
+			<div class="row p-1">
 				<span class="badge text-bg-light">Permanent Embargo</span>
 				<% if @thesis.embargoed == true %>
 				<div class="alert alert-danger" role="alert">This thesis has been placed under permanent embargo. It will not be published.
@@ -120,6 +121,7 @@
 						<% end %>
 					</div>
 				<% end %>
+			</div>
 		</div>
 	</div>
 </div>
