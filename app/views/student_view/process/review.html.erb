@@ -2,7 +2,7 @@
 
 <% title_html do %>
 	<h4 class="blend soft">My ETD Submission</h4>
-	<h1><%= @student.name %></h1>
+	<h1 class="border-bottom"><%= @student.name %></h1>
 <% end %>
 
 <%= progress_bar (Thesis::PROCESS_REVIEW) %>
