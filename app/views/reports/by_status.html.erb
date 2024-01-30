@@ -1,5 +1,7 @@
 <% title "Review #{@status.humanize.titleize} Theses" %>
-
+<% title_html do %>
+	<h1 class="border-bottom mb-3">Review <%= @status.humanize.titleize %> Theses</h1>
+<% end %>
 <div class="home fitted">
 	<%= render "nav" %>
 
