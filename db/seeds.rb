@@ -16,7 +16,7 @@ if (Rails.env != 'test') && User.all.count.zero?
 end
 
 if Rails.env.development?
-  for i in 10..75
+  (10..75).each do |i|
     if i < 50
       Student.create(username: "username#{i}", name: "name#{i}", email: "email#{i}@domain.com", created_by_id: 1,
                      blocked: false, role: User::STUDENT, sisid: "1000000#{i}")

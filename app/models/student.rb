@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Student < User
-
   belongs_to :created_by, foreign_key: 'created_by_id', class_name: 'User'
 
   validates_presence_of :sisid
