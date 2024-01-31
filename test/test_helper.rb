@@ -11,6 +11,8 @@ require 'mocha/minitest'
 require 'database_cleaner/active_record'
 require 'capybara/rails'
 require 'capybara/minitest'
+require 'rails-controller-testing'
+Rails::Controller::Testing.install
 
 Capybara.server_host = '0.0.0.0'
 Capybara.app_host = "http://#{Socket.gethostname}:#{Capybara.server_port}"

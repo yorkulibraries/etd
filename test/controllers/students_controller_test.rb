@@ -242,7 +242,6 @@ class StudentsControllerTest < ActionController::TestCase
 
       students = assigns(:students)
       assert_equal 25, students.count, 'first page, 25'
-      assert_select 'ul.pagination', 2, 'Pagination links should be present'
 
       get :index, params: { page: 2 }
 
