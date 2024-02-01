@@ -21,20 +21,20 @@
 		<p>Please review all of the information on this page for accuracy and completeness and ensure all files are uploaded. If you are satisfied with the information you have provided, click "Submit for Review".</p>
 	</div>
 
-	<span class="badge text-bg-light">Abstract</span>
+	<h6>Abstract</h6>
 	<p><%= format @thesis.abstract, true %></p>
 	<div class="row">
 	  <div class="col-md-12 col-lg-4">
-	  	<span class="badge text-bg-light">Supervisor</span>
+	  	<h6>Supervisor</h6>
 		<p><%= format @thesis.supervisor %></p>
-	  	<span class="badge text-bg-light">Exam date</span>
+	  	<h6>Exam date</h6>
 		<p><%= @thesis.exam_date.strftime("%B %d, %Y") rescue nil %></p>
-		<span class="badge text-bg-light">Publish on</span>
+		<h6>Publish on</h6>
 		<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
 	  </div>
 	  <div class="col-md-12 col-lg-4">
 	  	<div class="span5 committee" title="examining committee">
-			<span class="badge text-bg-light">Examining committee</span>
+			<h6>Examining committee</h6>
 			<table class="committee_members" id="committee_members">
 				<% @thesis.committee_members.each do |committee_member| %>
 					<%= render partial: committee_member %>
@@ -48,11 +48,11 @@
 
 	<div class="row">
 	  <div class="col-md-12 col-lg-4">
-		<span class="badge text-bg-light">Degree Name and Level</span>
+		<h6>Degree Name and Level</h6>
 		<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
 	  </div>
 	  <div class="col-md-12 col-lg-4">
-	  	<span class="badge text-bg-light">Program</span>
+	  	<h6>Program</h6>
 		<p><%= format @thesis.program %></p>
 	  </div>
 	  <div class="col-lg-4 d-none d-lg-block"></div>
@@ -61,13 +61,13 @@
 
 	<div class="row">
 	  <div class="col-md-12 col-lg-4">
-		<span class="badge text-bg-light">Language</span>
+		<h6>Language</h6>
 		<p><%= format @thesis.language %></p>
-	  	<span class="badge text-bg-light">Subjects</span>
+	  	<h6>Subjects</h6>
 		<p><%= format @thesis.loc_subjects.map(&:name).join ', ' %></p>
 	  </div>
 	  <div class="col-md-12 col-lg-4">
-		<span class="badge text-bg-light">Keywords</span>
+		<h6>Keywords</h6>
 		<p><%= format @thesis.keywords%></p>
 	  </div>
 	  <div class="col-lg-4 d-none d-lg-block"></div>

@@ -1,1 +1,6 @@
-@import "bootstrap"
+@import "bootstrap";
+$color_h6: #d2452a;
+
+h6 {
+	color: $color_h6;
+}
