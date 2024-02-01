@@ -18,23 +18,23 @@
   <div class="card-body">
 		<div class="row">
 			<div class="col-md-12 col-lg-4">
-				<span class="badge text-bg-light">Title</span>
+				<h6>Title</h6>
 				<p><%= @thesis.title %></p>
-				<span class="badge text-bg-light">Author</span>
+				<h6>Author</h6>
 				<p><%= @student.name %></p>
 			</div>
 			<div class="col-md-6 col-lg-4">
-				<span class="badge text-bg-light">Exam date</span>
+				<h6>Exam date</h6>
 				<p><%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
-				<span class="badge text-bg-light">Supervisor</span>
+				<h6>Supervisor</h6>
 				<p><%= format @thesis.supervisor %></p>
-				<span class="badge text-bg-light">Publish On</span>
+				<h6>Publish On</h6>
 				<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
 			</div>
 			<div class="col-md-6 col-lg-4">
-				<span class="badge text-bg-light">Program</span>
+				<h6>Program</h6>
 				<p><%= format @thesis.program %></p>
-				<span class="badge text-bg-light">Degree Name and Level</span>
+				<h6>Degree Name and Level</h6>
 				<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
 			</div>
 		</div>

@@ -1,24 +1,30 @@
 <% title "Students" %>
 <% title_html do %>
+<div class="container">
+  <div class="row">
 	<h1 class="border-bottom mb-3">Students</h1>
+  </div>
+</div>
 <% end %>
-
+<div class="container">
+  <div class="row">
 <% if @search_result %>
 	<h4><%= @search_result %></h4>
 <% end %>
 
-<div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
-  <div class="btn-group" role="group" aria-label="First group">
-		<%= paginate @students %>
-  </div>
-  <div class="input-group">
-		<p class="my-auto">
-			<%= link_to_if params[:oldest], "Newest", students_path(newest: true), class: "btn btn-outline-secondary  my-auto" %>
-			<%= link_to_unless params[:oldest], "Oldest", students_path(oldest: true),class: "btn btn-outline-secondary" %>	
-		</p>
+	<div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+	<div class="btn-group" role="group" aria-label="First group">
+			<%= paginate @students %>
+	</div>
+	<div class="input-group">
+			<p class="my-auto">
+				<%= link_to_if params[:oldest], "Newest", students_path(newest: true), class: "btn btn-outline-secondary  my-auto" %>
+				<%= link_to_unless params[:oldest], "Oldest", students_path(oldest: true),class: "btn btn-outline-secondary" %>	
+			</p>
+	</div>
+	</div>
   </div>
 </div>
-
 <div class="students mt-4">
 	<% @students.each do |student| %>
 		<%= render partial: student %>
