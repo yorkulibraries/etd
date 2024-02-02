@@ -1,16 +1,13 @@
 <% title "#{@student.name}" %>
-
 <% title_html do %>
+	<% if @student.blocked %>
+		<div class="alert alert-warning alert-dismissible fitted" role="alert" id="student_blocked_message">
+			<strong>This student is blocked from accessing this record.</strong>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+	<% end %>
 	<%= render partial: "header" %>
 <% end %>
-
-<% if @student.blocked %>
-	<div class="alert alert-warning alert-dismissible fitted" role="alert" id="student_blocked_message">
-		<strong>This student is blocked from accessing this record.</strong>
-		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-	</div>
-<% end %>
-
 
 <div class="card">
   <div class="card-header">

@@ -1,11 +1,9 @@
-<h4>Student Record</h4>
-
-<div class="container">
 	<div class="row">
+	  	<h4>Student Record</h4>
 		<div class="col-sm-12 col-lg-7">
 			<h1 title="<%= @student.sisid %>">
 				<%= link_to_unless controller.controller_name == "students" && controller.action_name == "show", @student.name, @student, title: @student.sisid %>
-				<% if @student.blocked? %><i class="fa fa-ban" title="blocked", style:"color:red"></i><% end %>
+				<% if @student.blocked? %><i class="fa fa-ban text-danger" title="blocked"></i><% end %>
 			</h1>
 		</div>
 		<div class="col-sm-12 col-lg">
@@ -37,4 +35,3 @@
 			</div>
 		</div>
 	</div>
-</div>
