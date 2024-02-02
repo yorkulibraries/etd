@@ -2,10 +2,10 @@
  <div class="row">
 	<div class="col border border-secondary p-2 m-1 step <%= activate == Thesis::PROCESS_BEGIN ? "bg-warning-subtle" :"bg-secondary-subtle" %> <%= "disable" if block_thesis_changes?(@thesis) %>">
 	  <div class="row">
-	   <div class="col-2">
+	   <div class="col-lg-2 d-none d-lg-block">
 		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_BEGIN ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
-	   <div class="col-10">
+	   <div class="col-lg-10 col-sm-12">
 		<a class="text-black ms-2" href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_BEGIN)  unless block_thesis_changes?(@thesis) %>" title="Begin Submission">
 			Begin<br/>
 			<strong class="ms-2">submission</strong>
@@ -15,10 +15,10 @@
 	</div>
 	<div class="col border border-secondary p-2 m-1 step  <%= activate == Thesis::PROCESS_UPDATE ? "bg-warning-subtle" :"bg-secondary-subtle" %> <%= "disable" if block_thesis_changes?(@thesis) %>">
 	  <div class="row">
-	   <div class="col-2">
+	   <div class="col-lg-2 d-none d-lg-block">
 		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_UPDATE ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
-	   <div class="col-10">
+	   <div class="col-lg-10 col-sm-12">
 		<a class="text-black ms-2" href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) unless block_thesis_changes?(@thesis) %>" title="Update Details">
 			Update<br/>
 			<strong class="ms-2">details</strong>
@@ -28,10 +28,10 @@
 	</div>
 	<div class="col border border-secondary p-2 m-1 step  <%= activate == Thesis::PROCESS_UPLOAD ? "bg-warning-subtle" :"bg-secondary-subtle" %> <%= "disable" if block_thesis_changes?(@thesis) %>">
 	  <div class="row">
-	   <div class="col-2">
+	   <div class="col-lg-2 d-none d-lg-block">
 		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_UPLOAD ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
-	   <div class="col-10">
+	   <div class="col-lg-10 col-sm-12">
 		<a class="text-black ms-2" href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)  unless block_thesis_changes?(@thesis) %>" title="Upload Files">
 			Upload<br/>
 			<strong class="ms-2">files</strong>
@@ -41,10 +41,10 @@
 	</div>
 	<div class="col border border-secondary p-2 m-1 step  <%= activate == Thesis::PROCESS_REVIEW  ? "bg-warning-subtle" :"bg-secondary-subtle" %>">
 	  <div class="row">
-	   <div class="col-2">
+	   <div class="col-lg-2 d-none d-lg-block">
 		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_REVIEW ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
-	   <div class="col-10">
+	   <div class="col-lg-10 col-sm-12">
 		<a class="text-black ms-2" href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW)   %>" title="Review Details">
 				Review<br/>
 			<strong class="ms-2">details</strong>
@@ -54,10 +54,10 @@
 	</div>
 	<div class="col border border-secondary p-2 m-1 step <%= activate == Thesis::PROCESS_SUBMIT ? "bg-warning-subtle" :"bg-secondary-subtle" %> <%= "disable" if block_thesis_changes?(@thesis) %>">
 	  <div class="row">
-	   <div class="col-2">
+	   <div class="col-lg-2 d-none d-lg-block">
 		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_SUBMIT ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
-	   <div class="col-10">
+	   <div class="col-lg-10 col-sm-12">
 		<a class="text-black ms-2" href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)  unless block_thesis_changes?(@thesis) %>" title="Submit For Review"
 			data-confirm="Have you completed all thesis details and uploaded all files?">
 			Submit<br/>
@@ -66,12 +66,12 @@
 	   </div>
 	  </div>
 	</div>
-	<div class="col border border-secondary p-2 m-1 step <%= activate == Thesis::PROCESS_STATUS ? "bg-warning-subtle" :"bg-secondary-subtle" %>">
+	<div class="col-2 border border-secondary p-2 m-1 step <%= activate == Thesis::PROCESS_STATUS ? "bg-warning-subtle" :"bg-secondary-subtle" %>">
 	  <div class="row">
-	   <div class="col-2">
+	   <div class="col-lg-2 d-none d-lg-block">
 		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_STATUS ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
-	   <div class="col-10">
+	   <div class="col-lg-10 col-sm-12">
 		<a class="text-black ms-2" href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS) %>" title="Check Thesis Status">
 			Check<br/>
 			<strong class="ms-2">status</strong>

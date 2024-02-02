@@ -18,7 +18,7 @@
 	</ul>	
 	<div id="theses">
 		<% if @theses.size == 0 %>
-			<p>There are no <strong><%= @which.humanize.titleize %></strong> theses available right now.</p>
+			<p class="py-3">There are no <strong><%= @which.humanize.titleize %></strong> theses available right now.</p>
 		<% end %>
 		<% @theses.each do |thesis| %>			
 			<%= render partial: thesis %>
