@@ -27,7 +27,7 @@
   <div class="tab-pane fade" id="welcome_email_settings" role="tabpanel" tabindex="0">
     <h4>Welcome Email</h4>
     <%= f.input :email_welcome_allow, as: :radio_buttons, label: "Allow Welcome Email?" %>
-		<%= f.input :email_welcome_subject, label: "Subject", input_html: { class: "span8" } %>
+		<%= f.input :email_welcome_subject, as: :text, label: "Subject" %>
 		<%= f.input :email_welcome_body, as: :text, label: "Body", input_html: { rows: 20, class: "span8" } %>
 		<p class="help-block">Available Tags: {{student_name}} | {{date}} | {{date-short}} | {{application_url}} </p>
   </div>
@@ -35,7 +35,7 @@
   <div class="tab-pane fade" id="status_change_email_settings" role="tabpanel" tabindex="0">
     <h4>Status Change Email</h4>
     <%= f.input :email_status_change_allow, as: :radio_buttons, label: "Allow Status Change Email?" %>
-    <%= f.input :email_status_change_subject, label: "Subject", input_html: { class: "span8" } %>
+    <%= f.input :email_status_change_subject, as: :text, label: "Subject", input_html: { class: "span8" } %>
     <%= f.input :email_status_change_body, as: :text, label: "Body", input_html: { rows: 20, class: "span8" } %>
     <p class="help-block">Available Tags:
       {{thesis_title}} | {{student_name}} | {{custom_message}} | {{old_status}} | {{new_status}} | {{date}} | {{date-short}}| {{application_url}} </p>
