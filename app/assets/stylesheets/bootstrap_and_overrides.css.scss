@@ -1,6 +1,11 @@
 @import "bootstrap";
 $color_h6: #d2452a;
-
+$color_h6_green: #009900;
 h6 {
 	color: $color_h6;
+}
+
+h6.green{
+	color: $color_h6_green;
+	border-bottom: 1px solid rgb(228, 228, 228);
 }

@@ -18,7 +18,7 @@
 	  <div class="row">
 			<div class="col-4">
 				<h6 class="text-black">Edit thesis</h6>
-				<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success d-grid" unless @thesis.status == Thesis::PUBLISHED %></div>
+				<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success btn-sm d-grid" unless @thesis.status == Thesis::PUBLISHED %></div>
 			</div>
 			<div class="col-5">
 				<% if @thesis.status == Thesis::PUBLISHED %>
@@ -69,7 +69,7 @@
 						<%= render partial: committee_member %>
 					<% end %>
 					<% if @thesis.status != Thesis::PUBLISHED %>
-						<div class="link_section">
+						<div class="link_section pt-4">
 							<div class="add_link" colspan="3">
 								<%= link_to "+ Add committee member", new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success"} %>
 							</div>
