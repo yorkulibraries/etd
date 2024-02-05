@@ -4,7 +4,8 @@
 	<%= f.input :name %>
 	<%= f.input :email %>
 	<%= f.input :role, :collection =>  User::ROLES  %>
-	
-	<%= f.button :submit %> or <%= link_to "Cancel",  @user.blocked? ? blocked_users_path : users_path %>
+	<div class=" mt-3">
+	  <%= f.button :submit, class: "btn btn-primary" %> or <%= link_to "Cancel",  @user.blocked? ? blocked_users_path : users_path %>
+	</div>
 
 <% end %>

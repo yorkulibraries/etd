@@ -19,7 +19,7 @@
 			<tr>
 				<td class="trivial time"><%= event.created_at.strftime("%R")%></td>
 				<td class="what">
-					<span class="badge <%= type.underscore.downcase %>"><%= defined?(audit_what) ? audit_what : type.tableize.singularize.humanize %></span>
+					<span class="badge rounded-pill text-bg-secondary <%= type.underscore.downcase %>"><%= defined?(audit_what) ? audit_what : type.tableize.singularize.humanize %></span>
 				</td>
 				<td class="distinct" width="45%">				
 					<% unless event.auditable.nil? %>	
