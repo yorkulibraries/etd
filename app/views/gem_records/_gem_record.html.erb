@@ -11,43 +11,27 @@
 	    <h5 class="card-title"><%= gem_record.title %></h5>
 	   <% end %>
 		<div class="row">
-		  <div class="col-md-12 col-lg-5">
-			<div class="row">
-			  <div class="col-4">student id </div>
-			  <div class="col fw-bold"><%= gem_record.sisid%></div>
-			</div>
-			<div class="row">
-			  <div class="col-4">supervisor</div>
-			  <div class="col fw-bold"><%= gem_record.superv%></div>
-			</div>
-			<div class="row">
-			  <div class="col-4">event type</div>
-			  <div class="col fw-bold"><%= gem_record.eventtype%></div>
-			</div>
-			<div class="row">
-			  <div class="col-4">exam result</div>
-			  <div class="col fw-bold"><%= gem_record.examresult%></div>
-			</div>
+		  <div class="col-4">
+			<h6>Student id</h6>
+			<p><%= gem_record.sisid%></p>
+			<h6>Email address</h6>
+			<p><%= gem_record.emailaddress %></p>
+			<h6>Supervisor</h6>
+			<p><%= gem_record.superv%></p>
 		  </div>
-		  <div class="col-lg-2 d-none d-lg-block">
+		  <div class="col-4">
+			<h6>Event type</h6>
+			<p><%= gem_record.eventtype%></p>
+			<h6>Program</h6>
+			<p><%= gem_record.program %></p>
 		  </div>
-		  <div class="col-md-12 col-lg-5">
-		    <div class="row">
-			  <div class="col-4">email address</div>
-			  <div class="col fw-bold"><%= gem_record.emailaddress %></div>
-			</div>
-		    <div class="row">
-			  <div class="col-4">program</div>
-			  <div class="col fw-bold"><%= gem_record.program %></div>
-			</div>
-		    <div class="row">
-			  <div class="col-4">event date</div>
-			  <div class="col fw-bold"><%= gem_record.eventdate.to_date.strftime("%B %d, %Y") %></div>
-			</div>
-		    <div class="row">
-			  <div class="col-4">exam date</div>
-			  <div class="col fw-bold"><%= gem_record.examdate.to_date.strftime("%B %d, %Y") rescue nil %></div>
-			</div>
+		  <div class="col-4">
+			<h6>Event date</h6>
+			<p><%= gem_record.eventdate.to_date.strftime("%B %d, %Y") %></p>
+			<h6>Exam date</h6>
+			<p><%= gem_record.examdate.to_date.strftime("%B %d, %Y") rescue nil %></p>
+			<h6>Exam result</h6>
+			<p><%= gem_record.examresult%></p>
 		  </div>
 		</div>
 	  </div>

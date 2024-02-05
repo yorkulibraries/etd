@@ -18,46 +18,29 @@
 		</h5>
   </div>
   <div class="card-body">
-		<div class="row">
-			<div class="col-sm-12 col-lg-6">
-				<div class="row">
-					<div class="col-4">Username</div>
-					<div class="col fw-bold"><%= @student.username%></div>
-				</div>
-				<div class="row">
-					<div class="col-4">Email</div>
-					<div class="col fw-bold"><%= @student.email%></div>
-				</div>
-				<div class="row">
-					<div class="col-4">Invitation</div>
-					<div class="col fw-bold">
-						<% if @student.invitation_sent_at.nil? %>
-							<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", send_invite_student_path(@student) %>
-						<% else %>
-							Sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>
-							<span class="soft weak">(<%= link_to_if AppSettings.email_welcome_allow, "Send Again", send_invite_student_path(@student), class: "soft weak"%>)</span>
-						<% end %>
-					</div>
-				</div>
-
-			</div>
-			<div class="col-lg-2 d-none d-lg-block">
-			</div>			
-			<div class="col-sm-12 col-lg-4">
-				<div class="row">
-					<div class="col-4">SISID</div>
-					<div class="col fw-bold"><%= @student.sisid %></div>
-				</div>
-				<div class="row">
-					<div class="col-4">Joined on</div>
-					<div class="col fw-bold"><%= @student.created_at.strftime("%B %d, %Y")%></div>
-				</div>
-
-			</div>
-		</div>
-
-
-
+  	<div class="row">
+	  <div class="col-6">
+	  	<h6>Username</h6>
+		<p><%= @student.username%></p>
+	  	<h6>Email</h6>
+		<p><%= @student.email%></p>
+	  	<h6>Invitation</h6>
+		<p>
+		  <% if @student.invitation_sent_at.nil? %>
+		  	<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", send_invite_student_path(@student) %>
+		  <% else %>
+			Sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>
+			<span class="soft weak">(<%= link_to_if AppSettings.email_welcome_allow, "Send Again", send_invite_student_path(@student), class: "soft weak"%>)</span>
+		  <% end %>
+		</p>
+	  </div>
+	  <div class="col-6">
+	  	<h6>SISID</h6>
+		<p><%= @student.sisid %></p>
+	  	<h6>Joined on</h6>
+		<p><%= @student.created_at.strftime("%B %d, %Y")%></p>
+	  </div>
+	</div>
   </div>
 </div>
 
@@ -74,7 +57,7 @@
 		<% end %>
 
 		<% if @available_theses.size > 0 %>
-			<h3 class='heading clear'>Available <%= "thesis".pluralize(@available_theses.count )%></h3>
+			<h6 class='green heading clear'>Available <%= "thesis".pluralize(@available_theses.count )%></h6>
 
 			<% @available_theses.each do |record| %>
 				<table class="thesis not_started">

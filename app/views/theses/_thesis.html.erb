@@ -1,44 +1,32 @@
 <div class="thesis py-3">
-	<div class="card">
-		<h5 class="card-header">
-			<div class="pull-right">
-				<span class="badge rounded-pill text-bg-secondary label status status-<%= thesis.status %>"><%= thesis.status.humanize %></span>
-			</div>
-			<%= link_to thesis.title, student_thesis_path(thesis.student, thesis) %> 						
-		</h5>
-		<div class="card-body">
-			<h5 class="card-title">
-				<% unless @student %>
-					<p class="author trivial" title="student id: <%= thesis.student.sisid %>">By <%= thesis.student.name %></p>
-				<% end %>
-			</h5>
-			<div class="row">
-				<div class="col">
-					<div class="row">
-						<div class="col-4">Supervisor</div>
-						<div class="col fw-bold"><%= thesis.supervisor %></div>
-					</div>
-					<div class="row">
-						<div class="col-4">Exam date</div>
-						<div class="col fw-bold"><%= thesis.exam_date.strftime("%B %d, %Y") %></div>
-					</div>
-
-					<div class="row">
-						<div class="col-4">Degree Name and Level</div>
-						<div class="col fw-bold"><%= format thesis.degree_name %> - <%= format thesis.degree_level %></div>
-					</div>
-					<div class="row">
-						<div class="col-4">Program</div>
-						<div class="col fw-bold"><%= format thesis.program %></div>
-					</div>
-				</div>
-				<div class="col-2">
-					<div class="pull-right">
-						<%= render partial: "theses/assigned_to", locals: { thesis: thesis }%>
-					</div>
-				</div>
-			</div>
-
+  <div class="card">
+	<div class="card-body">
+	  <div class="row">
+		<div class="col-9">
+		  <h5><%= link_to thesis.title, student_thesis_path(thesis.student, thesis) %></h5>
+		  <% unless @student %>
+		  	<p class="author trivial" title="student id: <%= thesis.student.sisid %>">By <%= thesis.student.name %></p>
+		  <% end %>
 		</div>
+		<div class="pull-right col-3">
+		  <%= render partial: "theses/assigned_to", locals: { thesis: thesis }%>
+		  <span class="badge rounded-pill text-bg-secondary label status status-<%= thesis.status %>"><%= thesis.status.humanize %></span>
+		</div>
+	  </div>
+	  <div class="row">
+	  	<div class="col-6">
+		  <h6>Supervisor</h6>
+		  <p><%= thesis.supervisor %></p>
+		  <h6>Exam date</h6>
+		  <p><%= thesis.exam_date.strftime("%B %d, %Y") %></p>
+		</div>				
+		<div class="col-6">
+		  <h6>Degree Name and Level</h6>
+		  <p><%= format thesis.degree_name %> - <%= format thesis.degree_level %></p>
+		  <h6>Program</h6>
+		  <p><%= format thesis.program %></p>
+		</div>
+	  </div>
 	</div>
+  </div>
 </div>
