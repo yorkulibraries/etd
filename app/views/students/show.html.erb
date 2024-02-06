@@ -9,16 +9,9 @@
 	<%= render partial: "header" %>
 <% end %>
 
-<div class="card">
-  <div class="card-header">
-		<h5 class="trivial">Created by <%= @student.created_by.name%>
-			<% if can?(:login_as, :student) && is_controller_and_action?("students", "show") %>
-			- <%= link_to "Login as this student", login_as_student_path(id: @student.id) %>
-			<% end %>
-		</h5>
-  </div>
+<div class="card mt-3">
   <div class="card-body">
-  	<div class="row">
+   <div class="row">
 	  <div class="col-6">
 	  	<h6>Username</h6>
 		<p><%= @student.username%></p>
@@ -40,7 +33,7 @@
 	  	<h6>Joined on</h6>
 		<p><%= @student.created_at.strftime("%B %d, %Y")%></p>
 	  </div>
-	</div>
+	 </div>
   </div>
 </div>
 
@@ -49,7 +42,7 @@
 
 		<% if @current_theses.size > 0 %>
 
-			<h3 class="heading">Current <%= "thesis".pluralize(@current_theses.count )%></h3>
+			<h6 class="heading green">Current <%= "thesis".pluralize(@current_theses.count )%></h6>
 			<% @current_theses.each do |thesis| %>
 				<%= render partial: thesis %>
 			<% end %>

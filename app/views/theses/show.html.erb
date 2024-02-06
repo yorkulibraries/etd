@@ -4,9 +4,9 @@
 <div class="container">
   <div class="row">
 	<%= render partial: "students/header" %>
+	<div class="col-12 py-0"><hr /></div>
   </div>
 </div>
-	<hr />
 <% end %>
 <div class="container">
   <div class="row">
@@ -80,10 +80,9 @@
 		</div>
 		<div class="col-lg-4 d-none d-lg-block">
 		</div>
+		<div class="col-12"><hr /></div>
 	</div>
 </div>
-
-<hr />
 
 <div class="container">
 	<div class="row">
@@ -132,21 +131,22 @@
 	</div>
 </div>
 
-<hr />
+
 <div class="container">
   <div class="row">
+	<div class="col-12"><hr /></div>
 	<div class="col-3 span2 distinct strong"><h6>Last Under Review: </h6> <%= format @thesis.under_review_at %></div>
 	<div class="col-3 span2 distinct strong"><h6>Last Returned: </h6> <%= format @thesis.returned_at %></div>
 	<div class="col-3 span2 distinct strong"><h6>Thesis Accepted: </h6> <%= format @thesis.accepted_at %></span></div>
 	<div class="col-3 span2 distinct strong"><h6>Published: </h6> <%= format @thesis.published_at %></div>
   </div>
 </div>
-<hr />
+
 <div class="container">
   <div class="row">
 	<div class="documents fitted">
 
-	<h3>Thesis Files and Documents</h3>
+	<h6 class="green pt-4">Thesis Files and Documents</h6>
 
 	<h6>Primary</h6>
 	<% @primary_documents.each do | document | %>
