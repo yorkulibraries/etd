@@ -2,81 +2,75 @@
 
 <div class="home fitted">
 	<%= render "nav" %>
-
-
-  		<table class="table table-striped" >
-  			<tr>
-  				<td><%= link_to "Prev", reports_review_thesis_path(id: @prev_id) unless @prev_id == 0  %></td>
-  				<td colspan="2" class="strong" style="text-align: center">Review Thesis Details</td>
-  				<td style="text-align: right">
-  					<%= link_to "Next", reports_review_thesis_path(id: @next_id) unless @next_id == @thesis.id %>
-  				</td>
-
-  			</tr>
-  			<tr>
-  				<td class="strong span2">Title</td>
-  				<td class="span8" align="right" colspan="3"><%= @thesis.title %></td>
-  			</tr>
-
-
-
-  			<tr>
-  				<td class="span2 strong">Author</td>
-  				<td class="span4" align="right"><%= @thesis.author %></td>
-  				<td class="span2 strong">Supervisor</td>
-  				<td class="span4" align="right"><%= @thesis.supervisor %></td>
-  			</tr>
-
-  			<tr>
-  				<td class="span2 strong">Abstract</td>
-  				<td class="span8" align="right" colspan="3"><%= @thesis.abstract %></td>
-  			</tr>
-
-  			<tr>
-  				<td class="span2 strong">Subject Keywords</td>
-  				<td class="span8" align="right" colspan="3"><%= @thesis.keywords %></td>
-  			</tr>
-  			<tr>
-  				<td class="span2 strong">Subjects</td>
-  				<td class="span8" align="right" colspan="3">
-  					<%=  @thesis.loc_subjects.collect { |s| s.name }.join(", ") %>
-  				</td>
-  			</tr>
-
-  			<tr>
-  				<td class="span2 strong">Language</td>
-  				<td class="span4" align="right"><%= @thesis.language %></td>
-  				<td class="span2 strong">Program</td>
-  				<td class="span4" align="right"><%= @thesis.program %></td>
-  			</tr>
-  			<tr>
-  				<td class="span2 strong">Exam date</td>
-  				<td class="span4"><%=  @thesis.exam_date.strftime("%Y-%m-%d") %></td>
-  				<td class="span2 strong">Program Shortened</td>
-  				<td class="span4" align="right"><%= @thesis.program.split(".,").last.strip rescue nil %></td>
-  			</tr>
-  			<tr>
-  				<td class="span2 strong">Degree Name</td>
-  				<td class="span4" align="right"><%= Thesis::DEGREENAME_FULL[@thesis.degree_name] %></td>
-  				<td class="span2 strong">Degree Level</td>
-  				<td class="span4" align="right"><%= @thesis.degree_level %></td>
-  			</tr>
-
-  			<tr>
-  				<td colspan="4" style="text-align: right; ">
-  					<%= link_to "Go to record", [@thesis.student, @thesis], class: "btn btn-success" %>
-  				</td>
-
-  			</tr>
-
-  		</table>
+	<div class="row pb-5">
+		<div class="col-1">
+			<%= link_to "Prev", reports_review_thesis_path(id: @prev_id) unless @prev_id == 0  %>
+		</div>
+		<div class="col-10 text-center fw-bold">
+			Review Thesis Details
+		</div>
+		<div class="col-1 text-end">
+			<%= link_to "Next", reports_review_thesis_path(id: @next_id) unless @next_id == @thesis.id %>
+		</div>
+		<div class="col-lg-12 col-sm-12 pt-3">
+			<h6>Title</h6>
+			<p><%= @thesis.title %></p>
+		</div>
+		<div class="col-lg-4 col-sm-12">
+			<h6>Author</h6>
+			<p><%= @thesis.author %></p>
+		</div>
+		<div class="col-lg-4 col-sm-12">
+			<h6>Supervisor</h6>
+			<p><%= @thesis.supervisor %></p>
+		</div>
+		<div class="col-lg-12 col-sm-12">
+			<h6>Abstract</h6>
+			<p><%= @thesis.abstract %></p>
+		</div>
+		<div class="col-12">
+			<h6>Subject Keywords</h6>
+			<p><%= @thesis.keywords %></p>
+		</div>
+		<div class="col-lg-12 col-sm-12">
+			<h6>Subjects</h6>
+			<p><%=  @thesis.loc_subjects.collect { |s| s.name }.join(", ") %></p>
+		</div>
+		<div class="col-lg-4 col-sm-12">
+			<h6>Language</h6>
+			<p><%= @thesis.language %></p>
+		</div>
+		<div class="col-lg-4 col-sm-12">
+			<h6>Program</h6>
+			<p><%= @thesis.program %></p>
+		</div>
+		<div class="col-lg-4 col-sm-12">
+			<h6>Degree Name</h6>
+			<p><%= Thesis::DEGREENAME_FULL[@thesis.degree_name] %></p>
+		</div>
+		<div class="col-lg-4 col-sm-12">
+			<h6>Exam date</h6>
+			<p><%= @thesis.exam_date.strftime("%Y-%m-%d") %></p>
+		</div>
+		<div class="col-lg-4 col-sm-12">
+			<h6>Program Shortened</h6>
+			<p><%= @thesis.program.split(".,").last.strip rescue nil %></p>
+		</div>
+		<div class="col-lg-4 col-sm-12">
+			<h6>Degree Level</h6>
+			<p><%= @thesis.degree_level %></p>
+		</div>
+		<div class="col-lg-12 col-sm-12 text-end">
+			<%= link_to "Go to record", [@thesis.student, @thesis], class: "btn btn-success pull-end" %>
+		</div>
+	</div>
 
   		<% @student = @thesis.student %>
   		<div class="documents fitted">
 
-  			<h3>Thesis Files and Documents</h3>
+  			<h6 class="green">Thesis Files and Documents</h6>
 
-  			<% @thesis.documents.not_deleted.primary.each do | document | %>
+				<% @thesis.documents.not_deleted.primary.each do | document | %>
   				<%= render partial: document %>
   			<% end %>
 
