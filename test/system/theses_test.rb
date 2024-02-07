@@ -21,11 +21,11 @@ class ThesesTest < ApplicationSystemTestCase
 
   test 'Check thesis Under review and Overview on nav-tabs' do
     visit root_url
-    assert_selector 'h5', text: @thesis_01.title
+    assert_selector 'h3', text: @thesis_01.title
     click_link(@thesis_01.title)
     click_link('Overview')
     click_link('Under Review')
-    assert_selector 'h5', text: @thesis_02.title
+    assert_selector 'h3', text: @thesis_02.title
     click_link(@thesis_02.title)
   end
 
