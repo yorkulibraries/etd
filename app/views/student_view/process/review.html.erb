@@ -1,7 +1,7 @@
 <% title "#{@student.name}" %>
 
 <% title_html do %>
-	<h4 class="blend soft">My ETD Submission</h4>
+	<h4 class="fw-lighter">My ETD Submission</h4>
 	<h1 class="border-bottom"><%= @student.name %></h1>
 <% end %>
 
@@ -74,13 +74,11 @@
 	</div>
 </div>
 
-<hr class="fitted clear"/>
-
 <div class="documents fitted student-view">
 
-	<h3>Files and Documents</h3>
+	<h6 class="green pt-3">Files and Documents</h6>
 	<p>You have uploaded the following files:</p>
-	<h5>Primary</h5>
+	<h6>Primary</h6>
 	<% @primary_documents.each do | document | %>
 		<%= render partial: document %>
 	<% end %>
@@ -91,7 +89,7 @@
 
 
 
-	<h5>Supplementary</h5>
+	<h6>Supplementary</h6>
 	<% @supplemental_documents.each do | document | %>
 		<%= render partial: document %>
 	<% end %>

@@ -1,7 +1,7 @@
 <% title "#{@student.name}" %>
 
 <% title_html do %>
-	<h4 class="blend soft">My ETD Submission</h4>
+	<h4 class="fw-lighter">My ETD Submission</h4>
 	<h1 class="border-bottom"><%= @student.name %></h1>
 <% end %>
 
@@ -16,28 +16,22 @@
 	</div>
 
 
+	<h6 class="green">Files and Documents</h6>
 	<div class="documents">
 		<div class="alert alert-secondary" role="alert">
-			<h4 class="alert-heading">Files and Documents</h4>
 			<p>Your thesis or dissertation must be submitted as a PDF file (.pdf) only. You may submit only one file, which must be saved using the following naming convention:	</p>
 			<p class="text-center"><span class="fw-bold">Lastname_Firstname_MiddleInitial_yearofcopyright_PhdORMasters</span> (e.g. Smith_Jane_E_2014_PhD)</p>
 			<p>If necessary, you can add supplementary files to your thesis/dissertation. Supplementary files refer to items that are part of the approved, examined thesis/dissertation that cannot be included in the PDF, such as multi-media, sound, video or hypertext.</p>
 			<p>A supplementary file is NOT an appendix. Regular appendices can be included in the PDF document of your thesis/dissertation. </p>
-
-
-		</div>
-		<div  class="hint-text">
 		</div>
 
-
-
-		<h5>Primary &nbsp; &nbsp;
+		<h6>Primary &nbsp; &nbsp;
 				<%  unless block_thesis_changes?(@thesis) %>
 					<% if @primary_documents.count == 0 %>
 						<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#primary-file">Upload Primary File</button>
 					<% end %>
 				<% end %>
-		</h5>
+		</h6>
 
 		<% @primary_documents.each do | document | %>
 			<%= render partial: document %>
@@ -49,11 +43,11 @@
 
 		<div class="push-down"></div>
 
-		<h5>Supplementary  &nbsp; &nbsp;
+		<h6>Supplementary  &nbsp; &nbsp;
 				<%  unless block_thesis_changes?(@thesis) %>
 					<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#supplemental-files">Upload Supplementary Files</button>
 				<% end %>
-		</h5>
+		</h6>
 
 		<% @supplemental_documents.each do | document | %>
 			<%= render partial: document %>

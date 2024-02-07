@@ -1,7 +1,7 @@
 <% title "#{@student.name}" %>
 
 <% title_html do %>
-	<h4 class="blend soft">My Thesis Submission</h4>
+	<h4 class="fw-lighter">My ETD Submission</h4>
 	<h1 class="border-bottom"><%= @student.name %></h1>
 <% end %>
 
@@ -17,37 +17,43 @@
 <div class="card">
   <div class="card-body">
 		<div class="row">
-			<div class="col-md-12 col-lg-4">
+			<div class="col-md-12 col-lg-8">
 				<h6>Title</h6>
 				<p><%= @thesis.title %></p>
+			</div>
+			<div class="col-md-6 col-lg-4">
 				<h6>Author</h6>
 				<p><%= @student.name %></p>
 			</div>
 			<div class="col-md-6 col-lg-4">
 				<h6>Exam date</h6>
 				<p><%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
+			</div>
+			<div class="col-md-6 col-lg-4">
 				<h6>Supervisor</h6>
 				<p><%= format @thesis.supervisor %></p>
+			</div>
+			<div class="col-md-6 col-lg-4">
 				<h6>Publish On</h6>
 				<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
 			</div>
 			<div class="col-md-6 col-lg-4">
-				<h6>Program</h6>
-				<p><%= format @thesis.program %></p>
 				<h6>Degree Name and Level</h6>
 				<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+			</div>
+			<div class="col-md-6 col-lg-4">
+				<h6>Program</h6>
+				<p><%= format @thesis.program %></p>
 			</div>
 		</div>
 
 		<div class="row">
-		  <span class='badge text-bg-light mb-3'>Examination committee members</span>
+		  <h6>Examination committee members</h6>
 		  <div class="row">
 			<% @thesis.committee_members.each do |committee_member| %>
 				<div class="col-md-12 col-lg-3">
-				  <div class="border border-secondary rounded p-1 my-1">
 					<p><%= committee_member.role %><br />
 					<span class="fw-bold"><%= committee_member.name %></span></p>
-				  </div>
 				</div>
 			<% end %>
 		  </div>
