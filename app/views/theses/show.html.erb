@@ -1,14 +1,11 @@
 <% title "#{@student.name} - Thesis" %>
 <% title_html do %>
 
-<div class="container">
   <div class="row">
 	<%= render partial: "students/header" %>
 	<div class="col-12 py-0"><hr /></div>
   </div>
-</div>
 <% end %>
-<div class="container">
   <div class="row">
 	<div class="col-sm-12 col-lg-6">
 		<h5 class="author" title="author">By <%= @thesis.author %> | <%= number_with_delimiter(@thesis.student.sisid, delimiter: " ") %></h5>
@@ -43,9 +40,7 @@
 	  </div>
 	</div>
   </div>
-</div>
 
-<div class="container">
 	<div class="row">
 		<div class="col-12 pt-3">
 			<h6>Abstract</h6>
@@ -82,9 +77,7 @@
 		</div>
 		<div class="col-12"><hr /></div>
 	</div>
-</div>
 
-<div class="container">
 	<div class="row">
 		<div class="col-4">
 				<h6>Publish On</h6>
@@ -129,21 +122,16 @@
 			</div>
 		</div>
 	</div>
-</div>
 
-
-<div class="container">
-  <div class="row">
+	<div class="row">
 	<div class="col-12"><hr /></div>
 	<div class="col-3 span2 distinct strong"><h6>Last Under Review: </h6> <%= format @thesis.under_review_at %></div>
 	<div class="col-3 span2 distinct strong"><h6>Last Returned: </h6> <%= format @thesis.returned_at %></div>
 	<div class="col-3 span2 distinct strong"><h6>Thesis Accepted: </h6> <%= format @thesis.accepted_at %></span></div>
 	<div class="col-3 span2 distinct strong"><h6>Published: </h6> <%= format @thesis.published_at %></div>
   </div>
-</div>
 
-<div class="container">
-  <div class="row">
+	<div class="row">
 	<div class="documents fitted">
 
 	<h6 class="green pt-4">Thesis Files and Documents</h6>
@@ -169,4 +157,5 @@
 
 	</div>
   </div>
-</div>
+
+	
