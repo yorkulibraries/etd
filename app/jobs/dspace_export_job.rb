@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require Rails.root.join('lib/etd/exporter.rb')
 require 'ostruct'
 
@@ -23,7 +25,7 @@ class DspaceExportJob < ActiveJob::Base
     @export_log.update_attribute(:job_status, ExportLog::JOB_RUNNING)
 
     ## if there is something to do, do the deposit
-    if @export_log.theses_count > 0
+    if @export_log.theses_count.positive?
 
       @exporter.prepare_collection
 
@@ -114,10 +116,8 @@ class DspaceExportJob < ActiveJob::Base
       entry.add_dublin_core_extension!('subject', subject.name)
     end
 
-    unless thesis.keywords.nil?
-      thesis.keywords.split(',').each do |keyword|
-        entry.add_dublin_core_extension!('relationSubjectKeywords', keyword.strip)
-      end
+    thesis.keywords&.split(',')&.each do |keyword|
+      entry.add_dublin_core_extension!('relationSubjectKeywords', keyword.strip)
     end
 
     entry.add_dublin_core_extension!('abstract', thesis.abstract)
@@ -158,29 +158,20 @@ class DspaceExportJob < ActiveJob::Base
   end
 
   ## UTIL FUNCTIONS
-  def settings(production)
-    if production
-      {
-        username: AppSettings.dspace_live_username, password: AppSettings.dspace_live_password,
-        service_document_url: AppSettings.dspace_live_service_document_url,
-        collection_uri: AppSettings.dspace_live_collection_uri,
-        collection_title: AppSettings.dspace_live_collection_title
-      }
-    else
-      {
-        username: AppSettings.dspace_test_username, password: AppSettings.dspace_test_password,
-        service_document_url: AppSettings.dspace_test_service_document_url,
-        collection_uri: AppSettings.dspace_test_collection_uri,
-        collection_title: AppSettings.dspace_test_collection_title
-      }
-    end
+  def settings(_production)
+    {
+      username: AppSettings.dspace_live_username, password: AppSettings.dspace_live_password,
+      service_document_url: AppSettings.dspace_live_service_document_url,
+      collection_uri: AppSettings.dspace_live_collection_uri,
+      collection_title: AppSettings.dspace_live_collection_title
+    }
   end
 
   def log(string)
-    if @export_log
-      o = @export_log.output_full
-      @export_log.update_attribute(:output_full, "#{o} \n #{string}")
-    end
+    return unless @export_log
+
+    o = @export_log.output_full
+    @export_log.update_attribute(:output_full, "#{o} \n #{string}")
   end
 
   def error(thesis, exception)
@@ -194,7 +185,7 @@ class DspaceExportJob < ActiveJob::Base
     end
     o += "Error: #{exception.message}\n"
     o += "--------------------------\n"
-    o = o + exception.to_s + "\n"
+    o = "#{o}#{exception}\n"
     o += "=============================\n\n"
 
     @export_log.update_attribute(:output_error, "#{@export_log.output_error} \n #{o}")

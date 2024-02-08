@@ -1,32 +1,33 @@
-<div class="thesis">
-
-	<div class="span9 no-space">
-		
+<div class="thesis pt-3">
+	<div class="row">
 		<% unless @student %>
-			<p class="author trivial" title="student id: <%= thesis.student.sisid %>">By <%= thesis.student.name %></p>
-	 	<% end %>
-
-		<h3 class="title clearfix" title="title">
-			<div class="pull-right">
-				<%= render partial: "theses/assigned_to", locals: { thesis: thesis }%>
-				<span class="label status status-<%= thesis.status %>"><%= thesis.status.humanize %></span>
+			<div class="col-12">
+				<p class="author trivial mb-1 fw-light text-warning-emphasis" title="student id: <%= thesis.student.sisid %>">By <%= thesis.student.name %></p>
 			</div>
-			<%= link_to thesis.title, student_thesis_path(thesis.student, thesis) %> 						
-		</h3>
-	
+		<% end %>
+		<div class="col-lg-9 col-sm-10">
+			<h3><%= link_to thesis.title, student_thesis_path(thesis.student, thesis) %></h3>
+		</div>
+		<div class="col-lg-3 col-sm-2">
+			<span class="align-middle badge rounded-pill text-bg-secondary label status status-<%= thesis.status %>"><%= thesis.status.humanize %></span>
+		</div>
+	  <div class="col-lg-5 col-sm-12">
+		  <h6>Supervisor</h6>
+		  <p><%= thesis.supervisor %></p>
+		  <h6>Exam date</h6>
+		  <p><%= thesis.exam_date.strftime("%B %d, %Y") %></p>
+		</div>				
+		<div class="col-lg-4 col-sm-12">
+		  <h6>Degree Name and Level</h6>
+		  <p><%= format thesis.degree_name %> - <%= format thesis.degree_level %></p>
+		  <h6>Program</h6>
+		  <p><%= format thesis.program %></p>
+		</div>
+		<div class="col-lg-3 col-sm-12">
+		<%= render partial: "theses/assigned_to", locals: { thesis: thesis }%>
+		</div>
+		<div class="col-12">
+			<hr />
+		</div>
 	</div>
-	
-	
-	<div class="span4 no-space">
-		<p class="supervisor" title="supervisor"><label>supervisor</label> <%=  thesis.supervisor %></p>
-		<p class="exam_date" title="exam date"><label>exam date</label> <%= thesis.exam_date.strftime("%B %d, %Y") %></p>
-	</div>
-	
-	<div class="span5 ">
-		<p class="degree_level"><label>Degree Name and Level</label><%= format thesis.degree_name %> - <%= format thesis.degree_level %></p>
-		<p class="program"><label>Program</label><%= format thesis.program %></p>			
-	</div>
-
-	<hr class="clear fitted"/>	
-
 </div>

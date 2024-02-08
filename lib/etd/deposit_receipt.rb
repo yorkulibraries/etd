@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'base64'
 require 'atom/element'
 require 'atom/collection'
@@ -39,7 +41,7 @@ module Sword2Ruby
         begin
           # ensure that there are not parse errors. If there are, warn, rather then raise
           ## encode the stuff to utf
-          res = response.body.encode!('UTF-8', response.body.encoding, invalid: :replace, undef: :replace, replace: '')
+          response.body.encode!('UTF-8', response.body.encoding, invalid: :replace, undef: :replace, replace: '')
 
           @entry = ::Atom::Entry.parse(response.body)
           @has_entry = true

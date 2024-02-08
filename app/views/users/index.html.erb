@@ -1,44 +1,51 @@
 <% title "Users" %>
 <% title_html do %>
-	<h1>Users</h1>
-	<div class="float-right"><p><%= link_to "+ New User", new_user_path %></p></div>
+	<h1 class="border-bottom mb-3">Users</h1>
 <% end %>
 
-<div class="strong fitted">
-	<%= link_to_unless_current "Active Users", users_path %> &nbsp; &nbsp;
+<div class="row">
+  <div class="col-lg-4 col-sm-8">
+	<%= link_to_unless_current "Active Users", users_path %> | 
 	<%= link_to_unless_current "Blocked Users", blocked_users_path %>
+  </div>
+  <div class="col text-end">
+	<%= link_to "+ New User", new_user_path, class: "btn btn-primary btn-sm" %>
+  </div>
 </div>
 
-<div class="users fitted">
-	<% @user_groups.each do |role, users| %>
-
+<% @user_groups.each do |role, users| %>
+  <div class="card my-3">
+	<div class="card-header">
 		<h6><%= role.pluralize(users.size) %></h6>
-
-		<table>
-			<% for user in users %>
-
-			<tr class="user">
-				<td>
-					<h4><a href="<%= edit_user_path(user) %>"><%= user.name%></a></h4>
-					<span class="blend">created by: <%= user.created_by_name %></span>
-				</td>
-				<td><%= user.username%> - <%= link_to "recent activity", activity_user_path(user) %><br/> <span><%= user.email %></span></td>
-				<td class="actions">
-					<% unless user.blocked? %>
-						<% unless user.id == @current_user.id %>
-							<%= link_to block_user_path(user), data: { confirm: "Are you sure?" }, class: "btn btn-small", method: :post do %>
-								<i class="fa fa-ban"></i> Block
-							<% end %>
-						<% end %>
-					<% else %>
-						<%= link_to unblock_user_path(user), data: { confirm: "Are you sure?" }, class: "btn btn-small", method: :post do %>
-							<i class="fa fa-ban"></i> Unblock
+	</div>
+	<ul class="list-group list-group-flush">
+	  <% for user in users %>
+	  	<li class="list-group-item">
+		  <div class="row">
+			<div class="col-lg-4 col-sm-12">
+				<h4><a href="<%= edit_user_path(user) %>"><%= user.name%></a></h4>
+				<span class="blend">created by: <%= user.created_by_name %></span>
+			</div>
+			<div class="col-lg-4 col-sm-12">
+				<%= user.username%> - <%= link_to "recent activity", activity_user_path(user) %><br/>
+				<span><%= user.email %></span>
+			</div>
+			<div class="col-lg-4 col-sm-12 text-end">
+				<% unless user.blocked? %>
+					<% unless user.id == @current_user.id %>
+						<%= link_to block_user_path(user), data: { confirm: "Are you sure?" }, class: "btn btn-small", method: :post do %>
+							<i class="fa fa-ban"></i> Block
 						<% end %>
 					<% end %>
-				</td>
-
-			</tr>
-			<% end %>
-		</table>
-	<% end %>
-</div>
+				<% else %>
+					<%= link_to unblock_user_path(user), data: { confirm: "Are you sure?" }, class: "btn btn-small", method: :post do %>
+						<i class="fa fa-ban"></i> Unblock
+					<% end %>
+				<% end %>
+			</div>
+		  </div>
+		</li>
+	  <% end %>
+	</ul>
+  </div>
+<% end %>

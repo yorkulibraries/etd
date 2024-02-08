@@ -1,6 +1,6 @@
-class Student < User
-  # attr_accessible :name, :email, :username, :sisid, :invitation_sent_at
+# frozen_string_literal: true
 
+class Student < User
   belongs_to :created_by, foreign_key: 'created_by_id', class_name: 'User'
 
   validates_presence_of :sisid
@@ -18,7 +18,7 @@ class Student < User
   scope :oldest, -> { order('created_at asc') }
 
   IMMUTABLE_THESIS_FIELDS = %w[title author supervisor committee exam_date program degree_name degree_level embargo
-                               published_date id gem_record_event_id status]
+                               published_date id gem_record_event_id status].freeze
 
   has_many :theses, dependent: :destroy
 
@@ -28,11 +28,11 @@ class Student < User
   paginates_per 25
 
   def check_email_addresses
-    unless email.nil?
-      email.split(/[\s,]+/).each do |address|
-        unless address =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-          errors.add(:email, "are invalid because of #{address} email")
-        end
+    return if email.nil?
+
+    email.split(/[\s,]+/).each do |address|
+      unless address =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
+        errors.add(:email, "are invalid because of #{address} email")
       end
     end
   end

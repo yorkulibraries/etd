@@ -1,69 +1,70 @@
-<div class="modal hide" id="full_info_export_log">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>DSpace Export</h3>
-  </div>
-    <div class="modal-body">
-      <div class="row">
-        <div class="span3">
-          <blockquote class="export_log">
-            <small>User</small>
-            <p><%= @export_log.creator.name %></p>
-            <small>Published Date</small>
-            <p><%= @export_log.published_date.strftime("%b %d, %Y") rescue nil %></p>
-            <small>Production / Test Server</small>
-            <p><%= @export_log.production_export? ? "Production" : "Test" %></p>
-            <small>Complete Submission?</small>
-            <p><%= @export_log.complete_thesis? ? "Yes" : "No" %></p>
-            <small>Change Thesis Status To Publish?</small>
-            <p><%= @export_log.publish_thesis? ? "Yes" : "No" %></p>
-          </blockquote>
-
-        </div>
-
-        <div class="span2">
-          <blockquote class="export_log">
-            <small>Status</small>
-            <p><%= @export_log.job_status.upcase %></p>
-            <small>Total Theses</small>
-            <p><%= @export_log.theses_count.to_i %></p>
-            <small>Successful Count</small>
-            <p><%= @export_log.successful_count.to_i %></p>
-            <small>Failed Count</small>
-            <p><%= @export_log.successful_count.to_i %></p>
-            <% if @export_log.job_status == ExportLog::JOB_OPEN %>
-              <small>Export Pending</small>
-              <p>
-              <%= link_to @export_log, method: :delete, class: "red", data: { confirm: "Are you sure?" } do %>
-                <i title="Cancel Export" class="fa fa-times-circle"></i> Cancel ?
-              <% end %>
-              </p>
-            <% elsif @export_log.job_status == ExportLog::JOB_CANCELLED %>
-              <small>Export Cancelled</small>
-              <p><%= @export_log.job_cancelled_at.strftime("%b %d, %Y") rescue nil %></p>
-              <p><%= @export_log.job_cancelled_by.name rescue nil %></p>
-            <% else %>
-              <small>Export Started</small>
-              <p><%= @export_log.job_started_at.strftime("%b %d, %Y") rescue nil %></p>
-            <% end %>
-          </blockquote>
-        </div>
+<div class="modal fade" id="full_info_export_log" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">DSpace Export</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="span3">
+            <blockquote class="export_log">
+              <small>User</small>
+              <p><%= @export_log.creator.name %></p>
+              <small>Published Date</small>
+              <p><%= @export_log.published_date.strftime("%b %d, %Y") rescue nil %></p>
+              <small>Production / Test Server</small>
+              <p><%= @export_log.production_export? ? "Production" : "Test" %></p>
+              <small>Complete Submission?</small>
+              <p><%= @export_log.complete_thesis? ? "Yes" : "No" %></p>
+              <small>Change Thesis Status To Publish?</small>
+              <p><%= @export_log.publish_thesis? ? "Yes" : "No" %></p>
+            </blockquote>
 
-      <blockquote class="export_log">
-        <small>Theses IDs To Export</small>
-        <p><%= format @export_log.theses_ids %></p>
-        <small>Successfully Exported IDs</small>
-        <p><%= format @export_log.successful_ids %></p>
-        <small>Failed IDs</small>
-        <p><%= format @export_log.failed_ids %></p>
-      </blockquote>
+          </div>
 
-      <p><%= link_to "Click here to see export log output ", export_log_path(@export_log, anchor: "full_output") %></p>
+          <div class="span2">
+            <blockquote class="export_log">
+              <small>Status</small>
+              <p><%= @export_log.job_status.upcase %></p>
+              <small>Total Theses</small>
+              <p><%= @export_log.theses_count.to_i %></p>
+              <small>Successful Count</small>
+              <p><%= @export_log.successful_count.to_i %></p>
+              <small>Failed Count</small>
+              <p><%= @export_log.successful_count.to_i %></p>
+              <% if @export_log.job_status == ExportLog::JOB_OPEN %>
+                <small>Export Pending</small>
+                <p>
+                <%= link_to @export_log, method: :delete, class: "red", data: { confirm: "Are you sure?" } do %>
+                  <i title="Cancel Export" class="fa fa-times-circle"></i> Cancel ?
+                <% end %>
+                </p>
+              <% elsif @export_log.job_status == ExportLog::JOB_CANCELLED %>
+                <small>Export Cancelled</small>
+                <p><%= @export_log.job_cancelled_at.strftime("%b %d, %Y") rescue nil %></p>
+                <p><%= @export_log.job_cancelled_by.name rescue nil %></p>
+              <% else %>
+                <small>Export Started</small>
+                <p><%= @export_log.job_started_at.strftime("%b %d, %Y") rescue nil %></p>
+              <% end %>
+            </blockquote>
+          </div>
+        </div>
 
-
+        <blockquote class="export_log">
+          <small>Theses IDs To Export</small>
+          <p><%= format @export_log.theses_ids %></p>
+          <small>Successfully Exported IDs</small>
+          <p><%= format @export_log.successful_ids %></p>
+          <small>Failed IDs</small>
+          <p><%= format @export_log.failed_ids %></p>
+        </blockquote>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <%= link_to "Click here to see export log output ", export_log_path(@export_log, anchor: "full_output"), class: "btn btn-primary" %>
+      </div>
     </div>
-    <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
-    </div>
+  </div>
 </div>

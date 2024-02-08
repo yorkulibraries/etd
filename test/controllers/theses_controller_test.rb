@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class ThesesControllerTest < ActionController::TestCase
@@ -360,7 +362,7 @@ class ThesesControllerTest < ActionController::TestCase
       post :update,
            params: { id: t.id, student_id: @student.id, thesis: { title: 'new title', author: 'new author' } }
 
-      thesis = assigns(:thesis)
+      assigns(:thesis)
 
       # assert_not_equal "new title", thesis.title
       # assert_not_equal "new author", thesis.author
