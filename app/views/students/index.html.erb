@@ -1,12 +1,7 @@
 <% title "Students" %>
 <% title_html do %>
-<div class="container">
-  <div class="row">
 	<h1 class="border-bottom mb-3">Students</h1>
-  </div>
-</div>
 <% end %>
-<div class="container">
   <div class="row">
 <% if @search_result %>
 	<h4><%= @search_result %></h4>
@@ -24,7 +19,6 @@
 	</div>
 	</div>
   </div>
-</div>
 <div class="students mt-4">
 	<% @students.each do |student| %>
 		<%= render partial: student %>
