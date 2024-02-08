@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :etd do
   desc 'Loading Gem Records.'
 

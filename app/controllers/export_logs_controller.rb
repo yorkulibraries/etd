@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ExportLogsController < ApplicationController
   authorize_resource
 

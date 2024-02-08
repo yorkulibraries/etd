@@ -1,35 +1,35 @@
 <% remote = request.xhr? ? true : false %>
-<%= simple_form_for [@student, @thesis, @committee_member], remote: remote do |f| %>
-	<div class="modal-header">
-		<% if request.xhr? %>
-			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		<% end %>
+<div class="modal" id="add_committee_member_modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Committee Member</h5>
+				<% if request.xhr? %>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<% end %>      
+      </div>
+			<%= simple_form_for [@student, @thesis, @committee_member], remote: remote do |f| %>
+				<div class="modal-body">
+					<p id="member_first_name">
+						<%= f.input :first_name, label: "First Name", required: true %>
+					</p>
+					<p id="member_last_name">
+						<%= f.input :last_name, label: "Last Name" %>
+					</p>
+					<%= f.input :role, label: "Choose a Role:", required: true, collection: CommitteeMember::ROLES, as: :radio_buttons %>
+				</div>
+				<div class="modal-footer">
+					<% if request.xhr? %>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<% else %>
+						<%= link_to "Cancel", :back, class: "btn" %>
+					<% end %>
+						<%= f.button :submit, "Add Member", class: "btn btn-primary" %>
+				</div>
 
-		<h3>Add Committee Member</h3>
-	</div>
+    </div>
+  </div>
+</div>
 
-	<div class="modal-body">
-		<div class="row">
-			<div class="span" style="width: 210px; margin-right: 20px; ">
-				<% #unless CommitteeMember.unique_names.size == 0 %>
-					<% #f.input :full_name, label: "Select an existing name:", required: false, collection:  sort_by_last_name(CommitteeMember.unique_names.map { |m| m.full_name }) %>
-				<% #end %>
 
-				<%= f.input :first_name, label: "Committee Member:", required: false, placeholder: "First Name ..."%>
-				<%= f.input :last_name, label: false, placeholder: "Last name ..."%>
-			</div>
-			<div class="span2">
-				<%= f.input :role, label: "Choose a Role:", required: false, collection: CommitteeMember::ROLES, as: :radio_buttons %>
-			</div>
-		</div>
-	</div>
-
-	<div class="modal-footer">
-		<% if request.xhr? %>
-			<a href="#" class="btn"  data-dismiss="modal" aria-hidden="true">Close</a>
-		<% else %>
-			<%= link_to "Cancel", :back, class: "btn" %>
-		<% end %>
-		<%= f.button :submit, "Add Member", class: "btn btn-primary" %>
-	</div>
 <% end %>

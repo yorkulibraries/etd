@@ -1,22 +1,28 @@
+# frozen_string_literal: true
+
 source 'http://rubygems.org'
 ruby '3.1.2'
 
-gem 'puma', '~> 5.6', '>= 5.6.5'
+gem 'puma', '~> 6.4', '>= 6.4.2'
 gem 'rails', '~> 7.0', '>= 7.0.3.1'
 
 ## DATABASES ##
-gem 'mysql2', '0.5.3', group: :production
+gem 'mysql2', '0.5.3'
 
 ## CSS AND JAVASCRIPT ##
 gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails', '4.5.0'
 gem 'jquery-tablesorter', '~> 1.27', '>= 1.27.2'
 gem 'jquery-ui-rails', '6.0.1'
-gem 'mini_racer', '~> 0.6.3'
 gem 'sass-rails', '~> 6.0'
-gem 'uglifier', '~> 4.2'
+gem 'terser', '~> 1.1', '>= 1.1.20'
+source 'https://rails-assets.org' do
+  gem 'rails-assets-chosen-bootstrap-theme'
+end
 
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
+gem 'active_link_to', '~> 1.0', '>= 1.0.5'
+gem 'bootstrap', '~> 5.3', '>= 5.3.2'
 gem 'chosen-rails', '~> 1.10'
 gem 'font-awesome-rails', '~> 4.7'
 gem 'simple_form', '~> 5.1'
@@ -62,18 +68,18 @@ group :development, :test do
   gem 'guard-bundler', '~> 3.0'
   gem 'guard-livereload', '~> 2.5', '>= 2.5.2', require: false
   gem 'populator', git: 'https://github.com/ryanb/populator.git'
-  gem 'sqlite3', '~> 1.4', '>= 1.4.4'
 end
 
 group :test do
   gem 'byebug', '~> 11.1', '>= 11.1.3'
-  gem 'database_cleaner', '~> 2.0', '>= 2.0.1'
+  gem 'capybara', '~> 3.39', '>= 3.39.2'
+  gem 'database_cleaner-active_record'
   gem 'factory_girl_rails', '4.8.0'
   gem 'guard-minitest', '2.4.6'
-  gem 'minitest', '~> 5.16', '>= 5.16.3'
-  gem 'minitest-around', '~> 0.5.0'
-  gem 'mocha', '0.14', require: false
+  gem 'minitest', '~> 5.20'
+  gem 'mocha', '~> 2.1'
   gem 'rails-controller-testing', '~> 1.0', '>= 1.0.5'
+  gem 'selenium-webdriver', '~> 4.15'
   gem 'shoulda-context', '~> 2.0'
   gem 'shoulda-matchers', '~> 5.1'
   gem 'spring' # , "1.3.6"

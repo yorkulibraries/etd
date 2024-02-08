@@ -1,47 +1,47 @@
 <% primary =  false if local_assigns[:primary].nil? %>
-
-<%= simple_form_for [@student, @thesis, Document.new], html: { class: "document", multipart: true, id: "new_document_#{primary}" }, authenticity_token: true, remote: true do |f| %>
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		<h3>
+<div class="modal fade" id="<%= primary ? 'primary-file' : 'supplemental-files' %>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
 				<% if primary %>
-					Upload Primary File
+        	<h1 class="modal-title fs-5" id="primary-file">Upload Primary File</h1>
 				<% else %>
-					Upload Supplementary File
+					<h1 class="modal-title fs-5" id="supplemental-files">Upload Supplementary File</h1>
 				<% end %>
-		</h3>
-	</div>
-	<div class="modal-body">
-			<div class="hint-text">
-				<% if primary %>
-					<p>Your primary file should be in <strong>PDF format.</strong></p>
-					<p class="example"><span class="muted">e.g.</span> Smith_Jane_E_2014_PhD.pdf</p>
-				<% else %>
-					<p>File size must be limited to acceptable formats include:</p>
-					<ul>
-					<li><strong>Documents:</strong> Portable Document Format (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).</li>
-					<li><strong>Images:</strong> Portable Network Graphics format (.png), Tagged Image File format (.tif), JPEG (.jpg)</li>
-					<li><strong>Data:</strong> Comma-separated values (.csv) or other delimited text, Extensible Markup Language (.xml)</li>
-					<li><strong>Video:</strong> 8-10 bit uncompressed AVI (.avi)</li>
-					<li><strong>Audio:</strong> Free Lossless Audio Codec or WAVE (.flac or .wav)</li>
-					</ul>
-				<% end %>
-			</div>
-
-		  <% f.input :name, required: false, input_html: { class: "span4", autocomplete: "off"} %>
-		  <%= f.input :file, required: false, as: :file %>
-
-			<% if primary %>
-		  	<%= f.hidden_field :supplemental, value: false %>
-		  <% else %>
-				<%= f.hidden_field :supplemental, value: true %>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+			<%= simple_form_for [@student, @thesis, Document.new], html: { class: "document", multipart: true, id: "new_document_#{primary}" }, authenticity_token: true, remote: true do |f| %>
+				<div class="modal-body">
+					<div class="alert alert-secondary" role="alert">
+						<% if primary %>
+							<p>Your primary file should be in <strong>PDF format.</strong></p>
+							<p class="example"><span class="muted">e.g.</span> Smith_Jane_E_2014_PhD.pdf</p>
+						<% else %>
+							<p>File size must be limited to acceptable formats include:</p>
+							<ul>
+							<li><strong>Documents:</strong> Portable Document Format (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).</li>
+							<li><strong>Images:</strong> Portable Network Graphics format (.png), Tagged Image File format (.tif), JPEG (.jpg)</li>
+							<li><strong>Data:</strong> Comma-separated values (.csv) or other delimited text, Extensible Markup Language (.xml)</li>
+							<li><strong>Video:</strong> 8-10 bit uncompressed AVI (.avi)</li>
+							<li><strong>Audio:</strong> Free Lossless Audio Codec or WAVE (.flac or .wav)</li>
+							</ul>
+						<% end %>
+					</div>
+					<% f.input :name, required: false, input_html: { class: "span4", autocomplete: "off"} %>
+					<%= f.input :file, required: false, as: :file %>
+		
+					<% if primary %>
+						<%= f.hidden_field :supplemental, value: false %>
+					<% else %>
+						<%= f.hidden_field :supplemental, value: true %>
+					<% end %>
+					
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<%= f.button :submit, "Upload", class: "btn btn-primary" %>
+				</div>
 			<% end %>
-
-	</div>
-
-
-	<div class="modal-footer">
-		<a href="#" class="btn"  data-dismiss="modal" aria-hidden="true">Close</a>
-		<%= f.button :submit, "Upload", class: "btn btn-primary" %>
-	</div>
-<% end %>
+    </div>
+  </div>
+</div>

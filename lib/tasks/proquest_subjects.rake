@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :proquest_subjects do
   desc 'Loading Proquest Subjects.'
 

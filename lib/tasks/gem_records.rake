@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require Rails.root.join('lib/tasks/load_gem_records.rb')
 
 namespace :gem_records do
@@ -6,7 +8,6 @@ namespace :gem_records do
 
   task load: :environment do
     GemRecord.delete_all
-    file = ''
     gem_load = LoadGemRecords.new
     gem_load.load_stdin
   end

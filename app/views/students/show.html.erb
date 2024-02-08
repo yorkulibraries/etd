@@ -1,47 +1,48 @@
 <% title "#{@student.name}" %>
-
 <% title_html do %>
+	<% if @student.blocked %>
+		<div class="alert alert-warning alert-dismissible fitted" role="alert" id="student_blocked_message">
+			<strong>This student is blocked from accessing this record.</strong>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+	<% end %>
 	<%= render partial: "header" %>
 <% end %>
 
-<% if @student.blocked %>
-	<div class="alert alert-error fitted" id="student_blocked_message">
-		<strong>This student is blocked from accessing this record.</strong>
-	</div>
-<% end %>
+<div class="card mt-3">
+  <div class="card-body">
+   <div class="row">
+	  <div class="col-6">
+	  	<h6>Username</h6>
+		<p><%= @student.username%></p>
+	  	<h6>Email</h6>
+		<p><%= @student.email%></p>
+	  	<h6>Invitation</h6>
+		<p>
+		  <% if @student.invitation_sent_at.nil? %>
+		  	<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", send_invite_student_path(@student) %>
+		  <% else %>
+			Sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>
+			<span class="soft weak">(<%= link_to_if AppSettings.email_welcome_allow, "Send Again", send_invite_student_path(@student), class: "soft weak"%>)</span>
+		  <% end %>
+		</p>
+	  </div>
+	  <div class="col-6">
+	  	<h6>SISID</h6>
+		<p><%= @student.sisid %></p>
+	  	<h6>Joined on</h6>
+		<p><%= @student.created_at.strftime("%B %d, %Y")%></p>
+	  </div>
+	 </div>
+  </div>
+</div>
 
-<div class="student fitted">
-	<table cellpadding="5">
-		<tr>
-			<td class="blend" width="10%">username</td>
-			<td class="strong"><%= @student.username%></td>
-			<td class="blend"  width="10%">SISID</td>
-			<td class="strong"><%= @student.sisid %></td>
-		</tr>
-		<tr>
-			<td class="blend">email</td>
-			<td class="strong"><%= @student.email %></td>
-			<td class="blend">joined on</td>
-			<td class="strong"><%= @student.created_at.strftime("%B %d, %Y")%></td>
-		</tr>
-		<tr>
-			<td class="blend" width="10%">invitation</td>
-			<td class="strong">
-				<% if @student.invitation_sent_at.nil? %>
-					<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", send_invite_student_path(@student) %>
-				<% else %>
-					Sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>
-					<span class="soft weak">(<%= link_to_if AppSettings.email_welcome_allow, "Send Again", send_invite_student_path(@student), class: "soft weak"%>)</span>
-				<% end %>
-			</td>
-		</tr>
-	</table>
-
-	<section class="theses">
+<div>
+	<section class="theses pt-4">
 
 		<% if @current_theses.size > 0 %>
 
-			<h3 class="heading">Current <%= "thesis".pluralize(@current_theses.count )%></h3>
+			<h6 class="heading green">Current <%= "thesis".pluralize(@current_theses.count )%></h6>
 			<% @current_theses.each do |thesis| %>
 				<%= render partial: thesis %>
 			<% end %>
@@ -49,25 +50,20 @@
 		<% end %>
 
 		<% if @available_theses.size > 0 %>
-			<h3 class='heading clear'>Available <%= "thesis".pluralize(@available_theses.count )%></h3>
-
+			<h6 class='green heading clear'>Available <%= "thesis".pluralize(@available_theses.count )%></h6>
+			<div class="row">
 			<% @available_theses.each do |record| %>
-				<table class="thesis not_started">
-					<tr>
-						<td>
-							<h5><%= record.program %></h5>
-							<h3><%= record.title %></h3>
-
-
-						</td>
-						<td width="18%">
-							<a href="<%= new_student_thesis_path(@student, gem_record: record.id) %>" class="btn btn-success btn-small float-right">
-								<i class="fa fa-plus"></i> Start this thesis
-							</a>
-						</td>
-					</tr>
-				</table>
+				<div class="col-10">
+					<h5 class="fw-light"><%= record.program %></h5>
+					<h3><%= record.title %></h3>
+				</div>
+				<div class="col-2 col-sm-2">
+					<a href="<%= new_student_thesis_path(@student, gem_record: record.id) %>" class="btn btn-success btn-small float-end">
+						<i class="fa fa-plus"></i> Start this thesis
+					</a>
+				</div>
 			<% end %>
+			</div>
 		<% end %>
 
 	</section>

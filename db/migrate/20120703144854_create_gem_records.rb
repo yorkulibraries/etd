@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateGemRecords < ActiveRecord::Migration[5.0]
   def self.up
     create_table :gem_records do |t|

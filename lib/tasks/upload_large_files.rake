@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :etd do
   desc 'Loading Gem Records.'
   # Usage: rake etd:upload_file THESIS_ID=id ADMIN_ID=id  FILE=filepath

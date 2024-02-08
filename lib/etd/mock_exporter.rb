@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ostruct'
 
 module ETD
@@ -10,7 +12,7 @@ module ETD
       # return receipt or throw exception based on predetermined attribute value
       p = OpenStruct.new(params)
 
-      raise Exception, 'Error is found' if ETD::MockExporter.get_entry_value(p.entry, 'title').include?('FAIL')
+      raise StandardError, 'Error is found' if ETD::MockExporter.get_entry_value(p.entry, 'title').include?('FAIL')
 
       OpenStruct.new({
                        status_code: 1234,

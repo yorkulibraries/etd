@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class ThesisTest < ActiveSupport::TestCase
@@ -54,7 +56,7 @@ class ThesisTest < ActiveSupport::TestCase
 
   should 'delete associated documents if thesis is deleted' do
     @thesis = create(:thesis)
-    document = create(:document, thesis: @thesis)
+    create(:document, thesis: @thesis)
 
     assert_difference 'Document.count', -1 do
       @thesis.destroy
@@ -131,8 +133,8 @@ class ThesisTest < ActiveSupport::TestCase
 
   should 'reload thesis data from GemRecord' do
     thesis = create(:thesis, gem_record_event_id: 1234, title: 'Old Title', program: 'GS PHD PSYC>BBCS - Whatever')
-    gem_rec = create(:gem_record, seqgradevent: 1234, title: 'New Title',
-                                  program: 'GS Med PSYC>BBCS - Faculty Of Graduate Studies')
+    create(:gem_record, seqgradevent: 1234, title: 'New Title',
+                        program: 'GS Med PSYC>BBCS - Faculty Of Graduate Studies')
 
     thesis.update_from_gem_record
 
@@ -196,7 +198,7 @@ class ThesisTest < ActiveSupport::TestCase
 
   should 'not show up in accepted if embargoed' do
     t = create(:thesis, status: Thesis::ACCEPTED, embargoed: false)
-    t2 = create(:thesis, status: Thesis::ACCEPTED, embargoed: true)
+    create(:thesis, status: Thesis::ACCEPTED, embargoed: true)
 
     assert_equal 1, Thesis.accepted.size
     assert_equal t.id, Thesis.accepted.first.id
@@ -204,7 +206,7 @@ class ThesisTest < ActiveSupport::TestCase
 
   should 'not show up in published if embargoed' do
     t = create(:thesis, status: Thesis::PUBLISHED, embargoed: false)
-    t2 = create(:thesis, status: Thesis::PUBLISHED, embargoed: true)
+    create(:thesis, status: Thesis::PUBLISHED, embargoed: true)
 
     assert_equal 1, Thesis.published.size
     assert_equal t.id, Thesis.published.first.id

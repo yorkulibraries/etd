@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ExportLog < ApplicationRecord
   audited
 
@@ -8,7 +10,7 @@ class ExportLog < ApplicationRecord
   JOB_FAILED = 'failed'
   JOB_CANCELLED = 'cancelled'
 
-  JOB_STATUSES = [JOB_OPEN, JOB_RUNNING, JOB_DONE, JOB_FAILED, JOB_CANCELLED]
+  JOB_STATUSES = [JOB_OPEN, JOB_RUNNING, JOB_DONE, JOB_FAILED, JOB_CANCELLED].freeze
 
   ## RELATIONS
   belongs_to :creator, foreign_key: 'user_id', class_name: 'User'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class AuthenticatedStaffControllerTest < ActionController::TestCase
@@ -9,7 +11,7 @@ class AuthenticatedStaffControllerTest < ActionController::TestCase
     end
 
     should 'redirect to unauthorized if logged user is not staff' do
-      thesis = create(:thesis, student: @student)
+      create(:thesis, student: @student)
 
       # get :show, params: { id: thesis.id, student_id: @student.id }
       # assert_response :redirect
@@ -25,7 +27,7 @@ class AuthenticatedStaffControllerTest < ActionController::TestCase
     end
 
     should 'work as normal for staff' do
-      thesis = create(:thesis, student: @student)
+      create(:thesis, student: @student)
 
       # get :show, params: { id: thesis.id, student_id: @student.id }
       # assert_response :success

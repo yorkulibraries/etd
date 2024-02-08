@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class DocumentsControllerTest < ActionController::TestCase
@@ -40,7 +42,7 @@ class DocumentsControllerTest < ActionController::TestCase
       create_list(:document, 10, deleted: true, thesis: @thesis)
       create_list(:document, 3, thesis: @thesis, created_at: 1.year.ago)
       first = create(:document, created_at: 1.day.ago, thesis: @thesis)
-      last = create(:document, created_at: 3.years.ago, thesis: @thesis)
+      create(:document, created_at: 3.years.ago, thesis: @thesis)
 
       get :index, params: { thesis_id: @thesis.id, student_id: @student.id }
 
@@ -157,8 +159,8 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     should 'be able to upload another primary file if there is a primary file' do
-      d = create(:document, file: fixture_file_upload('document-microsoft.doc', 'application/text'),
-                            thesis: @thesis, supplemental: false)
+      create(:document, file: fixture_file_upload('document-microsoft.doc', 'application/text'),
+                        thesis: @thesis, supplemental: false)
       assert_no_difference 'Document.count' do
         post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
                                 document: attributes_for(:document, supplemental: false).except(:user, :thesis) }
