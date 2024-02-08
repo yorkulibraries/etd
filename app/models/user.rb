@@ -1,10 +1,10 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   audited
   devise :registerable
 
   before_save :default_values
-
-  # attr_accessible :username, :name, :email, :role
 
   validates_presence_of :username, :name, :email, :role
   validates_uniqueness_of :username, :email
@@ -19,8 +19,8 @@ class User < ApplicationRecord
   MANAGER = 'manager'
   STAFF = 'staff'
   STUDENT = 'student'
-  ROLE_NAMES = [ADMIN, MANAGER, STAFF, STUDENT]
-  ROLES = [[ADMIN.titleize, ADMIN], [MANAGER.titleize, MANAGER], [STAFF.titleize, STAFF]]
+  ROLE_NAMES = [ADMIN, MANAGER, STAFF, STUDENT].freeze
+  ROLES = [[ADMIN.titleize, ADMIN], [MANAGER.titleize, MANAGER], [STAFF.titleize, STAFF]].freeze
 
   scope :active, -> { where(blocked: false).order('users.name asc') }
   scope :blocked, -> { where(blocked: true).order('users.name asc') }

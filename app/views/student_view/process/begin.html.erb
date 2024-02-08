@@ -1,8 +1,8 @@
 <% title "#{@student.name}" %>
 
 <% title_html do %>
-	<h4 class="blend soft">My ETD Submission</h4>
-	<h1><%= @student.name %></h1>
+	<h4 class="fw-lighter">My ETD Submission</h4>
+	<h1 class="border-bottom"><%= @student.name %></h1>
 <% end %>
 
 <%= progress_bar (Thesis::PROCESS_BEGIN) %>
@@ -22,24 +22,27 @@
 
 
 	<div class="thesis row">
-			<div class="span9">
-				<h4 class="title" title="title"><%= link_to @thesis.title, student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE), title: "Update Thesis Details" %></h4>
+			<h4 class="title" title="title"><%= link_to @thesis.title, student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE), title: "Update Thesis Details" %></h4>
+
+			<div class="col-md-12 col-lg-4">
+				<h6>Supervisor</h6>
+				<p><%= format @thesis.supervisor %></p>
+				<h6>Exam date</h6>
+				<p><%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
 			</div>
 
-			<div class="span4">
-				<p class="supervisor" title="supervisor"><label>supervisor</label> <%= format @thesis.supervisor %></p>
-				<p class="exam_date" title="exam date"><label>exam date</label> <%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
+			<div class="col-md-12 col-lg-4">
+				<h6>Degree Name and Level</h6>
+				<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+				<h6>Program</h6>
+				<p><%= format @thesis.program %></p>
 			</div>
-
-			<div class="span5">
-				<p class="degree_level"><label>Degree Name and Level</label><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
-				<p class="program"><label>Program</label><%= format @thesis.program %></p>
-			</div>
+			<div class="col-lg-4 d-none d-lg-block"></div>
 	</div>
 
 	<hr/>
-	<div class="process-nav float-right">
-		<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="next-btn" title="Update Thesis Details">
+	<div class="process-nav float-end">
+		<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="next-btn btn btn-success" title="Update Thesis Details">
  			<i class="fa fa-angle-double-right"></i> Update Details
 		</a>
 	</div>

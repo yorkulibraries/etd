@@ -1,7 +1,7 @@
+# frozen_string_literal: true
+
 class GemRecord < ApplicationRecord
   audited
-
-  # attr_accessible :studentname, :sisid, :emailaddress, :eventtype, :eventdate, :examresult, :title, :program, :superv
 
   validates_presence_of :studentname, :sisid, :emailaddress, :eventtype, :eventdate, :examresult, :title, :program,
                         :superv
@@ -35,6 +35,6 @@ class GemRecord < ApplicationRecord
 
   ### FINDERS ###
   def self.find_by_sisid_or_name(query)
-    where('sisid = ? OR studentname LIKE ? ', query, "%#{query}%")
+    where('sisid = ? OR studentname LIKE ?', query, "%#{query}%")
   end
 end

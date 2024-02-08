@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class UsersControllerTest < ActionController::TestCase
@@ -32,7 +34,7 @@ class UsersControllerTest < ActionController::TestCase
     end
 
     should 'be able to list all active users on the index page, alphabetically' do
-      u1 = create(:user, name: 'Xavier')
+      create(:user, name: 'Xavier')
       create(:user, name: 'Aaron')
       create(:user, name: 'John')
 
@@ -127,12 +129,10 @@ class UsersControllerTest < ActionController::TestCase
       create_list(:user, 4, role: User::STAFF, blocked: true)
 
       get :index
-      users = assigns(:users)
+      assigns(:users)
       user_groups = assigns(:user_groups)
       assert user_groups, 'should list user groups'
       assert_equal 2, user_groups.count, 'Should list two user groups'
-
-      user_groups = nil
 
       get :blocked
 

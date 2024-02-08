@@ -1,9 +1,9 @@
 <% title "Gem Record" %>
 <% title_html do %>
 	<div class="parent_page">
-		<h4 class="blend soft">Gem Record <span class="strong float-right black">id: <%= @gem_record.seqgradevent%></span></h4>
-		<h1><%= @gem_record.studentname %></h1>
-		<h5 class="trivial"><%= @gem_record.title%></h5>
+		<h4 class="blend soft fw-lighter mb-0">Gem Record <span class="strong float-end black">id: <%= @gem_record.seqgradevent%></span></h4>
+		<h1 class="border-bottom"><%= @gem_record.studentname %></h1>
+		<h5 class="trivial fw-light text-warning-emphasis mb-0"><%= @gem_record.title%></h5>
 	</div>
 <% end %>
 
@@ -15,7 +15,7 @@
 		 Go To Student Record <i class="fa  fa-chevron-right"></i>
 	<% end %>
 <% else %>
-	<%= link_to new_student_path(sisid: @gem_record.sisid), method: :get, data: { confirm: "Are you sure?" }, class: "btn btn-inverse" do %>
-		 Create ETD Student Record <i class="fa fa-plus"></i>
+	<%= link_to new_student_path(sisid: @gem_record.sisid), method: :get, data: { confirm: "Are you sure?" }, class: "btn btn-primary" do %>
+		<i class="fa fa-plus"></i> Create ETD Student Record
 	<% end %>
 <% end %>

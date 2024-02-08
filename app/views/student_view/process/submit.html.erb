@@ -1,8 +1,8 @@
 <% title "#{@student.name}" %>
 
 <% title_html do %>
-	<h4 class="blend soft">My ETD Submission</h4>
-	<h1><%= @student.name %></h1>
+	<h4 class="fw-lighter">My ETD Submission</h4>
+	<h1 class="border-bottom"><%= @student.name %></h1>
 <% end %>
 
 <%= progress_bar (Thesis::PROCESS_SUBMIT) %>
@@ -18,7 +18,7 @@
 		<li>Your submission has formatting or other errors and has been returned to you for modification. In this case, your ETD record will be reopened to enable you to make the required changes and resubmit.</li>
 	</ol>
 
-	<div class="well">
+	<div class="alert alert-secondary">
 		<h4>Non-Exclusive License to York University</h4>
 
 		<p>In the interests of facilitating research and contributing to scholarship at York University (“York”) and elsewhere, the author (“Author”) hereby grants to York a non-exclusive, royalty free and irrevocable license on the following terms:</p>
@@ -40,11 +40,11 @@
 
 
 		<div class="process-nav">
-			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn back" title="Review Thesis Details">
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn back btn btn-primary" title="Review Thesis Details">
 				<i class="fa fa-angle-double-left"></i></a>
 
 			<%= link_to "I accept and send for review", submit_for_review_student_thesis_path(@current_user, @thesis), method: :post, title: "Accept and send for review",
-			 	class: "next-btn send", data: { confirm: "Are you sure? You will not be able to make further changes." } %></div>
+			 	class: "next-btn send btn btn-danger", data: { confirm: "Are you sure? You will not be able to make further changes." } %></div>
 		</div>
 
 

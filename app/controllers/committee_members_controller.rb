@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CommitteeMembersController < ApplicationController
   authorize_resource
   before_action do

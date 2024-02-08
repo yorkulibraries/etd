@@ -1,17 +1,17 @@
-<ul class="nav nav-tabs">
-	<li  class="<%= "active" if @status ==  nil %>" >
-		<a href="<%= reports_dashboard_path %>">Dashboard</a>
+<ul class="nav nav-tabs mb-3">
+	<li class="nav-item">
+		<%= active_link_to 'Dashboard', reports_dashboard_path, class:"nav-link" %>
 	</li>
-	<li class="<%= "active" if @status ==  Thesis::UNDER_REVIEW %>">
-		<a href="<%= reports_by_status_path(status: Thesis::UNDER_REVIEW) %>">Under Review Theses</a>
+	<li class="nav-item">
+		<%= active_link_to 'Under Review Theses', reports_by_status_path(status: Thesis::UNDER_REVIEW), active: /under_review/, class:"nav-link" %>
 	</li>
-	<li class="<%= "active" if @status ==  Thesis::ACCEPTED %>">
-		<a href="<%= reports_by_status_path(status: Thesis::ACCEPTED) %>">Review Accepted Theses</a>
+	<li class="nav-item">
+		<%= active_link_to 'Review Accepted Theses', reports_by_status_path(status: Thesis::ACCEPTED), active: /accepted/, class:"nav-link" %>
 	</li>
-	<li class="<%= "active" if @status ==  "embargoed" %>">
-		<a href="<%= reports_by_status_path(status: "embargoed") %>">Permanently Embargoed</a>
+	<li class="nav-item">
+		<%= active_link_to 'Permanently Embargoed', reports_by_status_path(status: "embargoed"), active: /embargoed/, class:"nav-link" %>
 	</li>
-	<li class="<%= "active" if @status ==  Thesis::PUBLISHED %>">
-		<a href="<%= reports_by_status_path(status: Thesis::PUBLISHED) %>">Published Theses</a>
+	<li class="nav-item">
+		<%= active_link_to 'Published Theses', reports_by_status_path(status: Thesis::PUBLISHED), active: /published/, class:"nav-link" %>
 	</li>
 </ul>

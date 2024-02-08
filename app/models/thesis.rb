@@ -1,11 +1,7 @@
+# frozen_string_literal: true
+
 class Thesis < ApplicationRecord
   attr_accessor :current_user
-
-  # attr_accessible :title, :gem_record_event_id, :author, :supervisor, :student,
-  #                 :keywords, :embargo, :language, :degree_name, :degree_level, :program, :published_date,
-  #                 :exam_date, :student_id, :committee, :abstract, :loc_subject_ids, :assigned_to_id, :assigned_to,
-  #                 :student_accepted_terms_at, :under_review_at, :accepted_at, :published_at, :returned_at,
-  #                 :committee_members_attributes, :embargoed, embargoed_at, embargoed_by_id
 
   ##### VALIDATIONS ######
 
@@ -48,14 +44,14 @@ class Thesis < ApplicationRecord
   ACCEPTED = 'accepted'
   PUBLISHED = 'published'
 
-  STATUSES = [OPEN, UNDER_REVIEW, ACCEPTED, PUBLISHED, RETURNED]
+  STATUSES = [OPEN, UNDER_REVIEW, ACCEPTED, PUBLISHED, RETURNED].freeze
   STATUS_ACTIONS = { OPEN => 'Open', UNDER_REVIEW => 'Under Review', REJECTED => 'Reject', ACCEPTED => 'Accept',
-                     PUBLISHED => 'Publish', RETURNED => 'Return' }
+                     PUBLISHED => 'Publish', RETURNED => 'Return' }.freeze
 
   DEGREENAME = [
     'EMBA', 'IMBA', 'LLM', 'MA', 'MASc', 'MBA', 'Mdes', 'MEd', 'MES', 'MFA', 'MFAc', 'MHRM', 'MPA', 'MPIA', 'MPPAL', 'MSc', 'MScN', 'MSW',
     'MAcc', 'MCI', 'MDEM', 'MBA/JD', 'MES/JD', 'MA/JD', 'PhD'
-  ]
+  ].freeze
 
   DEGREENAME_FULL = {
     'EMBA' => 'EMBA - Executive Master of Business Administration',
@@ -83,12 +79,12 @@ class Thesis < ApplicationRecord
     'MES/JD' => 'MES/JD - Master in Environmental Studies/Juris Doctor',
     'MA/JD' => 'MA/JD - Master of Arts/Juris Doctor',
     'PhD' => 'PhD - Doctor of Philosophy'
-  }
+  }.freeze
 
-  LANGUAGE = %w[English French Other]
+  LANGUAGE = %w[English French Other].freeze
   MASTERS = "Master's"
   DOCTORAL = 'Doctoral'
-  DEGREELEVEL = [MASTERS, DOCTORAL]
+  DEGREELEVEL = [MASTERS, DOCTORAL].freeze
 
   PROCESS_BEGIN = 'begin'
   PROCESS_UPDATE = 'update'
@@ -142,14 +138,14 @@ class Thesis < ApplicationRecord
 
   def update_from_gem_record
     record = GemRecord.find_by_seqgradevent(gem_record_event_id)
-    if record
-      self.title = record.title
-      self.gem_record_event_id = record.seqgradevent
-      self.supervisor = record.superv
-      self.exam_date = record.eventdate
-      self.program = record.program
-      assign_degree_name_and_level
-    end
+    return unless record
+
+    self.title = record.title
+    self.gem_record_event_id = record.seqgradevent
+    self.supervisor = record.superv
+    self.exam_date = record.eventdate
+    self.program = record.program
+    assign_degree_name_and_level
   end
 
   ### ASSIGNED_TO methods ###
@@ -175,11 +171,11 @@ class Thesis < ApplicationRecord
   end
 
   def publish
-    if embargoed == false
-      self.status = Thesis::PUBLISHED
-      self.audit_comment = 'Publishing this thesis. Status changed to published'
-      self.published_at = published_date
-      save(valudate: false)
-    end
+    return unless embargoed == false
+
+    self.status = Thesis::PUBLISHED
+    self.audit_comment = 'Publishing this thesis. Status changed to published'
+    self.published_at = published_date
+    save(valudate: false)
   end
 end
