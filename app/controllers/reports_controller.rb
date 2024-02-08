@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ReportsController < ApplicationController
   skip_authorization_check
 
@@ -44,23 +46,23 @@ class ReportsController < ApplicationController
 
   def review_thesis
     @thesis = Thesis.find(params[:id])
-    theses = Thesis.where(status: @thesis.status).order(:published_date).select(:id).collect { |t| t.id }
+    theses = Thesis.where(status: @thesis.status).order(:published_date).select(:id).collect(&:id)
     @status = @thesis.status
     current = theses.index(@thesis.id)
 
     @next_id = current == theses.last ? current : theses[current + 1]
-    @prev_id = current == 0 ? 0 : theses[current - 1]
+    @prev_id = current.zero? ? 0 : theses[current - 1]
   end
 
   def under_review_theses
     if params[:id]
       @thesis = Thesis.find(params[:id])
-      theses = Thesis.under_review.select(:id).collect { |t| t.id }
+      theses = Thesis.under_review.select(:id).collect(&:id)
 
       current = theses.index(@thesis.id)
 
       @next_id = current == theses.last ? current : theses[current + 1]
-      @prev_id = current == 0 ? 0 : theses[current - 1]
+      @prev_id = current.zero? ? 0 : theses[current - 1]
 
     else
       @theses = Thesis.under_review

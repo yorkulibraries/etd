@@ -1,22 +1,27 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Mayor.create(name: 'Emanuel', city: cities.first)
-# admin user
+# frozen_string_literal: true
 
-LocSubject.load_from_file('lib/loc_subjects.txt') if Rails.env != 'test' and LocSubject.all.count == 0
+# rails db:seed
+LocSubject.load_from_file('lib/loc_subjects.txt') if (Rails.env != 'test') && LocSubject.all.count.zero?
 
-if Rails.env != 'test' and User.all.count == 0
+if (Rails.env != 'test') && User.all.count.zero?
   [User::ADMIN, User::MANAGER, User::STAFF].each do |role|
     user = User.new
-    user.username = "#{role}"
+    user.username = role.to_s
     user.email = "#{role}@me.ca"
     user.name = "#{role} User"
     user.role = role
     user.blocked = false
     user.save
+  end
+end
+
+if Rails.env.development?
+  (10..75).each do |i|
+    if i < 50
+      Student.create(username: "username#{i}", name: "name#{i}", email: "email#{i}@domain.com", created_by_id: 1,
+                     blocked: false, role: User::STUDENT, sisid: "1000000#{i}")
+    end
+    GemRecord.create(studentname: "studentname #{i}", sisid: "100000#{i}",
+                     emailaddress: "student-email#{i}@domain.com", eventtype: GemRecord::PHD_EXAM, eventdate: 45.days.ago.to_s, examresult: 'XXXX', title: "title #{i}", program: "program #{i}", superv: "superv #{i}", seqgradevent: "999999#{i}".to_i, examdate: Time.now)
   end
 end

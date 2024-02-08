@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -11,7 +13,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.0].define(version: 20_220_706_233_055) do
-  create_table 'audits', force: :cascade do |t|
+  create_table 'audits', id: :integer, charset: 'utf8', force: :cascade do |t|
     t.integer 'auditable_id'
     t.string 'auditable_type'
     t.integer 'associated_id'
@@ -33,7 +35,7 @@ ActiveRecord::Schema[7.0].define(version: 20_220_706_233_055) do
     t.index %w[user_id user_type], name: 'user_index'
   end
 
-  create_table 'committee_members', force: :cascade do |t|
+  create_table 'committee_members', id: :integer, charset: 'utf8', force: :cascade do |t|
     t.string 'full_name'
     t.string 'role'
     t.integer 'thesis_id'
@@ -43,7 +45,7 @@ ActiveRecord::Schema[7.0].define(version: 20_220_706_233_055) do
     t.string 'last_name'
   end
 
-  create_table 'delayed_jobs', force: :cascade do |t|
+  create_table 'delayed_jobs', id: :integer, charset: 'utf8', force: :cascade do |t|
     t.integer 'priority', default: 0, null: false
     t.integer 'attempts', default: 0, null: false
     t.text 'handler', null: false
@@ -58,7 +60,7 @@ ActiveRecord::Schema[7.0].define(version: 20_220_706_233_055) do
     t.index %w[priority run_at], name: 'delayed_jobs_priority'
   end
 
-  create_table 'documents', force: :cascade do |t|
+  create_table 'documents', id: :integer, charset: 'utf8', force: :cascade do |t|
     t.integer 'thesis_id'
     t.integer 'user_id'
     t.boolean 'supplemental'
@@ -71,7 +73,7 @@ ActiveRecord::Schema[7.0].define(version: 20_220_706_233_055) do
     t.index ['user_id'], name: 'index_documents_on_user_id'
   end
 
-  create_table 'export_logs', force: :cascade do |t|
+  create_table 'export_logs', id: :integer, charset: 'utf8', force: :cascade do |t|
     t.integer 'user_id'
     t.date 'published_date'
     t.boolean 'production_export', default: false
@@ -95,7 +97,7 @@ ActiveRecord::Schema[7.0].define(version: 20_220_706_233_055) do
     t.datetime 'updated_at', precision: nil, null: false
   end
 
-  create_table 'gem_records', force: :cascade do |t|
+  create_table 'gem_records', id: :integer, charset: 'utf8', force: :cascade do |t|
     t.string 'studentname'
     t.integer 'sisid'
     t.string 'emailaddress'
@@ -111,7 +113,7 @@ ActiveRecord::Schema[7.0].define(version: 20_220_706_233_055) do
     t.date 'examdate'
   end
 
-  create_table 'loc_subjects', force: :cascade do |t|
+  create_table 'loc_subjects', id: :integer, charset: 'utf8', force: :cascade do |t|
     t.string 'name'
     t.string 'category'
     t.integer 'code'
@@ -120,15 +122,15 @@ ActiveRecord::Schema[7.0].define(version: 20_220_706_233_055) do
     t.datetime 'updated_at', precision: nil, null: false
   end
 
-  create_table 'settings', force: :cascade do |t|
+  create_table 'settings', charset: 'utf8', force: :cascade do |t|
     t.string 'var', null: false
     t.text 'value'
-    t.datetime 'created_at', null: false
-    t.datetime 'updated_at', null: false
+    t.datetime 'created_at', precision: nil, null: false
+    t.datetime 'updated_at', precision: nil, null: false
     t.index ['var'], name: 'index_settings_on_var', unique: true
   end
 
-  create_table 'theses', force: :cascade do |t|
+  create_table 'theses', id: :integer, charset: 'utf8', force: :cascade do |t|
     t.text 'title'
     t.string 'author'
     t.string 'supervisor'
@@ -159,7 +161,7 @@ ActiveRecord::Schema[7.0].define(version: 20_220_706_233_055) do
     t.index ['student_id'], name: 'index_theses_on_student_id'
   end
 
-  create_table 'thesis_subjectships', force: :cascade do |t|
+  create_table 'thesis_subjectships', id: :integer, charset: 'utf8', force: :cascade do |t|
     t.integer 'thesis_id'
     t.integer 'loc_subject_id'
     t.integer 'rank'
@@ -167,7 +169,7 @@ ActiveRecord::Schema[7.0].define(version: 20_220_706_233_055) do
     t.datetime 'updated_at', precision: nil, null: false
   end
 
-  create_table 'users', force: :cascade do |t|
+  create_table 'users', id: :integer, charset: 'utf8', force: :cascade do |t|
     t.string 'username'
     t.string 'name'
     t.string 'type'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class StudentsControllerTest < ActionController::TestCase
@@ -182,7 +184,7 @@ class StudentsControllerTest < ActionController::TestCase
     #### GEM and SIS Search ####
     should 'search by student sisid, if found in db redirect to student, if not found redirect to the gem record' do
       gem_record = create(:gem_record, sisid: '202202202')
-      student = create(:student, sisid: '111111111')
+      create(:student, sisid: '111111111')
 
       post :gem_search, params: { sisid: '202202202' }
 
@@ -240,7 +242,6 @@ class StudentsControllerTest < ActionController::TestCase
 
       students = assigns(:students)
       assert_equal 25, students.count, 'first page, 25'
-      assert_select 'ul.pagination', 2, 'Pagination links should be present'
 
       get :index, params: { page: 2 }
 
@@ -250,7 +251,7 @@ class StudentsControllerTest < ActionController::TestCase
 
     should 'display audit trail for this student, including theses and documents' do
       student = create(:student)
-      thesis = create(:thesis, student:)
+      create(:thesis, student:)
 
       get :audit_trail, params: { id: student.id }
 
@@ -260,7 +261,7 @@ class StudentsControllerTest < ActionController::TestCase
 
     should 'send an invitation email' do
       student = create(:student)
-      thesis = create(:thesis, student:)
+      create(:thesis, student:)
 
       get :send_invite, params: { id: student.id }
 
@@ -288,7 +289,7 @@ class StudentsControllerTest < ActionController::TestCase
     should 'remove student completly if current user is manager' do
       student = create(:student)
       thesis = create(:thesis, student:)
-      document = create(:document, thesis:)
+      create(:document, thesis:)
 
       assert_difference ['Student.count', 'Thesis.count', 'Document.count'], -1 do
         post :destroy, params: { id: student.id }

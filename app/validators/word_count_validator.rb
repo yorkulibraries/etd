@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WordCountValidator < ActiveModel::EachValidator
   ## USAGE
   # validates :summary, maximum: 30, word_count: true
@@ -12,13 +14,13 @@ class WordCountValidator < ActiveModel::EachValidator
     # puts "VALUE: #{value}"
     return if value.blank?
 
-    word_count = value.scan((/[\w-]+/)).size
+    word_count = value.scan(/[\w-]+/).size
 
-    if maximum && maximum.is_a?(Integer) && word_count.to_i > maximum.to_i
+    if maximum.is_a?(Integer) && word_count.to_i > maximum.to_i
       record.errors[attribute] << (options[:message] || " exceeds maxmimum count of #{maximum} words")
-    elsif minimum && minimum.is_a?(Integer) && word_count.to_i < minumum.to_i
+    elsif minimum.is_a?(Integer) && word_count.to_i < minumum.to_i
       record.errors[attribute] << (options[:message] || " has less than mimumum (#{maximum}) number of words")
-    elsif between && between.is_a?(Range) && (word_count.to_i < range.begin || word_count.to_i > range.end)
+    elsif between.is_a?(Range) && (word_count.to_i < range.begin || word_count.to_i > range.end)
       record.errors[attribute] << (options[:message] || " must have between #{range.begin} and #{range.end} words")
     end
   end

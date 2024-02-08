@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HomeController < ApplicationController
   before_action :authorize_controller, except: :unauthorized
   skip_authorization_check

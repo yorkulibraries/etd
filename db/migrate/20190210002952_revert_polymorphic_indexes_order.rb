@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RevertPolymorphicIndexesOrder < ActiveRecord::Migration[5.0]
   def self.up
     fix_index_order_for %i[associated_id associated_type], 'associated_index'
@@ -12,9 +14,9 @@ class RevertPolymorphicIndexesOrder < ActiveRecord::Migration[5.0]
   private
 
   def fix_index_order_for(columns, index_name)
-    if index_exists? :audits, columns, name: index_name
-      remove_index :audits, name: index_name
-      add_index :audits, columns.reverse, name: index_name
-    end
+    return unless index_exists? :audits, columns, name: index_name
+
+    remove_index :audits, name: index_name
+    add_index :audits, columns.reverse, name: index_name
   end
 end

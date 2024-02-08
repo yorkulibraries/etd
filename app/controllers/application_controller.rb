@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::Base
   protect_from_forgery
   check_authorization
@@ -10,13 +12,13 @@ class ApplicationController < ActionController::Base
   helper_method :current_user
 
   def login_required
-    unless current_user || controller_name == 'sessions'
-      redirect_to login_url,
-                  alert: 'You must login before accessing this page'
-    end
+    return if current_user || controller_name == 'sessions'
+
+    redirect_to login_url,
+                alert: 'You must login before accessing this page'
   end
 
   rescue_from CanCan::AccessDenied do |exception|
-    redirect_to unauthorized_url, alert: "#{exception.message}"
+    redirect_to unauthorized_url, alert: exception.message.to_s
   end
 end

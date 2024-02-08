@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StudentViewController < ApplicationController
   before_action :authorize_controller, :load_student, except: :login_as_student
 

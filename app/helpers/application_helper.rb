@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ApplicationHelper
   def app_version
     '1.3.1'
@@ -26,15 +28,16 @@ module ApplicationHelper
   end
 
   def auditable_link(auditable)
-    if auditable.is_a?(Thesis)
+    case auditable
+    when Thesis
       student_thesis_path(auditable.student.id, auditable.id)
-    elsif auditable.is_a?(User)
+    when User
       users_path
-    elsif auditable.is_a?(Student)
+    when Student
       student_path(auditable.id)
-    elsif auditable.is_a?(Document)
+    when Document
       student_thesis_path(auditable.thesis.student.id, auditable.id)
-    elsif auditable.is_a?(GemRecord)
+    when GemRecord
       gem_record_path(auditable.id)
     else
       ''
@@ -45,8 +48,8 @@ module ApplicationHelper
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
     fields = f.fields_for(association, new_object, child_index: id) do |builder|
-      render(association.to_s.singularize + '_fields', f: builder)
+      render("#{association.to_s.singularize}_fields", f: builder)
     end
-    link_to(name, '#', class: 'add_fields', data: { id:, fields: fields.gsub("\n", '') })
+    link_to(name, '#', class: 'btn btn-outline-primary add_fields', data: { id:, fields: fields.gsub("\n", '') })
   end
 end

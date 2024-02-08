@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Custompath < Devise::FailureApp
   def redirect
     # flash[:alert] = i18n_message unless flash[:notice]

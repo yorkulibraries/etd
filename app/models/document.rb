@@ -1,8 +1,8 @@
+# frozen_string_literal: true
+
 class Document < ApplicationRecord
   mount_uploader :file, DocumentUploader
   audited associated_with: :thesis
-
-  # attr_accessible :supplemental, :name, :file
 
   ### RELATIONS
   belongs_to :thesis
@@ -36,7 +36,7 @@ class Document < ApplicationRecord
 
   ### CUSTOM VALIDATIONS
   def primary_file_presence
-    if thesis && (thesis.documents.primary.not_deleted.size > 0 && supplemental? == false && deleted? == false)
+    if thesis && (thesis.documents.primary.not_deleted.size.positive? && supplemental? == false && deleted? == false)
       errors.add(:file, 'You can only upload one primrary file per thesis')
     end
   end
