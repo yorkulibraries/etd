@@ -28,4 +28,11 @@ class AppSettings < RailsSettings::Base
   field :dspace_live_service_document_url, default: ENV['dspace_live_service_document_url'] || ''
   field :dspace_live_collection_uri, default: ENV['dspace_live_collection_uri'] || ''
   field :dspace_live_collection_title, default: ENV['dspace_live_collection_title'] || ''
+  field :student_begin_submission, default: ''
+  field :student_update_details_abstract, default: ''
+  field :student_update_details_keywords, default: ''
+  field :student_upload_files, default: ''
+  field :student_review_details, default: ''
+  field :student_submit_for_review, default: ''
+  field :student_submit_for_review_license, default: ''
 end
