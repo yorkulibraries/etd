@@ -10,7 +10,7 @@ class AppSettings < RailsSettings::Base
   field :app_maintenance_message,
         default: ENV['app_maintenance_message'] || 'ETD Application will be taken down for maintenance today from 12pm to 1pm.  We apologize for any inconvenience this may have caused.'
   field :email_allow, default: ENV['email_allow'] || true
-  field :email_from, default: ENV['email_from'] || 'noreply@library.yorku.ca'
+  field :email_from, default: ENV['email_from'] || 'noreply@yorku.ca'
   field :email_welcome_subject,
         default: ENV['email_welcome_subject'] || "Welcome to York University's Electronic Thesis and Dissertation (ETD) application"
   field :email_welcome_allow, default: ENV['email_welcome_allow'] || true
