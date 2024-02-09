@@ -10,6 +10,7 @@
  *= require chosen-bootstrap-theme
  *= require font-awesome
  *= require chosen
+ *= require trix
  *= require_tree .
  *= require_self
  */
