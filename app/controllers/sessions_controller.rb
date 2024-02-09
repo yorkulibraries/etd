@@ -31,6 +31,6 @@ class SessionsController < ApplicationController
     cookies.delete('mayaauth', domain: 'yorku.ca')
     cookies.delete('pybpp', domain: 'yorku.ca')
 
-    redirect_to 'http://www.library.yorku.ca', allow_other_host: true
+    redirect_to 'https://passportyork.yorku.ca/ppylogin/ppylogout', allow_other_host: true
   end
 end
