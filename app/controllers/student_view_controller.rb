@@ -3,6 +3,19 @@
 class StudentViewController < ApplicationController
   before_action :authorize_controller, :load_student, except: :login_as_student
 
+  def validate_active_thesis
+    Document.exists?(deleted: false, user_id: current_user.id, thesis_id: params[:id], supplemental: false)
+  end
+
+  def render_according_to_validation(template)
+    if validate_active_thesis
+      render template: template
+    else
+      flash[:error] = "You have to upload a primary file to continue"
+      render template: 'student_view/process/upload'
+    end
+  end
+
   def index
     if @student.theses.count == 1
       @thesis = @student.theses.first
@@ -33,11 +46,11 @@ class StudentViewController < ApplicationController
     when Thesis::PROCESS_REVIEW
       @primary_documents = @thesis.documents.not_deleted.primary
       @supplemental_documents = @thesis.documents.not_deleted.supplemental
-      render template: 'student_view/process/review'
+      render_according_to_validation('student_view/process/review')
     when Thesis::PROCESS_SUBMIT
-      render template: 'student_view/process/submit'
+      render_according_to_validation('student_view/process/submit')
     when Thesis::PROCESS_STATUS
-      render template: 'student_view/process/status'
+      render_according_to_validation('student_view/process/status')
     else
       render template: 'student_view/process/status'
     end

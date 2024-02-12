@@ -43,8 +43,22 @@ class StudentViewControllerTest < ActionController::TestCase
       assert_equal 2, theses.size, 'Just one for now'
     end
 
+    should 'avoid routing if files are not uploaded' do
+      thesis = create(:thesis, student: @student)
+
+      get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_UPLOAD }
+      assert assigns(:thesis)
+      assert_response :success
+      assert_template 'upload'
+      get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_REVIEW }
+      assert_response :success
+      assert_template 'upload'
+      assert_match /You have to upload a primary file to continue/, flash[:alert]
+    end
+
     should 'load thesis object and display or redirect to proper process step' do
       thesis = create(:thesis, student: @student)
+      create(:document, thesis_id: thesis.id, user_id: @student.id, supplemental: false)
 
       get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_BEGIN }
       assert assigns(:thesis)
@@ -83,6 +97,7 @@ class StudentViewControllerTest < ActionController::TestCase
 
     should 'redirect to status if thesis status is anything by OPEN on process step is not status or review' do
       thesis = create(:thesis, student: @student, status: Thesis::UNDER_REVIEW)
+      create(:document, thesis_id: thesis.id, user_id: @student.id, supplemental: false)
 
       get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_UPLOAD }
       assert_template 'status'
