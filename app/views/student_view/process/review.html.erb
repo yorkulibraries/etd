@@ -17,8 +17,7 @@
 <div class="thesis fitted student-view review">
 	<h3 class="title" title="title"><%= @thesis.title %></h3>
 	<div class="alert alert-secondary" role="alert">
-
-		<p>Please review all of the information on this page for accuracy and completeness and ensure all files are uploaded. If you are satisfied with the information you have provided, click "Submit for Review".</p>
+		<%= AppSettings.student_review_details.html_safe %>
 	</div>
 
 	<h6>Abstract</h6>

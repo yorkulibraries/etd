@@ -5,10 +5,10 @@
 		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_BEGIN ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
 	   <div class="col-lg-10 col-sm-12">
-		<a class="text-black ms-2" href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_BEGIN)  unless block_thesis_changes?(@thesis) %>" title="Begin Submission">
+		<span class="text-black ms-2" title="Begin Submission">
 			Begin<br/>
 			<strong class="ms-2">submission</strong>
-		</a>
+		</span>
 	   </div>
 	  </div>
 	</div>
@@ -18,10 +18,10 @@
 		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_UPDATE ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
 	   <div class="col-lg-10 col-sm-12">
-		<a class="text-black ms-2" href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) unless block_thesis_changes?(@thesis) %>" title="Update Details">
+		<span class="text-black ms-2" title="Update Details">
 			Update<br/>
 			<strong class="ms-2">details</strong>
-		</a>
+		</span>
 	   </div>
 	  </div>
 	</div>
@@ -31,10 +31,10 @@
 		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_UPLOAD ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
 	   <div class="col-lg-10 col-sm-12">
-		<a class="text-black ms-2" href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)  unless block_thesis_changes?(@thesis) %>" title="Upload Files">
+		<span class="text-black ms-2" title="Upload Files">
 			Upload<br/>
 			<strong class="ms-2">files</strong>
-		</a>
+		</span>
 	   </div>
 	  </div>
 	</div>
@@ -44,10 +44,10 @@
 		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_REVIEW ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
 	   <div class="col-lg-10 col-sm-12">
-		<a class="text-black ms-2" href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW)   %>" title="Review Details">
+		<span class="text-black ms-2" title="Review Details">
 				Review<br/>
 			<strong class="ms-2">details</strong>
-		</a>
+		</span>
 	   </div>
 	  </div>
 	</div>
@@ -57,11 +57,10 @@
 		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_SUBMIT ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
 	   <div class="col-lg-10 col-sm-12">
-		<a class="text-black ms-2" href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)  unless block_thesis_changes?(@thesis) %>" title="Submit For Review"
-			data-confirm="Have you completed all thesis details and uploaded all files?">
+		<span class="text-black ms-2" title="Submit For Review">
 			Submit<br/>
 			<strong class="ms-2">for review</strong>
-		</a>
+		</span>
 	   </div>
 	  </div>
 	</div>
@@ -71,10 +70,10 @@
 		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_STATUS ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
 	   <div class="col-lg-10 col-sm-12">
-		<a class="text-black ms-2" href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS) %>" title="Check Thesis Status">
+		<span class="text-black ms-2" title="Check Thesis Status">
 			Check<br/>
 			<strong class="ms-2">status</strong>
-		</a>
+		</span>
 	   </div>
 	  </div>
 	</div>

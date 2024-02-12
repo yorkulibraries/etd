@@ -9,6 +9,9 @@
 
 <div class="student-view fitted status">
 	<h3><%= @thesis.title %></h3>
+	<div>
+		<%= AppSettings.student_check_status %>
+	</div>
 	<p>Your Current Thesis/Dissertation Status: <span class="badge text-bg-primary"><%= @thesis.status.humanize %></span></p>
 
 	<div class="accordion" id="accordionThesis">

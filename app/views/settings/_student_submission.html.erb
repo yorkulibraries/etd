@@ -13,9 +13,9 @@
     <%= f.input :student_begin_submission, as: :rich_text_area, label: "Welcome message", input_html: { rows: 15 } %>
   </div>
   <div class="tab-pane fade" id="nav-update" role="tabpanel" aria-labelledby="nav-update-tab" tabindex="0">
-    <%= f.input :student_update_details_initial, as: :rich_text_area, label: "Initial information", input_html: { rows: 15 } %>
-    <%= f.input :student_update_details_abstract, as: :text, label: "Abstract", input_html: { rows: 5 } %>
-    <%= f.input :student_update_details_subjects, as: :text, label: "Subjects", input_html: { rows: 5 } %>
+    <%= f.input :student_update_details_initial, as: :rich_text_area, label: "Initial information", input_html: { rows: 15, class: "mb-4"  } %>
+    <%= f.input :student_update_details_abstract, as: :text, label: "Abstract", input_html: { rows: 5, class: "mb-4"  } %>
+    <%= f.input :student_update_details_subjects, as: :text, label: "Subjects", input_html: { rows: 5, class: "mb-4"  } %>
     <%= f.input :student_update_details_keywords, as: :text, label: "Keywords", input_html: { rows: 5 } %>
   </div>
   <div class="tab-pane fade" id="nav-upload" role="tabpanel" aria-labelledby="nav-upload-tab" tabindex="0">
@@ -25,12 +25,12 @@
       <%= f.input :student_review_details, as: :rich_text_area, label: "Information", input_html: { rows: 20 } %>
   </div>
   <div class="tab-pane fade" id="nav-submit" role="tabpanel" aria-labelledby="nav-submit-tab" tabindex="0">
-      <%= f.input :student_submit_for_review, as: :rich_text_area, label: "Information", input_html: { rows: 20 } %>
-      <%= f.input :student_submit_for_review_license, as: :rich_text_area, label: "License", input_html: { rows: 20 } %>
+      <%= f.input :student_submit_for_review, as: :rich_text_area, label: "Information", input_html: { rows: 20, class: "mb-4" } %>
+      <%= f.input :student_submit_for_review_license, as: :rich_text_area, label: "Non-Exclusive License to York University", input_html: { rows: 20 } %>
   
   </div>
   <div class="tab-pane fade" id="nav-check" role="tabpanel" aria-labelledby="nav-check-tab" tabindex="0">
-    <%= f.input :student_check_status, as: :rich_text_area, label: "License", input_html: { rows: 20 } %>
+    <%= f.input :student_check_status, as: :rich_text_area, label: "Status message", input_html: { rows: 20 } %>
   </div>
 </div>
 

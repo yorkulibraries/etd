@@ -19,10 +19,7 @@
 	<h6 class="green">Files and Documents</h6>
 	<div class="documents">
 		<div class="alert alert-secondary" role="alert">
-			<p>Your thesis or dissertation must be submitted as a PDF file (.pdf) only. You may submit only one file, which must be saved using the following naming convention:	</p>
-			<p class="text-center"><span class="fw-bold">Lastname_Firstname_MiddleInitial_yearofcopyright_PhdORMasters</span> (e.g. Smith_Jane_E_2014_PhD)</p>
-			<p>If necessary, you can add supplementary files to your thesis/dissertation. Supplementary files refer to items that are part of the approved, examined thesis/dissertation that cannot be included in the PDF, such as multi-media, sound, video or hypertext.</p>
-			<p>A supplementary file is NOT an appendix. Regular appendices can be included in the PDF document of your thesis/dissertation. </p>
+			<%= AppSettings.student_upload_files.html_safe %>
 		</div>
 
 		<h6>Primary &nbsp; &nbsp;

@@ -5,15 +5,12 @@
 <%= f.input :language, collection: Thesis::LANGUAGE, readonly: read_only_if_student("language"), input_html: { aria_label: "Language" }  %>
 
 <%= f.input :abstract, input_html: { class: "span6", rows: "8" }, readonly: read_only_if_student("abstract"),
-						hint: "Masters: 150 word limit. Doctoral: 350 word limit."  %>
+						hint: AppSettings.student_update_details_abstract.html_safe  %>
 
 <hr class="fitted"/>
 
-
-<div class="control-group">
-	<label class="text optional control-label">Subjects</label>
-	<div class="controls" id="">
-			<p class="fitted">Please select the one category from the drop down list below that best describes the overall subject of your dissertation or thesis. You must select at least one primary subject and may select up to two additional secondary subjects (optional). </p>
+	<label class="text optional control-label">Subjects</label><br />
+		<small class="form-text text-muted"><%= AppSettings.student_update_details_subjects.html_safe %></small>		
 
 		<div id="thesis_loc_subject_ids" class="span3 no-space">
 
@@ -30,14 +27,6 @@
 			<% end %>
 
 		</div>
-	</div>
-</div>
-<div class="control-group">
+		
 	<label class="text optional control-label">Keywords</label>
-	<div class="controls">
-		<p class="fitted">
-			Enter as many appropriate keywords about your work as possible. The more terms you provide, the more likely it is that users will find your work in their searches. Please use a comma to separate each keyword or string of keywords. (e.g. business, corporate social responsibility, sustainable business models)
-		</p>
-	</div>
-</div>
-<%= f.input :keywords, label: false, input_html: { class: "span6", rows: "2",  aria:{ label: "Keywords" } }, readonly: read_only_if_student("keywords") %>
+	<%= f.input :keywords, label: false, input_html: { rows: "2",  aria:{ label: "Keywords" } }, readonly: read_only_if_student("keywords"), hint: AppSettings.student_update_details_keywords.html_safe %>
