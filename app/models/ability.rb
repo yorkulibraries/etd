@@ -21,7 +21,7 @@ class Ability
 
       can :login_as, :student
       can :show, :home
-    else
+    elsif user.role == User::STUDENT
       can :read, [:student, Student]
 
       can :manage, Document do |document|
@@ -34,6 +34,10 @@ class Ability
 
       can :show, Thesis do |thesis|
         thesis.student_id == user.id
+      end
+
+      can %i[new create destroy], CommitteeMember do |committee|
+        committee.thesis.student_id == user.id
       end
 
       can :show, :home
