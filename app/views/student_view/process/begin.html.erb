@@ -35,6 +35,12 @@
 			</div>
 			<div class="col-lg-4 d-none d-lg-block"></div>
 	</div>
+	<% if @thesis.returned_message.present? && Thesis::RETURNED == @thesis.status %>
+		<h6>Returned message</h6>
+		<div class="alert alert-danger" role="alert">
+			<%= @thesis.returned_message %>
+		</div>
+	<% end %>
 
 	<hr/>
 	<div class="process-nav float-end">
