@@ -46,10 +46,12 @@ class ThesesControllerTest < ActionController::TestCase
 
     should 'load documents separately, as primary and non primary. All must be not_deleted' do
       thesis = create(:thesis, student: @student)
-      create_list(:document, 1, supplemental: false, thesis:, user: @student)
+      create_list(:document, 1, supplemental: false, thesis:, user: @student,
+                                file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
       create_list(:document, 3, supplemental: true, thesis:, user: @student)
       create(:document, supplemental: true, deleted: true, thesis:, user: @student)
-      create(:document, supplemental: false, deleted: true, thesis:, user: @student)
+      create(:document, supplemental: false, deleted: true, thesis:, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 
       get :show, params: { id: thesis.id, student_id: @student.id }
 
@@ -117,21 +119,6 @@ class ThesesControllerTest < ActionController::TestCase
       assert thesis.supervisor.blank?, 'Supervisor should be blank'
     end
 
-    should 'Only create a valid Thesis, status should be OPEN on create, must assign student first' do
-      # thesis_attrs = attributes_for(:thesis)
-      #
-      #
-      # assert_difference "Thesis.count", 1 do
-      #   #post :create, params: { thesis: thesis_attrs.except(:status, :published_date), student_id: @student.id }
-      # end
-      #
-      # thesis = assigns(:thesis)
-      # assert thesis, "Thesis should not be nil"
-      # assert_equal @student.id, thesis.student.id, "Thesis should have been assigned to a student"
-      # assert_equal Thesis::OPEN, thesis.status, "Thesis status should be set to #{Thesis::OPEN}"
-      # assert_redirected_to student_thesis_path(@student, thesis), "Should redirect to thesis details"
-    end
-
     should 'Throw an ActiveRecordNotFound exception if try to assign to a non_existent student' do
       thesis_attrs = attributes_for(:thesis)
 
@@ -141,24 +128,6 @@ class ThesesControllerTest < ActionController::TestCase
         end
       end
     end
-
-    # should "Not create an invalid thesis, Reject is fields are missing" do
-    #
-    #
-    #   thesis_attrs = attributes_for(:thesis)
-    #
-    #   assert_no_difference "Thesis.count", "Should reject it since there are missing attributes" do
-    #     post :create, params: { thesis: thesis_attrs.except(:status, :assigned_to_id, :published_date, :title), student_id: @student.id }
-    #     assert_response :success
-    #     assert_template 'new', "Redirect back to the form"
-    #
-    #     post :create, params: { thesis: thesis_attrs.except(:author, :published_date, :status), student_id: @student.id }
-    #     assert_response :success
-    #     assert_template 'new', "Redirect back to the form"
-    #   end
-    #
-    #
-    # end
 
     should 'Display edit form for an existing thesis, without student selection' do
       thesis = create(:thesis, student: @student)
@@ -227,7 +196,7 @@ class ThesesControllerTest < ActionController::TestCase
         delete :destroy, params: { id: thesis.id, student_id: @student.id }
       end
       assert_redirected_to student_thesis_path(@student, thesis)
-      thesis.reload
+      thesis = Thesis.find(thesis.id)
       assert_equal Thesis::REJECTED, thesis.status
     end
 
@@ -247,6 +216,18 @@ class ThesesControllerTest < ActionController::TestCase
       assert_equal Thesis::UNDER_REVIEW, t.status
     end
 
+    should 'record dates and message for returned item' do
+      thesis = create(:thesis, status: Thesis::OPEN, student: @student)
+
+      REASON_MESSAGE = 'The thesis is missing this, and this, and so on'
+      post :update_status,
+           params: { id: thesis.id, student_id: @student.id, status: Thesis::RETURNED, custom_message: REASON_MESSAGE }
+      thesis = assigns(:thesis)
+      assert_equal thesis.returned_at, Date.today
+      assert_equal thesis.status, Thesis::RETURNED
+      assert_equal thesis.returned_message, REASON_MESSAGE
+    end
+
     should 'record dates for each status' do
       thesis = create(:thesis, status: Thesis::OPEN, student: @student)
 
@@ -257,10 +238,6 @@ class ThesesControllerTest < ActionController::TestCase
       post :update_status, params: { id: thesis.id, student_id: @student.id, status: Thesis::ACCEPTED }
       thesis = assigns(:thesis)
       assert_equal thesis.accepted_at, Date.today
-
-      post :update_status, params: { id: thesis.id, student_id: @student.id, status: Thesis::RETURNED }
-      thesis = assigns(:thesis)
-      assert_equal thesis.returned_at, Date.today
 
       post :update_status, params: { id: thesis.id, student_id: @student.id, status: Thesis::PUBLISHED }
       thesis = assigns(:thesis)

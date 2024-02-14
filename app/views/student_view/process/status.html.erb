@@ -12,6 +12,13 @@
 	<div>
 		<%= AppSettings.student_check_status %>
 	</div>
+	<% if @thesis.returned_message.present? && Thesis::RETURNED == @thesis.status %>
+		<h6>Returned message</h6>
+		<div class="alert alert-danger" role="alert">
+			<%= @thesis.returned_message %>
+		</div>
+	<% end %>
+
 	<p>Your Current Thesis/Dissertation Status: <span class="badge text-bg-primary"><%= @thesis.status.humanize %></span></p>
 
 	<div class="accordion" id="accordionThesis">

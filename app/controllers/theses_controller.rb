@@ -111,7 +111,9 @@ class ThesesController < ApplicationController
 
       @thesis.update_attribute(:under_review_at, Date.today) if params[:status] == Thesis::UNDER_REVIEW
       @thesis.update_attribute(:accepted_at, Date.today) if params[:status] == Thesis::ACCEPTED
-      @thesis.update_attribute(:returned_at, Date.today) if params[:status] == Thesis::RETURNED
+      if params[:status] == Thesis::RETURNED
+        @thesis.update(returned_at: Date.today, returned_message: params[:custom_message])
+      end
       @thesis.update_attribute(:published_at, Date.today) if params[:status] == Thesis::PUBLISHED
 
       if params[:notify_student].blank? == false

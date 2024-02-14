@@ -58,7 +58,8 @@ class StudentViewControllerTest < ActionController::TestCase
 
     should 'load thesis object and display or redirect to proper process step' do
       thesis = create(:thesis, student: @student)
-      create(:document, thesis_id: thesis.id, user_id: @student.id, supplemental: false)
+      create(:document, thesis_id: thesis.id, user_id: @student.id, supplemental: false,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 
       get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_BEGIN }
       assert assigns(:thesis)
@@ -97,7 +98,8 @@ class StudentViewControllerTest < ActionController::TestCase
 
     should 'redirect to status if thesis status is anything by OPEN on process step is not status or review' do
       thesis = create(:thesis, student: @student, status: Thesis::UNDER_REVIEW)
-      create(:document, thesis_id: thesis.id, user_id: @student.id, supplemental: false)
+      create(:document, thesis_id: thesis.id, user_id: @student.id, supplemental: false,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 
       get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_UPLOAD }
       assert_template 'status'
