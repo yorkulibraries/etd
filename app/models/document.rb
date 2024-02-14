@@ -44,13 +44,13 @@ class Document < ApplicationRecord
 
   FILENAME_REGEX = /[a-zA-Z]+_[a-zA-Z]+_[a-zA-Z]{1}_\d{4}_(Phd|Masters)\.[a-zA-Z]{3}/
   def filename_naming
-    if file.filename.present? && !FILENAME_REGEX.match?(file.filename) && !supplemental && file.filename.downcase.end_with?('.pdf')
+    return unless file.filename.present? && !supplemental
+
+    if !FILENAME_REGEX.match?(file.filename) && file.filename.downcase.end_with?('.pdf')
       errors.add(:file,
                  'Lastname_Firstname_MiddleInitial_yearofcopyright_PhdORMasters - this naming convention is needed.')
+    elsif !file.filename.downcase.end_with?('.pdf')
+      errors.add(:file, 'Primary have to be a PDF')
     end
-
-    return unless file.filename.present? && !supplemental && !file.filename.downcase.end_with?('.pdf')
-
-    errors.add(:file, 'Primary have to be a PDF')
   end
 end
