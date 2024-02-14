@@ -37,7 +37,15 @@ class Document < ApplicationRecord
   ### CUSTOM VALIDATIONS
   def primary_file_presence
     if thesis && (thesis.documents.primary.not_deleted.size.positive? && supplemental? == false && deleted? == false)
-      errors.add(:file, 'You can only upload one primrary file per thesis')
+      errors.add(:file, 'You can only upload one primary file per thesis')
+    end
+  end
+  validate :filename_naming
+
+  FILENAME_REGEX = /[a-zA-Z]+_[a-zA-Z]+_[a-zA-Z]{1}_\d{4}_(Phd|Masters)\.[a-zA-Z]{3}/
+  def filename_naming
+    if file.filename.present? && !FILENAME_REGEX.match?(file.filename) && !supplemental && file.filename.downcase.end_with?('.pdf')
+      errors.add(:file, 'Lastname_Firstname_MiddleInitial_yearofcopyright_PhdORMasters - this naming convention is needed.')
     end
   end
 end

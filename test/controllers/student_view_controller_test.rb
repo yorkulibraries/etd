@@ -53,7 +53,7 @@ class StudentViewControllerTest < ActionController::TestCase
       get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_REVIEW }
       assert_response :success
       assert_template 'upload'
-      assert_match /You have to upload a primary file to continue/, flash[:alert]
+      assert_match(/You have to upload a primary file to continue/, flash[:error])
     end
 
     should 'load thesis object and display or redirect to proper process step' do

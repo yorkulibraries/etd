@@ -29,11 +29,11 @@ class DocumentTest < ActiveSupport::TestCase
 
   should 'only allow one primary file per thesis, and it should ignore deleted' do
     thesis = create(:thesis)
-    create(:document, thesis:, supplemental: false)
+    create(:document, thesis:, supplemental: false, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 
-    assert !build(:document, thesis:, supplemental: false).valid?,
+    assert !build(:document, thesis:, supplemental: false, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf')).valid?,
            'Already have one primary, so it should fails'
-    assert build(:document, thesis:, supplemental: false, deleted: true).valid?,
+    assert build(:document, thesis:, supplemental: false, deleted: true, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf')).valid?,
            'If its a deleted file it should be ok'
   end
 
@@ -52,6 +52,12 @@ class DocumentTest < ActiveSupport::TestCase
     assert d.save, "should save properly #{d.errors.inspect}"
 
     assert_equal "/uploads/theses/#{d.thesis.id}/files/#{d.id}/html-document.html", d.file.url
+  end
+
+  should 'update the file when it changes' do
+    d = create(:document, supplemental: false, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+    assert_equal "/uploads/theses/#{d.thesis.id}/files/#{d.id}/Tony_Rich_E_2012_Phd.pdf", d.file.url
   end
 
   should 'not destroy files, set deleted flag instead' do
@@ -83,11 +89,11 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   should 'list primary and suplemental files' do
-    create_list(:document, 5, supplemental: false)
+    create_list(:document, 2, supplemental: false, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
     create_list(:document, 4, supplemental: true)
 
-    assert_equal 9, Document.count, 'There should be nine in total'
+    assert_equal 6, Document.count, 'There should be nine in total'
     assert_equal 4, Document.supplemental.count, 'The shoudl be 4 supplemental documents'
-    assert_equal 5, Document.primary.count, 'There should be 5 primary documents'
+    assert_equal 2, Document.primary.count, 'There should be 5 primary documents'
   end
 end
