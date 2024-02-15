@@ -378,6 +378,7 @@ class ThesesControllerTest < ActionController::TestCase
     end
 
     should 'submit for review, thesis status will cahnge to under_review' do
+      create(:document, supplemental: false, thesis: @thesis, user: @student, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
       post :submit_for_review, params: { id: @thesis.id, student_id: @student.id }
 
       thesis = assigns(:thesis)
@@ -397,6 +398,13 @@ class ThesesControllerTest < ActionController::TestCase
       get :edit, params: { id: thesis.id, student_id: @student.id }
 
       assert_redirected_to unauthorized_url, 'Should redirect to unauthorized.'
+    end
+
+    should 'submit for review, thesis status will change to upload due to lack of document' do
+      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id }
+      thesis = assigns(:thesis)
+      assert_response :redirect
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
     end
   end
 end

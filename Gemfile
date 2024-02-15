@@ -62,7 +62,7 @@ gem 'zip-zip', '~> 0.3'
 ## TESTING && DEVELOPMENT ##
 
 group :development do
-  gem 'web-console', '~> 4.2'
+  gem 'web-console', '~> 4.2', '>= 4.2.1'
 end
 
 group :development, :test do

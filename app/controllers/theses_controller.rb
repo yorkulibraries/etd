@@ -133,15 +133,23 @@ class ThesesController < ApplicationController
     redirect_to [@student, @thesis], notice: @message
   end
 
+  def validate_active_thesis(thesis_id)
+    Document.exists?(deleted: false, user_id: current_user.id, thesis_id: thesis_id, supplemental: false)
+  end
+
   def submit_for_review
     @thesis = @student.theses.find(params[:id])
-    @thesis.audit_comment = 'Submitting for review.'
-    @thesis.update_attribute(:student_accepted_terms_at, Date.today)
-    @thesis.update_attribute(:under_review_at, Date.today)
+    if validate_active_thesis(@thesis.id)
+      @thesis.audit_comment = 'Submitting for review.'
+      @thesis.update_attribute(:student_accepted_terms_at, Date.today)
+      @thesis.update_attribute(:under_review_at, Date.today)
 
-    @thesis.update_attribute(:status, Thesis::UNDER_REVIEW)
-    redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS),
-                notice: "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
+      @thesis.update_attribute(:status, Thesis::UNDER_REVIEW)
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS),
+                  notice: "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
+    else
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
+    end
   end
 
   ### THESIS ASSIGNMENT TO USERS ###
