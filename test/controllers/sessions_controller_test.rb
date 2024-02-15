@@ -49,7 +49,7 @@ class SessionsControllerTest < ActionController::TestCase
     get :new
 
     assert_equal student.id, session[:user_id]
-    student.reload
+    student = Student.find(student.id)
     assert_equal 'student_user', student.username, 'Student username was saved'
     assert_redirected_to student_view_index_url
   end

@@ -208,7 +208,7 @@ class ThesesControllerTest < ActionController::TestCase
       post :update_status, params: { id: thesis.id, student_id: @student.id, status: Thesis::UNDER_REVIEW }
 
       assert_redirected_to student_thesis_path(@student, thesis)
-      thesis.reload
+      thesis = Thesis.find(thesis.id)
       assert_equal Thesis::UNDER_REVIEW, thesis.status
 
       post :update_status, params: { id: thesis.id, student_id: @student.id, status: 'blahblabha' }
