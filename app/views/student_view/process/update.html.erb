@@ -9,7 +9,7 @@
 
 <div class="student-view fitted update">
 	<h3><%= @thesis.title %></h3>
-	<%= AppSettings.student_upload_files.html_safe %>
+	<%= raw(AppSettings.student_upload_files) %>
 
 <div class="card">
   <div class="card-body">

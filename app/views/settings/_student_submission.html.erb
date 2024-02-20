@@ -26,8 +26,15 @@
   </div>
   <div class="tab-pane fade" id="nav-submit" role="tabpanel" aria-labelledby="nav-submit-tab" tabindex="0">
       <%= f.input :student_submit_for_review, as: :rich_text_area, label: "Information", input_html: { rows: 20, class: "mb-4" } %>
-      <%= f.input :student_submit_for_review_license, as: :rich_text_area, label: "Non-Exclusive License to York University", input_html: { rows: 20 } %>
-  
+      <div class="row mb-4">
+        <%= f.input :student_submit_for_review_license_lac, as: :rich_text_area, label: "LAC licence", input_html: { rows: 20 } %>
+      </div>
+      <div class="row mb-4">
+        <%= f.input :student_submit_for_review_license_yorkspace, as: :rich_text_area, label: "YorkSpace Non-Exclusive Distribution Licence", input_html: { rows: 20 } %>
+      </div>
+      <div class="row mb-4">
+        <%= f.input :student_submit_for_review_license_etd, as: :rich_text_area, label: "YorkU ETD Licence", input_html: { rows: 20 } %>
+      </div>
   </div>
   <div class="tab-pane fade" id="nav-check" role="tabpanel" aria-labelledby="nav-check-tab" tabindex="0">
     <%= f.input :student_check_status, as: :rich_text_area, label: "Status message", input_html: { rows: 20 } %>

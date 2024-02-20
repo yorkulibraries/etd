@@ -17,7 +17,7 @@
 <div class="thesis fitted student-view review">
 	<h3 class="title" title="title"><%= @thesis.title %></h3>
 	<div class="alert alert-secondary" role="alert">
-		<%= AppSettings.student_review_details.html_safe %>
+		<%= raw(AppSettings.student_review_details) %>
 	</div>
 
 	<h6>Abstract</h6>

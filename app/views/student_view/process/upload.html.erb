@@ -19,7 +19,7 @@
 	<h6 class="green">Files and Documents</h6>
 	<div class="documents">
 		<div class="alert alert-secondary" role="alert">
-			<%= AppSettings.student_upload_files.html_safe %>
+			<%= raw(AppSettings.student_upload_files) %>
 		</div>
 
 		<h6>Primary &nbsp; &nbsp;

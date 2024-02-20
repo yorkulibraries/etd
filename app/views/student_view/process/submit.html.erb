@@ -10,11 +10,75 @@
 
 <div class="student-view fitted submit">
 	<h3><%= @thesis.title %></h3>
-	<%= AppSettings.student_submit_for_review.html_safe %>
+	<%= raw(AppSettings.student_submit_for_review) %>
 
 	<div class="alert alert-secondary">
-		<h4>Non-Exclusive License to York University</h4>
-		<%= AppSettings.student_submit_for_review_license.html_safe %>
+
+	<%= simple_form_for Student.new do |f| %>
+		<div>
+			<%= f.input :blocked, as: :boolean, label: false, wrapper_html: { class: 'form-check-inline' } %> <a href="#L1_" data-bs-toggle="modal">LAC licence</a>
+		</div>
+		<div>
+			<%= f.input :blocked, as: :boolean, label: false, wrapper_html: { class: 'form-check-inline' } %> <a href="#L2_" data-bs-toggle="modal">YorkSpace Non-Exclusive Distribution Licence</a>
+		</div>
+		<div>
+			<%= f.input :blocked, as: :boolean, label: false, wrapper_html: { class: 'form-check-inline' } %> <a href="#L3_" data-bs-toggle="modal">YorkU ETD Licence</a>
+		</div>
+	<% end %>
+
+	<!-- Modal L1_ -->
+	<div class="modal fade" id="L1_" tabindex="-1" aria-labelledby="L1_Label" aria-hidden="true">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="L1_Label">LAC licence</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<%= raw(AppSettings.student_submit_for_review_license_lac) %>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal L2_ -->
+	<div class="modal fade" id="L2_" tabindex="-1" aria-labelledby="L2_Label" aria-hidden="true">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="L2_Label">YorkSpace Non-Exclusive Distribution Licence</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<%= raw(AppSettings.student_submit_for_review_license_yorkspace) %>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal L3_ -->
+	<div class="modal fade" id="L3_" tabindex="-1" aria-labelledby="L3_Label" aria-hidden="true">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="L3_Label">YorkU ETD Licence</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<%= raw(AppSettings.student_submit_for_review_license_etd) %>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 		<hr/>
 		<h4>	<%= Date.today.strftime("%B %d, %Y")%></h4>
