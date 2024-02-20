@@ -61,7 +61,7 @@
 				
 				<div class="committee_members" id="committee_members">
 					<% @thesis.committee_members.each do |committee_member| %>
-						<%= render partial: committee_member %>
+						<%= render committee_member, delete_btn: false %>
 					<% end %>
 					<% if @thesis.status != Thesis::PUBLISHED %>
 						<div class="link_section pt-4">

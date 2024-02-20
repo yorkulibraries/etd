@@ -36,7 +36,7 @@
 			<h6>Examining committee</h6>
 			<table class="committee_members" id="committee_members">
 				<% @thesis.committee_members.each do |committee_member| %>
-					<%= render partial: committee_member %>
+					<%= render committee_member, delete_btn: false %>
 				<% end %>
 			</table>
 		</div>
