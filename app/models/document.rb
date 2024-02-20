@@ -42,7 +42,7 @@ class Document < ApplicationRecord
   end
   validate :filename_naming
 
-  FILENAME_REGEX = /[a-zA-Z]+_[a-zA-Z]+_[a-zA-Z]{1}_\d{4}_(Phd|Masters)\.[a-zA-Z]{3}/
+  FILENAME_REGEX = /[a-zA-Z]+_[a-zA-Z]+(_[a-zA-Z])?_\d{4}_(Phd|Masters)\.[a-zA-Z]{3}/
   def filename_naming
     return unless file.filename.present? && !supplemental
 
