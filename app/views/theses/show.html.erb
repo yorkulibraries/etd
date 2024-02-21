@@ -61,14 +61,7 @@
 				
 				<div class="committee_members" id="committee_members">
 					<% @thesis.committee_members.each do |committee_member| %>
-						<%= render committee_member, delete_btn: false %>
-					<% end %>
-					<% if @thesis.status != Thesis::PUBLISHED %>
-						<div class="link_section pt-4">
-							<div class="add_link" colspan="3">
-								<%= link_to "+ Add committee member", new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success"} %>
-							</div>
-						</div>
+						<%= render "committee_members/committee_member_read", committee_member: committee_member %>
 					<% end %>
 				</div>
 			

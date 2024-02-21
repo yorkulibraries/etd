@@ -3,10 +3,8 @@
   <div class="col"><%= committee_member.role %></div>
   <div class="col-1">
 	<% if can?(:destroy, committee_member) && @thesis.status != Thesis::PUBLISHED  %>
-   <% if defined?(delete_btn) && delete_btn %>
 		<%= link_to student_thesis_committee_member_path(@student, @thesis, committee_member),
 								method: :delete, class: "btn btn-close pull-right", remote: true, data: { confirm: "Are you sure?" } do %>&nbsp;<% end %>
-   <% end %>
-	<% end %>
+  <% end %>
   </div>
 </div>

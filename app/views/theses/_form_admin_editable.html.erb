@@ -33,12 +33,12 @@
 	<div class="col-lg-6 col-sm-12">
 		<div class="committee_members" id="committee_members">
 			<% @thesis.committee_members.each do |committee_member| %>
-				<%= render committee_member, delete_btn: true %>
+				<%= render committee_member %>
 			<% end %>
 			<% if @thesis.status != Thesis::PUBLISHED %>
 				<div class="link_section pt-4">
 					<div class="add_link" colspan="3">
-						<%= link_to "+ Add committee member", new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success"} %>
+						<%= link_to raw("<i class='fa fa-plus'></i> Add committee member"), new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success"} %>
 					</div>
 				</div>
 			<% end %>
