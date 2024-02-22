@@ -38,7 +38,11 @@
 			<% if @thesis.status != Thesis::PUBLISHED %>
 				<div class="link_section pt-4">
 					<div class="add_link" colspan="3">
+					  <% unless @thesis.id %>
+					  	<%= link_to_add_fields raw("<i class='fa fa-plus'></i> Add Committee Member"), f, :committee_members%>
+					  <% else %>
 						<%= link_to raw("<i class='fa fa-plus'></i> Add committee member"), new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success"} %>
+					  <% end %>
 					</div>
 				</div>
 			<% end %>

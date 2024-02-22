@@ -1,0 +1,17 @@
+<fieldset>
+	<div class="card my-3">
+		<div class="card-body">
+			<div class="row">
+				<%= f.input :first_name, label: "First Name", input_html: { class: "committee_member_names" } %>
+				<%= f.input :last_name, label: "Last Name", input_html: { class: "committee_member_names" } %>
+				<%= f.input :role, label: "Choose a Role:", required: false, collection: CommitteeMember::ROLES%>
+				<div class="span1 float-end" style="padding-top: 6px;">
+					<%= link_to '#', class: "remove_fields btn btn-danger pull-right", title: "Remove Committee Member" do %>
+						Remove
+					<% end %>
+				</div>
+			</div>
+			<%= f.hidden_field :_destroy %>
+		</div>
+	</div>
+</fieldset>
