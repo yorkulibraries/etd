@@ -46,6 +46,7 @@ Rails.application.routes.draw do
 
     resources :theses do
       member do
+        post 'organize_student_information'
         post 'update_status'
         post 'submit_for_review'
 

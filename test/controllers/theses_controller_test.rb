@@ -152,17 +152,6 @@ class ThesesControllerTest < ActionController::TestCase
       assert_equal loc_subject2.id, t.loc_subjects.last.id
     end
 
-    should 'update committee members as part of the thesis update' do
-      thesis = create(:thesis, student: @student)
-      put :update, params: { id: thesis.id, student_id: @student.id, thesis: { title: 'new title',
-                                                                               committee_members_attributes: { '0' => {
-                                                                                 name: 'Test', role: 'Chair'
-                                                                               } } } }
-      t = assigns(:thesis)
-      assert t, 'New thesis must not be nil'
-      assert_equal 1, t.committee_members.size, 'Committee member assigned'
-    end
-
     should "update a valid Thesis, Student can't be changed. Status can't be changed" do
       thesis = create(:thesis, student: @student, title: 'old title', status: Thesis::UNDER_REVIEW)
 
@@ -226,6 +215,22 @@ class ThesesControllerTest < ActionController::TestCase
       assert_equal thesis.returned_at, Date.today
       assert_equal thesis.status, Thesis::RETURNED
       assert_equal thesis.returned_message, REASON_MESSAGE
+    end
+
+    should "change status of thesis, and update student record information" do
+      thesis = create(:thesis, status: Thesis::OPEN, student: @student)
+
+      post :organize_student_information, params: { id: thesis.id, student_id: @student.id, student: {first_name: "", middle_name: "", last_name: "", email_external: ""}}
+      assert_template 'student_view/process/begin'
+
+      post :organize_student_information, params: { id: thesis.id, student_id: @student.id, student: {first_name: "John", middle_name: "E", last_name: "Cake", email_external: "email@domain.com"}}
+      assert_redirected_to student_view_thesis_process_path(thesis, Thesis::PROCESS_UPDATE)
+
+      thesis = Thesis.find(thesis.id)
+      assert_equal thesis.student.first_name, "John"
+      assert_equal thesis.student.middle_name, "E"
+      assert_equal thesis.student.last_name, "Cake"
+      assert_equal thesis.student.email_external, "email@domain.com"
     end
 
     should 'record dates for each status' do

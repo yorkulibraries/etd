@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_02_09_161716) do
+ActiveRecord::Schema[7.0].define(version: 2024_02_23_183501) do
   create_table "action_text_rich_texts", charset: "utf8", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
@@ -194,6 +194,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_09_161716) do
     t.boolean "embargoed", default: false
     t.datetime "embargoed_at", precision: nil
     t.integer "embargoed_by_id"
+    t.text "returned_message"
     t.index ["student_id"], name: "index_theses_on_student_id"
   end
 
@@ -217,6 +218,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_09_161716) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.date "invitation_sent_at"
+    t.string "email_external"
+    t.string "first_name"
+    t.string "middle_name"
+    t.string "last_name"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

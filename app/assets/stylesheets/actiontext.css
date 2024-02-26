@@ -29,3 +29,7 @@
   padding: 0 !important;
   max-width: 100% !important;
 }
+
+.trix-button.trix-button--icon.trix-button--icon-attach{
+  display: none;
+}

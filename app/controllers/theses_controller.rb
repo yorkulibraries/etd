@@ -4,6 +4,17 @@ class ThesesController < ApplicationController
   load_and_authorize_resource :student
   authorize_resource :thesis, through: :student
 
+  def organize_student_information
+    @thesis = Thesis.find(params[:id])
+    @student = @thesis.student
+    @student.validate_secondary_info = true
+    if @student.update(student_params)
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE)
+    else
+      render 'student_view/process/begin'
+    end
+  end
+
   def index
     @theses = @student.theses
   end
@@ -37,8 +48,6 @@ class ThesesController < ApplicationController
   end
 
   def create
-    # params[:thesis].delete :status
-
     @thesis = Thesis.new(thesis_params)
 
     @thesis.student = @student
@@ -58,9 +67,6 @@ class ThesesController < ApplicationController
   end
 
   def update
-    # params[:thesis].delete :status
-    # params[:thesis].delete :student_id
-
     @thesis =  @student.theses.find(params[:id])
 
     @thesis.current_user = current_user # set the current_user for later validation
@@ -176,6 +182,10 @@ class ThesesController < ApplicationController
   end
 
   private
+
+  def student_params
+    params.require(:student).permit(:first_name, :middle_name, :last_name, :email_external)
+  end
 
   def thesis_params
     params.require(:thesis).permit(:title, :gem_record_event_id, :author, :supervisor, :student,

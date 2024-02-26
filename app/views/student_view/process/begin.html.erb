@@ -43,9 +43,20 @@
 	<% end %>
 
 	<hr/>
-	<div class="process-nav float-end">
-		<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="next-btn btn btn-success" title="Update Thesis Details">
- 			<i class="fa fa-angle-double-right"></i> Continue
-		</a>
-	</div>
+
+	<%= simple_form_for @student, method: :post, url: organize_student_information_student_thesis_path(@student, @thesis), html: { class: "form-horizontal" } do |f| %>
+	  <%= f.input :first_name, label: "First name" %>
+	  <%= f.input :middle_name, label: "Middle name" %>
+	  <%= f.input :last_name, label: "Last name" %>
+	  <%= f.input :email_external, label: "Secondary email", placeholder: "Provide a NOT York University email" %>
+
+	  <div class="row">
+		<div class="pt-2">
+		  <hr />
+		  <%= f.button :button, class: "float-end btn btn-success" do %>
+			<i class='fa fa-angle-double-right'></i> Continue
+		  <% end %>
+		</div>
+	  </div>
+	<% end %>
 </div>
