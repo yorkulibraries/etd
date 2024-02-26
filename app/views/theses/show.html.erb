@@ -14,8 +14,10 @@
 	<div class="col-sm-12 col-lg">
 	  <div class="row">
 			<div class="col-4">
+			  <% unless @thesis.status == Thesis::PUBLISHED %>
 				<h6 class="text-black">Edit thesis</h6>
-				<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success btn-sm d-grid" unless @thesis.status == Thesis::PUBLISHED %></div>
+				<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success btn-sm d-grid" %></div>
+			  <% end %>
 			</div>
 			<div class="col-5">
 				<% if @thesis.status == Thesis::PUBLISHED %>
@@ -67,11 +69,11 @@
 			
 		</div>
 				
-		<% if @thesis.returned_message.present? && Thesis::RETURNED == @thesis.status %>
+		<% if @thesis.embargo.present? && Thesis::RETURNED == @thesis.status %>
 		<div class="col-lg-4 col-sm-12">
 			<h6>Returned message</h6>
 			<div class="alert alert-danger" role="alert">
-				<%= @thesis.returned_message %>
+				<%= @thesis.embargo %>
 			</div>
 		<% else %>
 		<div class="col-lg-4 d-none d-lg-block">

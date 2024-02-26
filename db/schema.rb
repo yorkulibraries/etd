@@ -194,7 +194,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_23_183501) do
     t.boolean "embargoed", default: false
     t.datetime "embargoed_at", precision: nil
     t.integer "embargoed_by_id"
-    t.text "returned_message"
     t.index ["student_id"], name: "index_theses_on_student_id"
   end
 

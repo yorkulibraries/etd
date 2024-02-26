@@ -214,7 +214,7 @@ class ThesesControllerTest < ActionController::TestCase
       thesis = assigns(:thesis)
       assert_equal thesis.returned_at, Date.today
       assert_equal thesis.status, Thesis::RETURNED
-      assert_equal thesis.returned_message, REASON_MESSAGE
+      assert_equal thesis.embargo, REASON_MESSAGE
     end
 
     should "change status of thesis, and update student record information" do

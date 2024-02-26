@@ -35,10 +35,10 @@
 			</div>
 			<div class="col-lg-4 d-none d-lg-block"></div>
 	</div>
-	<% if @thesis.returned_message.present? && Thesis::RETURNED == @thesis.status %>
+	<% if @thesis.embargo.present? && Thesis::RETURNED == @thesis.status %>
 		<h6>Reason why your thesis was returned</h6>
 		<div class="alert alert-danger" role="alert">
-			<%= @thesis.returned_message %>
+			<%= @thesis.embargo %>
 		</div>
 	<% end %>
 
