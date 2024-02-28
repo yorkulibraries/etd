@@ -88,6 +88,13 @@ class DocumentTest < ActiveSupport::TestCase
     assert d.image?, 'This one should be an image'
   end
 
+  should 'automatic naming convention ' do
+    document_name = 'html-document.html'
+    d = create(:document_for_naming, file: fixture_file_upload(document_name, 'text/html'))
+    assert_equal "#{d.user.last_name.gsub(/\s/, '_')}_#{d.user.first_name.gsub(/\s/, '_')}_#{d.user.middle_name.first}_#{d.thesis.exam_date.year}_Masters_#{document_name}",
+                 d.file.filename
+  end
+
   should 'list primary and suplemental files' do
     create_list(:document, 2, supplemental: false, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
     create_list(:document, 4, supplemental: true)

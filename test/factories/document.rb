@@ -8,4 +8,11 @@ FactoryGirl.define do
     association :thesis, factory: :thesis
     association :user, factory: :user
   end
+
+  factory :document_for_naming, class: Document do
+    sequence(:name) { |n| "document #{n}" }
+    supplemental true
+    association :thesis, factory: :thesis
+    association :user, factory: :student_with_last_name
+  end
 end

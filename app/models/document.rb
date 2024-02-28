@@ -11,6 +11,7 @@ class Document < ApplicationRecord
   #### VALIDATIONS
   validates_presence_of :file, :user, :thesis
   validate :primary_file_presence, on: :create
+  validate :filename_naming
 
   #### SCOPES
   scope :newest, -> { order('created_at desc') }
@@ -40,17 +41,12 @@ class Document < ApplicationRecord
       errors.add(:file, 'You can only upload one primary file per thesis')
     end
   end
-  validate :filename_naming
 
-  FILENAME_REGEX = /[a-zA-Z]+_[a-zA-Z]+(_[a-zA-Z])?_\d{4}_(Phd|Masters)\.[a-zA-Z]{3}/
   def filename_naming
     return unless file.filename.present? && !supplemental
 
-    if !FILENAME_REGEX.match?(file.filename) && file.filename.downcase.end_with?('.pdf')
-      errors.add(:file,
-                 'Lastname_Firstname_MiddleInitial_yearofcopyright_PhdORMasters - this naming convention is needed.')
-    elsif !file.filename.downcase.end_with?('.pdf')
-      errors.add(:file, 'Primary have to be a PDF')
-    end
+    return if file.filename.downcase.end_with?('.pdf')
+
+    errors.add(:file, 'Primary have to be a PDF')
   end
 end
