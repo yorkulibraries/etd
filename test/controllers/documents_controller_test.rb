@@ -159,8 +159,8 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     should 'be able to upload another primary file if there is a primary file and validate naming convetion' do
-      create(:document, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'),
-                        thesis: @thesis, supplemental: false)
+      create(:document_for_naming, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'),
+                                   thesis: @thesis, supplemental: false)
       assert_no_difference 'Document.count' do
         post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
                                 document: attributes_for(:document, supplemental: false, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf')).except(:user, :thesis) }
