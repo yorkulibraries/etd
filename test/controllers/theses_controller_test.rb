@@ -217,20 +217,24 @@ class ThesesControllerTest < ActionController::TestCase
       assert_equal thesis.embargo, REASON_MESSAGE
     end
 
-    should "change status of thesis, and update student record information" do
+    should 'change status of thesis, and update student record information' do
       thesis = create(:thesis, status: Thesis::OPEN, student: @student)
 
-      post :organize_student_information, params: { id: thesis.id, student_id: @student.id, student: {first_name: "", middle_name: "", last_name: "", email_external: ""}}
+      post :organize_student_information,
+           params: { id: thesis.id, student_id: @student.id,
+                     student: { first_name: '', middle_name: '', last_name: '', email_external: '' } }
       assert_template 'student_view/process/begin'
 
-      post :organize_student_information, params: { id: thesis.id, student_id: @student.id, student: {first_name: "John", middle_name: "E", last_name: "Cake", email_external: "email@domain.com"}}
+      post :organize_student_information,
+           params: { id: thesis.id, student_id: @student.id,
+                     student: { first_name: 'John', middle_name: 'E', last_name: 'Cake', email_external: 'email@domain.com' } }
       assert_redirected_to student_view_thesis_process_path(thesis, Thesis::PROCESS_UPDATE)
 
       thesis = Thesis.find(thesis.id)
-      assert_equal thesis.student.first_name, "John"
-      assert_equal thesis.student.middle_name, "E"
-      assert_equal thesis.student.last_name, "Cake"
-      assert_equal thesis.student.email_external, "email@domain.com"
+      assert_equal thesis.student.first_name, 'John'
+      assert_equal thesis.student.middle_name, 'E'
+      assert_equal thesis.student.last_name, 'Cake'
+      assert_equal thesis.student.email_external, 'email@domain.com'
     end
 
     should 'record dates for each status' do
@@ -383,7 +387,8 @@ class ThesesControllerTest < ActionController::TestCase
     end
 
     should 'submit for review, thesis status will cahnge to under_review' do
-      create(:document, supplemental: false, thesis: @thesis, user: @student, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
       post :submit_for_review, params: { id: @thesis.id, student_id: @student.id }
 
       thesis = assigns(:thesis)
@@ -407,7 +412,7 @@ class ThesesControllerTest < ActionController::TestCase
 
     should 'submit for review, thesis status will change to upload due to lack of document' do
       post :submit_for_review, params: { id: @thesis.id, student_id: @student.id }
-      thesis = assigns(:thesis)
+      assigns(:thesis)
       assert_response :redirect
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
     end

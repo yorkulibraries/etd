@@ -117,9 +117,7 @@ class ThesesController < ApplicationController
 
       @thesis.update_attribute(:under_review_at, Date.today) if params[:status] == Thesis::UNDER_REVIEW
       @thesis.update_attribute(:accepted_at, Date.today) if params[:status] == Thesis::ACCEPTED
-      if params[:status] == Thesis::RETURNED
-        @thesis.update(returned_at: Date.today, embargo: params[:custom_message])
-      end
+      @thesis.update(returned_at: Date.today, embargo: params[:custom_message]) if params[:status] == Thesis::RETURNED
       @thesis.update_attribute(:published_at, Date.today) if params[:status] == Thesis::PUBLISHED
 
       if params[:notify_student].blank? == false
@@ -140,7 +138,7 @@ class ThesesController < ApplicationController
   end
 
   def validate_active_thesis(thesis_id)
-    Document.exists?(deleted: false, user_id: current_user.id, thesis_id: thesis_id, supplemental: false)
+    Document.exists?(deleted: false, user_id: current_user.id, thesis_id:, supplemental: false)
   end
 
   def submit_for_review

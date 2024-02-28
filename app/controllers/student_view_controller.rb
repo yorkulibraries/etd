@@ -9,9 +9,9 @@ class StudentViewController < ApplicationController
 
   def render_according_to_validation(template)
     if validate_active_thesis
-      render template: template
+      render(template:)
     else
-      flash[:error] = "You have to upload a primary file to continue"
+      flash[:error] = 'You have to upload a primary file to continue'
       render template: 'student_view/process/upload'
     end
   end

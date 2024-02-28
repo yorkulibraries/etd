@@ -10,14 +10,14 @@ gem 'rails', '~> 7.0', '>= 7.0.3.1'
 gem 'mysql2', '0.5.3'
 
 ## CSS AND JAVASCRIPT ##
+gem 'actiontext', '~> 7.0', '>= 7.0.3.1'
 gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails', '4.5.0'
 gem 'jquery-tablesorter', '~> 1.27', '>= 1.27.2'
 gem 'jquery-ui-rails', '6.0.1'
 gem 'sass-rails', '~> 6.0'
-gem 'actiontext', '~> 7.0', '>= 7.0.3.1'
-gem 'trix-rails', require: 'trix'
 gem 'terser', '~> 1.1', '>= 1.1.20'
+gem 'trix-rails', require: 'trix'
 source 'https://rails-assets.org' do
   gem 'rails-assets-chosen-bootstrap-theme'
 end

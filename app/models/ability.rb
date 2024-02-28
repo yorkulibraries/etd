@@ -6,14 +6,15 @@ class Ability
   def initialize(user)
     user ||= User.new
 
-    if user.role == User::ADMIN || user.role == User::MANAGER
+    case user.role
+    when User::ADMIN, User::MANAGER
       can :manage, :all
 
       can :login_as, :student
       can :show, :home
       can :embargo, :student
 
-    elsif user.role == User::STAFF
+    when User::STAFF
       can :read, GemRecord
       can %i[create update read update_status audit_trail block unblock assign unassign],
           [Student, Thesis, CommitteeMember]
@@ -21,7 +22,7 @@ class Ability
 
       can :login_as, :student
       can :show, :home
-    elsif user.role == User::STUDENT
+    when User::STUDENT
       can :read, [:student, Student]
 
       can :manage, Document do |document|
