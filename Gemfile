@@ -10,12 +10,14 @@ gem 'rails', '~> 7.0', '>= 7.0.3.1'
 gem 'mysql2', '0.5.3'
 
 ## CSS AND JAVASCRIPT ##
+gem 'actiontext', '~> 7.0', '>= 7.0.3.1'
 gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails', '4.5.0'
 gem 'jquery-tablesorter', '~> 1.27', '>= 1.27.2'
 gem 'jquery-ui-rails', '6.0.1'
 gem 'sass-rails', '~> 6.0'
 gem 'terser', '~> 1.1', '>= 1.1.20'
+gem 'trix-rails', require: 'trix'
 source 'https://rails-assets.org' do
   gem 'rails-assets-chosen-bootstrap-theme'
 end
@@ -25,7 +27,7 @@ gem 'active_link_to', '~> 1.0', '>= 1.0.5'
 gem 'bootstrap', '~> 5.3', '>= 5.3.2'
 gem 'chosen-rails', '~> 1.10'
 gem 'font-awesome-rails', '~> 4.7'
-gem 'simple_form', '~> 5.1'
+gem 'simple_form', '~> 5.3'
 
 ## AUDITS ##
 gem 'audited', '~> 5.0', '>= 5.0.2'
@@ -60,7 +62,7 @@ gem 'zip-zip', '~> 0.3'
 ## TESTING && DEVELOPMENT ##
 
 group :development do
-  gem 'web-console', '~> 4.2'
+  gem 'web-console', '~> 4.2', '>= 4.2.1'
 end
 
 group :development, :test do

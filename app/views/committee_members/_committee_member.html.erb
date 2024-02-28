@@ -2,9 +2,9 @@
   <div class="col"><span class="fw-bold"><%= committee_member.name %></span></div>
   <div class="col"><%= committee_member.role %></div>
   <div class="col-1">
-	<% if can?(:manage, committee_member) && @thesis.status != Thesis::PUBLISHED  %>
+	<% if can?(:destroy, committee_member) && @thesis.status != Thesis::PUBLISHED  %>
 		<%= link_to student_thesis_committee_member_path(@student, @thesis, committee_member),
 								method: :delete, class: "btn btn-close pull-right", remote: true, data: { confirm: "Are you sure?" } do %>&nbsp;<% end %>
-	<% end %>
+  <% end %>
   </div>
 </div>

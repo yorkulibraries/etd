@@ -18,6 +18,7 @@
 //= require jquery-ui
 //= require jquery-tablesorter
 //= require chosen-jquery
+//= require trix
 //= require_self
 //= require_tree .
 

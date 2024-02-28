@@ -4,6 +4,17 @@ class ThesesController < ApplicationController
   load_and_authorize_resource :student
   authorize_resource :thesis, through: :student
 
+  def organize_student_information
+    @thesis = Thesis.find(params[:id])
+    @student = @thesis.student
+    @student.validate_secondary_info = true
+    if @student.update(student_params)
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE)
+    else
+      render 'student_view/process/begin'
+    end
+  end
+
   def index
     @theses = @student.theses
   end
@@ -37,8 +48,6 @@ class ThesesController < ApplicationController
   end
 
   def create
-    # params[:thesis].delete :status
-
     @thesis = Thesis.new(thesis_params)
 
     @thesis.student = @student
@@ -58,9 +67,6 @@ class ThesesController < ApplicationController
   end
 
   def update
-    # params[:thesis].delete :status
-    # params[:thesis].delete :student_id
-
     @thesis =  @student.theses.find(params[:id])
 
     @thesis.current_user = current_user # set the current_user for later validation
@@ -111,7 +117,7 @@ class ThesesController < ApplicationController
 
       @thesis.update_attribute(:under_review_at, Date.today) if params[:status] == Thesis::UNDER_REVIEW
       @thesis.update_attribute(:accepted_at, Date.today) if params[:status] == Thesis::ACCEPTED
-      @thesis.update_attribute(:returned_at, Date.today) if params[:status] == Thesis::RETURNED
+      @thesis.update(returned_at: Date.today, embargo: params[:custom_message]) if params[:status] == Thesis::RETURNED
       @thesis.update_attribute(:published_at, Date.today) if params[:status] == Thesis::PUBLISHED
 
       if params[:notify_student].blank? == false
@@ -131,15 +137,23 @@ class ThesesController < ApplicationController
     redirect_to [@student, @thesis], notice: @message
   end
 
+  def validate_active_thesis(thesis_id)
+    Document.exists?(deleted: false, user_id: current_user.id, thesis_id:, supplemental: false)
+  end
+
   def submit_for_review
     @thesis = @student.theses.find(params[:id])
-    @thesis.audit_comment = 'Submitting for review.'
-    @thesis.update_attribute(:student_accepted_terms_at, Date.today)
-    @thesis.update_attribute(:under_review_at, Date.today)
+    if validate_active_thesis(@thesis.id)
+      @thesis.audit_comment = 'Submitting for review.'
+      @thesis.update_attribute(:student_accepted_terms_at, Date.today)
+      @thesis.update_attribute(:under_review_at, Date.today)
 
-    @thesis.update_attribute(:status, Thesis::UNDER_REVIEW)
-    redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS),
-                notice: "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
+      @thesis.update_attribute(:status, Thesis::UNDER_REVIEW)
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS),
+                  notice: "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
+    else
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
+    end
   end
 
   ### THESIS ASSIGNMENT TO USERS ###
@@ -166,6 +180,10 @@ class ThesesController < ApplicationController
   end
 
   private
+
+  def student_params
+    params.require(:student).permit(:first_name, :middle_name, :last_name, :email_external)
+  end
 
   def thesis_params
     params.require(:thesis).permit(:title, :gem_record_event_id, :author, :supervisor, :student,

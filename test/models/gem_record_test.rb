@@ -22,7 +22,7 @@ class GemRecordTest < ActiveSupport::TestCase
     record.sisid = '111111111'
     record.save
 
-    record.reload
+    record = GemRecord.find(record.id)
     assert_equal '222222222', record.sisid.to_s
   end
 

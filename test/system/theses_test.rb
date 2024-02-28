@@ -32,6 +32,7 @@ class ThesesTest < ApplicationSystemTestCase
   test 'Add committee member' do
     visit root_url
     click_link(@thesis_01.title)
+    click_on('Make Changes')
     click_on('Add committee member')
     click_on('Close')
     click_on('Add committee member')

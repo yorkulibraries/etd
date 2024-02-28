@@ -1,0 +1,53 @@
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <button class="nav-link active" id="nav-begin-tab" data-bs-toggle="tab" data-bs-target="#nav-begin" type="button" role="tab" aria-controls="nav-begin" aria-selected="true">Begin submission</button>
+    <button class="nav-link" id="nav-update-tab" data-bs-toggle="tab" data-bs-target="#nav-update" type="button" role="tab" aria-controls="nav-update" aria-selected="false">Update details</button>
+    <button class="nav-link" id="nav-upload-tab" data-bs-toggle="tab" data-bs-target="#nav-upload" type="button" role="tab" aria-controls="nav-upload" aria-selected="false">Upload files</button>
+    <button class="nav-link" id="nav-review-tab" data-bs-toggle="tab" data-bs-target="#nav-review" type="button" role="tab" aria-controls="nav-review" aria-selected="false">Review details</button>
+    <button class="nav-link" id="nav-submit-tab" data-bs-toggle="tab" data-bs-target="#nav-submit" type="button" role="tab" aria-controls="nav-submit" aria-selected="false">Submit for review</button>
+    <button class="nav-link" id="nav-check-tab" data-bs-toggle="tab" data-bs-target="#nav-check" type="button" role="tab" aria-controls="nav-check" aria-selected="false">Check status</button>
+  </div>
+</nav>
+<div class="tab-content py-3" id="nav-for-submission">
+  <div class="tab-pane fade show active" id="nav-begin" role="tabpanel" aria-labelledby="nav-begin-tab" tabindex="0">
+    <%= f.input :student_begin_submission, as: :rich_text_area, label: "Welcome message", input_html: { rows: 15 } %>
+  </div>
+  <div class="tab-pane fade" id="nav-update" role="tabpanel" aria-labelledby="nav-update-tab" tabindex="0">
+    <%= f.input :student_update_details_initial, as: :rich_text_area, label: "Initial information", input_html: { rows: 15, class: "mb-4"  } %>
+    <%= f.input :student_update_details_abstract, as: :text, label: "Abstract", input_html: { rows: 5, class: "mb-4"  } %>
+    <%= f.input :student_update_details_subjects, as: :text, label: "Subjects", input_html: { rows: 5, class: "mb-4"  } %>
+    <%= f.input :student_update_details_keywords, as: :text, label: "Keywords", input_html: { rows: 5 } %>
+  </div>
+  <div class="tab-pane fade" id="nav-upload" role="tabpanel" aria-labelledby="nav-upload-tab" tabindex="0">
+      <%= f.input :student_upload_files, as: :rich_text_area, label: "Upload files message", input_html: { rows: 20 } %>
+  </div>
+  <div class="tab-pane fade" id="nav-review" role="tabpanel" aria-labelledby="nav-review-tab" tabindex="0">
+      <%= f.input :student_review_details, as: :rich_text_area, label: "Information", input_html: { rows: 20 } %>
+  </div>
+  <div class="tab-pane fade" id="nav-submit" role="tabpanel" aria-labelledby="nav-submit-tab" tabindex="0">
+      <%= f.input :student_submit_for_review, as: :rich_text_area, label: "Information", input_html: { rows: 20, class: "mb-4" } %>
+      <div class="row mb-4">
+        <%= f.input :student_submit_for_review_license_lac, as: :rich_text_area, label: "LAC licence", input_html: { rows: 20 } %>
+      </div>
+      <div class="row mb-4">
+        <%= f.input :student_submit_for_review_license_yorkspace, as: :rich_text_area, label: "YorkSpace Non-Exclusive Distribution Licence", input_html: { rows: 20 } %>
+      </div>
+      <div class="row mb-4">
+        <%= f.input :student_submit_for_review_license_etd, as: :rich_text_area, label: "YorkU ETD Licence", input_html: { rows: 20 } %>
+      </div>
+  </div>
+  <div class="tab-pane fade" id="nav-check" role="tabpanel" aria-labelledby="nav-check-tab" tabindex="0">
+    <%= f.input :student_check_status, as: :rich_text_area, label: "Status message", input_html: { rows: 20 } %>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+

@@ -29,12 +29,23 @@
 
 <h5 style="padding-bottom: 10px;">Committee Members</h5>
 
-<%= f.fields_for :committee_members do |builder| %>
-	<%= render 'committee_member_fields', f: builder %>
-<% end %>
-
-<%= link_to_add_fields raw("<i class='fa fa-plus'></i> Add Committee Member"), f, :committee_members%>
-
-
-<hr class="fitted"/>
-
+<div class="row">
+	<div class="col-lg-6 col-sm-12">
+		<div class="committee_members" id="committee_members">
+			<% @thesis.committee_members.each do |committee_member| %>
+				<%= render committee_member %>
+			<% end %>
+			<% if @thesis.status != Thesis::PUBLISHED %>
+				<div class="link_section pt-4">
+					<div class="add_link" colspan="3">
+					  <% unless @thesis.id %>
+					  	<%= link_to_add_fields raw("<i class='fa fa-plus'></i> Add Committee Member"), f, :committee_members%>
+					  <% else %>
+						<%= link_to raw("<i class='fa fa-plus'></i> Add committee member"), new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success"} %>
+					  <% end %>
+					</div>
+				</div>
+			<% end %>
+		</div>
+	</div>
+</div>

@@ -159,11 +159,11 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     should 'be able to upload another primary file if there is a primary file' do
-      create(:document, file: fixture_file_upload('document-microsoft.doc', 'application/text'),
-                        thesis: @thesis, supplemental: false)
+      create(:document_for_naming, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'),
+                                   thesis: @thesis, supplemental: false)
       assert_no_difference 'Document.count' do
         post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
-                                document: attributes_for(:document, supplemental: false).except(:user, :thesis) }
+                                document: attributes_for(:document, supplemental: false, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf')).except(:user, :thesis) }
         document = assigns(:document)
         assert_equal 1, document.errors.size, "There should be an error coming back, #{document.errors.inspect}"
       end

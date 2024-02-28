@@ -79,4 +79,18 @@ class StudentTest < ActiveSupport::TestCase
     assert_equal 2, Student.find_by_sisid_or_name('john').size, 'Should be two Johns'
     assert_equal 0, Student.find_by_sisid_or_name('brandon').size, 'No one was found'
   end
+
+  should 'Auto populate first_name' do
+    student = create(:student, name: 'John Smith', sisid: '111111111')
+    assert_equal student.first_name, 'John Smith'
+    student.save
+    assert_equal student.first_name, 'John Smith'
+  end
+
+  should 'Validate extra information when validate_secondary_info is true' do
+    student = create(:student, name: 'John Smith', sisid: '111111111')
+    student.validate_secondary_info = true
+    student.save
+    assert_includes(student.errors[:email_external], "can't be blank")
+  end
 end

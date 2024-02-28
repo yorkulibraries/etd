@@ -11,6 +11,7 @@ class Document < ApplicationRecord
   #### VALIDATIONS
   validates_presence_of :file, :user, :thesis
   validate :primary_file_presence, on: :create
+  validate :filename_naming
 
   #### SCOPES
   scope :newest, -> { order('created_at desc') }
@@ -37,7 +38,15 @@ class Document < ApplicationRecord
   ### CUSTOM VALIDATIONS
   def primary_file_presence
     if thesis && (thesis.documents.primary.not_deleted.size.positive? && supplemental? == false && deleted? == false)
-      errors.add(:file, 'You can only upload one primrary file per thesis')
+      errors.add(:file, 'You can only upload one primary file per thesis')
     end
+  end
+
+  def filename_naming
+    return unless file.filename.present? && !supplemental
+
+    return if file.filename.downcase.end_with?('.pdf')
+
+    errors.add(:file, 'Primary have to be a PDF')
   end
 end

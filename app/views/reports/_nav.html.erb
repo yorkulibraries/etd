@@ -3,15 +3,15 @@
 		<%= active_link_to 'Dashboard', reports_dashboard_path, class:"nav-link" %>
 	</li>
 	<li class="nav-item">
-		<%= active_link_to 'Under Review Theses', reports_by_status_path(status: Thesis::UNDER_REVIEW), active: /under_review/, class:"nav-link" %>
+		<%= active_link_to 'Under Review Theses', reports_by_status_path(status: Thesis::UNDER_REVIEW), active: Thesis::UNDER_REVIEW==@status, class:"nav-link" %>
 	</li>
 	<li class="nav-item">
-		<%= active_link_to 'Review Accepted Theses', reports_by_status_path(status: Thesis::ACCEPTED), active: /accepted/, class:"nav-link" %>
+		<%= active_link_to 'Review Accepted Theses', reports_by_status_path(status: Thesis::ACCEPTED), active: Thesis::ACCEPTED==@status, class:"nav-link" %>
 	</li>
 	<li class="nav-item">
-		<%= active_link_to 'Permanently Embargoed', reports_by_status_path(status: "embargoed"), active: /embargoed/, class:"nav-link" %>
+		<%= active_link_to 'Permanently Embargoed', reports_by_status_path(status: "embargoed"), active: "embargoed"==@status, class:"nav-link" %>
 	</li>
 	<li class="nav-item">
-		<%= active_link_to 'Published Theses', reports_by_status_path(status: Thesis::PUBLISHED), active: /published/, class:"nav-link" %>
+		<%= active_link_to 'Published Theses', reports_by_status_path(status: Thesis::PUBLISHED), active: Thesis::PUBLISHED==@status, class:"nav-link" %>
 	</li>
 </ul>

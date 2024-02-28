@@ -348,7 +348,7 @@ GEM
     shoulda-context (2.0.0)
     shoulda-matchers (5.1.0)
       activesupport (>= 5.2.0)
-    simple_form (5.1.0)
+    simple_form (5.3.0)
       actionpack (>= 5.2)
       activemodel (>= 5.2)
     spring (4.0.0)
@@ -367,12 +367,14 @@ GEM
     tilt (2.0.11)
     timeliness (0.4.4)
     timeout (0.3.0)
+    trix-rails (2.4.0)
+      rails (> 4.1)
     tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
     unicode (0.4.4.4)
     warden (1.2.9)
       rack (>= 2.0.9)
-    web-console (4.2.0)
+    web-console (4.2.1)
       actionview (>= 6.0.0)
       activemodel (>= 6.0.0)
       bindex (>= 0.4.0)
@@ -396,6 +398,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  actiontext (~> 7.0, >= 7.0.3.1)
   active_link_to (~> 1.0, >= 1.0.5)
   audited (~> 5.0, >= 5.0.2)
   bootstrap (~> 5.3, >= 5.3.2)
@@ -438,13 +441,14 @@ DEPENDENCIES
   selenium-webdriver (~> 4.15)
   shoulda-context (~> 2.0)
   shoulda-matchers (~> 5.1)
-  simple_form (~> 5.1)
+  simple_form (~> 5.3)
   spring
   sword2ruby!
   terser (~> 1.1, >= 1.1.20)
+  trix-rails
   unicode (~> 0.4.4.4)
   validates_timeliness!
-  web-console (~> 4.2)
+  web-console (~> 4.2, >= 4.2.1)
   zip-zip (~> 0.3)
 
 RUBY VERSION

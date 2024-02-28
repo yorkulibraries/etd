@@ -9,10 +9,7 @@
 
 <div class="student-view fitted update">
 	<h3><%= @thesis.title %></h3>
-	<p>The fields in this section are automatically pulled from your Student Information System (SIS) and Graduate Event Module (GEM) records.</p>
-	<p>If there are any errors or changes required to this information, please contact a Thesis Coordinator at gsthesis@yorku.ca.</p>
-	<p>Please include your student number in all communications.</p>
-
+	<%= raw(AppSettings.student_upload_files) %>
 
 <div class="card">
   <div class="card-body">
@@ -50,19 +47,21 @@
 		<div class="row">
 		  <h6>Examination committee members</h6>
 		  <div class="row">
-			<% @thesis.committee_members.each do |committee_member| %>
-				<div class="col-md-12 col-lg-3">
-					<p><%= committee_member.role %><br />
-					<span class="fw-bold"><%= committee_member.name %></span></p>
+				<div class="col-6" id="committee_members">
+					<% @thesis.committee_members.each do |committee_member| %>
+						<%= render committee_member %>
+					<% end %>
+					<div class="link_section pt-4">
+					</div>
 				</div>
-			<% end %>
 		  </div>
 		</div>
+		<%= link_to raw("<i class='fa fa-plus'></i> Add committee member"), new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success"} %>
   </div>
 </div>
 	
 
-<p>Please provide the information requested in the following fields. </p>
+<p class="pt-4">Please provide the information requested in the following fields. </p>
 
 <%= simple_form_for [@student, @thesis], html: { class: "form-horizontal" } do |f| %>
 
@@ -81,7 +80,7 @@
 			</a>
 	</div>
 
-	<div class="hide error_messages">
+	<div class="d-none error_messages">
 		<%= f.error_messages %>
 	</div>
 

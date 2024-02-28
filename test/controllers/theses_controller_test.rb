@@ -46,10 +46,12 @@ class ThesesControllerTest < ActionController::TestCase
 
     should 'load documents separately, as primary and non primary. All must be not_deleted' do
       thesis = create(:thesis, student: @student)
-      create_list(:document, 1, supplemental: false, thesis:, user: @student)
+      create_list(:document, 1, supplemental: false, thesis:, user: @student,
+                                file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
       create_list(:document, 3, supplemental: true, thesis:, user: @student)
       create(:document, supplemental: true, deleted: true, thesis:, user: @student)
-      create(:document, supplemental: false, deleted: true, thesis:, user: @student)
+      create(:document, supplemental: false, deleted: true, thesis:, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 
       get :show, params: { id: thesis.id, student_id: @student.id }
 
@@ -117,21 +119,6 @@ class ThesesControllerTest < ActionController::TestCase
       assert thesis.supervisor.blank?, 'Supervisor should be blank'
     end
 
-    should 'Only create a valid Thesis, status should be OPEN on create, must assign student first' do
-      # thesis_attrs = attributes_for(:thesis)
-      #
-      #
-      # assert_difference "Thesis.count", 1 do
-      #   #post :create, params: { thesis: thesis_attrs.except(:status, :published_date), student_id: @student.id }
-      # end
-      #
-      # thesis = assigns(:thesis)
-      # assert thesis, "Thesis should not be nil"
-      # assert_equal @student.id, thesis.student.id, "Thesis should have been assigned to a student"
-      # assert_equal Thesis::OPEN, thesis.status, "Thesis status should be set to #{Thesis::OPEN}"
-      # assert_redirected_to student_thesis_path(@student, thesis), "Should redirect to thesis details"
-    end
-
     should 'Throw an ActiveRecordNotFound exception if try to assign to a non_existent student' do
       thesis_attrs = attributes_for(:thesis)
 
@@ -141,24 +128,6 @@ class ThesesControllerTest < ActionController::TestCase
         end
       end
     end
-
-    # should "Not create an invalid thesis, Reject is fields are missing" do
-    #
-    #
-    #   thesis_attrs = attributes_for(:thesis)
-    #
-    #   assert_no_difference "Thesis.count", "Should reject it since there are missing attributes" do
-    #     post :create, params: { thesis: thesis_attrs.except(:status, :assigned_to_id, :published_date, :title), student_id: @student.id }
-    #     assert_response :success
-    #     assert_template 'new', "Redirect back to the form"
-    #
-    #     post :create, params: { thesis: thesis_attrs.except(:author, :published_date, :status), student_id: @student.id }
-    #     assert_response :success
-    #     assert_template 'new', "Redirect back to the form"
-    #   end
-    #
-    #
-    # end
 
     should 'Display edit form for an existing thesis, without student selection' do
       thesis = create(:thesis, student: @student)
@@ -181,17 +150,6 @@ class ThesesControllerTest < ActionController::TestCase
       assert_equal 2, t.loc_subjects.size, 'Two subjects assigned'
       assert_equal loc_subject.id, t.loc_subjects.first.id
       assert_equal loc_subject2.id, t.loc_subjects.last.id
-    end
-
-    should 'update committee members as part of the thesis update' do
-      thesis = create(:thesis, student: @student)
-      put :update, params: { id: thesis.id, student_id: @student.id, thesis: { title: 'new title',
-                                                                               committee_members_attributes: { '0' => {
-                                                                                 name: 'Test', role: 'Chair'
-                                                                               } } } }
-      t = assigns(:thesis)
-      assert t, 'New thesis must not be nil'
-      assert_equal 1, t.committee_members.size, 'Committee member assigned'
     end
 
     should "update a valid Thesis, Student can't be changed. Status can't be changed" do
@@ -227,7 +185,7 @@ class ThesesControllerTest < ActionController::TestCase
         delete :destroy, params: { id: thesis.id, student_id: @student.id }
       end
       assert_redirected_to student_thesis_path(@student, thesis)
-      thesis.reload
+      thesis = Thesis.find(thesis.id)
       assert_equal Thesis::REJECTED, thesis.status
     end
 
@@ -239,12 +197,44 @@ class ThesesControllerTest < ActionController::TestCase
       post :update_status, params: { id: thesis.id, student_id: @student.id, status: Thesis::UNDER_REVIEW }
 
       assert_redirected_to student_thesis_path(@student, thesis)
-      thesis.reload
+      thesis = Thesis.find(thesis.id)
       assert_equal Thesis::UNDER_REVIEW, thesis.status
 
       post :update_status, params: { id: thesis.id, student_id: @student.id, status: 'blahblabha' }
       t = assigns(:thesis)
       assert_equal Thesis::UNDER_REVIEW, t.status
+    end
+
+    should 'record dates and message for returned item' do
+      thesis = create(:thesis, status: Thesis::OPEN, student: @student)
+
+      REASON_MESSAGE = 'The thesis is missing this, and this, and so on'
+      post :update_status,
+           params: { id: thesis.id, student_id: @student.id, status: Thesis::RETURNED, custom_message: REASON_MESSAGE }
+      thesis = assigns(:thesis)
+      assert_equal thesis.returned_at, Date.today
+      assert_equal thesis.status, Thesis::RETURNED
+      assert_equal thesis.embargo, REASON_MESSAGE
+    end
+
+    should 'change status of thesis, and update student record information' do
+      thesis = create(:thesis, status: Thesis::OPEN, student: @student)
+
+      post :organize_student_information,
+           params: { id: thesis.id, student_id: @student.id,
+                     student: { first_name: '', middle_name: '', last_name: '', email_external: '' } }
+      assert_template 'student_view/process/begin'
+
+      post :organize_student_information,
+           params: { id: thesis.id, student_id: @student.id,
+                     student: { first_name: 'John', middle_name: 'E', last_name: 'Cake', email_external: 'email@domain.com' } }
+      assert_redirected_to student_view_thesis_process_path(thesis, Thesis::PROCESS_UPDATE)
+
+      thesis = Thesis.find(thesis.id)
+      assert_equal thesis.student.first_name, 'John'
+      assert_equal thesis.student.middle_name, 'E'
+      assert_equal thesis.student.last_name, 'Cake'
+      assert_equal thesis.student.email_external, 'email@domain.com'
     end
 
     should 'record dates for each status' do
@@ -257,10 +247,6 @@ class ThesesControllerTest < ActionController::TestCase
       post :update_status, params: { id: thesis.id, student_id: @student.id, status: Thesis::ACCEPTED }
       thesis = assigns(:thesis)
       assert_equal thesis.accepted_at, Date.today
-
-      post :update_status, params: { id: thesis.id, student_id: @student.id, status: Thesis::RETURNED }
-      thesis = assigns(:thesis)
-      assert_equal thesis.returned_at, Date.today
 
       post :update_status, params: { id: thesis.id, student_id: @student.id, status: Thesis::PUBLISHED }
       thesis = assigns(:thesis)
@@ -401,6 +387,8 @@ class ThesesControllerTest < ActionController::TestCase
     end
 
     should 'submit for review, thesis status will cahnge to under_review' do
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
       post :submit_for_review, params: { id: @thesis.id, student_id: @student.id }
 
       thesis = assigns(:thesis)
@@ -420,6 +408,13 @@ class ThesesControllerTest < ActionController::TestCase
       get :edit, params: { id: thesis.id, student_id: @student.id }
 
       assert_redirected_to unauthorized_url, 'Should redirect to unauthorized.'
+    end
+
+    should 'submit for review, thesis status will change to upload due to lack of document' do
+      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id }
+      assigns(:thesis)
+      assert_response :redirect
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
     end
   end
 end

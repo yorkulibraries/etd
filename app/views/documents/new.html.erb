@@ -4,10 +4,12 @@
 	<%= render partial: "students/header" %>
 <% end %>
 
-
-<div class="fitted">
-	<h4 style="margin-bottom: 20px;">Upload New Document File </h4>
-	<h5><%= link_to @thesis.title, student_thesis_path(@student, @thesis)  %></h5>
-
-	<%= render 'form' %>
+<div class="card mt-3">
+  <div class="card-body">
+		<h5 class="card-title">Upload New Document File </h5>
+		<h6 class="card-subtitle mb-2 text-body-secondary"><%= @thesis.title %></h6>
+		<div class="card-text pt-2">
+			<%= render 'form' %>
+		</div>
+  </div>
 </div>

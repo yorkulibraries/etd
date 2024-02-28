@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
 class Student < User
+  attr_accessor :validate_secondary_info
+
+  validate :secondary_information, on: :update
+  validate :auto_populate_first_name, on: :create
   belongs_to :created_by, foreign_key: 'created_by_id', class_name: 'User'
 
   validates_presence_of :sisid
   validates_uniqueness_of :sisid
   validates_length_of :sisid, is: 9
-  # validates_format_of :email, with: /.*/
 
   validate :check_email_addresses
 
@@ -44,5 +47,22 @@ class Student < User
   ### Finders
   def self.find_by_sisid_or_name(query)
     where('sisid = ? or name LIKE ?', query, "%#{query}%")
+  end
+
+  def auto_populate_first_name
+    self.first_name = name
+  end
+
+  def secondary_information
+    return unless validate_secondary_info
+
+    validates_presence_of :first_name
+    validates_presence_of :last_name
+    validates_presence_of :email_external
+    email_external.present? && email_external.split(/[\s,]+/).each do |address|
+      unless address =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
+        errors.add(:email_external, "are invalid because of #{address} email")
+      end
+    end
   end
 end

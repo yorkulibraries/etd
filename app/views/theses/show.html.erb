@@ -14,8 +14,10 @@
 	<div class="col-sm-12 col-lg">
 	  <div class="row">
 			<div class="col-4">
+			  <% unless @thesis.status == Thesis::PUBLISHED %>
 				<h6 class="text-black">Edit thesis</h6>
-				<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success btn-sm d-grid" unless @thesis.status == Thesis::PUBLISHED %></div>
+				<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success btn-sm d-grid" %></div>
+			  <% end %>
 			</div>
 			<div class="col-5">
 				<% if @thesis.status == Thesis::PUBLISHED %>
@@ -61,19 +63,21 @@
 				
 				<div class="committee_members" id="committee_members">
 					<% @thesis.committee_members.each do |committee_member| %>
-						<%= render partial: committee_member %>
-					<% end %>
-					<% if @thesis.status != Thesis::PUBLISHED %>
-						<div class="link_section pt-4">
-							<div class="add_link" colspan="3">
-								<%= link_to "+ Add committee member", new_student_thesis_committee_member_path(@student, @thesis), {remote: true, class: "btn btn-success"} %>
-							</div>
-						</div>
+						<%= render "committee_members/committee_member_read", committee_member: committee_member %>
 					<% end %>
 				</div>
 			
 		</div>
+				
+		<% if @thesis.embargo.present? && Thesis::RETURNED == @thesis.status %>
+		<div class="col-lg-4 col-sm-12">
+			<h6>Returned message</h6>
+			<div class="alert alert-danger" role="alert">
+				<%= @thesis.embargo %>
+			</div>
+		<% else %>
 		<div class="col-lg-4 d-none d-lg-block">
+		<% end %>
 		</div>
 		<div class="col-12"><hr /></div>
 	</div>
@@ -108,7 +112,7 @@
 			<div class="row p-1">
 				<h6>Permanent Embargo</h6>
 				<% if @thesis.embargoed == true %>
-				<div class="alert alert-danger" role="alert">This thesis has been placed under permanent embargo. It will not be published.
+				<div class="alert alert-warning" role="alert">This thesis has been placed under permanent embargo. It will not be published.
 					<hr />
 					<%= format @thesis.embargo, true, "Embargo explanation was not filled in..." %>
 				</div>

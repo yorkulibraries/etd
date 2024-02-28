@@ -86,7 +86,7 @@ class UsersControllerTest < ActionController::TestCase
 
       post :destroy, params: { id: @user.id }
 
-      @user.reload
+      @user = User.find(@user.id)
 
       assert_equal false, @user.blocked?, "Can't disable myself"
       assert_equal 'You are not allowed to disable yourself', flash[:alert]
@@ -158,12 +158,12 @@ class UsersControllerTest < ActionController::TestCase
       post :block, params: { id: user.id }
 
       assert_redirected_to users_path, 'Should redirect to users path'
-      user.reload
+      user = User.find(user.id)
       assert user.blocked?, 'User should be blocked'
 
       post :block, params: { id: @user.id }
 
-      @user.reload
+      @user = User.find(@user.id)
       assert !@user.blocked?, "Make sure you can't block yourself"
     end
 
@@ -173,7 +173,7 @@ class UsersControllerTest < ActionController::TestCase
       post :unblock, params: { id: user.id }
 
       assert_redirected_to blocked_users_path, 'Should redirect back to blocked users list'
-      user.reload
+      user = User.find(user.id)
       assert !user.blocked?, 'User should not be blocked'
     end
   end

@@ -154,7 +154,7 @@ class ThesisTest < ActiveSupport::TestCase
     user = create(:user)
 
     thesis.assign_to(user)
-    thesis.reload
+    thesis = Thesis.find(thesis.id)
     assert_equal user.id, thesis.assigned_to.id, 'Assigned to the user'
   end
 
@@ -163,7 +163,7 @@ class ThesisTest < ActiveSupport::TestCase
     thesis = create(:thesis, assigned_to: user)
 
     thesis.unassign
-    thesis.reload
+    thesis = Thesis.find(thesis.id)
     assert_nil thesis.assigned_to, 'No one is assigned to the thesis'
   end
 
@@ -184,7 +184,7 @@ class ThesisTest < ActiveSupport::TestCase
     t = create(:thesis, status: Thesis::ACCEPTED)
     t.publish
 
-    t.reload
+    t = Thesis.find(t.id)
     assert_equal Thesis::PUBLISHED, t.status, 'Thesis should have its status changed'
   end
 
@@ -192,7 +192,7 @@ class ThesisTest < ActiveSupport::TestCase
     t = create(:thesis, status: Thesis::ACCEPTED, embargoed: true)
     t.publish
 
-    t.reload
+    t = Thesis.find(t.id)
     assert_equal Thesis::ACCEPTED, t.status, 'Thesis should not have its status changed'
   end
 

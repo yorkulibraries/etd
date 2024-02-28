@@ -13,11 +13,7 @@
 
 <div class="student-view begin fitted">
 	<h3>Hello <%= @student.name %></h3>
-	<p>Welcome to York University’s Electronic Thesis and Dissertation (ETD) application. This interface will enable to you to upload and submit your final approved thesis or dissertation to the Thesis Coordinator in the Faculty of Graduate Studies. </p>
-	<p>Once your submission is approved and all requirements for graduation are met, your thesis or dissertation will be submitted to YorkSpace, York University's digital library of research outputs and will be available for electronic viewing through Library and Archives Canada.</p>
-	<p>For step-by-step submission instructions and more information on ETD, please click <a href=" http://www.yorku.ca/grads/policies_procedures/thesis_dissertations_index.html">here</a>. At any point while you are using the application, you may click on the help button next to each field for more information. </p>
-	<p>Click on the title of your thesis/dissertation to get started.
-	</p>
+	<%= raw(AppSettings.student_begin_submission) %>
 	<hr/>
 
 
@@ -39,11 +35,28 @@
 			</div>
 			<div class="col-lg-4 d-none d-lg-block"></div>
 	</div>
+	<% if @thesis.embargo.present? && Thesis::RETURNED == @thesis.status %>
+		<h6>Reason why your thesis was returned</h6>
+		<div class="alert alert-danger" role="alert">
+			<%= @thesis.embargo %>
+		</div>
+	<% end %>
 
 	<hr/>
-	<div class="process-nav float-end">
-		<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="next-btn btn btn-success" title="Update Thesis Details">
- 			<i class="fa fa-angle-double-right"></i> Continue
-		</a>
-	</div>
+
+	<%= simple_form_for @student, method: :post, url: organize_student_information_student_thesis_path(@student, @thesis), html: { class: "form-horizontal" } do |f| %>
+	  <%= f.input :first_name, label: "First name" %>
+	  <%= f.input :middle_name, label: "Middle name" %>
+	  <%= f.input :last_name, label: "Last name" %>
+	  <%= f.input :email_external, label: "Secondary email", placeholder: "Provide a NOT York University email" %>
+
+	  <div class="row">
+		<div class="pt-2">
+		  <hr />
+		  <%= f.button :button, class: "float-end btn btn-success" do %>
+			<i class='fa fa-angle-double-right'></i> Continue
+		  <% end %>
+		</div>
+	  </div>
+	<% end %>
 </div>

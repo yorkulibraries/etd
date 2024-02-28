@@ -17,8 +17,7 @@
 <div class="thesis fitted student-view review">
 	<h3 class="title" title="title"><%= @thesis.title %></h3>
 	<div class="alert alert-secondary" role="alert">
-
-		<p>Please review all of the information on this page for accuracy and completeness and ensure all files are uploaded. If you are satisfied with the information you have provided, click "Submit for Review".</p>
+		<%= raw(AppSettings.student_review_details) %>
 	</div>
 
 	<h6>Abstract</h6>
@@ -37,7 +36,7 @@
 			<h6>Examining committee</h6>
 			<table class="committee_members" id="committee_members">
 				<% @thesis.committee_members.each do |committee_member| %>
-					<%= render partial: committee_member %>
+					<%= render "committee_members/committee_member_read", committee_member: committee_member %>
 				<% end %>
 			</table>
 		</div>
@@ -105,7 +104,7 @@
 			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD) %>" class="next-btn back btn btn-primary" title="Upload Thesis Files">
 				<i class="fa fa-angle-double-left"></i></a>
 			<%= link_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), title: "Submit Thesis For Review",
-					 	class: "next-btn btn btn-success", data: { confirm: "Have you completed all thesis details and uploaded all files?" } do %>
+					 	class: "next-btn btn btn-success" do %>
 						<i class="fa fa-angle-double-right"></i> Continue
 			<% end %>
 		</div>

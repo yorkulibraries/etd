@@ -20,8 +20,14 @@ class StudentsTest < ApplicationSystemTestCase
     @thesis = FactoryGirl.create(:thesis)
     login_as(@thesis.student)
     visit root_url
-    click_link('Update details')
-    click_link('Upload files')
-    click_link('Review details')
+    fill_in('student_first_name', with: Faker::Name.first_name)
+    fill_in('student_last_name', with: Faker::Name.last_name)
+    fill_in('Secondary email', with: Faker::Internet.email)
+    click_button('Continue')
+    click_link('Continue')
+    click_link('Continue')
+    click_link('Continue')
+    assert_selector '.alert-warning', text: 'Error: You have to upload a primary file to continue'
+    # page.accept_alert
   end
 end
