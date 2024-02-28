@@ -158,7 +158,7 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_redirected_to unauthorized_url
     end
 
-    should 'be able to upload another primary file if there is a primary file and validate naming convetion' do
+    should 'be able to upload another primary file if there is a primary file' do
       create(:document_for_naming, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'),
                                    thesis: @thesis, supplemental: false)
       assert_no_difference 'Document.count' do
