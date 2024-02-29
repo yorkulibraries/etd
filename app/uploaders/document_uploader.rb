@@ -30,15 +30,15 @@ class DocumentUploader < CarrierWave::Uploader::Base
   def filename
     return original_filename unless model.user.present? && !model.user.last_name.nil?
 
-    last_first_name = "#{model.user.last_name.titleize}_#{model.user.first_name.titleize}".gsub(/\s/, '_')
+    last_and_first_name = "#{model.user.last_name.titleize}_#{model.user.first_name.titleize}".gsub(/\s/, '_')
     year_copy = model.thesis.exam_date.year
     grade = model.thesis.degree_level == 'Doctoral' ? 'PhD' : 'Masters'
     year_grade_and_file = "_#{year_copy}_#{grade}_#{original_filename}"
 
     if model.user.last_name.present? && model.user.middle_name.present?
-      "#{last_first_name}_#{model.user.middle_name.first.capitalize}#{year_grade_and_file}"
+      "#{last_and_first_name}_#{model.user.middle_name.first.capitalize}#{year_grade_and_file}"
     elsif model.user.last_name.present?
-      "#{last_first_name}#{year_grade_and_file}"
+      "#{last_and_first_name}#{year_grade_and_file}"
     end
   end
 
