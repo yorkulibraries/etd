@@ -53,7 +53,6 @@
 			</ul>
 		</div>
 		<ul class="navbar-nav mt-2 mt-md-0">
-			<% if @current_user.role == User::ADMIN || @current_user.role == User::MANAGER %>
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false" title="<%= @current_user.name if @current_user %>">
 					<%= truncate(@current_user.name, length: 20) if @current_user%> <b class="caret"></b>
@@ -64,7 +63,7 @@
 				<% else %>
 					<li><%= link_to "Logout", logout_path, class: "dropdown-item" %></li>
 				<% end %>
-				<% if Rails.env.development? %>
+				<% if Rails.env.development? && (@current_user.role == User::ADMIN || @current_user.role == User::MANAGER) %>
 					<li><hr class="dropdown-divider"></li>
 					<li class="dropdown-header">Log in as </li>
 					<% User::ROLE_NAMES.each do |role| %>
@@ -73,7 +72,6 @@
 				<% end %>
 				</ul>
 			</li>
-			<% end %>
 			</ul>
 
 		</div>
