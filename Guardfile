@@ -24,7 +24,11 @@ guard :minitest, all_on_start: false, cli: '' do
   watch(%r{^app/jobs/(.+)\.rb}) { |m| "test/jobs/#{m[1]}_test.rb" }
   watch(%r{^app/helpers/(.+)\.rb}) { |m| "test/helpers/#{m[1]}_test.rb" }
   watch(%r{^lib/(.+)\.rb}) { |m| "test/lib/#{m[1]}_test.rb" }
-  watch(%r{^test/.+_test\.rb})
+  if ENV['SELENIUM_SERVER']
+    watch(%r{^test/.+_test\.rb})
+  else
+    watch(%r{^test/(?!(system)/).+_test\.rb})
+  end
   watch(%r{^test/test_helper\.rb}) { 'test' }
 end
 
