@@ -10,8 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-  create_table "action_text_rich_texts", charset: "utf8", force: :cascade do |t|
 ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
+  create_table "action_text_rich_texts", charset: "utf8", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
     t.string "record_type", null: false
@@ -105,6 +105,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
     t.datetime "updated_at", precision: nil, null: false
     t.string "file"
     t.boolean "deleted", default: false
+    t.integer "usage"
     t.index ["thesis_id"], name: "index_documents_on_thesis_id"
     t.index ["user_id"], name: "index_documents_on_user_id"
   end
