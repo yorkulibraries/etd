@@ -33,7 +33,7 @@ class DocumentUploader < CarrierWave::Uploader::Base
     last_and_first_name = "#{model.user.last_name.titleize}_#{model.user.first_name.titleize}".gsub(/\s/, '_')
     year_copy = model.thesis.exam_date.year
     grade = model.thesis.degree_level == 'Doctoral' ? 'PhD' : 'Masters'
-    year_grade_and_file = "_#{year_copy}_#{grade}_#{original_filename}"
+    year_grade_and_file = "_#{year_copy}_#{grade}#{File.extname(original_filename)}"
 
     if model.user.last_name.present? && model.user.middle_name.present?
       "#{last_and_first_name}_#{model.user.middle_name.first.capitalize}#{year_grade_and_file}"
