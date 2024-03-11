@@ -6,7 +6,7 @@
   </div>
   <div class="col">
 	<p class="name <%= "suplemental" if document.supplemental? %>" title="<%= File.basename(document.file_url) %>">
-			<%= File.basename(document.file_url) %>
+			<%= URI.decode_www_form_component(File.basename(document.file_url)) %>
 		</p>
 		<p class="file_path" >
 		  <% if document.name %>
