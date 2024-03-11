@@ -136,13 +136,13 @@ namespace :dspace do
     return [] if thesis.nil?
 
     files = []
-    thesis.documents.primary.not_deleted.each do |document|
+    thesis.documents.primary.not_deleted.where(usage: :thesis).each do |document|
       log "       #{document.file.path}"
       files.push document.file.path
     end
 
     unless ENV['PRIMARY_FILES_ONLY'] == 'true'
-      thesis.documents.supplemental.not_deleted.each do |document|
+      thesis.documents.supplemental.not_deleted.where(usage: :thesis).each do |document|
         log "       #{document.file.path}"
         files.push document.file.path
       end

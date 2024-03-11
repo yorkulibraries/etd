@@ -19,7 +19,7 @@ class Document < ApplicationRecord
   scope :primary, -> { where('supplemental = ? ', false) }
   scope :supplemental, -> { where('supplemental = ? ', true) }
   scope :deleted, -> { where('deleted = ?', true) }
-  scope :not_deleted, -> { where('deleted = ?', false).where(usage: :thesis) }
+  scope :not_deleted, -> { where('deleted = ?', false) }
 
   enum usage: [:thesis, :embargo, :license]
   

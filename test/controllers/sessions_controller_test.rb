@@ -65,6 +65,6 @@ class SessionsControllerTest < ActionController::TestCase
     get :destroy
 
     assert_nil session[:user_id]
-    assert_redirected_to 'http://www.library.yorku.ca'
+    assert_redirected_to 'https://passportyork.yorku.ca/ppylogin/ppylogout'
   end
 end
