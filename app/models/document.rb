@@ -21,8 +21,8 @@ class Document < ApplicationRecord
   scope :deleted, -> { where('deleted = ?', true) }
   scope :not_deleted, -> { where('deleted = ?', false) }
 
-  enum usage: [:thesis, :embargo, :license]
-  
+  enum usage: %i[thesis embargo licence]
+
   #### ADDITIONAL METHODS
   def image?
     file.to_s.include?('.gif') or file.to_s.include?('.png') or file.to_s.include?('.jpg')

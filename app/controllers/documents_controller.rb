@@ -85,6 +85,6 @@ class DocumentsController < ApplicationController
   end
 
   def document_params
-    params.require(:document).permit(:supplemental, :name, :file)
+    params.require(:document).permit(:supplemental, :name, :file, :usage)
   end
 end

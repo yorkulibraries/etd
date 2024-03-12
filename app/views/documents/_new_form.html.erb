@@ -28,11 +28,13 @@
 						<% end %>
 					</div>
 					<% f.input :name, required: false, input_html: { class: "span4", autocomplete: "off"} %>
-					<%= f.input :file, required: false, as: :file %>
+					<%= f.input :file, required: true, as: :file %>
 		
 					<% if primary %>
+						<%= f.hidden_field :usage, value: :thesis %>
 						<%= f.hidden_field :supplemental, value: false %>
 					<% else %>
+						<%= f.input :usage, label: "Document type", collection: Document.usages.keys.map(&:to_sym), required: true, label_html: { class: 'pt-2' } %>
 						<%= f.hidden_field :supplemental, value: true %>
 					<% end %>
 					

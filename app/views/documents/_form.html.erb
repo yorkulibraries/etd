@@ -1,12 +1,17 @@
 <%= simple_form_for [@student, @thesis, @document], html: { class: "document form-horizontal", multipart: true } do |f| %>
-		  <%= f.input :file, as: :file %>
-		  <%  if @document.file_url %>
- 			  <div class="controls"> 
-			 	<p class="py-3"><strong>Current file:</strong> <%= File.basename(@document.file_url)%></p>
-			  </div>
-		  <% end %>
-		  				
-		<hr class="fitted"/>
+	<% if @document.file_url %>
+		<div class="controls"> 
+			<strong>Current file:</strong> <%= File.basename(@document.file_url)%>
+		</div>
+	<% end %>
+	<%= f.input :file, as: :file, required: true, label_html: { class: 'py-4' } %>
+	<% if @document.supplemental == true %>
+		<%= f.input :usage, label: "Document type", collection: Document.usages.keys.map(&:to_sym), required: true %>
+	<% else %>
+		<%= f.hidden_field :usage, value: :thesis %>
+	<% end %>
+
+		<hr />
 		<div class="action controls">
 			<%= f.button :submit, "Upload", class: "btn btn-primary" %>  or <%= link_to "Cancel", :back %>
 		</div>
