@@ -17,17 +17,17 @@
 	<%= simple_form_for Student.new do |f| %>
 	 <% if AppSettings.student_submit_for_review_license_lac.present? %>
 		<div>
-			<%= f.input :blocked, as: :boolean, label: false, wrapper_html: { class: 'form-check-inline' } %> <a href="#L1_" data-bs-toggle="modal">I confirm LAC licence</a>
+			<a href="#L1_" data-bs-toggle="modal">LAC Licence</a>
 		</div>
 	 <% end %>
 	 <% if AppSettings.student_submit_for_review_license_yorkspace.present? %>
 		<div>
-			<%= f.input :blocked, as: :boolean, label: false, wrapper_html: { class: 'form-check-inline' } %> <a href="#L2_" data-bs-toggle="modal">I confirm YorkSpace Non-Exclusive Distribution Licence</a>
+			<a href="#L2_" data-bs-toggle="modal">YorkSpace Non-Exclusive Distribution Licence</a>
 		</div>
 	 <% end %>
 	 <% if AppSettings.student_submit_for_review_license_etd.present? %>
 		<div>
-			<%= f.input :blocked, as: :boolean, label: false, wrapper_html: { class: 'form-check-inline' } %> <a href="#L3_" data-bs-toggle="modal">I confirm YorkU ETD Licence</a>
+			<a href="#L3_" data-bs-toggle="modal">YorkU ETD Licence</a>
 		</div>
 	 <% end %>
 	<% end %>
