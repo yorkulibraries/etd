@@ -17,17 +17,17 @@
 	<%= simple_form_for Student.new do |f| %>
 	 <% if AppSettings.student_submit_for_review_license_lac.present? %>
 		<div>
-			<a href="#L1_" data-bs-toggle="modal">LAC Licence</a>
+			<input type="checkbox" class='form-check-inline' name="" id="" checked disabled> <a href="#L1_" data-bs-toggle="modal">LAC licence</a>
 		</div>
 	 <% end %>
 	 <% if AppSettings.student_submit_for_review_license_yorkspace.present? %>
 		<div>
-			<a href="#L2_" data-bs-toggle="modal">YorkSpace Non-Exclusive Distribution Licence</a>
+			<input type="checkbox" class='form-check-inline' name="" id="" checked disabled> <a href="#L2_" data-bs-toggle="modal">YorkSpace Non-Exclusive Distribution Licence</a>
 		</div>
 	 <% end %>
 	 <% if AppSettings.student_submit_for_review_license_etd.present? %>
 		<div>
-			<a href="#L3_" data-bs-toggle="modal">YorkU ETD Licence</a>
+			<input type="checkbox" class='form-check-inline' name="" id="" checked disabled> <a href="#L3_" data-bs-toggle="modal">YorkU ETD Licence</a>
 		</div>
 	 <% end %>
 	<% end %>
