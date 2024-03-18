@@ -69,11 +69,11 @@
 			
 		</div>
 				
-		<% if @thesis.embargo.present? && Thesis::RETURNED == @thesis.status %>
+		<% if @thesis.returned_message.present? && Thesis::RETURNED == @thesis.status %>
 		<div class="col-lg-4 col-sm-12">
 			<h6>Returned message</h6>
 			<div class="alert alert-danger" role="alert">
-				<%= @thesis.embargo %>
+				<%= @thesis.returned_message %>
 			</div>
 		<% else %>
 		<div class="col-lg-4 d-none d-lg-block">
