@@ -15,4 +15,5 @@ en:
         usage:
           thesis: 'Supplementary file or document attached to thesis/dissertation'
           embargo: 'Request for embargo document'
+          embargo_letter: 'Letters from supervisors - embargo'
           licence: 'Licence'

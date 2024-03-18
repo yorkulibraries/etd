@@ -29,6 +29,7 @@ class DocumentUploader < CarrierWave::Uploader::Base
   # Avoid using model.id or version_name here, see uploader/store.rb for details.
   def filename
     return original_filename unless model.user.present? && !model.user.last_name.nil?
+    return original_filename if model.usage != "thesis"
 
     last_and_first_name = "#{model.user.last_name.titleize}_#{model.user.first_name.titleize}".gsub(/\s/, '_')
     year_copy = model.thesis.exam_date.year

@@ -21,7 +21,7 @@ class Document < ApplicationRecord
   scope :deleted, -> { where('deleted = ?', true) }
   scope :not_deleted, -> { where('deleted = ?', false) }
 
-  enum usage: %i[thesis embargo licence]
+  enum usage: %i[thesis embargo embargo_letter licence]
 
   #### ADDITIONAL METHODS
   def image?
