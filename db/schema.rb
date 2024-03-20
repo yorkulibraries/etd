@@ -11,27 +11,27 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
-  create_table "action_text_rich_texts", charset: "utf8", force: :cascade do |t|
+  create_table "action_text_rich_texts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
     t.string "record_type", null: false
     t.bigint "record_id", null: false
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
   end
 
-  create_table "active_storage_attachments", charset: "utf8", force: :cascade do |t|
+  create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
     t.bigint "record_id", null: false
     t.bigint "blob_id", null: false
-    t.datetime "created_at", precision: nil, null: false
+    t.datetime "created_at", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
-  create_table "active_storage_blobs", charset: "utf8", force: :cascade do |t|
+  create_table "active_storage_blobs", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "key", null: false
     t.string "filename", null: false
     t.string "content_type"
@@ -39,17 +39,17 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
     t.string "service_name", null: false
     t.bigint "byte_size", null: false
     t.string "checksum"
-    t.datetime "created_at", precision: nil, null: false
+    t.datetime "created_at", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
-  create_table "active_storage_variant_records", charset: "utf8", force: :cascade do |t|
+  create_table "active_storage_variant_records", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "audits", id: :integer, charset: "utf8", force: :cascade do |t|
+  create_table "audits", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "auditable_id"
     t.string "auditable_type"
     t.integer "associated_id"
@@ -71,7 +71,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
     t.index ["user_id", "user_type"], name: "user_index"
   end
 
-  create_table "committee_members", id: :integer, charset: "utf8", force: :cascade do |t|
+  create_table "committee_members", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "full_name"
     t.string "role"
     t.integer "thesis_id"
@@ -81,7 +81,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
     t.string "last_name"
   end
 
-  create_table "delayed_jobs", id: :integer, charset: "utf8", force: :cascade do |t|
+  create_table "delayed_jobs", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
     t.text "handler", null: false
@@ -96,7 +96,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
-  create_table "documents", id: :integer, charset: "utf8", force: :cascade do |t|
+  create_table "documents", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "thesis_id"
     t.integer "user_id"
     t.boolean "supplemental"
@@ -110,7 +110,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
     t.index ["user_id"], name: "index_documents_on_user_id"
   end
 
-  create_table "export_logs", id: :integer, charset: "utf8", force: :cascade do |t|
+  create_table "export_logs", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "user_id"
     t.date "published_date"
     t.boolean "production_export", default: false
@@ -134,7 +134,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
-  create_table "gem_records", id: :integer, charset: "utf8", force: :cascade do |t|
+  create_table "gem_records", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "studentname"
     t.integer "sisid"
     t.string "emailaddress"
@@ -150,7 +150,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
     t.date "examdate"
   end
 
-  create_table "loc_subjects", id: :integer, charset: "utf8", force: :cascade do |t|
+  create_table "loc_subjects", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.string "category"
     t.integer "code"
@@ -159,15 +159,17 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
-  create_table "settings", charset: "utf8", force: :cascade do |t|
+  create_table "settings", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "var", null: false
     t.text "value"
+    t.integer "thing_id"
+    t.string "thing_type", limit: 30
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.index ["var"], name: "index_settings_on_var", unique: true
+    t.index ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true
   end
 
-  create_table "theses", id: :integer, charset: "utf8", force: :cascade do |t|
+  create_table "theses", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.text "title"
     t.string "author"
     t.string "supervisor"
@@ -199,7 +201,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
     t.index ["student_id"], name: "index_theses_on_student_id"
   end
 
-  create_table "thesis_subjectships", id: :integer, charset: "utf8", force: :cascade do |t|
+  create_table "thesis_subjectships", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "thesis_id"
     t.integer "loc_subject_id"
     t.integer "rank"
@@ -207,7 +209,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
-  create_table "users", id: :integer, charset: "utf8", force: :cascade do |t|
+  create_table "users", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "username"
     t.string "name"
     t.string "type"
