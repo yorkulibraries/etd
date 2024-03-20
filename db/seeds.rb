@@ -15,13 +15,10 @@ if (Rails.env != 'test') && User.all.count.zero?
   end
 end
 
-if Rails.env.development?
-  (10..75).each do |i|
-    if i < 50
-      Student.create(username: "username#{i}", name: "name#{i}", email: "email#{i}@domain.com", created_by_id: 1,
-                     blocked: false, role: User::STUDENT, sisid: "1000000#{i}")
-    end
-    GemRecord.create(studentname: "studentname #{i}", sisid: "100000#{i}",
-                     emailaddress: "student-email#{i}@domain.com", eventtype: GemRecord::PHD_EXAM, eventdate: 45.days.ago.to_s, examresult: 'XXXX', title: "title #{i}", program: "program #{i}", superv: "superv #{i}", seqgradevent: "999999#{i}".to_i, examdate: Time.now)
+if Rails.env.development? && GemRecord.all.count.zero?
+  (10..19).each do |i|
+    g = GemRecord.create(studentname: "studentname #{i}", sisid: "6942000#{i}",
+                     emailaddress: "student-email#{i}@domain.com", eventtype: GemRecord::PHD_EXAM, eventdate: 45.days.ago.to_s, examresult: 'Accepted Pending Specified Revisions', title: "title #{i}", program: "program #{i}", superv: "superv #{i}", seqgradevent: "#{i}".to_i, examdate: Time.now)
+    g.save!
   end
 end
