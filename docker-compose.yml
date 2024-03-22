@@ -5,18 +5,18 @@ services:
     volumes:
       - ./:/app
     working_dir: /app
-    command: sh -c "/wait && bundle exec rake db:migrate && bundle exec rake db:seed && bundle exec rake assets:precompile && bundle exec puma"
+    command: sh -c "bundle exec rake db:create && bundle exec rake db:migrate && bundle exec rake db:seed && bundle exec rake assets:precompile && rm -f tmp/pids/server.pid && bundle exec rails server -b '0.0.0.0'"
     ports:
-      - 4004:4004
+      - ${PORT:-4004}:${PORT:-4004}
+    depends_on:
+      mysql:
+        condition: service_healthy
     environment:
-      - RAILS_ENV=development
-      - DATABASE_URL=mysql2://etd:etd@mysql/etd
-      - PORT=4004
+      - PORT=${PORT:-4004}
+      - RAILS_ENV=${RAILS_ENV:-development}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - DATABASE_URL=mysql2://root:mysql@mysql/etd_${RAILS_ENV:-development}
       - RAILS_SERVE_STATIC_FILES=true
-      - WAIT_HOSTS=mysql:3306
-      - WAIT_HOSTS_TIMEOUT=300
-      - WAIT_SLEEP_INTERVAL=30
-      - WAIT_HOST_CONNECT_TIMEOUT=30
 
   mysql:
     image: mysql
@@ -24,6 +24,5 @@ services:
     environment:
       MYSQL_ROOT_HOST: "%"
       MYSQL_ROOT_PASSWORD: mysql
-      MYSQL_DATABASE: etd
-      MYSQL_USER: etd
-      MYSQL_PASSWORD: etd
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
