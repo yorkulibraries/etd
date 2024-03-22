@@ -85,4 +85,5 @@ group :test do
   gem 'shoulda-context', '~> 2.0'
   gem 'shoulda-matchers', '~> 5.1'
   gem 'spring' # , "1.3.6"
+  gem 'sqlite3'
 end
