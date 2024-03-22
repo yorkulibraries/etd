@@ -91,8 +91,8 @@ class DocumentTest < ActiveSupport::TestCase
   should 'automatic naming convention ' do
     document_name = 'html-document.html'
     d = create(:document_for_naming, file: fixture_file_upload(document_name, 'text/html'), usage: :thesis)
-    assert_equal "#{d.user.last_name}_#{d.user.first_name}_#{d.user.middle_name.first}_#{d.thesis.exam_date.year}_Masters#{File.extname(document_name)}".gsub(/\s/, '_'),
-                 d.file.filename
+    expected = Document.filename_by_convention(d.user.first_name, d.user.last_name, d.user.middle_name, d.thesis.exam_date, d.thesis.degree_level, document_name)
+    assert_equal expected, d.file.filename
   end
 
   should 'None naming convention for non-existence of usage' do

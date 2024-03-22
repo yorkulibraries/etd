@@ -31,16 +31,7 @@ class DocumentUploader < CarrierWave::Uploader::Base
     return original_filename unless model.user.present? && !model.user.last_name.nil?
     return original_filename if model.usage != "thesis"
 
-    last_and_first_name = "#{model.user.last_name.titleize}_#{model.user.first_name.titleize}".gsub(/\s/, '_')
-    year_copy = model.thesis.exam_date.year
-    grade = model.thesis.degree_level == 'Doctoral' ? 'PhD' : 'Masters'
-    year_grade_and_file = "_#{year_copy}_#{grade}#{File.extname(original_filename)}"
-
-    if model.user.last_name.present? && model.user.middle_name.present?
-      "#{last_and_first_name}_#{model.user.middle_name.first.capitalize}#{year_grade_and_file}"
-    elsif model.user.last_name.present?
-      "#{last_and_first_name}#{year_grade_and_file}"
-    end
+    Document.filename_by_convention(model.user.first_name, model.user.last_name, model.user.middle_name, model.thesis.exam_date, model.thesis.degree_level, original_filename)
   end
 
   def move_to_cache

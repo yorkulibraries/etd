@@ -51,4 +51,14 @@ class Document < ApplicationRecord
 
     errors.add(:file, 'Primary have to be a PDF')
   end
+
+  def self.filename_by_convention(first_name, last_name, middle_name, exam_date, degree_level, filename)
+    last_and_first_name = "#{last_name.titleize}_#{first_name.titleize}".gsub(/\s/, '_')
+    year_copy = exam_date.year
+    grade = degree_level == 'Doctoral' ? 'PhD' : 'Masters'
+    year_grade_and_ext = "#{year_copy}_#{grade}#{File.extname(filename)}"
+
+    middle_name.nil? ? "#{last_and_first_name}_#{year_grade_and_ext}"
+      : "#{last_and_first_name}_#{middle_name.titleize}_#{year_grade_and_ext}"
+  end
 end
