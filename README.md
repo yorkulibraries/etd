@@ -8,7 +8,7 @@ cd etd
 docker compose up --build
 ```
 
-There are 2 containers created: *etd-app-1* and *etd-mysql-1*
+There are 2 containers created: *etd-web-1* and *etd-db-1*
 
 # Access the front end web app in DEVELOPMENT 
 
@@ -43,18 +43,18 @@ docker compose up --build
 Run the tests
 
 ```
-docker exec -it  -e RAILS_ENV=test -e DATABASE_URL=sqlite3:db/test.sqlite3 etd-app-1 rails test
+docker exec -it  -e RAILS_ENV=test -e DATABASE_URL=sqlite3:db/test.sqlite3 etd-web-1 rails test
 ```
 
 # Access the containers
 
-Mysql container
+DB container
 ```
-docker exec -it etd-mysql-1 bash
+docker exec -it etd-db-1 bash
 ```
 
-ETD app container
+Webapp container
 ```
-docker exec -it etd-app-1 bash
+docker exec -it etd-web-1 bash
 ```
 

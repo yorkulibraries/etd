@@ -1,6 +1,6 @@
 version: '3.6'
 services:
-  app:
+  web:
     build: .
     volumes:
       - ./:/app
@@ -15,14 +15,13 @@ services:
       - PORT=${PORT:-4004}
       - RAILS_ENV=${RAILS_ENV:-development}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
-      - DATABASE_URL=mysql2://root:mysql@mysql/${COMPOSE_PROJECT_NAME}_${RAILS_ENV:-development}
+      - DATABASE_URL=mysql2://root:mysql@mypasswd/${COMPOSE_PROJECT_NAME}_${RAILS_ENV:-development}
       - RAILS_SERVE_STATIC_FILES=true
 
-  mysql:
+  db:
     image: mysql
-    command: --default-authentication-plugin=mysql_native_password 
     environment:
       MYSQL_ROOT_HOST: "%"
-      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_ROOT_PASSWORD: mypasswd
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
