@@ -125,7 +125,7 @@ class ThesisTest < ActiveSupport::TestCase
     create_list(:loc_subject, 10)
     thesis = create(:thesis)
 
-    thesis.loc_subject_ids = [1, 2, 3]
+    thesis.loc_subject_ids = [LocSubject.first.id, LocSubject.second.id, LocSubject.last.id]
     thesis.save
 
     assert_equal 3, thesis.loc_subjects.size
