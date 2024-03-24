@@ -1,5 +1,3 @@
-# etd
-
 # Start developing
 
 ```
@@ -8,9 +6,11 @@ cd etd
 docker compose up --build
 ```
 
-There are 2 containers created: *etd-web-1* and *etd-db-1*
+There are 3 containers created: **web**, **db** and **mailcatcher**
 
 # Access the front end web app in DEVELOPMENT 
+
+http://localhost:3004/
 
 By default, the application will listen on port 3004 and runs with RAILS_ENV=development.
 
@@ -21,6 +21,9 @@ Value: admin (or manager or whatever user you want to mimic)
 
 For convenience, you can import the ModHeader profile from the included ModHeader_admin.json. 
 
+# Access mailcatcher web app
+
+http://localhost:3084/
 
 # What if I want to use a different port?
 
