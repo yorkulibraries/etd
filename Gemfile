@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 source 'http://rubygems.org'
-ruby '3.1.4'
+ruby File.read('.ruby-version').strip
 
 gem 'puma', '~> 6.4', '>= 6.4.2'
 gem 'rails', '~> 7.0', '>= 7.0.3.1'
