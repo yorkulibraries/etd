@@ -12,21 +12,19 @@ There are 2 containers created: *etd-web-1* and *etd-db-1*
 
 # Access the front end web app in DEVELOPMENT 
 
-By default, the application will listen on port 4004 and runs with RAILS_ENV=development.
+By default, the application will listen on port 3004 and runs with RAILS_ENV=development.
 
 To access the application in Chrome browser, you will need to add the ModHeader extension to your Chrome browser.
 
-Once the extension has been activated, you can add the following header to the site http://localhost:4004/. This will enable you to login as **admin** user.
-
 Header: PYORK_USER
+Value: admin (or manager or whatever user you want to mimic)
 
-Value: admin
+For convenience, you can import the ModHeader profile from the included ModHeader_admin.json. 
 
-The application is now accessible at http://localhost:4004/
 
 # What if I want to use a different port?
 
-If you wish to use a different port, you can set the PORT environment 
+If you wish to use a different port, you can set the PORT environment or change PORT in .env file.
 
 ```
 PORT=4005 docker compose up --build
