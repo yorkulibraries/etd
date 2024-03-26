@@ -1,5 +1,6 @@
 db/*.sqlite3
 log/*
+!log/.keep
 tmp/
 public/uploads/**/*
 MissingDrawer.tmplugin
@@ -19,3 +20,4 @@ lib/tasks/gem_records.txt
 app_settings.yml
 .byebug_history
 .rubocop.yml
+*.env

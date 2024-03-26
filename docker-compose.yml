@@ -21,6 +21,9 @@ services:
       - DATABASE_URL=mysql2://root:mypasswd@db/${COMPOSE_PROJECT_NAME}_${RAILS_ENV:-development}
       - RAILS_SERVE_STATIC_FILES=true
       - NODE_OPTIONS=--openssl-legacy-provider
+    env_file:
+      - path: ./override.env
+        required: false
 
   db:
     image: mysql
