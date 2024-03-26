@@ -49,7 +49,7 @@ docker compose exec web rt
 
 Run a specific test
 ```
-docker compose exec web rt test/controllers/users_controller_test.rb
+docker compose exec web rt TEST=test/controllers/users_controller_test.rb
 ```
 
 # Access the containers
