@@ -1,3 +1,7 @@
+# About
+
+ETD is a collaboration between York University Libraries and Faculty of Graduate Studies to facilitate depositing of Electronic Thesis and Dissertations.
+
 # Start developing
 
 ```
