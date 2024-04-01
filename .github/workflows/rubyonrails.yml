@@ -42,7 +42,6 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: sqlite3:db/test.sqlite3
           SELENIUM_SERVER: 127.0.0.1
-          TEST_CONTROLLERS_DELAY: 0.1
         run: |
           bundle exec rake db:reset
           bundle exec rake test
@@ -52,7 +51,6 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: mysql2://test:test@127.0.0.1:3306/test
           SELENIUM_SERVER: 127.0.0.1
-          TEST_CONTROLLERS_DELAY: 0.1
         run: |
           bundle exec rake db:reset
           bundle exec rake test
