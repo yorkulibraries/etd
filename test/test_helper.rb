@@ -14,9 +14,13 @@ require 'capybara/minitest'
 require 'rails-controller-testing'
 Rails::Controller::Testing.install
 
+DatabaseCleaner.url_allowlist = [
+  %r{.*test.*}
+]
+DatabaseCleaner.strategy = :truncation
+
 Capybara.server_host = '0.0.0.0'
 Capybara.app_host = "http://#{Socket.gethostname}:#{Capybara.server_port}"
-Capybara.save_path = Rails.root.to_s
 
 include ActionDispatch::TestProcess
 
@@ -38,9 +42,15 @@ module ActiveSupport
     include Capybara::DSL
     # Make `assert_*` methods behave like Minitest assertions
     include Capybara::Minitest::Assertions
+
+    setup do
+      DatabaseCleaner.start
+    end
+
     teardown do
       Capybara.reset_sessions!
       Capybara.use_default_driver
+      DatabaseCleaner.clean
     end
   end
 end

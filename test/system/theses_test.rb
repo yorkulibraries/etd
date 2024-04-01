@@ -13,7 +13,7 @@ class ThesesTest < ApplicationSystemTestCase
   test 'Assign a thesis to ME and unassign this' do
     visit root_url
     click_on('Unassigned')
-    click_on('Me')
+    click_on('Me (')
     click_on("I'm working on it")
     # click_on('Unassign This Thesis')
     # refute_selector 'a', text: 'Unassign This Thesis'

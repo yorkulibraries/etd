@@ -7,7 +7,7 @@ gem 'puma', '~> 6.4', '>= 6.4.2'
 gem 'rails', '~> 7.0', '>= 7.0.3.1'
 
 ## DATABASES ##
-gem 'mysql2', '0.5.3'
+gem 'mysql2'
 
 ## CSS AND JAVASCRIPT ##
 gem 'actiontext', '~> 7.0', '>= 7.0.3.1'
