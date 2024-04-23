@@ -12,4 +12,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     user = FactoryGirl.create(:user)
     login_as(user)
   end
+
+  Capybara.save_path = "tmp/test-screenshots"
 end

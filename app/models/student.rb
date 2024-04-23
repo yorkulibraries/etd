@@ -57,12 +57,19 @@ class Student < User
     return unless validate_secondary_info
 
     validates_presence_of :first_name
-    validates_presence_of :last_name
     validates_presence_of :email_external
-    email_external.present? && email_external.split(/[\s,]+/).each do |address|
-      unless address =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-        errors.add(:email_external, "are invalid because of #{address} email")
+
+    if email_external.present?
+      email_external.split(/[\s,]+/).each do |address|
+        unless address =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
+          errors.add(:email_external, "are invalid because of #{address} email")
+        end
+    
+        if address.include?('yorku.ca')
+          errors.add(:email_external, "cannot be a yorku.ca domain. Please add an external email.")
+        end
       end
     end
+
   end
 end

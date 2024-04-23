@@ -93,4 +93,15 @@ class StudentTest < ActiveSupport::TestCase
     student.save
     assert_includes(student.errors[:email_external], "can't be blank")
   end
+
+  should 'Validate email external / non-YorkU email does not contain YorkU address' do
+    student = create(:student, name: 'John Smith', sisid: '111111111')
+    student.validate_secondary_info = true
+    student.email_external = 'john@yorku.ca'
+    student.save
+  
+    assert_includes student.errors[:email_external], 'cannot be a yorku.ca domain. Please add an external email.'
+
+  end
+
 end

@@ -29,33 +29,34 @@
 			<div class="col-md-12 col-lg-4">
 				<h6>Supervisor</h6>
 				<p><%= format @thesis.supervisor %></p>
-				<h6>Exam date</h6>
-				<p><%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
+				<h6>Email</h6>
+				<p><%= @student.email %></p>
 			</div>
-
 			<div class="col-md-12 col-lg-4">
 				<h6>Degree Name and Level</h6>
 				<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
 				<h6>Program</h6>
 				<p><%= format @thesis.program %></p>
 			</div>
-			<div class="col-lg-4 d-none d-lg-block"></div>
+			<div class="col-md-12 col-lg-4">
+				<h6>Exam date</h6>
+				<p><%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
+			</div>
 	</div>
 	<hr/>
 
 	<%= simple_form_for @student, method: :post, url: organize_student_information_student_thesis_path(@student, @thesis), html: { class: "form-horizontal" } do |f| %>
-	  <%= f.input :first_name, label: "First name" %>
-	  <%= f.input :middle_name, label: "Middle name" %>
-	  <%= f.input :last_name, label: "Last name" %>
-	  <%= f.input :email_external, label: "Secondary email", placeholder: "Provide a NOT York University email" %>
+		<h6>Full Name</h6>
+		<p><%= @student.name %></p>
+		<%= f.input :email_external, label: "Non-YorkU Email Address", hint: "#{AppSettings.student_begin_external_non_yorku_email}", required: true %>
 
-	  <div class="row">
-		<div class="pt-2">
-		  <hr />
-		  <%= f.button :button, class: "float-end btn btn-success" do %>
-			<i class='fa fa-angle-double-right'></i> Continue
-		  <% end %>
-		</div>
+		<div class="row">
+			<div class="pt-2">
+		  	<hr />
+				<%= f.button :button, class: "float-end btn btn-success" do %>
+				<i class='fa fa-angle-double-right'></i> Continue
+				<% end %>
+			</div>
 	  </div>
 	<% end %>
 </div>

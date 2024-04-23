@@ -29,6 +29,7 @@ class AppSettings < RailsSettings::Base
   field :dspace_live_collection_uri, default: ENV['dspace_live_collection_uri'] || ''
   field :dspace_live_collection_title, default: ENV['dspace_live_collection_title'] || ''
   field :student_begin_submission, default: ''
+  field :student_begin_external_non_yorku_email, default: ''
   field :student_update_details_initial, default: ''
   field :student_update_details_abstract, default: ''
   field :student_update_details_subjects, default: ''
