@@ -51,10 +51,13 @@ Run all the tests
 docker compose exec web rt 
 ```
 
-Run a specific test
+Run a specific test and test within the test file.
 ```
 docker compose exec web rt TEST=test/controllers/users_controller_test.rb
+
+docker compose exec web rt TEST=test/system/students_test.rb TESTOPTS="-n '/not allow student to add committee members/'" 
 ```
+#specific test with testopts does not work, then run it with rails_env and database_url as prefix.
 
 # Access the containers
 

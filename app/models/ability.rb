@@ -37,10 +37,6 @@ class Ability
         thesis.student_id == user.id
       end
 
-      can %i[new create destroy], CommitteeMember do |committee|
-        committee.thesis.student_id == user.id
-      end
-
       can :show, :home
 
     end

@@ -104,4 +104,31 @@ class StudentTest < ActiveSupport::TestCase
 
   end
 
+  should 'do not allow student to [new, create, delete] a committee member for their own thesis' do
+
+    # Reference: ability.rb
+    # can %i[new create destroy], CommitteeMember do |committee|
+    #   committee.thesis.student_id == user.id
+    # end
+
+    @student = create(:student)
+    @thesis = create(:thesis, student: @student)
+    member = create(:committee_member, thesis: @thesis)
+    committee_member = @thesis.committee_members.first
+
+    # puts "\n**************************"
+    # puts "\nStudent: #{@student.inspect}"
+    # puts "\nThesis: #{@thesis.inspect}"
+    # puts "\nMember: #{member.inspect}"
+    # puts "\nCommitteeMember: #{committee_member.inspect}"
+    # puts "\n**************************"
+
+    @ability = Ability.new(@student)
+    assert @ability.cannot?(:new, committee_member), "student should not be allowed to add new committee members to thesis"
+    assert @ability.cannot?(:create, committee_member), "student should not be allowed to create committee members to thesis"
+    assert @ability.cannot?(:destroy, committee_member), "student should not be allowed to delete committee members to thesis"
+
+
+  end
+
 end

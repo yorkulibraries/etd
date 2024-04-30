@@ -37,9 +37,6 @@ class StudentsTest < ApplicationSystemTestCase
     assert_selector "h3", text: "Hello #{@thesis.student.first_name}"
     assert_selector "h6", text: "Email", visible: :all
     assert_selector "p", text: "#{@thesis.student.email}", visible: :all
-    
-    # page.driver.browser.manage.window.resize_to(1920, 2500)
-    # save_screenshot()
   end
 
   should "display full name instead of first, middle and last name" do
@@ -54,4 +51,30 @@ class StudentsTest < ApplicationSystemTestCase
     assert_selector "h6", text: "Full Name", visible: :all
     assert_selector "p", text: "#{@thesis.student.name}", visible: :all
   end
+
+
+  should "not allow student to add committee members" do
+    @thesis = FactoryGirl.create(:thesis)
+    login_as(@thesis.student)
+    visit root_url
+    click_link("My ETD Submission")
+    assert_selector "input#student_email_external"
+    fill_in("Non-YorkU Email Address", with: "#{@thesis.student.username}@mailinator.com")
+    click_on("Continue")
+
+    # Ensure Add Committee Members button is not present.
+    assert_no_selector '.student-view .card .card-body a.btn.btn-success', text: 'Add committee member'
+    
+    # Ensure that the close links are not present within the #committee_members section
+    refute_selector("#committee_members .btn-close")
+    
+    # page.driver.browser.manage.window.resize_to(1920, 2500)
+    save_screenshot()
+  end
 end
+
+########################################
+## For Debugging and building tests ##
+# page.driver.browser.manage.window.resize_to(1920, 2500)
+# save_screenshot()
+########################################
