@@ -35,6 +35,7 @@ class AppSettings < RailsSettings::Base
   field :student_update_details_subjects, default: ''
   field :student_update_details_keywords, default: ''
   field :student_upload_files, default: ''
+  field :student_supplementary_upload_files, default: ''
   field :student_review_details, default: ''
   field :student_submit_for_review, default: ''
   field :student_submit_for_review_license_lac, default: ''

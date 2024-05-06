@@ -55,7 +55,11 @@ Run a specific test and test within the test file.
 ```
 docker compose exec web rt TEST=test/controllers/users_controller_test.rb
 
-docker compose exec web rt TEST=test/system/students_test.rb TESTOPTS="-n '/not allow student to add committee members/'" 
+1. docker compose exec web bash
+2. $>  rts TEST=test/system/students_test.rb
+
+Note: There is option to specific test within the test file with TESTOPTS="-n '/not allow student to add committee members/'" but it may not work with 'rt' or 'rts' scripts. You will have to specify the db url and environment. 
+
 ```
 #specific test with testopts does not work, then run it with rails_env and database_url as prefix.
 
