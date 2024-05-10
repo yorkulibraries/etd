@@ -28,10 +28,10 @@ class DocumentUploader < CarrierWave::Uploader::Base
   # Override the filename of the uploaded files:
   # Avoid using model.id or version_name here, see uploader/store.rb for details.
   def filename
-    return original_filename unless model.user.present? && !model.user.last_name.nil?
+    return original_filename unless model.user.present? && !model.user.name.nil?
     return original_filename if model.usage != "thesis"
 
-    Document.filename_by_convention(model.user.first_name, model.user.last_name, model.user.middle_name, model.thesis.exam_date, model.thesis.degree_level, original_filename)
+    Document.filename_by_convention(model.user.name, model.thesis.exam_date, model.thesis.degree_name, model.thesis.degree_level, original_filename, model.supplemental, model.usage)
   end
 
   def move_to_cache

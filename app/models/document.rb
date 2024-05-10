@@ -52,13 +52,18 @@ class Document < ApplicationRecord
     errors.add(:file, 'Primary have to be a PDF')
   end
 
-  def self.filename_by_convention(first_name, last_name, middle_name, exam_date, degree_level, filename)
-    last_and_first_name = "#{last_name.titleize}_#{first_name.titleize}".gsub(/\s/, '_')
+  def self.filename_by_convention(name, exam_date, degree_name, degree_level, filename, is_supplemental, usage)
+    full_name = "#{name.titleize}".gsub(/\s/, '_')
     year_copy = exam_date.year
-    grade = degree_level == 'Doctoral' ? 'PhD' : 'Masters'
-    year_grade_and_ext = "#{year_copy}_#{grade}#{File.extname(filename)}"
+    level = degree_level == 'Doctoral' ? 'PhD' : 'Masters'
+    deg_name = degree_name.gsub(/\s/, '_')
+    year_degree_and_ext = "#{year_copy}_#{deg_name}_#{level}"
 
-    middle_name.nil? ? "#{last_and_first_name}_#{year_grade_and_ext}"
-      : "#{last_and_first_name}_#{middle_name.titleize}_#{year_grade_and_ext}"
+    sequence_number = self.count
+    upload_type = is_supplemental ? "Supplemental" : "Primary"
+    usage == nil ? usage_caps = '' : usage_caps = usage.upcase + "_FILE"
+    
+    "#{full_name}_#{year_degree_and_ext}_#{usage_caps}_#{upload_type}_#{sequence_number}#{File.extname(filename)}"
   end
+
 end

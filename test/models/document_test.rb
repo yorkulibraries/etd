@@ -88,11 +88,40 @@ class DocumentTest < ActiveSupport::TestCase
     assert d.image?, 'This one should be an image'
   end
 
-  should 'automatic naming convention ' do
-    document_name = 'html-document.html'
-    d = create(:document_for_naming, file: fixture_file_upload(document_name, 'text/html'), usage: :thesis)
-    expected = Document.filename_by_convention(d.user.first_name, d.user.last_name, d.user.middle_name, d.thesis.exam_date, d.thesis.degree_level, document_name)
+  should 'automatic naming for primary file FullNameField_Year_Degree_Primary.pdf' do
+    document_name = 'pdf-document.pdf'
+    d = create(:document_for_file_naming, file: fixture_file_upload(document_name), usage: :thesis, supplemental: false)
+    expected = Document.filename_by_convention(d.user.name, d.thesis.exam_date, d.thesis.degree_name, d.thesis.degree_level, document_name, d.supplemental, d.usage)
+
     assert_equal expected, d.file.filename
+  end
+
+  should 'automate naming for secondary file FullNameField_Year_Degree_Supplementary_1.file extension' do 
+    document_name = 'pdf-document.pdf'
+    d = create(:document_for_file_naming, file: fixture_file_upload(document_name), usage: :thesis, supplemental: true)
+    expected = Document.filename_by_convention(d.user.name, d.thesis.exam_date, d.thesis.degree_name, d.thesis.degree_level, document_name, d.supplemental, d.usage)
+
+    assert_equal expected, d.file.filename
+
+  end
+
+  should 'sequence document attachments in filenames' do
+
+    document_name = 'pdf-document.pdf'
+    dp1 = create(:document_for_file_naming, file: fixture_file_upload(document_name), usage: :thesis, supplemental: false)
+    # Assert that the filename ends with "_1"
+    assert_match(/_1\.\w+$/, dp1.file.filename)
+
+    supplemental_name = 'image-example.jpg'
+    dsp1 = create(:document_for_file_naming, file: fixture_file_upload(supplemental_name), usage: :thesis, supplemental: true)
+    # Assert that the filename ends with "_2"
+    assert_match(/_2\.\w+$/, dsp1.file.filename)
+
+    supplemental_name_2 = 'papyrus-feature.png'
+    dsp2 = create(:document_for_file_naming, file: fixture_file_upload(supplemental_name_2), usage: :thesis, supplemental: true)
+    # Assert that the filename ends with "_3"
+    assert_match(/_3\.\w+$/, dsp2.file.filename)
+
   end
 
   should 'None naming convention for non-existence of usage' do
