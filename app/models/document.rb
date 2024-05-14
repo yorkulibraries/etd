@@ -64,12 +64,12 @@ class Document < ApplicationRecord
     # upload_type = self.supplemental == "Supplemental" ? "Supplemental" : "Primary"
     if is_supplemental 
       upload_type = "Supplemental"
-      return "#{full_name}_#{year_degree_and_ext}_#{usage_caps}_#{upload_type}_#{original_filename}"
+      return "#{full_name}_#{year_degree_and_ext}_#{upload_type}_#{original_filename}"
     elsif self.primary
       upload_type = "Primary"
-      return "#{full_name}_#{year_degree_and_ext}_#{usage_caps}_#{upload_type}#{File.extname(original_filename)}"
+      return "#{full_name}_#{year_degree_and_ext}_#{upload_type}#{File.extname(original_filename)}"
     else
-      return "#{full_name}_#{year_degree_and_ext}_#{usage_caps}_#{original_filename}"
+      return "#{full_name}_#{year_degree_and_ext}_#{original_filename}"
     end
   end
 
