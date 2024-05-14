@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require 'application_system_test_case'
-require '/app/test/helpers/system_test_helper'
+# require '/app/test/helpers/system_test_helper'
+require_relative '../helpers/system_test_helper'
 
 class StudentsTest < ApplicationSystemTestCase
   include SystemTestHelper  # Include the SystemTestHelper module here
