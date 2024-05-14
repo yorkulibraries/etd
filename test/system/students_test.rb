@@ -116,8 +116,7 @@ class StudentsTest < ApplicationSystemTestCase
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
 
-
-    assert_selector('p', text: 'Tony_Rich_E_2012_Phd.pdf')
+    assert_selector('p', text: /Primary\.pdf/)
 
     # page.driver.browser.manage.window.resize_to(1920, 2500)
     save_screenshot()
