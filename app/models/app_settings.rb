@@ -35,7 +35,14 @@ class AppSettings < RailsSettings::Base
   field :student_update_details_subjects, default: ''
   field :student_update_details_keywords, default: ''
   field :student_upload_files, default: ''
-  field :student_supplementary_upload_files, default: ''
+  field :student_supplementary_upload_files, default: '<p>File size must be limited to acceptable formats include:</p>
+  <ul>
+  <li><strong>Documents:</strong> Portable Document Format (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).</li>
+  <li><strong>Images:</strong> Portable Network Graphics format (.png), Tagged Image File format (.tif), JPEG (.jpg)</li>
+  <li><strong>Data:</strong> Comma-separated values (.csv) or other delimited text, Extensible Markup Language (.xml)</li>
+  <li><strong>Video:</strong> 8-10 bit uncompressed AVI (.avi)</li>
+  <li><strong>Audio:</strong> Free Lossless Audio Codec or WAVE (.flac or .wav)</li>
+  </ul>'
   field :student_review_details, default: ''
   field :student_submit_for_review, default: ''
   field :student_submit_for_review_license_lac, default: ''
