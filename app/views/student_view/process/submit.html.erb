@@ -7,94 +7,114 @@
 
 <%= progress_bar (Thesis::PROCESS_SUBMIT) %>
 
+<div class="thesis fitted student-view review">
+	<h3 class="title" title="title"><%= @thesis.title %></h3>
+	<div class="alert alert-secondary" role="alert">
+		<%= raw(AppSettings.student_review_details) %>
+	</div>
 
-<div class="student-view fitted submit">
-	<h3><%= @thesis.title %></h3>
-	<%= raw(AppSettings.student_submit_for_review) %>
+	<div class="row">
+	  <div class="col-md-12 col-lg-4">
+	  	<h6>Supervisor</h6>
+		<p><%= format @thesis.supervisor %></p>
+	  	<h6>Exam date</h6>
+		<p><%= @thesis.exam_date.strftime("%B %d, %Y") rescue nil %></p>
+		<h6>Publish on</h6>
+		<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
+	  </div>
+	  <div class="col-md-12 col-lg-4">
+	  	<div class="span5 committee" title="examining committee">
+			<h6>Examining committee</h6>
+			<table class="committee_members" id="committee_members">
+				<% @thesis.committee_members.each do |committee_member| %>
+					<%= render "committee_members/committee_member_read", committee_member: committee_member %>
+				<% end %>
+			</table>
+		</div>
+	  </div>
+	  <div class="col-lg-4 d-none d-lg-block"></div>
+	</div>
+	<hr />
 
-	<div class="alert alert-secondary">
+	<div class="row">
+	  <div class="col-md-12 col-lg-4">
+		<h6>Degree Name and Level</h6>
+		<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+	  </div>
+	  <div class="col-md-12 col-lg-4">
+	  	<h6>Program</h6>
+		<p><%= format @thesis.program %></p>
+	  </div>
+	  <div class="col-lg-4 d-none d-lg-block"></div>
+	</div>
+	<hr />
 
-	<%= simple_form_for Student.new do |f| %>
-	 <% if AppSettings.student_submit_for_review_license_lac.present? %>
-		<div>
-			<input type="checkbox" class='form-check-inline' name="" id="" checked disabled> <a href="#L1_" data-bs-toggle="modal">LAC licence</a>
+	<div class="row">
+	  <div class="col-md-12 col-lg-4">
+		<h6>Language</h6>
+		<p><%= format @thesis.language %></p>
+	  	<h6>Subjects</h6>
+		<p><%= format @thesis.loc_subjects.map(&:name).join ', ' %></p>
+	  </div>
+	  <div class="col-md-12 col-lg-4">
+		<h6>Keywords</h6>
+		<p><%= format @thesis.keywords%></p>
+		<h6>Abstract</h6>
+		<p><%= format @thesis.abstract, true %></p>
+	  </div>
+	  <div class="col-lg-4 d-none d-lg-block">
 		</div>
-	 <% end %>
-	 <% if AppSettings.student_submit_for_review_license_yorkspace.present? %>
-		<div>
-			<input type="checkbox" class='form-check-inline' name="" id="" checked disabled> <a href="#L2_" data-bs-toggle="modal">YorkSpace Non-Exclusive Distribution Licence</a>
-		</div>
-	 <% end %>
-	 <% if AppSettings.student_submit_for_review_license_etd.present? %>
-		<div>
-			<input type="checkbox" class='form-check-inline' name="" id="" checked disabled> <a href="#L3_" data-bs-toggle="modal">YorkU ETD Licence</a>
-		</div>
-	 <% end %>
+	</div>
+</div>
+
+<div class="documents fitted student-view">
+
+	<h6 class="green pt-3">Files and Documents</h6>
+	<p>You have uploaded the following files:</p>
+	<h6>Primary</h6>
+	<% @primary_documents.each do | document | %>
+		<%= render partial: document %>
 	<% end %>
 
-	<!-- Modal L1_ -->
-	<div class="modal fade" id="L1_" tabindex="-1" aria-labelledby="L1_Label" aria-hidden="true">
-		<div class="modal-dialog modal-xl">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="L1_Label">LAC licence</h1>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<%= raw(AppSettings.student_submit_for_review_license_lac) %>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				</div>
+	<% if @primary_documents.count == 0 %>
+		<p>There are no <strong>primary</strong> files or documents attached to this thesis/dissertation.</p>
+	<% end %>
+
+	<h6>Supplementary</h6>
+	<% @supplemental_documents.each do | document | %>
+		<%= render partial: document %>
+	<% end %>
+	<% if @supplemental_documents.count == 0 %>
+		<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
+	<% end %>
+
+	<div>
+		<h6>License Agreements</h6>
+		<% if AppSettings.student_submit_for_review_license_lac.present? %>
+			<div>
+				<i class="fa fa-check" aria-hidden="true"></i> LAC licence
 			</div>
-		</div>
+		<% end %>
+		<% if AppSettings.student_submit_for_review_license_yorkspace.present? %>
+			<div>
+				<i class="fa fa-check" aria-hidden="true"></i> YorkSpace Non-Exclusive Distribution Licence
+			</div>
+		<% end %>
+		<% if AppSettings.student_submit_for_review_license_etd.present? %>
+			<div>
+				<i class="fa fa-check" aria-hidden="true"></i> YorkU ETD Licence
+			</div>
+		<% end %>
 	</div>
 
-	<!-- Modal L2_ -->
-	<div class="modal fade" id="L2_" tabindex="-1" aria-labelledby="L2_Label" aria-hidden="true">
-		<div class="modal-dialog modal-xl">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="L2_Label">YorkSpace Non-Exclusive Distribution Licence</h1>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<%= raw(AppSettings.student_submit_for_review_license_yorkspace) %>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- Modal L3_ -->
-	<div class="modal fade" id="L3_" tabindex="-1" aria-labelledby="L3_Label" aria-hidden="true">
-		<div class="modal-dialog modal-xl">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="L3_Label">YorkU ETD Licence</h1>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<%= raw(AppSettings.student_submit_for_review_license_etd) %>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-		<hr/>
+	<div class="mt-3">
 		<h4>	<%= Date.today.strftime("%B %d, %Y")%></h4>
-		<div class="process-nav">
-			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn back btn btn-primary" title="Review Thesis Details">
-				<i class="fa fa-angle-double-left"></i></a>
+			<div class="process-nav">
+				<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn back btn btn-primary" title="Review Thesis Details">
+					<i class="fa fa-angle-double-left"></i></a>
 
-			<%= link_to "I accept and send for review", submit_for_review_student_thesis_path(@current_user, @thesis), method: :post, title: "Accept and send for review",
-			 	class: "next-btn send btn btn-danger", data: { confirm: "Are you sure? You will not be able to make further changes." } %></div>
-		</div>
-
-
+				<%= link_to "I accept and send for review", submit_for_review_student_thesis_path(@current_user, @thesis), method: :post, title: "Accept and send for review",
+					class: "next-btn send btn btn-danger", data: { confirm: "Are you sure? You will not be able to make further changes." } %>
+			</div>
+	</div>
 </div>

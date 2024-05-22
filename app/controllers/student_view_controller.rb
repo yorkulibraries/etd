@@ -48,6 +48,8 @@ class StudentViewController < ApplicationController
       @supplemental_documents = @thesis.documents.not_deleted.supplemental
       render_according_to_validation('student_view/process/review')
     when Thesis::PROCESS_SUBMIT
+      @primary_documents = @thesis.documents.not_deleted.primary
+      @supplemental_documents = @thesis.documents.not_deleted.supplemental
       render_according_to_validation('student_view/process/submit')
     when Thesis::PROCESS_STATUS
       render_according_to_validation('student_view/process/status')

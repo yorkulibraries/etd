@@ -26,9 +26,12 @@ class StudentsTest < ApplicationSystemTestCase
     visit root_url
     fill_in('Non-YorkU Email Address', with: Faker::Internet.email)
     click_button('Continue')
-    click_link('Continue')
-    click_link('Continue')
-    click_link('Continue')
+    puts "\nGoing to Update Details\n"
+    click_link('Continue') #update
+    puts "Going to Upload\n"
+    click_link('Continue') #upload
+    puts "Going to Review\n"
+    click_link('Continue') #review
     assert_selector '.alert-warning', text: 'Error: You have to upload a primary file to continue'
     # page.accept_alert
   end
@@ -117,7 +120,13 @@ class StudentsTest < ApplicationSystemTestCase
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
 
-    assert_selector('p', text: /Primary\.pdf/)
+    assert_selector("p", text: /Primary\.pdf/)
+
+    click_on("Continue")
+
+    ## Page 4
+    assert_link("Accept and Continue")
+
 
     # page.driver.browser.manage.window.resize_to(1920, 2500)
     save_screenshot()
@@ -126,6 +135,10 @@ class StudentsTest < ApplicationSystemTestCase
     save_page()
 
     # create(:document, thesis:, supplemental: false, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+
+    
+
   end
 
 
