@@ -10,7 +10,7 @@
 <div class="thesis fitted student-view review">
 	<h3 class="title" title="title"><%= @thesis.title %></h3>
 	<div class="alert alert-secondary" role="alert">
-		<%= raw(AppSettings.student_review_details) %>
+		<%= raw(AppSettings.student_submit_for_review) %>
 	</div>
 
 	<div class="row">
@@ -90,17 +90,17 @@
 
 	<div>
 		<h6>License Agreements</h6>
-		<% if AppSettings.student_submit_for_review_license_lac.present? %>
+		<% if AppSettings.student_review_license_lac.present? %>
 			<div>
 				<i class="fa fa-check" aria-hidden="true"></i> LAC licence
 			</div>
 		<% end %>
-		<% if AppSettings.student_submit_for_review_license_yorkspace.present? %>
+		<% if AppSettings.student_review_license_yorkspace.present? %>
 			<div>
 				<i class="fa fa-check" aria-hidden="true"></i> YorkSpace Non-Exclusive Distribution Licence
 			</div>
 		<% end %>
-		<% if AppSettings.student_submit_for_review_license_etd.present? %>
+		<% if AppSettings.student_review_license_etd.present? %>
 			<div>
 				<i class="fa fa-check" aria-hidden="true"></i> YorkU ETD Licence
 			</div>

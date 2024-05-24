@@ -15,22 +15,22 @@
 
 <div class="student-view fitted submit">
 	<h3><%= @thesis.title %></h3>
-	<p><%= raw(AppSettings.student_submit_for_review) %></p>
+	<p><%= raw(AppSettings.student_review_license_info) %></p>
 
 	<div class="mt-2 p-3 bg-light border border-dark">
 
 		<%= simple_form_for Student.new do |f| %>
-		<% if AppSettings.student_submit_for_review_license_lac.present? %>
+		<% if AppSettings.student_review_license_lac.present? %>
 			<div>
 				<input type="checkbox" class='form-check-inline' name="" id="" checked disabled> <a href="#L1_" data-bs-toggle="modal">LAC licence</a>
 			</div>
 		<% end %>
-		<% if AppSettings.student_submit_for_review_license_yorkspace.present? %>
+		<% if AppSettings.student_review_license_yorkspace.present? %>
 			<div>
 				<input type="checkbox" class='form-check-inline' name="" id="" checked disabled> <a href="#L2_" data-bs-toggle="modal">YorkSpace Non-Exclusive Distribution Licence</a>
 			</div>
 		<% end %>
-		<% if AppSettings.student_submit_for_review_license_etd.present? %>
+		<% if AppSettings.student_review_license_etd.present? %>
 			<div>
 				<input type="checkbox" class='form-check-inline' name="" id="" checked disabled> <a href="#L3_" data-bs-toggle="modal">YorkU ETD Licence</a>
 			</div>
@@ -46,7 +46,7 @@
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
-						<%= raw(AppSettings.student_submit_for_review_license_lac) %>
+						<%= raw(AppSettings.student_review_license_lac) %>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -64,7 +64,7 @@
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
-						<%= raw(AppSettings.student_submit_for_review_license_yorkspace) %>
+						<%= raw(AppSettings.student_review_license_yorkspace) %>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -82,7 +82,7 @@
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
-						<%= raw(AppSettings.student_submit_for_review_license_etd) %>
+						<%= raw(AppSettings.student_review_license_etd) %>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

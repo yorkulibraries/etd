@@ -21,3 +21,4 @@ app_settings.yml
 .byebug_history
 .rubocop.yml
 *.env
+*.bk

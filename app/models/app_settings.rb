@@ -43,10 +43,10 @@ class AppSettings < RailsSettings::Base
   <li><strong>Video:</strong> 8-10 bit uncompressed AVI (.avi)</li>
   <li><strong>Audio:</strong> Free Lossless Audio Codec or WAVE (.flac or .wav)</li>
   </ul>'
+  field :student_review_license_info, default: ''
+  field :student_review_license_lac, default: ''
+  field :student_review_license_yorkspace, default: ''
+  field :student_review_license_etd, default: ''
   field :student_review_details, default: ''
-  field :student_submit_for_review, default: ''
-  field :student_submit_for_review_license_lac, default: ''
-  field :student_submit_for_review_license_yorkspace, default: ''
-  field :student_submit_for_review_license_etd, default: ''
   field :student_check_status, default: ''
 end
