@@ -19,6 +19,25 @@
 
 	<div class="mt-2 p-3 bg-light border border-dark">
 
+	<h6>Supplementary Licence Files</h6>
+
+	<% if @supplemental_documents.licence.count == 0 %>
+		<p>There are no <strong>supplementary</strong> license files or documents attached to this thesis/dissertation.</p>
+	<% else %>
+		<h6>License Files uploaded</h6>
+		<% @supplemental_documents.each do | document | %>
+			<% if document.usage == "licence" %>
+				<%= render partial: 'documents/licence', locals: { document: document } %>
+			<% end %>
+		<% end %>
+	<% end %>
+	<%  unless block_thesis_changes?(@thesis) %>
+		<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#supplemental-files">Upload Supplementary Licence Files</button>
+	<% end %>
+	<br/><br/>
+	<p>LAC licence file is mandatory: [Insert link here for LAC Download Document to sign and upload]</p>
+<br/><br/>		
+
 		<%= simple_form_for Student.new do |f| %>
 		<% if AppSettings.student_review_license_lac.present? %>
 			<div>
@@ -102,4 +121,6 @@
 			<% end %>
 		</div>
 	 	<% end %>
+
+		<%= render partial: "documents/new_form", locals: { primary: false } %>
 </div>
