@@ -71,6 +71,7 @@ class ThesesController < ApplicationController
 
     @thesis.current_user = current_user # set the current_user for later validation
 
+    # puts "Thesis before update: #{@thesis.pretty_inspect}"
     authorize! :update, @thesis
 
     @thesis.audit_comment = 'Updating thesis details.'
@@ -79,6 +80,7 @@ class ThesesController < ApplicationController
     ## Need to check if thesis params are empty or not, if they are -> don't update
     if @thesis.update(thesis_params)
 
+      # puts "Thesis after update: #{@thesis.pretty_inspect}"
       if current_user.role == User::STUDENT
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
       else
@@ -146,16 +148,26 @@ class ThesesController < ApplicationController
 
   def submit_for_review
     @thesis = @student.theses.find(params[:id])
-    if validate_active_thesis(@thesis.id)
-      @thesis.audit_comment = 'Submitting for review.'
-      @thesis.update_attribute(:student_accepted_terms_at, Date.today)
-      @thesis.update_attribute(:under_review_at, Date.today)
-
-      @thesis.update_attribute(:status, Thesis::UNDER_REVIEW)
-      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS),
-                  notice: "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
+    @thesis.current_user = current_user
+    
+    # Temporarily assign the attributes for validation
+    @thesis.assign_attributes(thesis_params)
+    
+    if @thesis.valid?(:submit_for_review)
+      if @thesis.update(thesis_params)
+        if validate_active_thesis(@thesis.id)
+          @thesis.update(audit_comment: 'Submitting for review.', student_accepted_terms_at: Date.today, under_review_at: Date.today, status: Thesis::UNDER_REVIEW)
+          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS), notice: "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
+        else
+          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), alert: 'Missing Primary Document'
+        end
+      else
+        error_messages = @thesis.errors.full_messages.join(', ')
+        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: "There was an error submitting your thesis: #{error_messages}."
+      end
     else
-      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
+      error_messages = @thesis.errors.full_messages.join(', ')
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: "There was an error submitting your thesis: #{error_messages}."
     end
   end
 
@@ -193,7 +205,7 @@ class ThesesController < ApplicationController
                                    :keywords, :embargo, :language, :degree_name, :degree_level, :program, :published_date,
                                    :exam_date, :student_id, :committee, :abstract, :assigned_to_id, :assigned_to,
                                    :student_accepted_terms_at, :under_review_at, :accepted_at, :published_at, :returned_at,
-                                   :committee_members_attributes, :embargoed,
+                                   :committee_members_attributes, :embargoed, :certify_content_correct,
                                    committee_members_attributes: %i[first_name last_name role id _destroy],
                                    loc_subject_ids: [])
   end

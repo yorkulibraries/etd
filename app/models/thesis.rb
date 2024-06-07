@@ -9,6 +9,7 @@ class Thesis < ApplicationRecord
                         :exam_date
   validates_presence_of :student_id, message: 'A student must be selected before thesis can be created.'
   validates_presence_of :abstract, if: :updating_by_student?
+  validates_presence_of :certify_content_correct, if: :updating_by_student?, on: :submit_for_review
 
   # validates :abstract, word_count: { maximum: 150 }, if: :masters?
   # validates :abstract, word_count:  { maximum: 350 }, unless: :masters?

@@ -11,6 +11,35 @@ class ThesisTest < ActiveSupport::TestCase
     end
   end
 
+  should belong_to(:student)
+  should have_many(:documents).dependent(:delete_all)
+  # should have_many(:documents)
+  
+  ## VALIDATIONS
+  # Licenses are required fields
+  # should validate_presence_of(:lac_license_agreed)
+  # should validate_presence_of(:yspace_license_agreed)
+  # should validate_presence_of(:etd_license_agreed)
+
+  should 'validate presence of certify_content_correct if submitting_for_review_by_student?' do
+    student_user = create(:student)
+    thesis = build(:thesis, current_user: student_user, certify_content_correct: false)
+    assert_not thesis.valid?(:submit_for_review), 'Should not validate thesis if certify_content_correct is missing for students submitting for review'
+    assert_includes thesis.errors[:certify_content_correct], "can't be blank"
+  end
+
+  should 'not validate presence of certify_content_correct if not submitting_for_review_by_student?' do
+    staff_user = create(:user)
+    thesis = build(:thesis, current_user: staff_user, certify_content_correct: nil)
+    assert thesis.valid?(:submit_for_review), 'Should validate thesis if certify_content_correct is missing for staff even when submitting for review'
+  end
+
+  should 'not validate presence of certify_content_correct if updating by student but not submitting for review' do
+    student_user = create(:student)
+    thesis = build(:thesis, current_user: student_user, certify_content_correct: nil)
+    assert thesis.valid?, 'Should validate thesis if certify_content_correct is missing for students when not submitting for review'
+  end
+
   should 'fail if required attributes are missing' do
     assert !build(:thesis, student_id: nil).valid?, 'Thesis must be assigned to a student'
     assert !build(:thesis, title: nil).valid?, 'Title for thesis must be present'

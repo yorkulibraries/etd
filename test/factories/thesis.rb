@@ -24,8 +24,14 @@ FactoryGirl.define do
     exam_date Date.today.next_month
     published_date 1.year.from_now
 
+    # lac_license_agreed { true }
+    # yspace_license_agreed { true }
+    # etd_license_agreed { true }
+    certify_content_correct { true }
+
     status Thesis::OPEN
 
     embargoed false
   end
+
 end

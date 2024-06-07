@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_27_154322) do
   create_table "action_text_rich_texts", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
@@ -198,6 +198,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_06_172124) do
     t.datetime "embargoed_at", precision: nil
     t.integer "embargoed_by_id"
     t.text "returned_message"
+    t.boolean "certify_content_correct", default: false
     t.index ["student_id"], name: "index_theses_on_student_id"
   end
 

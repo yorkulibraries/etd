@@ -386,10 +386,10 @@ class ThesesControllerTest < ActionController::TestCase
       assert_redirected_to unauthorized_url
     end
 
-    should 'submit for review, thesis status will cahnge to under_review' do
+    should 'submit for review, thesis status will change to under_review' do
       create(:document, supplemental: false, thesis: @thesis, user: @student,
                         file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
-      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id }
+      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
 
       thesis = assigns(:thesis)
       assert_response :redirect
@@ -411,10 +411,22 @@ class ThesesControllerTest < ActionController::TestCase
     end
 
     should 'submit for review, thesis status will change to upload due to lack of document' do
-      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id }
+      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
       assigns(:thesis)
       assert_response :redirect
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
+    end
+
+    should 'should not submit for review without certifying content correct' do
+      @thesis.update(certify_content_correct: false)
+
+      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: false } }
+  
+      assigns(:thesis)
+      assert_response :redirect
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
+      assert_equal "There was an error submitting your thesis: Certify content correct can't be blank.", flash[:alert]
+      
     end
   end
 end

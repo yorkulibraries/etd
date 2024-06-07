@@ -12,6 +12,9 @@ require 'database_cleaner/active_record'
 require 'capybara/rails'
 require 'capybara/minitest'
 require 'rails-controller-testing'
+
+# Configure shoulda-matchers to use Minitest
+require 'shoulda/matchers'
 Rails::Controller::Testing.install
 
 DatabaseCleaner.url_allowlist = [
@@ -23,6 +26,13 @@ Capybara.server_host = '0.0.0.0'
 Capybara.app_host = "http://#{Socket.gethostname}:#{Capybara.server_port}"
 
 include ActionDispatch::TestProcess
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :minitest
+    with.library :rails
+  end
+end
 
 module ActiveSupport
   class TestCase
