@@ -11,6 +11,9 @@ class Thesis < ApplicationRecord
   validates_presence_of :abstract, if: :updating_by_student?
   validates_presence_of :certify_content_correct, if: :updating_by_student?, on: :submit_for_review
 
+  validates_presence_of :lac_licence_agreement, :yorkspace_licence_agreement, :etd_licence_agreement, if: :updating_by_student?, on: :accept_licences
+
+  
   # validates :abstract, word_count: { maximum: 150 }, if: :masters?
   # validates :abstract, word_count:  { maximum: 350 }, unless: :masters?
 
@@ -29,6 +32,7 @@ class Thesis < ApplicationRecord
   belongs_to :assigned_to, foreign_key: 'assigned_to_id', class_name: 'User'
   belongs_to :embargoed_by, foreign_key: 'embargoed_by_id', class_name: 'User'
 
+  
   audited associated_with: :student
   has_associated_audits
 
@@ -136,7 +140,7 @@ class Thesis < ApplicationRecord
       false
     end
   end
-
+  
   def update_from_gem_record
     record = GemRecord.find_by_seqgradevent(gem_record_event_id)
     return unless record

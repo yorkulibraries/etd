@@ -26,13 +26,15 @@ class DocumentsController < ApplicationController
     @document = @thesis.documents.new(document_params)
     @document.thesis = @thesis
     @document.user = current_user
-    @document.audit_comment = "Document was uploaded. File: #{@document.name}"
+    @document.audit_comment = "Document was uploaded. File: #{@document.name} | #{@document.usage} | "
 
     if @document.save
-      if current_user.role == User::STUDENT
+      if current_user.role == User::STUDENT && @document.usage == 'licence'
+        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW),
+                    notice: 'Successfully uploaded licence document'
+      elsif current_user.role == User::STUDENT && @document.usage != 'licence'
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
-                    notice: 'Successfully created document'
-      else
+                    notice: 'Successfully created document'else
         redirect_to [@student, @thesis], notice: 'Successfully created document.'
       end
     else
@@ -52,7 +54,10 @@ class DocumentsController < ApplicationController
     @document = @thesis.documents.find(params[:id])
     @document.audit_comment = "Document was updated. File: #{@document.name}"
     if @document.update(document_params)
-      if current_user.role == User::STUDENT
+      if current_user.role == User::STUDENT && @document.usage == 'licence'
+        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW),
+                    notice: 'Successfully updated licence document'
+      elsif current_user.role == User::STUDENT && @document.usage != 'licence'
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
                     notice: 'Successfully updated document'
       else
@@ -68,7 +73,10 @@ class DocumentsController < ApplicationController
     @document.audit_comment = "Document was deleted. File: #{@document.name}."
     @document.destroy
 
-    if current_user.role == User::STUDENT
+    if current_user.role == User::STUDENT && @document.usage == 'licence'
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW),
+                  notice: 'Successfully deleted licence document'
+    elsif current_user.role == User::STUDENT && @document.usage != 'licence'
       redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
                   notice: 'Successfully deleted the document'
     else

@@ -14,3 +14,9 @@
  *= require_tree .
  *= require_self
  */
+
+ /* Licence Boxes */
+ .scrollable-content {
+  max-height: 150px;
+  overflow-y: auto;
+}

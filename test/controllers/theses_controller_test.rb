@@ -428,5 +428,23 @@ class ThesesControllerTest < ActionController::TestCase
       assert_equal "There was an error submitting your thesis: Certify content correct can't be blank.", flash[:alert]
       
     end
+
+    ## LICENCE UPLOAD CHECK
+    should "should not accept licences without a licence document" do
+      # thesis = create(:thesis, student: @student)
+      patch :accept_licences, params: { student_id: @student.id, id: @thesis.id, thesis: { lac_licence_agreement: true, yorkspace_licence_agreement: true, etd_licence_agreement: true } }
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW)
+      assert_equal 'Missing Licence Document. Please upload LAC Licence Signed Doc.', flash[:alert]
+    end 
+  
+    should "should accept licences with a licence document" do
+      # thesis = create(:thesis, student: @student)
+      # create(:document, thesis: @thesis, user: @student, usage: 'licence', supplemental: true, deleted: false)
+      create(:document_licence, thesis: @thesis, user: @student, deleted: false)
+      patch :accept_licences, params: { student_id: @student.id, id: @thesis.id, thesis: { lac_licence_agreement: true, yorkspace_licence_agreement: true, etd_licence_agreement: true } }
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
+      assert_equal "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.reload.status]}", flash[:notice]
+    end
+
   end
 end

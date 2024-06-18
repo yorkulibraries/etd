@@ -47,7 +47,9 @@
 		</h6>
 
 		<% @supplemental_documents.each do | document | %>
-			<%= render partial: document %>
+			<% if document.usage != "licence" %>
+				<%= render partial: document %>
+			<% end %>
 		<% end %>
 		<% if @supplemental_documents.count == 0 %>
 			<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>

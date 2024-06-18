@@ -1,25 +1,30 @@
-<div class="row">
-  <div class="col-1 d-none d-lg-block my-auto">
-	<%= link_to_unless_current edit_student_thesis_document_path(@student, @thesis, document) do %>
-			<i class="fa fa-file fa-4x"></i>
-		<% end %>
-  </div>
-  <div class="col">
-	<p class="name <%= "suplemental" if document.supplemental? %>" title="<%= File.basename(document.file_url) %>">
-			<%= URI.decode_www_form_component(File.basename(document.file_url)) %>
-		</p>
-		<p class="file_path" >
-		  <% if document.name %>
-				<%= document.name %>
-				&nbsp; &nbsp;
+<ol class="list-group bg-light">
+	<li class="list-group-item d-flex justify-content-between align-items-start">
+    <div class="ms-2 me-auto mt-1">
+			
+      <div class="fw-bold">
+				<span class="name <%= "supplemental" if document.supplemental? %>" title="<%= File.basename(document.file_url) %>">
+					<i class="fa fa-file"></i> <%= URI.decode_www_form_component(File.basename(document.file_url)) %>
+				</span>
+				<% if document.name %>
+					<%= document.name %>
+					&nbsp; &nbsp;
+				<% end %>
+			</div>
+      
+    </div>
+		<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+			<!-- <%= link_to edit_student_thesis_document_path(@student, @thesis, document), class: "btn btn-sm btn-info", title: "Edit File" do %>
+				<i class="fa fa-edit green"></i> Edit file 
+			<% end %> -->
+			<%= link_to document.file_url, class: 'btn btn-sm btn-success', title: "Download file" do %>
+				<i class="fa fa-download"></i> Download
+				<span class="weak small">[<%=number_to_human_size document.file.file.size rescue nil%>]</span>
+			<% end %>		
+			<%= link_to [@student, @thesis, document], data: { confirm: 'Are you sure?' }, class: "btn btn-sm btn-danger 	float-end", :method => :delete do %>
+				<i class="fa fa-trash"></i> Delete
 			<% end %>
-			<% unless block_thesis_changes?(@thesis) %>
-			<p><a href="<%= edit_student_thesis_document_path(@student, @thesis, document)  %>" class=" green" title="Edit File">
-				<i class="fa fa-edit green"></i> Edit file
-			</a></p>
-			or <% end %>
-			<a href="<%= document.file_url %>" class="download" title="Download file"><i class="fa fa-download"></i> Download</a>
-		  <span class="weak small">[<%=number_to_human_size document.file.file.size rescue nil%>]</span>
-		</p>
-  </div>
-</div>
+		</div>
+  </li>
+
+</ol>

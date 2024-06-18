@@ -17,10 +17,8 @@ class ThesisTest < ActiveSupport::TestCase
   
   ## VALIDATIONS
   # Licenses are required fields
-  # should validate_presence_of(:lac_license_agreed)
-  # should validate_presence_of(:yspace_license_agreed)
-  # should validate_presence_of(:etd_license_agreed)
 
+  ## CERTIFY CONTENT CORRECT
   should 'validate presence of certify_content_correct if submitting_for_review_by_student?' do
     student_user = create(:student)
     thesis = build(:thesis, current_user: student_user, certify_content_correct: false)
@@ -38,6 +36,40 @@ class ThesisTest < ActiveSupport::TestCase
     student_user = create(:student)
     thesis = build(:thesis, current_user: student_user, certify_content_correct: nil)
     assert thesis.valid?, 'Should validate thesis if certify_content_correct is missing for students when not submitting for review'
+  end
+  
+  ## LICENCE AGREEMENTS
+  should 'validate presence of lac_licence_agreement if accepting_licences by student' do
+    student_user = create(:student)
+    thesis = build(:thesis, current_user: student_user, lac_licence_agreement: false, yorkspace_licence_agreement: true, etd_licence_agreement: true)
+    assert_not thesis.valid?(:accept_licences), 'Should not validate thesis if lac_licence_agreement is missing for students accepting licences'
+    assert_includes thesis.errors[:lac_licence_agreement], "can't be blank"
+  end
+
+  should 'validate presence of yorkspace_licence_agreement if accepting_licences by student' do
+    student_user = create(:student)
+    thesis = build(:thesis, current_user: student_user, lac_licence_agreement: true, yorkspace_licence_agreement: false, etd_licence_agreement: true)
+    assert_not thesis.valid?(:accept_licences), 'Should not validate thesis if yorkspace_licence_agreement is missing for students accepting licences'
+    assert_includes thesis.errors[:yorkspace_licence_agreement], "can't be blank"
+  end
+
+  should 'validate presence of etd_licence_agreement if accepting_licences by student' do
+    student_user = create(:student)
+    thesis = build(:thesis, current_user: student_user, lac_licence_agreement: true, yorkspace_licence_agreement: true, etd_licence_agreement: false)
+    assert_not thesis.valid?(:accept_licences), 'Should not validate thesis if etd_licence_agreement is missing for students accepting licences'
+    assert_includes thesis.errors[:etd_licence_agreement], "can't be blank"
+  end
+
+  should 'not validate presence of licence agreements if not accepting_licences by student' do
+    staff_user = create(:user)
+    thesis = build(:thesis, current_user: staff_user, lac_licence_agreement: nil, yorkspace_licence_agreement: nil, etd_licence_agreement: nil)
+    assert thesis.valid?(:accept_licences), 'Should validate thesis if licence agreements are missing for staff even when accepting licences'
+  end
+
+  should 'not validate presence of licence agreements if updating by student but not accepting licences' do
+    student_user = create(:student)
+    thesis = build(:thesis, current_user: student_user, lac_licence_agreement: nil, yorkspace_licence_agreement: nil, etd_licence_agreement: nil)
+    assert thesis.valid?, 'Should validate thesis if licence agreements are missing for students when not accepting licences'
   end
 
   should 'fail if required attributes are missing' do

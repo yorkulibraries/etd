@@ -6,6 +6,7 @@ require_relative '../helpers/system_test_helper'
 
 class StudentsTest < ApplicationSystemTestCase
   include SystemTestHelper  # Include the SystemTestHelper module here
+  
 
   setup do
     @gem_record = FactoryGirl.create(:gem_record)
@@ -84,9 +85,44 @@ class StudentsTest < ApplicationSystemTestCase
     create(:loc_subject, name: "Management", category: "BUSINESS")
     create(:loc_subject, name: "Finance", category: "BUSINESS")
 
+    # Set the AppSettings values
+    AppSettings.student_review_license_yorkspace = "<div>A Software Licence Agreement, commonly known as an <strong>End User Licence
+  Agreement (EULA)</strong>, is a contract that allows a user to buy the rights to
+  use a computer program, software, or application. This agreement does not transfer
+  ownership of the software but permits the buyer to use it according to certain terms
+  and conditions.<br><br></div><div>An EULA often appears as a pop-up before or after
+  you download a program or install an update on your computer. Software programs
+  sold through a retailer or mail order may come with a physical copy of a licence
+  agreement.&nbsp;<br><br></div><div>Whether it appears in digital or physical form,
+  this agreement is important for software developers who want to maintain some control
+  over the use and distribution of their intellectual property.&nbsp;</div>"
+
+    AppSettings.student_review_license_etd = "'<div>In addition to the licence terms mentioned above, LawDepot?s EULA template
+  also addresses provisions such as:<br><br></div><ul><li><strong>Limitation of liability</strong>:
+  limits the consequences a vendor may face if issues stem from the use of their software</li><li><strong>Warrants
+  and representations</strong>: clarifies copyright</li><li><strong>Termination</strong>:
+  outlines the process of termination if the end-user fails to comply with the agreement</li><li><a
+  href=\"https://www.lawdepot.com/force-majeure\"><strong>Force Majeure</strong></a>:
+  limits the vendor?s liability when problems arise from an unforeseen and uncontrollable
+  event (e.g., if a natural disaster causes the product to malfunction)</li></ul><div>If
+  needed, you can add a clause that?s specific to your product and not already included
+  in the template. For example, a vendor may need to detail further restrictions on
+  the end-user because the product allows users to create content. In this case, the
+  vendor may reserve the right to moderate content that meets certain criteria (e.g.,
+  ?A non-exhaustive list of content that may be rejected by the Software Publisher
+  includes??).<br><br></div><div>When using LawDepot?s EULA template to write your
+  own clause, follow these tips:<br><br></div><ul><li>Use everyday language and full
+  sentences.&nbsp;</li><li>Capitalize any defined terms, such as Licensee and Vendor.</li><li>Do
+  not use pronouns (e.g. ?we? and ?they?) to refer to the parties in the agreement.</li></ul><div>Contact
+  a local attorney if you?re unsure how to address a particular use for your Software
+  Licence Agreement.&nbsp;<br><br></div>"
+
     login_as(@thesis.student)
     visit root_url
 
+    # Set Page size
+    page.driver.browser.manage.window.resize_to(1920, 2500)
+    
     ## Page 1
     click_link("My ETD Submission")
     assert_selector "input#student_email_external"
@@ -124,15 +160,64 @@ class StudentsTest < ApplicationSystemTestCase
 
     click_on("Continue")
 
+    
     ## Page 4
-    assert_link("Accept and Continue")
+    
+    assert_text "LAC Supplementary Licence File Upload"
+    
+    # Initially, checkboxes should be disabled if not checked
+    assert page.has_unchecked_field?('thesis_yorkspace_licence_agreement', disabled: true)
+    assert page.has_unchecked_field?('thesis_etd_licence_agreement', disabled: true)
+
+    # Scroll through Yorkspace Licence
+    assert page.has_selector?('#yorkspace-licence', visible: true), "ERROR: Yorkspace-licence not found."
+
+    # Wait for the Yorkspace Licence content to be rendered
+    # assert_selector '#yorkspace-licence', visible: true
+
+    # Scroll to the bottom of the scrollable content to enable the checkbox
+    page.execute_script('document.getElementById("yorkspace-licence").scrollTop = document.getElementById("yorkspace-licence").scrollHeight')
+
+    # Ensure the checkbox is enabled
+    # assert find('#thesis_yorkspace_licence_agreement').enabled?
+    # assert_not find('#thesis_yorkspace_licence_agreement').disabled?, "ERROR: Yorkspace licence agreement checkbox is not enabled."
+    
+    checkbox = find('#thesis_yorkspace_licence_agreement')
+    assert_not checkbox.disabled?, "ERROR: Yorkspace licence agreement checkbox is not enabled."
+ 
+    # Check the checkbox
+    checkbox.check
+ 
+    # Verify that the checkbox is checked
+    assert checkbox.checked?, "ERROR: Yorkspace licence agreement checkbox is not checked."
+   
 
 
-    # page.driver.browser.manage.window.resize_to(1920, 2500)
+    
+    # within('#yorkspace-licence') do
+    #   save_page()
+    #   # assert_selector '.scrollable-content', visible: true
+    #   page.execute_script('arguments[0].scrollTop = arguments[0].scrollHeight', find('#yorkspace-licence'))
+    # end
+    # assert page.has_unchecked_field?('thesis_yorkspace_licence_agreement', disabled: false)
+
+    # # Scroll through ETD Licence
+    # within('#etd-licence') do
+    #   page.execute_script('arguments[0].scrollTop = arguments[0].scrollHeight', find('#etd-licence'))
+    # end
+    # assert page.has_unchecked_field?('thesis_etd_licence_agreement', disabled: false)
+    
+    
+    # assert_selector "a", text: "Accept and Continue"
+    # assert_selector "button", text: "Accept and Continue"
+
+
+    File.open("tmp/test-screenshots/error.html", "w") { |file| file.write(page.html) }    
+    save_page()
+
+    
     save_screenshot()
 
-    # File.open("tmp/test-screenshots/error.html", "w") { |file| file.write(page.html) }    
-    save_page()
 
     # create(:document, thesis:, supplemental: false, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 

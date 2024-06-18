@@ -30,4 +30,13 @@ FactoryGirl.define do
     association :user, factory: :student
   end
 
+  factory :document_licence, class: Document do
+    sequence(:name) { |n| "document #{n}" }
+    file { Rack::Test::UploadedFile.new('test/fixtures/files/pdf-document.pdf') }
+    usage :licence
+    supplemental true
+    association :thesis, factory: :thesis
+    association :user, factory: :user
+  end
+
 end

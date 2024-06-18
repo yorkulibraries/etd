@@ -43,8 +43,13 @@ class AppSettings < RailsSettings::Base
   <li><strong>Video:</strong> 8-10 bit uncompressed AVI (.avi)</li>
   <li><strong>Audio:</strong> Free Lossless Audio Codec or WAVE (.flac or .wav)</li>
   </ul>'
-  field :student_review_license_info, default: ''
-  field :student_review_license_lac, default: ''
+  field :student_review_license_info, default: 'Please review the licences below, you must agree to all to proceed.'
+  field :student_review_license_lac, default: 'LAC Licence is required. Please download the form (<a href="~//lib/assets/lac-non-exclusive-licence-en.pdf">lac-non-exclusive-licence-en.pdf</a>), sign it and upload it.'
+  field :student_review_lac_licence_instructions, default: '<p class="fw-bold">Please download, sign and upload the LAC Licence file. You must upload the licence to proceed to next step</p>
+<ul>
+  <li>Download English Licence: <a href="/documents/lac-non-exclusive-licence-en.pdf", target="_blank">LAC Non-Exclusive Licence (English)</a></p></li>
+  <li>Download French Licence: <a href="/documents/lac-non-exclusive-licence-fr.pdf", target="_blank">LAC Non-Exclusive Licence (French)</a></li>
+</ul>'
   field :student_review_license_yorkspace, default: ''
   field :student_review_license_etd, default: ''
   field :student_review_details, default: ''

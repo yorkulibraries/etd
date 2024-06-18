@@ -142,7 +142,7 @@ class DocumentTest < ActiveSupport::TestCase
     create_list(:document, 4, supplemental: true)
 
     assert_equal 6, Document.count, 'There should be nine in total'
-    assert_equal 4, Document.supplemental.count, 'The shoudl be 4 supplemental documents'
+    assert_equal 4, Document.supplemental.count, 'The should be 4 supplemental documents'
     assert_equal 2, Document.primary.count, 'There should be 5 primary documents'
   end
 end
