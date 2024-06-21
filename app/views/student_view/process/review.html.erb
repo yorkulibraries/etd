@@ -46,7 +46,7 @@
 						<% end %>
 						<% @supplemental_documents.each do | document | %>
 							<% if document.usage == "licence" %>
-								<%= render partial: 'documents/licence', locals: { document: document } %>
+								<%= render partial: document %>
 							<% end %>
 						<% end %>
 						<br/>
@@ -100,7 +100,7 @@
 			<%  unless block_thesis_changes?(@thesis) %>
 			<div class="mt-2 p-3">
 				<hr/>
-				<div class="process-nav float-end">
+				<div class="process-nav float-start">
 					<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD) %>" class="next-btn back btn btn-lg btn-primary" title="Upload Thesis Files">
 						<i class="fa fa-angle-double-left"></i></a>
 					<%= f.submit 'Accept and Continue', class: "next-btn btn btn-lg btn-success" %>

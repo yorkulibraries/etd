@@ -80,44 +80,40 @@
 		<p>There are no <strong>primary</strong> files or documents attached to this thesis/dissertation.</p>
 	<% end %>
 
-	<h6>Supplementary</h6>
-	<% @supplemental_documents.each do | document | %>
-		<%= render partial: document %>
-	<% end %>
-	<% if @supplemental_documents.count == 0 %>
-		<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
-	<% end %>
-
-	<div>
+	<div class="mt-3">
+		<h6>Supplementary</h6>
+		<% @supplemental_documents.each do | document | %>
+			<% if document.usage != 'licence'%>
+				<%= render partial: document %>
+			<% end %>
+		<% end %>
+		<% if @supplemental_documents.count == 0 %>
+			<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
+		<% end %>
+	</div>
+	<div class="mt-3">
 		<h6>License Agreements</h6>
-		<% if AppSettings.student_review_license_lac.present? %>
-			<div>
-				<i class="fa fa-check" aria-hidden="true"></i> LAC licence
-			</div>
+		<% @supplemental_documents.each do | document | %>
+			<% if document.usage == 'licence'%>
+				<%= render partial: document %>
+			<% end %>
 		<% end %>
-		<% if AppSettings.student_review_license_yorkspace.present? %>
-			<div>
-				<i class="fa fa-check" aria-hidden="true"></i> YorkSpace Non-Exclusive Distribution Licence
-			</div>
-		<% end %>
-		<% if AppSettings.student_review_license_etd.present? %>
-			<div>
-				<i class="fa fa-check" aria-hidden="true"></i> YorkU ETD Licence
-			</div>
+		<% if @supplemental_documents.count == 0 %>
+			<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
 		<% end %>
 	</div>
 
-	<div class="mt-3">
-		<h4>	<%= Date.today.strftime("%B %d, %Y")%></h4>
-
+	<div class="my-4">
+		<h4><%= Date.today.strftime("%B %d, %Y")%></h4>
+		<hr />
 				<%= simple_form_for([@current_user, @thesis], url: submit_for_review_student_thesis_path(@current_user, @thesis), method: :post) do |f| %>
-					<div class="field">
+					<div class="field bg-secondary text-white border p-3">
 						<%= f.input :certify_content_correct, as: :boolean, label: "I certify that the content is correct" %>
 					</div>
-					<div class="process-nav mt-2">
-						<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn back btn btn-primary" title="Review Thesis Details">
+					<div class="process-nav mt-4">
+						<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn back btn btn-primary btn-lg" title="Review Thesis Details">
 						<i class="fa fa-angle-double-left"></i></a>
-						<%= f.button :submit, "I accept and send for review", class: "next-btn send btn btn-danger", data: { confirm: "Are you sure? You will not be able to make further changes." } %>
+						<%= f.button :submit, "I accept and send for review", class: "next-btn send btn btn-lg btn-danger", data: { confirm: "Are you sure? You will not be able to make further changes." } %>
 					</div>
 				<% end %>
 	</div>

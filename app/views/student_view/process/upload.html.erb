@@ -40,20 +40,22 @@
 
 		<div class="push-down"></div>
 
-		<h6>Supplementary  &nbsp; &nbsp;
+		<div class="mt-3">
+			<h6>Supplementary</h6>
 				<%  unless block_thesis_changes?(@thesis) %>
 					<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#supplemental-files">Upload Supplementary Files</button>
 				<% end %>
-		</h6>
 
-		<% @supplemental_documents.each do | document | %>
-			<% if document.usage != "licence" %>
-				<%= render partial: document %>
+			<div class='mt-3'>
+			<% @supplemental_documents.each do | document | %>
+				<% if document.usage != "licence" %>
+					<%= render partial: document %>
+				<% end %>
 			<% end %>
-		<% end %>
-		<% if @supplemental_documents.count == 0 %>
-			<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
-		<% end %>
+			<% if @supplemental_documents.count == 0 %>
+				<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
+			<% end %>
+		</diV>
 
 
 
@@ -61,10 +63,10 @@
 
 	<%  unless block_thesis_changes?(@thesis) %>
 		<hr/>
-		<div class="process-nav float-end">
-			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="next-btn back btn btn-primary" title="Update Details">
+		<div class="process-nav float-start">
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="next-btn back btn btn-primary btn-lg " title="Update Details">
 				<i class="fa fa-angle-double-left"></i></a>
-			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn btn btn-success" title="Continue to Review Details">
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn btn btn-success btn-lg" title="Continue to Review Details">
 	 			<i class="fa fa-angle-double-right"></i> Continue
 			</a>
 		</div>
