@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'application_system_test_case'
-# require '/app/test/helpers/system_test_helper'
 require_relative '../helpers/system_test_helper'
 
 class StudentsTest < ApplicationSystemTestCase
@@ -156,7 +155,7 @@ class StudentsTest < ApplicationSystemTestCase
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
 
-    assert_selector("p", text: /Primary\.pdf/)
+    assert_selector(".name", text: /Primary\.pdf/)
 
     click_on("Continue")
 
@@ -191,46 +190,14 @@ class StudentsTest < ApplicationSystemTestCase
     # Verify that the checkbox is checked
     assert checkbox.checked?, "ERROR: Yorkspace licence agreement checkbox is not checked."
    
-
-
-    
-    # within('#yorkspace-licence') do
-    #   save_page()
-    #   # assert_selector '.scrollable-content', visible: true
-    #   page.execute_script('arguments[0].scrollTop = arguments[0].scrollHeight', find('#yorkspace-licence'))
-    # end
-    # assert page.has_unchecked_field?('thesis_yorkspace_licence_agreement', disabled: false)
-
-    # # Scroll through ETD Licence
-    # within('#etd-licence') do
-    #   page.execute_script('arguments[0].scrollTop = arguments[0].scrollHeight', find('#etd-licence'))
-    # end
-    # assert page.has_unchecked_field?('thesis_etd_licence_agreement', disabled: false)
-    
-    
-    # assert_selector "a", text: "Accept and Continue"
-    # assert_selector "button", text: "Accept and Continue"
-
-
-    File.open("tmp/test-screenshots/error.html", "w") { |file| file.write(page.html) }    
-    save_page()
-
-    
-    save_screenshot()
-
-
-    # create(:document, thesis:, supplemental: false, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
-
-
-    
-
   end
-
-
 end
 
 ########################################
 ## For Debugging and building tests ##
 # page.driver.browser.manage.window.resize_to(1920, 2500)
 # save_screenshot()
+## HTML Save
+# File.open("tmp/test-screenshots/error.html", "w") { |file| file.write(page.html) }    
+# save_page()
 ########################################
