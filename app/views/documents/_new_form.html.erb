@@ -37,7 +37,7 @@
 						<%= f.hidden_field :usage, value: :thesis %>
 						<%= f.hidden_field :supplemental, value: false %>
 					<% else %>
-						<%= f.input :usage, label: "Document type", collection: Document.usages.keys.map(&:to_sym), required: true, label_html: { class: 'pt-2' } %>
+						<%= f.input :usage, label: "Document type", collection: Document.usages.keys.map(&:to_sym).reject { |usage| usage == :licence }, required: true, label_html: { class: 'pt-2' } %>
 						<%= f.hidden_field :supplemental, value: true %>
 					<% end %>
 					
