@@ -10,7 +10,7 @@
 <div class="student-view fitted status">
 	<h3><%= @thesis.title %></h3>
 	<div>
-		<%= AppSettings.student_check_status %>
+		<%= raw(AppSettings.student_check_status_description) %>
 	</div>
 	<p>Your Current Thesis/Dissertation Status: <span class="badge text-bg-primary"><%= @thesis.status.humanize %></span></p>
 
@@ -24,7 +24,7 @@
 			</h2>
 			<div id="collapseOne" class="<%= show_accordion(Thesis::OPEN) %>" data-bs-parent="#accordionThesis">
 				<div class="accordion-body">
-					A record has been created for you to submit your thesis/dissertation. As long as the status is Open, you may continue to make changes until you are ready to submit.
+					<%= raw(AppSettings.student_check_status_open) %>
 				</div>
 			</div>
 		</div>
@@ -37,7 +37,7 @@
 			</h2>
 			<div id="collapseTwo" class="<%= show_accordion(Thesis::UNDER_REVIEW) %>" data-bs-parent="#accordionThesis">
 				<div class="accordion-body">
-				Your submission has been received and is being reviewed by a Thesis Coordinator in the Faculty of Graduate Studies. If you need to re-open your ETD record to make any changes, please email <a href="mailto:gsthesis@yorku.ca">gsthesis@yorku.ca</a>.
+					<%= raw(AppSettings.student_check_status_under_review) %>
 				</div>
 			</div>
 		</div>
@@ -50,7 +50,7 @@
 			</h2>
 			<div id="collapseThree" class="<%= show_accordion(Thesis::RETURNED) %>" data-bs-parent="#accordionThesis">
 				<div class="accordion-body">
-					Your submission has been reviewed by a Thesis Coordinator and has been returned to you for modification. Please make the updates detailed in the email from the Thesis Coordinator, attach an updated PDF (if applicable) and resubmit.
+					<%= raw(AppSettings.student_check_status_returned) %>
 				</div>
 			</div>
 		</div>
@@ -63,7 +63,7 @@
 			</h2>
 			<div id="collapseFour" class="<%= show_accordion(Thesis::ACCEPTED) %>" data-bs-parent="#accordionThesis">
 				<div class="accordion-body">
-					Your submission has been accepted and will be published following conferral of your degree.
+					<%= raw(AppSettings.student_check_status_accepted) %>
 				</div>
 			</div>
 		</div>
@@ -76,7 +76,7 @@
 			</h2>
 			<div id="collapseFive" class="<%= show_accordion(Thesis::PUBLISHED) %>" data-bs-parent="#accordionThesis">
 				<div class="accordion-body">
-					Your thesis&#47;dissertation has been deposited in YorkSpace, York University&#39;s digital library and is available for electronic viewing through Library and Archives Canada.
+					<%= raw(AppSettings.student_check_status_published) %>
 				</div>
 			</div>
 		</div>
@@ -89,7 +89,7 @@
 			</h2>
 			<div id="collapseSix" class="<%= show_accordion(Thesis::REJECTED) %>" data-bs-parent="#accordionThesis">
 				<div class="accordion-body">
-					Current status Rejected.
+					<%= raw(AppSettings.student_check_status_rejected) %>
 				</div>
 			</div>
 		</div>

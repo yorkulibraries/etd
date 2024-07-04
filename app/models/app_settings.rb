@@ -54,5 +54,11 @@ class AppSettings < RailsSettings::Base
   field :student_review_license_etd, default: ''
   field :student_review_details, default: ''
   field :student_submit_for_review, default: ''
-  field :student_check_status, default: ''
+  field :student_check_status_description, default: ''
+  field :student_check_status_open, default: 'A record has been created for you to submit your thesis/dissertation. As long as the status is Open, you may continue to make changes until you are ready to submit.'
+  field :student_check_status_under_review, default: 'Your submission has been received and is being reviewed by a Thesis Coordinator in the Faculty of Graduate Studies. If you need to re-open your ETD record to make any changes, please email <a href="mailto:gsthesis@yorku.ca">gsthesis@yorku.ca</a>.'
+  field :student_check_status_returned, default: 'Your submission has been reviewed by a Thesis Coordinator and has been returned to you for modification. Please make the updates detailed in the email from the Thesis Coordinator, attach an updated PDF (if applicable) and resubmit.'
+  field :student_check_status_accepted, default: 'Your submission has been accepted and will be published following conferral of your degree.'
+  field :student_check_status_published, default: 'Your thesis&#47;dissertation has been deposited in YorkSpace, York University&#39;s digital library and is available for electronic viewing through Library and Archives Canada.'
+  field :student_check_status_rejected, default: 'Current status Rejected.'
 end

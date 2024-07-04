@@ -39,7 +39,27 @@
       <%= f.input :student_submit_for_review, as: :rich_text_area, label: "Information", input_html: { rows: 20 } %>
   </div>
   <div class="tab-pane fade" id="nav-check" role="tabpanel" aria-labelledby="nav-check-tab" tabindex="0">
-    <%= f.input :student_check_status, as: :rich_text_area, label: "Status message", input_html: { rows: 20 } %>
+    <div class="row mb-4">
+      <%= f.input :student_check_status_description, as: :rich_text_area, label: "Status message", input_html: { rows: 20 } %>
+    </div>
+    <div class="row mb-4">
+      <%= f.input :student_check_status_open, as: :rich_text_area, label: "Status: Open", input_html: { rows: 20 } %>
+    </div>
+    <div class="row mb-4">
+      <%= f.input :student_check_status_under_review, as: :rich_text_area, label: "Status: Under Review", input_html: { rows: 20 } %>
+    </div>
+    <div class="row mb-4">
+      <%= f.input :student_check_status_returned, as: :rich_text_area, label: "Status: Returned", input_html: { rows: 20 } %>
+    </div>
+    <div class="row mb-4">
+      <%= f.input :student_check_status_accepted, as: :rich_text_area, label: "Status: Accepted", input_html: { rows: 20 } %>
+    </div>
+    <div class="row mb-4">
+      <%= f.input :student_check_status_published, as: :rich_text_area, label: "Status: Published", input_html: { rows: 20 } %>
+    </div>
+    <div class="row mb-4">
+      <%= f.input :student_check_status_rejected, as: :rich_text_area, label: "Status: Rejected", input_html: { rows: 20 } %>
+    </div>
   </div>
 </div>
 
