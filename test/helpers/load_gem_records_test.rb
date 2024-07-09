@@ -4,7 +4,7 @@ require Rails.root.join('lib/tasks/load_gem_records_csv.rb')
 class LoadGemRecordsTest < ActiveSupport::TestCase
   setup do
     gem_load = LoadGemRecordsCSV.new
-    gem_load.load_csv('dummy_gem_records.csv')
+    gem_load.load_csv('lib/dummy_gem_records.csv')
   end
 
   should "parse csv" do

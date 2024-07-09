@@ -9,6 +9,6 @@ namespace :gem_records_csv do
   task load: :environment do
     GemRecord.delete_all
     gem_load = LoadGemRecordsCSV.new
-    gem_load.load_csv('dummy_gem_records.csv')
+    gem_load.load_csv('lib/dummy_gem_records.csv')
   end
 end

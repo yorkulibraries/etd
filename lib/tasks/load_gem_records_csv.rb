@@ -11,8 +11,6 @@ class LoadGemRecordsCSV
   def load_csv(filename)
     count = 0
 
-    filename = File.join(File.dirname(__FILE__), filename)
-
     CSV.foreach(filename, headers: true) do |row|
       seqgradevent = row['seqgradevent'].strip
       unless GemRecord.find_by_seqgradevent(seqgradevent)
