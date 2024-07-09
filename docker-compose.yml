@@ -23,6 +23,9 @@ services:
       - RAILS_SERVE_STATIC_FILES=true
       - NODE_OPTIONS=--openssl-legacy-provider
       - SELENIUM_SERVER=chrome-server
+    env_file:
+      - path: ./override.env
+        required: false
 
   db:
     image: mysql
