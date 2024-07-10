@@ -28,6 +28,20 @@ class ThesesControllerTest < ActionController::TestCase
       assert_template 'index'
     end
 
+    should 'update thesis notes' do
+      thesis = create(:thesis, student: @student)
+
+      get :show, params: { id: thesis.id, student_id: @student.id }
+      t = assigns(:thesis)
+      assert t
+
+      post :update_notes, params: { id: t.id, student_id: @student.id, thesis_notes: "Thesis Notes Test" }
+
+      t.reload
+
+      assert_equal "Thesis Notes Test", t.notes, 'Notes should be updated'
+    end
+
     should 'Show Thesis details or fail if thesis was not found' do
       thesis = create(:thesis, student: @student)
 
@@ -421,12 +435,12 @@ class ThesesControllerTest < ActionController::TestCase
       @thesis.update(certify_content_correct: false)
 
       post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: false } }
-  
+
       assigns(:thesis)
       assert_response :redirect
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
       assert_equal "There was an error submitting your thesis: Certify content correct can't be blank.", flash[:alert]
-      
+
     end
 
     ## LICENCE UPLOAD CHECK
@@ -435,8 +449,8 @@ class ThesesControllerTest < ActionController::TestCase
       patch :accept_licences, params: { student_id: @student.id, id: @thesis.id, thesis: { lac_licence_agreement: true, yorkspace_licence_agreement: true, etd_licence_agreement: true } }
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW)
       assert_equal 'Missing Licence Document. Please upload LAC Licence Signed Doc.', flash[:alert]
-    end 
-  
+    end
+
     should "should accept licences with a licence document" do
       # thesis = create(:thesis, student: @student)
       # create(:document, thesis: @thesis, user: @student, usage: 'licence', supplemental: true, deleted: false)

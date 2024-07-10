@@ -40,7 +40,7 @@ Rails.application.routes.draw do
   devise_for :users
 
   resources :gem_records, except: %i[new edit create update destroy]
-  
+
   resources :students do
     get 'send_invite', on: :member
 
@@ -52,8 +52,9 @@ Rails.application.routes.draw do
         post 'submit_for_review'
         post 'assign'
         post 'unassign'
+        post 'update_notes'
       end
-      
+
 
       resource :embargo, only: %i[new create], controller: 'theses/embargo'
 

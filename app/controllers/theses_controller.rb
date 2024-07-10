@@ -96,6 +96,16 @@ class ThesesController < ApplicationController
     end
   end
 
+  def update_notes
+    @thesis =  @student.theses.find(params[:id])
+
+    if @thesis.update(notes: params[:thesis_notes])
+      redirect_to [@student, @thesis], notice: 'Notes updated successfully.'
+    else
+      redirect_to @thesis, alert: 'Failed to update notes.'
+    end
+  end
+
   def destroy
     @thesis = @student.theses.find(params[:id])
     @thesis.status = Thesis::REJECTED
@@ -149,10 +159,10 @@ class ThesesController < ApplicationController
   def submit_for_review
     @thesis = @student.theses.find(params[:id])
     @thesis.current_user = current_user
-    
+
     # Temporarily assign the attributes for validation
     @thesis.assign_attributes(thesis_params)
-    
+
     if @thesis.valid?(:submit_for_review)
       if @thesis.update(thesis_params)
         if validate_active_thesis(@thesis.id)
@@ -178,33 +188,33 @@ class ThesesController < ApplicationController
   def accept_licences
     @thesis = @student.theses.find(params[:id])
     @thesis.current_user = current_user
-    
+
     # Temporarily assign the attributes for validation
     @thesis.assign_attributes(thesis_params)
     @thesis.pretty_inspect
-    
+
     if @thesis.valid?(:accept_licences)
-      
+
       if @thesis.update(thesis_params)
-      
+
         if validate_licence_uplaod(@thesis.id)
-      
+
           redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), notice: "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
         else
-      
+
           redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: 'Missing Licence Document. Please upload LAC Licence Signed Doc.'
         end
       else
-       
+
         error_messages = @thesis.errors.full_messages.join(', ')
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: "There was an error submitting your thesis: #{error_messages}."
       end
     else
-     
+
       error_messages = @thesis.errors.full_messages.join(', ')
       redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: "There was an error submitting your thesis: #{error_messages}."
     end
-    
+
   end
 
   ### THESIS ASSIGNMENT TO USERS ###
@@ -241,7 +251,7 @@ class ThesesController < ApplicationController
                                    :keywords, :embargo, :language, :degree_name, :degree_level, :program, :published_date,
                                    :exam_date, :student_id, :committee, :abstract, :assigned_to_id, :assigned_to,
                                    :student_accepted_terms_at, :under_review_at, :accepted_at, :published_at, :returned_at,
-                                   :committee_members_attributes, :embargoed, :certify_content_correct, :lac_licence_agreement, 
+                                   :committee_members_attributes, :embargoed, :certify_content_correct, :lac_licence_agreement,
                                    :yorkspace_licence_agreement, :etd_licence_agreement,
                                    committee_members_attributes: %i[first_name last_name role id _destroy],
                                    loc_subject_ids: [])
