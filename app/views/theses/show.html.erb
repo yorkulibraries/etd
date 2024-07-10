@@ -1,12 +1,12 @@
 <% title "#{@student.name} - Thesis" %>
 <% title_html do %>
 
-  <div class="row">
+<div class="row">
 	<%= render partial: "students/header" %>
 	<div class="col-12 py-0"><hr /></div>
-  </div>
-<% end %>
-  <div class="row">
+</div>
+	<% end %>
+<div class="row">
 	<div class="col-sm-12 col-lg-6">
 		<h5 class="author" title="author">By <%= @thesis.author %> | <%= number_with_delimiter(@thesis.student.sisid, delimiter: " ") %></h5>
 		<h3 class="title" title="title"><%= @thesis.title %></h3>
@@ -136,30 +136,109 @@
   </div>
 
 	<div class="row">
-	<div class="documents fitted">
+		<div class="documents fitted">
+			<h6 class="green pt-4">Thesis Files and Documents</h6>
 
-	<h6 class="green pt-4">Thesis Files and Documents</h6>
-
-	<h6>Primary</h6>
-	<% @primary_documents.each do | document | %>
-		<%= render partial: document %>
-	<% end %>
-
-	<% if @primary_documents.count == 0 %>
-		<p>There are no <strong>primary</strong> files or documents attached to this thesis.</p>
-	<% end %>
-
+			<% if current_user.role != User::STUDENT %>
+				<div class="mt-4">
+					<h6>Primary</h5>
+					<%  unless block_thesis_changes?(@thesis) %>
+						<% if @primary_documents.count == 0 %>
+							<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#primary-file">Upload Primary File</button>
+						<% end %>
+					<% end %>
 
 
-	<h6>Supplemental</h6>
-	<% @supplemental_documents.each do | document | %>
-		<%= render partial: document %>
-	<% end %>
-	<% if @supplemental_documents.count == 0 %>
-		<p>There are no <strong>supplemental</strong> files or documents attached to this thesis.</p>
-	<% end %>
+					<% @primary_documents.each do | document | %>
+						<%= render partial: document %>
+					<% end %>
 
+					<% if @primary_documents.count == 0 %>
+						<p>There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
+					<% end %>
+
+					<div class="push-down"></div>
+				</div>
+				<div class="mt-4">
+					<h6>Supplementary</h6>
+						<%  unless block_thesis_changes?(@thesis) %>
+							<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#supplemental-files">Upload Supplementary Files</button>
+						<% end %>
+
+					<div class='mt-3'>
+						<% @supplemental_documents.each do | document | %>
+							<% if document.usage != "licence" %>
+								<%= render partial: document %>
+							<% end %>
+						<% end %>
+						<% if @supplemental_documents.count == 0 %>
+							<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
+						<% end %>
+					</div>
+				</div>
+				<div class='mt-4'>
+					<h6>License Agreements</h6>
+					<%  unless block_thesis_changes?(@thesis) %>
+						<button type="button" class="btn btn-dark mb-3 " data-bs-toggle="modal" data-bs-target="#supplemental-licence-files">Upload Licence Files</button>
+					<% end %>
+						<% @supplemental_documents.each do | document | %>
+							<% if document.usage == 'licence'%>
+								<div class='licence-file'>
+									<%= render partial: document %>
+								</div>
+							<% end %>
+						<% end %>
+						<% if @supplemental_documents.where(usage: :licence).count == 0 %>
+							<p>There are no <strong>supplementary</strong> licence files or documents attached to this thesis/dissertation.</p>
+						<% end %>
+				</div>
+			<% else %>
+				<h6>Primary</h5>
+					<% @primary_documents.each do | document | %>
+						<%= render partial: document %>
+					<% end %>
+
+					<% if @primary_documents.count == 0 %>
+						<p>There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
+					<% end %>
+					<% @supplemental_documents.each do | document | %>
+						<%= render partial: document %>
+					<% end %>
+					<% if @supplemental_documents.where(usage: :licence).count == 0 %>
+						<p>There are no <strong>supplementary</strong> licence files or documents attached to this thesis/dissertation.</p>
+					<% end %>
+			<% end %>
+
+		
+		</div>
 	</div>
+
+			<%= render partial: "documents/new_form", locals: { primary: true } %>
+
+			<%= render partial: "documents/new_form", locals: { primary: false } %>
+
+			<%= render partial: "documents/new_licence_form", locals: { primary: false } %>
+			<!-- 
+			<h6>Primary</h6>
+			<% @primary_documents.each do | document | %>
+				<%= render partial: document %>
+			<% end %>
+
+			<% if @primary_documents.count == 0 %>
+				<p>There are no <strong>primary</strong> files or documents attached to this thesis.</p>
+			<% end %>
+
+
+
+			<h6>Supplemental</h6>
+			<% @supplemental_documents.each do | document | %>
+				<%= render partial: document %>
+			<% end %>
+			<% if @supplemental_documents.count == 0 %>
+				<p>There are no <strong>supplemental</strong> files or documents attached to this thesis.</p>
+			<% end %>
+			-->
+		</div>
   </div>
 
 	
