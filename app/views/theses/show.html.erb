@@ -164,17 +164,4 @@
 
   	</div>
 
-	<%= form_tag update_notes_student_thesis_path(@student, @thesis) do %>
-	<div class="row">
-		<div class="col-12"><hr /></div>
-		<h6>Notes</h6>
-		<div class="col-12">
-			<textarea name="thesis_notes" class="form-control" rows=10 cols=10 placeholder="Notes"><%= @thesis.notes %></textarea>
-		</div>
-		<div class="col-3">
-			<input type="submit" class= "btn btn-success" value="Save Notes" style="margin-top:10px">
-		</div>
-	</div>
-	<% end %>
-
 	
