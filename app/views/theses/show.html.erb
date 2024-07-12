@@ -14,31 +14,33 @@
 	<div class="col-sm-12 col-lg">
 	  <div class="row">
 			<div class="col-4">
-			  <% unless @thesis.status == Thesis::PUBLISHED %>
-				<h6 class="text-black">Edit thesis</h6>
-				<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success btn-sm d-grid" %></div>
-			  <% end %>
-			</div>
-			<div class="col-5">
-				<% if @thesis.status == Thesis::PUBLISHED %>
+				<% if current_user.role == User::STUDENT %>
 					<div id="status_menu">
 						<button id="" class="btn" title="Change Thesis Status">
 						Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span>
 						</button>
 					</div>
-				<% else%>
-					<h6 class="text-black">Change status</h6>
-					<%= render partial: "status_menu"%>
+				<% else %>
+					
+					<h6 class="text-black">Edit thesis</h6>
+					<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success btn-sm d-grid" %></div>
+					
+				</div>
+				<div class="col-5">
+					
+						<h6 class="text-black">Change status</h6>
+						<%= render partial: "status_menu"%>
+					
+				</div>
+				<div class="col">
+					
+						<h6 class="text-black">Assign to</h6>
+						<div class="span d-grid">
+							<%= render partial: "assigned_to", locals: { thesis: @thesis }%>
+						</div>
+					
+				</div>
 				<% end %>
-			</div>
-			<div class="col">
-				<% unless @thesis.status == Thesis::PUBLISHED %>
-					<h6 class="text-black">Assign to</h6>
-					<div class="span d-grid">
-						<%= render partial: "assigned_to", locals: { thesis: @thesis }%>
-					</div>
-				<% end %>
-			</div>
 	  </div>
 	</div>
   </div>
