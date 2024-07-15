@@ -35,7 +35,7 @@ class GemRecordsControllerTest < ActionController::TestCase
     assert_template 'index', 'Index template should be displayed'
   end
 
-  should 'committee members included in gem records'
+  should 'committee members included in gem records' do
     gem_records = create_list(:gem_record, 5, eventtype: GemRecord::PHD_EXAM)
     gem_records.each do |record|
       create_list(:committee_member, 2, gem_record: record)
