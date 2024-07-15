@@ -28,6 +28,17 @@ class LoadGemRecordsCSV
         gr.examdate = row['examdate'].strip
 
         if gr.save!(validate: false)
+          committee_members = row['committee_members'].split(';')
+          committee_members.each do |member|
+            first_name, last_name, role = member.split(',')
+            CommitteeMember.create!(
+              gem_record: gr,
+              first_name: first_name.strip,
+              last_name: last_name.strip,
+              role: role.strip
+            )
+          end
+
           count += 1
         else
           warn('Error: Load Gem Records Save Failed!')

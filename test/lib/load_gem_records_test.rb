@@ -28,5 +28,32 @@ class LoadGemRecordsTest < ActiveSupport::TestCase
     assert_equal 'Alice Johnson', records[2].studentname
     assert_equal 789012, records[2].sisid
     assert_equal 'alicejohnson@example.com', records[2].emailaddress
+
+    assert_equal 2, records[0].committee_members.count
+    assert_equal 'John', records[0].committee_members.first.first_name
+    assert_equal 'Smith', records[0].committee_members.first.last_name
+    assert_equal 'Chair', records[0].committee_members.first.role
+
+    assert_equal 'Jane', records[0].committee_members.last.first_name
+    assert_equal 'Doe', records[0].committee_members.last.last_name
+    assert_equal 'Committee Member', records[0].committee_members.last.role
+
+    assert_equal 2, records[1].committee_members.count
+    assert_equal 'Jim', records[1].committee_members.first.first_name
+    assert_equal 'Brown', records[1].committee_members.first.last_name
+    assert_equal 'Chair', records[1].committee_members.first.role
+
+    assert_equal 'Jake', records[1].committee_members.last.first_name
+    assert_equal 'White', records[1].committee_members.last.last_name
+    assert_equal 'Committee Member', records[1].committee_members.last.role
+
+    assert_equal 2, records[2].committee_members.count
+    assert_equal 'Eve', records[2].committee_members.first.first_name
+    assert_equal 'Green', records[2].committee_members.first.last_name
+    assert_equal 'Chair', records[2].committee_members.first.role
+
+    assert_equal 'Frank', records[2].committee_members.last.first_name
+    assert_equal 'Black', records[2].committee_members.last.last_name
+    assert_equal 'Committee Member', records[2].committee_members.last.role
   end
 end
