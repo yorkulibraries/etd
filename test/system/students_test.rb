@@ -5,7 +5,7 @@ require_relative '../helpers/system_test_helper'
 
 class StudentsTest < ApplicationSystemTestCase
   include SystemTestHelper  # Include the SystemTestHelper module here
-  
+
 
   setup do
     @gem_record = FactoryGirl.create(:gem_record)
@@ -18,6 +18,35 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('Create ETD Student Record')
     page.accept_alert
     click_link('Start this thesis')
+  end
+
+  test 'Starting a thesis' do
+    visit root_url
+    click_link('Gem Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+    click_link('Start this thesis')
+    select "EMBA", from: "thesis_degree_name"
+    select "Master's", from: "thesis_degree_level"
+    click_button('Create Thesis')
+    assert_selector "a", text: @gem_record.studentname
+  end
+
+  test 'Editing a student' do
+    visit root_url
+    click_link('Gem Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+    click_link('Make changes')
+
+    fill_in('Email *', with: "test@test.com")
+    fill_in('Name *', with: "#{@gem_record.studentname} (test)")
+    click_button('Update Student')
+
+    assert_selector 'p', text: "test@test.com", visible: true
+    assert_selector 'h1', text: "#{@gem_record.studentname} (test)", visible: true
   end
 
   test 'Log in as Student and add a thesis' do
@@ -71,14 +100,14 @@ class StudentsTest < ApplicationSystemTestCase
 
     # Ensure Add Committee Members button is not present.
     assert_no_selector '.student-view .card .card-body a.btn.btn-success', text: 'Add committee member'
-    
+
     # Ensure that the close links are not present within the #committee_members section
     refute_selector("#committee_members .btn-close")
-  
+
   end
 
   ## Page 2 and 3 tests
-  should "upload primary file" do 
+  should "upload primary file" do
     @thesis = FactoryGirl.create(:thesis)
     create(:loc_subject, name: "Accounting", category: "BUSINESS")
     create(:loc_subject, name: "Management", category: "BUSINESS")
@@ -121,7 +150,7 @@ class StudentsTest < ApplicationSystemTestCase
 
     # Set Page size
     page.driver.browser.manage.window.resize_to(1920, 2500)
-    
+
     ## Page 1
     click_link("My ETD Submission")
     assert_selector "input#student_email_external"
@@ -144,14 +173,14 @@ class StudentsTest < ApplicationSystemTestCase
     fill_in "thesis_keywords", with: "accounting-kw, management-kw"
     click_on("Continue")
 
-    ## Page 3 
+    ## Page 3
 
     click_on("Upload Primary File")
     assert_selector "p", text: "Your primary file should be in PDF format.", visible: :all
-    
+
     # assert_no_selector("p", text: "Smith_Jane_E_2014_PhD.pdf", visible: :all)
     assert_not(page.has_css?("p", text: "Smith_Jane_E_2014_PhD.pdf"), "Should not show 'example text' as per Spring 2024 requirements")
-    
+
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
 
@@ -159,11 +188,11 @@ class StudentsTest < ApplicationSystemTestCase
 
     click_on("Continue")
 
-    
+
     ## Page 4
-    
+
     assert_text "LAC Supplementary Licence File Upload"
-    
+
     # Initially, checkboxes should be disabled if not checked
     assert page.has_unchecked_field?('thesis_yorkspace_licence_agreement', disabled: true)
     assert page.has_unchecked_field?('thesis_etd_licence_agreement', disabled: true)
@@ -180,16 +209,16 @@ class StudentsTest < ApplicationSystemTestCase
     # Ensure the checkbox is enabled
     # assert find('#thesis_yorkspace_licence_agreement').enabled?
     # assert_not find('#thesis_yorkspace_licence_agreement').disabled?, "ERROR: Yorkspace licence agreement checkbox is not enabled."
-    
+
     checkbox = find('#thesis_yorkspace_licence_agreement')
     assert_not checkbox.disabled?, "ERROR: Yorkspace licence agreement checkbox is not enabled."
- 
+
     # Check the checkbox
     checkbox.check
- 
+
     # Verify that the checkbox is checked
     assert checkbox.checked?, "ERROR: Yorkspace licence agreement checkbox is not checked."
-   
+
   end
 end
 
@@ -198,6 +227,6 @@ end
 # page.driver.browser.manage.window.resize_to(1920, 2500)
 # save_screenshot()
 ## HTML Save
-# File.open("tmp/test-screenshots/error.html", "w") { |file| file.write(page.html) }    
+# File.open("tmp/test-screenshots/error.html", "w") { |file| file.write(page.html) }
 # save_page()
 ########################################
