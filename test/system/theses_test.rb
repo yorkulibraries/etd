@@ -58,6 +58,8 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector 'p', text: 'This thesis has been placed under permanent embargo. It will not be published.'
   end
 
+  #### FILE UPLOADS FROM BACKEND #####
+  
   should "be able to upload primary document by admin/staff" do
     visit root_url
     click_link(@thesis_01.title)
@@ -81,7 +83,12 @@ class ThesesTest < ApplicationSystemTestCase
     select "Supplementary file or document attached to thesis/dissertation", from: 'Document type' #document_usage
     click_button('Upload')
     assert_selector(".supplemental", text: /Supplemental/) #Supplemental
+    
   end
+
+  ###########################################################
+  ##### TESTS WILL NEED BE UPDATED WITH NEW FILE NAMES ######
+  ###########################################################
 
   should "be able to upload supplementary license document by admin/staff" do
     visit root_url
@@ -89,7 +96,7 @@ class ThesesTest < ApplicationSystemTestCase
     
     click_on("Upload Licence Files")
     assert_selector "h1", text: "Upload Supplementary Licence File", visible: :all
-    attach_file("document_file", Rails.root.join('test/fixtures/files/pdf-document.pdf'))
+    attach_file("document_file", Rails.root.join('test/fixtures/files/image-example.jpg'))
     # page.driver.browser.manage.window.resize_to(1920, 2500)
     # save_screenshot()
     click_button('Upload')
@@ -97,5 +104,30 @@ class ThesesTest < ApplicationSystemTestCase
 
   end
 
+  should "be able to upload supplementary embargo document [Request for embargo document] by admin/staff" do
+    visit root_url
+    click_link(@thesis_01.title)
+    
+    page.driver.browser.manage.window.resize_to(1920, 2500)
+    click_on("Upload Embargo Files")
+    assert_selector "h1", text: "Upload Supplementary File", visible: :all
+    attach_file("document_file", Rails.root.join('test/fixtures/files/papyrus-feature.png'))
+
+    assert_selector "select#document_usage"
+    select "Request for embargo document", from: 'Document type' #document_usage
+    
+    click_button('Upload')
+    
+    ## NOTE TO SELF, CHECK HERE FOR EMBARGO SPECIFIC
+    # assert_selector(".supplemental", text: /Supplemental/) #Supplemental
+    assert_not_empty find('.embargo-file').text, "The .embargo-file element is empty, no file"
+    
+    # Take a screenshot
+    save_screenshot('screenshot_with_dropdown.png')
+  end
+  
+  ###########################################################
+  ################## END OF FILE UPLOADS ####################
+  ###########################################################
   
 end

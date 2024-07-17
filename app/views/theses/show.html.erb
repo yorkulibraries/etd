@@ -43,47 +43,46 @@
 				<% end %>
 	  </div>
 	</div>
-  </div>
+</div>
 
-	<div class="row">
-		<div class="col-12 pt-3">
-			<h6>Abstract</h6>
-			<p><%= format @thesis.abstract, true %></p>
-		</div>
-		<div class="col-sm-12 col-md-4">
+<div class="row">
+	<div class="col-12 pt-3">
+		<h6>Abstract</h6>
+		<p><%= format @thesis.abstract, true %></p>
+	</div>
+	<div class="col-sm-12 col-md-4">
+		
+			<h6>Supervisor</h6>
+			<p><%=  @thesis.supervisor %></p>
+			<h6>Exam date</h6>
+			<p><%= @thesis.exam_date ? @thesis.exam_date.strftime("%B %d, %Y") : format(@thesis.exam_date)  %></p>
 			
-				<h6>Supervisor</h6>
-				<p><%=  @thesis.supervisor %></p>
-				<h6>Exam date</h6>
-				<p><%= @thesis.exam_date ? @thesis.exam_date.strftime("%B %d, %Y") : format(@thesis.exam_date)  %></p>
-				
+		
+	</div>
+	<div class="col-sm-12 col-md-4">
+		
+			<h6>Examining committee</h6>
 			
-		</div>
-		<div class="col-sm-12 col-md-4">
-			
-				<h6>Examining committee</h6>
-				
-				<div class="committee_members" id="committee_members">
-					<% @thesis.committee_members.each do |committee_member| %>
-						<%= render "committee_members/committee_member_read", committee_member: committee_member %>
-					<% end %>
-				</div>
-			
-		</div>
-				
-		<% if @thesis.returned_message.present? && Thesis::RETURNED == @thesis.status %>
-		<div class="col-lg-4 col-sm-12">
-			<h6>Returned message</h6>
-			<div class="alert alert-danger" role="alert">
-				<%= @thesis.returned_message %>
+			<div class="committee_members" id="committee_members">
+				<% @thesis.committee_members.each do |committee_member| %>
+					<%= render "committee_members/committee_member_read", committee_member: committee_member %>
+				<% end %>
 			</div>
-		<% else %>
+		
+	</div>
+				
+	<% if @thesis.returned_message.present? && Thesis::RETURNED == @thesis.status %>
+		<div class="col-lg-4 col-sm-12">
+				<h6>Returned message</h6>
+				<div class="alert alert-danger" role="alert">
+					<%= @thesis.returned_message %>
+				</div>
+	<% else %>
 		<div class="col-lg-4 d-none d-lg-block">
-		<% end %>
+	<% end %>
 		</div>
 		<div class="col-12"><hr /></div>
-	</div>
-
+		</div>
 	<div class="row">
 		<div class="col-4">
 				<h6>Publish On</h6>
@@ -130,11 +129,11 @@
 	</div>
 
 	<div class="row">
-	<div class="col-12"><hr /></div>
-	<div class="col-3 span2 distinct strong"><h6>Last Under Review: </h6> <%= format @thesis.under_review_at %></div>
-	<div class="col-3 span2 distinct strong"><h6>Last Returned: </h6> <%= format @thesis.returned_at %></div>
-	<div class="col-3 span2 distinct strong"><h6>Thesis Accepted: </h6> <%= format @thesis.accepted_at %></span></div>
-	<div class="col-3 span2 distinct strong"><h6>Published: </h6> <%= format @thesis.published_at %></div>
+		<div class="col-12"><hr /></div>
+		<div class="col-3 span2 distinct strong"><h6>Last Under Review: </h6> <%= format @thesis.under_review_at %></div>
+		<div class="col-3 span2 distinct strong"><h6>Last Returned: </h6> <%= format @thesis.returned_at %></div>
+		<div class="col-3 span2 distinct strong"><h6>Thesis Accepted: </h6> <%= format @thesis.accepted_at %></span></div>
+		<div class="col-3 span2 distinct strong"><h6>Published: </h6> <%= format @thesis.published_at %></div>
   </div>
 
 	<div class="row">
@@ -169,7 +168,7 @@
 
 					<div class='mt-3'>
 						<% @supplemental_documents.each do | document | %>
-							<% if document.usage != "licence" %>
+							<% if document.usage == "thesis" %>
 								<%= render partial: document %>
 							<% end %>
 						<% end %>
@@ -194,6 +193,22 @@
 							<p>There are no <strong>supplementary</strong> licence files or documents attached to this thesis/dissertation.</p>
 						<% end %>
 				</div>
+				<div class='mt-4'>
+					<h6>Embargo Documents</h6>
+						<%  unless block_thesis_changes?(@thesis) %>
+							<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#supplemental-embargo-files">Upload Embargo Files</button>
+						<% end %>
+						<% @supplemental_documents.each do | document | %>
+							<% if document.usage == 'embargo' or document.usage == 'embargo_letter'%>
+								<div class='embargo-file'>
+									<%= render partial: document %>
+								</div>
+							<% end %>
+						<% end %>
+						<% if @supplemental_documents.where(usage: [:embargo, :embargo_letter]).count == 0 %>
+							<p>There are no <strong>supplementary</strong> embargo files or documents attached to this thesis/dissertation.</p>
+						<% end %>
+				</div>
 			<% else %>
 				<h6>Primary</h5>
 					<% @primary_documents.each do | document | %>
@@ -204,7 +219,7 @@
 						<p>There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
 					<% end %>
 					<% @supplemental_documents.each do | document | %>
-						<%= render partial: document %>
+						<%= render partial: document %> 
 					<% end %>
 					<% if @supplemental_documents.where(usage: :licence).count == 0 %>
 						<p>There are no <strong>supplementary</strong> licence files or documents attached to this thesis/dissertation.</p>
@@ -220,27 +235,7 @@
 			<%= render partial: "documents/new_form", locals: { primary: false } %>
 
 			<%= render partial: "documents/new_licence_form", locals: { primary: false } %>
-			<!-- 
-			<h6>Primary</h6>
-			<% @primary_documents.each do | document | %>
-				<%= render partial: document %>
-			<% end %>
 
-			<% if @primary_documents.count == 0 %>
-				<p>There are no <strong>primary</strong> files or documents attached to this thesis.</p>
-			<% end %>
+			<%= render partial: "documents/new_embargo_form", locals: { primary: false } %>
 
-
-
-			<h6>Supplemental</h6>
-			<% @supplemental_documents.each do | document | %>
-				<%= render partial: document %>
-			<% end %>
-			<% if @supplemental_documents.count == 0 %>
-				<p>There are no <strong>supplemental</strong> files or documents attached to this thesis.</p>
-			<% end %>
-			-->
-		</div>
-  </div>
-
-	
+<!-- </div> HTML structure is someone broken of divs. I need to review when working on GUI over hall.-->

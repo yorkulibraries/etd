@@ -38,16 +38,14 @@
 					</li>
 					<li class="list-group-item">
 						<p>
-						<% if @supplemental_documents.count == 0 %>
+						<% if @supplemental_licence_documents.count == 0 %>
 							<p>There are no <strong>supplementary</strong> license files or documents attached to this thesis/dissertation.</p>
 						<% end %>
 						<% if AppSettings.student_review_lac_licence_instructions.present? %>
 							<p><%= raw(AppSettings.student_review_lac_licence_instructions) %></p>
 						<% end %>
-						<% @supplemental_documents.each do | document | %>
-							<% if document.usage == "licence" %>
-								<%= render partial: document %>
-							<% end %>
+						<% @supplemental_licence_documents.each do | document | %>
+							<%= render partial: document %>
 						<% end %>
 						<br/>
 						<%  unless block_thesis_changes?(@thesis) %>

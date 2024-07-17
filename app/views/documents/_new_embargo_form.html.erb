@@ -1,5 +1,5 @@
 <% primary =  false if local_assigns[:primary].nil? %>
-<div class="modal fade" id="<%= primary ? 'primary-file' : 'supplemental-files' %>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="<%= primary ? 'primary-file' : 'supplemental-embargo-files' %>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -16,8 +16,8 @@
 						<% if primary %>
 							<p>Your primary file should be in <strong>PDF format.</strong></p>
 						<% else %>
-							<% if "#{AppSettings.student_supplementary_upload_files}" != '' %>
-								<%= raw(AppSettings.student_supplementary_upload_files) %>
+							<% if "#{AppSettings.student_supplementary_embargo_upload_files}" != '' %>
+								<%= raw(AppSettings.student_supplementary_embargo_upload_files) %>
 							<% else %>
 								<p>File size must be limited to acceptable formats include:</p>
 								<ul>
@@ -37,7 +37,7 @@
 						<%= f.hidden_field :usage, value: :thesis %>
 						<%= f.hidden_field :supplemental, value: false %>
 					<% else %>
-						<%= f.input :usage, label: "Document type", collection: Document.usages.keys.map(&:to_sym).reject { |usage| usage != :thesis }, required: true, label_html: { class: 'pt-2' } %>
+						<%= f.input :usage, label: "Document type", collection: Document.usages.keys.map(&:to_sym).reject { |usage| usage == :licence or usage == :thesis }, required: true, label_html: { class: 'pt-2' } %>
 						<%= f.hidden_field :supplemental, value: true %>
 					<% end %>
 					
