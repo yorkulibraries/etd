@@ -4,12 +4,11 @@ require Rails.root.join('lib/tasks/load_gem_records_csv.rb')
 class LoadGemRecordsTest < ActiveSupport::TestCase
   setup do
     gem_load = LoadGemRecordsCSV.new
-    gem_load.load_csv('lib/dummy_gem_records.csv')
+    gem_load.load_gem_records("test/fixtures/files/gem_records.csv")
+    gem_load.load_committee_members("test/fixtures/files/committee_members.csv")
   end
 
   should "parse csv" do
-    puts "\nRunning test..."
-
     assert_equal 3, GemRecord.count
 
     records = GemRecord.order(:seqgradevent)

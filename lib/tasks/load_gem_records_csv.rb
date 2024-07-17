@@ -1,17 +1,18 @@
 # frozen_string_literal: true
 
 ##
-# Function to load gem records from a text file, delimited by __ETD_COLSEP__
+# Function to load gem records from a CSV file
 ##
 
 require 'csv'
 
 class LoadGemRecordsCSV
 
-  def load_csv(filename)
+  def load_gem_records(filename)
     count = 0
 
-    CSV.foreach(filename, headers: true) do |row|
+    converter = lambda { |header| header.downcase }
+    CSV.foreach(filename, headers: true, header_converters: converter) do |row|
       seqgradevent = row['seqgradevent'].strip
       unless GemRecord.find_by_seqgradevent(seqgradevent)
         gr = GemRecord.new
@@ -28,17 +29,6 @@ class LoadGemRecordsCSV
         gr.examdate = row['examdate'].strip
 
         if gr.save!(validate: false)
-          committee_members = row['committee_members'].split(';')
-          committee_members.each do |member|
-            first_name, last_name, role = member.split(',')
-            CommitteeMember.create!(
-              gem_record: gr,
-              first_name: first_name.strip,
-              last_name: last_name.strip,
-              role: role.strip
-            )
-          end
-
           count += 1
         else
           warn('Error: Load Gem Records Save Failed!')
@@ -49,6 +39,21 @@ class LoadGemRecordsCSV
       warn("ERROR: #{e}")
       warn('Hint: Possible Bad File if strip nil')
     end
+  end
 
+  def load_committee_members(filename)
+    count = 0
+
+    converter = lambda { |header| header.downcase }
+    CSV.foreach(filename, headers: true, header_converters: converter) do |row|
+      seqgradevent = row['seqgradevent'].strip
+      gr = GemRecord.find_by_seqgradevent(seqgradevent)
+      cm = CommitteeMember.new
+      cm.gem_record = gr
+      cm.first_name = row['firstname'].strip
+      cm.last_name = row['surname'].strip
+      cm.role = row['role'].strip
+      cm.save!
+    end
   end
 end

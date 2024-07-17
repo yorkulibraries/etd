@@ -14,6 +14,8 @@ class GemRecord < ApplicationRecord
   MASTERS_EXAM = "Master's Thesis Exam"
   ACCEPTED = 'Accepted'
 
+  has_many :committee_members
+
   scope :completed, lambda {
                       where('eventtype = ? OR eventtype = ?', GemRecord::PHD_COMPLETED, GemRecord::MASTERS_COMPLETED)
                     }
