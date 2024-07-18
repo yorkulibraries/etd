@@ -24,6 +24,7 @@ DatabaseCleaner.strategy = :truncation
 
 Capybara.server_host = '0.0.0.0'
 Capybara.app_host = "http://#{Socket.gethostname}:#{Capybara.server_port}"
+Capybara.default_max_wait_time = 5
 
 include ActionDispatch::TestProcess
 
