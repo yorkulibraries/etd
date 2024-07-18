@@ -45,6 +45,8 @@ class ThesesController < ApplicationController
     @thesis.exam_date = record.examdate
     @thesis.program = record.program
     @thesis.assign_degree_name_and_level
+    @thesis.committee_members = record.committee_members
+
   end
 
   def create
@@ -53,8 +55,19 @@ class ThesesController < ApplicationController
     @thesis.student = @student
     @thesis.audit_comment = 'Starting a new thesis. Status: OPEN.'
 
+    @thesis.audit_comment = 'Starting a new thesis. Status: OPEN.'
+
     @thesis.status = Thesis::OPEN
     if @thesis.save
+
+      if params[:committee_member_ids].present?
+        params[:committee_member_ids].each do |committee_member_id|
+          if committee_member_id.present?
+            committee_member = CommitteeMember.find(committee_member_id)
+            committee_member.update(thesis: @thesis)
+          end
+        end
+      end
       redirect_to [@student, @thesis], notice: 'ETD record successfully created.'
     else
       render action: 'new'
@@ -149,10 +162,10 @@ class ThesesController < ApplicationController
   def submit_for_review
     @thesis = @student.theses.find(params[:id])
     @thesis.current_user = current_user
-    
+
     # Temporarily assign the attributes for validation
     @thesis.assign_attributes(thesis_params)
-    
+
     if @thesis.valid?(:submit_for_review)
       if @thesis.update(thesis_params)
         if validate_active_thesis(@thesis.id)
@@ -178,33 +191,33 @@ class ThesesController < ApplicationController
   def accept_licences
     @thesis = @student.theses.find(params[:id])
     @thesis.current_user = current_user
-    
+
     # Temporarily assign the attributes for validation
     @thesis.assign_attributes(thesis_params)
     @thesis.pretty_inspect
-    
+
     if @thesis.valid?(:accept_licences)
-      
+
       if @thesis.update(thesis_params)
-      
+
         if validate_licence_uplaod(@thesis.id)
-      
+
           redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), notice: "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
         else
-      
+
           redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: 'Missing Licence Document. Please upload LAC Licence Signed Doc.'
         end
       else
-       
+
         error_messages = @thesis.errors.full_messages.join(', ')
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: "There was an error submitting your thesis: #{error_messages}."
       end
     else
-     
+
       error_messages = @thesis.errors.full_messages.join(', ')
       redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: "There was an error submitting your thesis: #{error_messages}."
     end
-    
+
   end
 
   ### THESIS ASSIGNMENT TO USERS ###
@@ -241,7 +254,7 @@ class ThesesController < ApplicationController
                                    :keywords, :embargo, :language, :degree_name, :degree_level, :program, :published_date,
                                    :exam_date, :student_id, :committee, :abstract, :assigned_to_id, :assigned_to,
                                    :student_accepted_terms_at, :under_review_at, :accepted_at, :published_at, :returned_at,
-                                   :committee_members_attributes, :embargoed, :certify_content_correct, :lac_licence_agreement, 
+                                   :committee_members_attributes, :embargoed, :certify_content_correct, :lac_licence_agreement,
                                    :yorkspace_licence_agreement, :etd_licence_agreement,
                                    committee_members_attributes: %i[first_name last_name role id _destroy],
                                    loc_subject_ids: [])
