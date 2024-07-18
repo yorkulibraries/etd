@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'application_system_test_case'
+require 'helpers/system_test_helper'
 
 class ThesesTest < ApplicationSystemTestCase
   setup do
