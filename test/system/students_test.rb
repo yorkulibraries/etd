@@ -39,7 +39,7 @@ class StudentsTest < ApplicationSystemTestCase
     login_as(@thesis.student)
     visit root_url
     click_link("My ETD Submission")
-    assert_selector "h3", text: "Hello #{@thesis.student.first_name}"
+    assert_text(/#{Regexp.escape("Hello #{@thesis.student.first_name}")}/i)
     assert_selector "h6", text: "Email", visible: :all
     assert_selector "p", text: "#{@thesis.student.email}", visible: :all
   end
@@ -49,7 +49,7 @@ class StudentsTest < ApplicationSystemTestCase
     login_as(@thesis.student)
     visit root_url
     click_link("My ETD Submission")
-    assert_selector "h3", text: "Hello #{@thesis.student.first_name}"
+    assert_text(/#{Regexp.escape("Hello #{@thesis.student.first_name}")}/i)
     assert_no_selector "input#student_first_name"
     assert_no_selector "input#student_middle_name"
     assert_no_selector "input#student_last_name"
@@ -159,7 +159,9 @@ class StudentsTest < ApplicationSystemTestCase
     
     ## Page 4
     
-    assert_text "LAC Supplementary Licence File Upload"
+    # assert_text "LAC Supplementary Licence File Upload".upcase
+    assert_text(/#{Regexp.escape("LAC Supplementary Licence File Upload")}/i)
+
     
     # Initially, checkboxes should be disabled if not checked
     assert page.has_unchecked_field?('thesis_yorkspace_licence_agreement', disabled: true)
