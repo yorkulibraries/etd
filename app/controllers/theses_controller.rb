@@ -59,7 +59,6 @@ class ThesesController < ApplicationController
 
     @thesis.status = Thesis::OPEN
     if @thesis.save
-
       if params[:committee_member_ids].present?
         params[:committee_member_ids].each do |committee_member_id|
           if committee_member_id.present?

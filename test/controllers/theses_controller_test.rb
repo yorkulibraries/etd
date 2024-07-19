@@ -86,6 +86,10 @@ class ThesesControllerTest < ActionController::TestCase
       assert thesis, 'ensure that thesis is assigned'
 
       assert_equal record.committee_members.count, thesis.committee_members.count, 'Number of committee members should match'
+      record.committee_members.each do |record_member|
+        thesis_member = thesis.committee_members.find { |tm| tm.first_name == record_member.first_name && tm.last_name == record_member.last_name && tm.role == record_member.role }
+        assert thesis_member, "Committee member #{record_member.first_name} #{record_member.last_name} should be present in the thesis"
+      end
       assert_equal record.title, thesis.title, 'Title should be prepopulated'
       assert_equal record.examdate.beginning_of_day, thesis.exam_date.beginning_of_day,
                    'Exam date is prepopulate with event date'
