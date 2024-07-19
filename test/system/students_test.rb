@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'application_system_test_case'
-require_relative '../helpers/system_test_helper'
+require 'helpers/system_test_helper'
 
 class StudentsTest < ApplicationSystemTestCase
   include SystemTestHelper  # Include the SystemTestHelper module here
@@ -40,11 +40,8 @@ class StudentsTest < ApplicationSystemTestCase
     visit root_url
     fill_in('Non-YorkU Email Address', with: Faker::Internet.email)
     click_button('Continue')
-    puts "\nGoing to Update Details\n"
     click_link('Continue') #update
-    puts "Going to Upload\n"
     click_link('Continue') #upload
-    puts "Going to Review\n"
     click_link('Continue') #review
     assert_selector '.alert-warning', text: 'Error: You have to upload a primary file to continue'
     # page.accept_alert

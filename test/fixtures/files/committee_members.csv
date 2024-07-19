@@ -1,0 +1,7 @@
+"SEQGRADEVENT","SISID","FIRSTNAME","SURNAME","ROLE"
+1,12345,"John","Smith","Chair"
+1,12345,"Jane","Doe","Committee Member"
+2,654321,"Jim","Brown","Chair"
+2,654321,"Jake","White","Committee Member"
+3,789012,"Eve","Green","Chair"
+3,789012,"Frank","Black","Committee Member"

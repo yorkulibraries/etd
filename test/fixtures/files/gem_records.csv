@@ -1,0 +1,4 @@
+seqgradevent,studentname,sisid,emailaddress,eventtype,eventdate,examresult,title,program,superv,examdate
+1,John Doe,123456789,johndoe@example.com,Exam,2023-06-15,Pass,Thesis Title,Program A,Supervisor X,2023-07-01
+2,Jane Smith,654321476,janesmith@example.com,Defense,2023-06-20,Pass,Thesis Title B,Program B,Supervisor Y,2023-07-02
+3,Alice Johnson,789012185,alicejohnson@example.com,Exam,2023-06-25,Fail,Thesis Title C,Program C,Supervisor Z,2023-07-03

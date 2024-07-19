@@ -44,6 +44,6 @@ class CommitteeMembersController < ApplicationController
   private
 
   def committee_member_params
-    params.require(:committee_member).permit(:first_name, :last_name, :role, :thesis_id)
+    params.require(:committee_member).permit(:first_name, :last_name, :role, :thesis_id, :gem_record_id)
   end
 end
