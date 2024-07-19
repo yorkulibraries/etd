@@ -20,6 +20,20 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('Start this thesis')
   end
 
+  test 'Gem Record has committee members' do
+    visit root_url
+    click_link('Gem Records')
+    click_link(@gem_record.studentname)
+
+    assert_selector "h6", text: "Committee Members"
+    if @gem_record.committee_members.count > 1
+      @gem_record.committee_members.each do |committee_member|
+        assert_selector "p", text: committee_member.full_name
+      end
+    end  
+    
+  end
+
   test 'Log in as Student and add a thesis' do
     @thesis = FactoryGirl.create(:thesis)
     login_as(@thesis.student)

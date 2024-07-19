@@ -2,9 +2,16 @@
   <div class="col"><span class="fw-bold"><%= committee_member.name %></span></div>
   <div class="col"><%= committee_member.role %></div>
   <div class="col-1">
-	<% if can?(:destroy, committee_member) && @thesis.status != Thesis::PUBLISHED  %>
-		<%= link_to student_thesis_committee_member_path(@student, @thesis, committee_member),
-								method: :delete, class: "btn btn-close pull-right", remote: true, data: { confirm: "Are you sure?" } do %>&nbsp;<% end %>
+  <% if @thesis.id && %>
+    <% if can?(:destroy, committee_member) && @thesis.status != Thesis::PUBLISHED  %>
+      <%= link_to student_thesis_committee_member_path(@student, @thesis, committee_member),
+                  method: :delete, class: "btn btn-close pull-right", remote: true, data: { confirm: "Are you sure?" } do %>&nbsp;<% end %>
+    <% end %>
+  <% else %> 
+      <%= hidden_field_tag "committee_member_ids[]", committee_member.id %>
+      <a href="#" class="btn btn-close pull-right" onclick="this.closest('.row').remove(); return false;" data-confirm="Are you sure?" rel="nofollow" data-remote="true">
+        &nbsp;
+      </a>
   <% end %>
   </div>
 </div>
