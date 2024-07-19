@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_06_11_142734) do
+ActiveRecord::Schema[7.0].define(version: 2024_07_17_225736) do
   create_table "action_text_rich_texts", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
@@ -79,6 +79,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_11_142734) do
     t.datetime "updated_at", precision: nil, null: false
     t.string "first_name"
     t.string "last_name"
+    t.integer "gem_record_id"
   end
 
   create_table "delayed_jobs", id: :integer, charset: "utf8mb3", force: :cascade do |t|
