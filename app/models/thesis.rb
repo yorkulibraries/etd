@@ -19,6 +19,7 @@ class Thesis < ApplicationRecord
 
   validates :published_date, timeliness: { allow_blank: true }
   validates :exam_date, timeliness: { type: :date }
+  validates :title, uniqueness: { scope: [:student_id, :degree_name, :degree_level]}
 
   ##### RELATIONS ######
 

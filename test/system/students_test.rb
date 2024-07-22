@@ -86,6 +86,40 @@ class StudentsTest < ApplicationSystemTestCase
     assert_selector "p", text: "#{@thesis.student.email}", visible: :all
   end
 
+  
+  test 'Creating a thesis, pressing back and attempting to save again' do
+    visit root_url
+    click_link('Gem Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+    click_link('Start this thesis')
+    select "EMBA", from: "thesis_degree_name"
+    select "Master's", from: "thesis_degree_level"
+    click_button('Create Thesis')
+    page.go_back
+    click_button('Create Thesis')
+    visit root_url
+
+    thesis_elements = all('a')
+
+    thesis_titles = thesis_elements.map(&:text)
+
+    # Use a set to track seen titles and duplicates
+    seen_titles = Set.new
+    duplicates = []
+
+    thesis_titles.each do |title|
+      if seen_titles.include?(title)
+        duplicates << title
+      else
+        seen_titles.add(title)
+      end
+    end
+
+    assert_empty duplicates, "Duplicate thesis titles found: #{duplicates.join(', ')}"
+  end
+
   should "display full name instead of first, middle and last name" do
     @thesis = FactoryGirl.create(:thesis)
     login_as(@thesis.student)
