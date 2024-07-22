@@ -48,7 +48,7 @@
 
 			<div class='mt-3'>
 			<% @supplemental_documents.each do | document | %>
-				<% if document.usage != "licence" %>
+				<% if document.usage == "thesis" %>
 					<%= render partial: document %>
 				<% end %>
 			<% end %>

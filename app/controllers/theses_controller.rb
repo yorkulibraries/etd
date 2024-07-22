@@ -45,6 +45,8 @@ class ThesesController < ApplicationController
     @thesis.exam_date = record.examdate
     @thesis.program = record.program
     @thesis.assign_degree_name_and_level
+    @thesis.committee_members = record.committee_members
+
   end
 
   def create
@@ -53,8 +55,18 @@ class ThesesController < ApplicationController
     @thesis.student = @student
     @thesis.audit_comment = 'Starting a new thesis. Status: OPEN.'
 
+    @thesis.audit_comment = 'Starting a new thesis. Status: OPEN.'
+
     @thesis.status = Thesis::OPEN
     if @thesis.save
+      if params[:committee_member_ids].present?
+        params[:committee_member_ids].each do |committee_member_id|
+          if committee_member_id.present?
+            committee_member = CommitteeMember.find(committee_member_id)
+            committee_member.update(thesis: @thesis)
+          end
+        end
+      end
       redirect_to [@student, @thesis], notice: 'ETD record successfully created.'
     else
       render action: 'new'

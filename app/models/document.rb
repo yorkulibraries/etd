@@ -20,6 +20,8 @@ class Document < ApplicationRecord
   scope :supplemental, -> { where('supplemental = ? ', true) }
   scope :deleted, -> { where('deleted = ?', true) }
   scope :not_deleted, -> { where('deleted = ?', false) }
+  scope :licence_type, -> { where(usage: :licence) }
+  scope :embargo_type, -> { where(usage: [:embargo, :embargo_letter])}
 
   enum usage: %i[thesis embargo embargo_letter licence]
 

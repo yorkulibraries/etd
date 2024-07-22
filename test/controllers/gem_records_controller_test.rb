@@ -34,4 +34,19 @@ class GemRecordsControllerTest < ActionController::TestCase
 
     assert_template 'index', 'Index template should be displayed'
   end
+
+  should 'committee members included in gem records' do
+    gem_records = create_list(:gem_record, 5, eventtype: GemRecord::PHD_EXAM)
+    gem_records.each do |record|
+      create_list(:committee_member, 2, gem_record: record)
+    end
+    
+    get :index, params: { all: true }
+
+    records = assigns(:gem_records)
+
+    records.each do |record|
+      assert record.committee_members.count >= 1, 'Each gem record should have at least one committee member'
+    end
+  end
 end

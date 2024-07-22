@@ -24,6 +24,12 @@
 			<p><%= gem_record.eventtype%></p>
 			<h6>Program</h6>
 			<p><%= gem_record.program %></p>
+			<h6>Committee Members</h6>
+			<% gem_record.committee_members.each do |committee_member| %>
+				<div class="row" id="committee_member_<%= committee_member.id %>">
+				<div class="col"><%= committee_member.name %> - <%= committee_member.role %></div>
+				</div>
+			<% end %>
 		  </div>
 		  <div class="col-4">
 			<h6>Event date</h6>

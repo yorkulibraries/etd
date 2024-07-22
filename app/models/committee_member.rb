@@ -13,6 +13,7 @@ class CommitteeMember < ApplicationRecord
 
   ## RELATIONS ##
   belongs_to :thesis
+  belongs_to :gem_record
 
   ## VALIDATIONS ##
   validates_presence_of :first_name, message: 'Please choose a name.'
