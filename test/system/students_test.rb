@@ -75,6 +75,41 @@ class StudentsTest < ApplicationSystemTestCase
     # page.accept_alert
   end
 
+  test 'Unblock a student' do
+    visit root_url
+    click_link('Gem Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+    click_link('Unblock student')
+    page.accept_alert
+    assert_no_selector '.fa fa-ban text-danger'
+  end
+
+  test 'Block a student' do
+    visit root_url
+    click_link('Gem Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+    click_link('Unblock student')
+    page.accept_alert
+    assert_no_selector '.fa fa-ban text-danger'
+    click_link('Block student')
+    page.accept_alert
+    assert_selector '.fa-ban'
+  end
+
+  test 'View student audit trail' do
+    visit root_url
+    click_link('Gem Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+    click_link('Audit trail')
+    assert_selector "h3", text: "Audit Trail"
+  end
+
   ## Page 1 tests
   should "display student email on thesis begin_step" do
     @thesis = FactoryGirl.create(:thesis)

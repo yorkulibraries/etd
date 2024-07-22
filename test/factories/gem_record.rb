@@ -13,5 +13,9 @@ FactoryGirl.define do
     program       { FactoryGirl.generate(:random_string) }
     superv        { FactoryGirl.generate(:random_name) }
     seqgradevent  { FactoryGirl.generate(:random_seqgradevent) }
+
+    after(:create) do |gem_record|
+      FactoryGirl.create_list(:committee_member, 3, gem_record: gem_record)
+    end
   end
 end
