@@ -89,7 +89,6 @@ $theme-colors-rgb: map-loop($theme-colors, to-rgb, "$value");
 	h3, .h3 {
 		color: darken($info, 30%);
 		font-weight: 500;
-		text-transform: uppercase;
 	}
 
 	h4, .h4, h5, .h5, h6, .h6 {
