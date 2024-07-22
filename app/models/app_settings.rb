@@ -43,6 +43,12 @@ class AppSettings < RailsSettings::Base
   <li><strong>Video:</strong> 8-10 bit uncompressed AVI (.avi)</li>
   <li><strong>Audio:</strong> Free Lossless Audio Codec or WAVE (.flac or .wav)</li>
   </ul>'
+  field :student_supplementary_embargo_upload_files, default: '<p> Please Upload the following documents:</p> 
+  <ul>
+  <li><strong>Supervisor Letter</strong></li>
+  <li><strong>Other Embargo Supporting Documents</strong></li>
+  <li><strong>Portable Document Format:</strong> (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).</li>
+  </ul>'
   field :student_review_license_info, default: 'Please review the licences below, you must agree to all to proceed.'
   field :student_review_license_lac, default: 'LAC Licence is required. Please download the form (<a href="~//lib/assets/lac-non-exclusive-licence-en.pdf">lac-non-exclusive-licence-en.pdf</a>), sign it and upload it.'
   field :student_review_lac_licence_instructions, default: '<p class="fw-bold">Please download, sign and upload the LAC Licence file. You must upload the licence to proceed to next step</p>

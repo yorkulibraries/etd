@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'application_system_test_case'
-require_relative '../helpers/system_test_helper'
+require 'helpers/system_test_helper'
 
 class StudentsTest < ApplicationSystemTestCase
   include SystemTestHelper  # Include the SystemTestHelper module here
@@ -49,17 +49,27 @@ class StudentsTest < ApplicationSystemTestCase
     assert_selector 'h1', text: "#{@gem_record.studentname} (test)", visible: true
   end
 
+  test 'Gem Record has committee members' do
+    visit root_url
+    click_link('Gem Records')
+    click_link(@gem_record.studentname)
+
+    assert_selector "h6", text: "Committee Members"
+    if @gem_record.committee_members.count > 1
+      @gem_record.committee_members.each do |committee_member|
+        assert_selector "p", text: committee_member.full_name
+      end
+    end  
+  end
+
   test 'Log in as Student and add a thesis' do
     @thesis = FactoryGirl.create(:thesis)
     login_as(@thesis.student)
     visit root_url
     fill_in('Non-YorkU Email Address', with: Faker::Internet.email)
     click_button('Continue')
-    puts "\nGoing to Update Details\n"
     click_link('Continue') #update
-    puts "Going to Upload\n"
     click_link('Continue') #upload
-    puts "Going to Review\n"
     click_link('Continue') #review
     assert_selector '.alert-warning', text: 'Error: You have to upload a primary file to continue'
     # page.accept_alert
@@ -71,7 +81,7 @@ class StudentsTest < ApplicationSystemTestCase
     login_as(@thesis.student)
     visit root_url
     click_link("My ETD Submission")
-    assert_selector "h3", text: "Hello #{@thesis.student.first_name}"
+    assert_text(/#{Regexp.escape("Hello #{@thesis.student.first_name}")}/i)
     assert_selector "h6", text: "Email", visible: :all
     assert_selector "p", text: "#{@thesis.student.email}", visible: :all
   end
@@ -81,7 +91,7 @@ class StudentsTest < ApplicationSystemTestCase
     login_as(@thesis.student)
     visit root_url
     click_link("My ETD Submission")
-    assert_selector "h3", text: "Hello #{@thesis.student.first_name}"
+    assert_text(/#{Regexp.escape("Hello #{@thesis.student.first_name}")}/i)
     assert_no_selector "input#student_first_name"
     assert_no_selector "input#student_middle_name"
     assert_no_selector "input#student_last_name"
@@ -190,9 +200,11 @@ class StudentsTest < ApplicationSystemTestCase
 
 
     ## Page 4
+    
+    # assert_text "LAC Supplementary Licence File Upload".upcase
+    assert_text(/#{Regexp.escape("LAC Supplementary Licence File Upload")}/i)
 
-    assert_text "LAC Supplementary Licence File Upload"
-
+    
     # Initially, checkboxes should be disabled if not checked
     assert page.has_unchecked_field?('thesis_yorkspace_licence_agreement', disabled: true)
     assert page.has_unchecked_field?('thesis_etd_licence_agreement', disabled: true)
