@@ -28,6 +28,23 @@ class ThesesControllerTest < ActionController::TestCase
       assert_template 'index'
     end
 
+    should 'update thesis notes' do
+      thesis = create(:thesis, student: @student)
+
+      get :show, params: { id: thesis.id, student_id: @student.id }
+      t = assigns(:thesis)
+      assert t
+
+      put :update,
+          params: { id: thesis.id, student_id: @student.id,
+                    thesis: { notes: "Updating the thesis notes..." }
+      }
+
+      t.reload
+
+      assert_equal "Updating the thesis notes...", t.notes, 'Notes should be updated'
+    end
+
     should 'Show Thesis details or fail if thesis was not found' do
       thesis = create(:thesis, student: @student)
 
@@ -357,6 +374,13 @@ class ThesesControllerTest < ActionController::TestCase
 
       # assert_not_equal "new title", thesis.title
       # assert_not_equal "new author", thesis.author
+    end
+
+    should 'not be able to update notes field in thesis' do
+      put :update, params: { id: @thesis.id, student_id: @student.id, thesis: { notes: "updating thesis notes as student..." } }
+      thesis = assigns(:thesis)
+
+       assert_not_equal "updating thesis notes as student...", thesis.notes
     end
 
     should 'show edit for if thesis is editing, [CHECK FOR FIELDS PRESENT LATER]' do

@@ -88,6 +88,11 @@ class ThesesController < ApplicationController
 
     @thesis.audit_comment = 'Updating thesis details.'
 
+    if current_user.role == User::STUDENT
+      if thesis_params.key?(:notes) && !thesis_params[:notes].blank?
+        redirect_to [@student, @thesis], alert: 'You cannot edit thesis notes' and return
+      end
+    end    
     # params[:thesis] = params[:thesis].reject { |p| Student::IMMUTABLE_THESIS_FIELDS.include?(p) } if current_user.role == User::STUDENT
     ## Need to check if thesis params are empty or not, if they are -> don't update
     if @thesis.update(thesis_params)
@@ -254,7 +259,7 @@ class ThesesController < ApplicationController
                                    :exam_date, :student_id, :committee, :abstract, :assigned_to_id, :assigned_to,
                                    :student_accepted_terms_at, :under_review_at, :accepted_at, :published_at, :returned_at,
                                    :committee_members_attributes, :embargoed, :certify_content_correct, :lac_licence_agreement,
-                                   :yorkspace_licence_agreement, :etd_licence_agreement,
+                                   :yorkspace_licence_agreement, :etd_licence_agreement, :notes,
                                    committee_members_attributes: %i[first_name last_name role id _destroy],
                                    loc_subject_ids: [])
   end

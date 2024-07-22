@@ -203,6 +203,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_17_225736) do
     t.boolean "lac_licence_agreement", default: false
     t.boolean "yorkspace_licence_agreement", default: false
     t.boolean "etd_licence_agreement", default: false
+    t.text "notes"
     t.index ["student_id"], name: "index_theses_on_student_id"
   end
 
