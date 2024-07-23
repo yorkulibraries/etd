@@ -10,7 +10,7 @@ class LoadGemRecordsCSV
 
   def load_gem_records(filename)
     converter = lambda { |header| header.downcase }
-    CSV.foreach(filename, headers: true, header_converters: converter) do |row|
+    CSV.foreach(filename, headers: true, header_converters: converter, skip_blanks: true) do |row|
       seqgradevent = row['seqgradevent'].strip
       unless gr = GemRecord.find_by_seqgradevent(seqgradevent)
         gr = GemRecord.new
@@ -35,7 +35,7 @@ class LoadGemRecordsCSV
     count = 0
 
     converter = lambda { |header| header.downcase }
-    CSV.foreach(filename, headers: true, header_converters: converter) do |row|
+    CSV.foreach(filename, headers: true, header_converters: converter, skip_blanks: true) do |row|
       seqgradevent = row['seqgradevent'].strip
       sisid = row['sisid'].strip
       first_name = row['firstname'].strip
