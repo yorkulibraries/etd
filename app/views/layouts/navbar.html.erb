@@ -18,7 +18,7 @@
 			<% end %>
 			<% if can? :read, GemRecord %>
 				<li class="nav-item">
-					<%= active_link_to "Gem Records", gem_records_path, class:"nav-link" %>
+					<%= active_link_to "GEM Records", gem_records_path, class:"nav-link" %>
 				</li>
 			<% end %>
 			<% if @current_user.role == User::ADMIN || @current_user.role == User::MANAGER %>
