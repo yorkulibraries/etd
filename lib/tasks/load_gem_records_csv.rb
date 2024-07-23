@@ -9,8 +9,6 @@ require 'csv'
 class LoadGemRecordsCSV
 
   def load_gem_records(filename)
-    count = 0
-
     converter = lambda { |header| header.downcase }
     CSV.foreach(filename, headers: true, header_converters: converter) do |row|
       seqgradevent = row['seqgradevent'].strip
@@ -29,15 +27,7 @@ class LoadGemRecordsCSV
       gr.superv = row['superv'].strip
       gr.examdate = row['examdate'].strip
 
-      if gr.save!(validate: false)
-        count += 1
-      else
-        warn('Error: Load Gem Records Save Failed!')
-        warn("Error: #{gr.errors.inspect}")
-      end
-    rescue StandardError => e
-      warn("ERROR: #{e}")
-      warn('Hint: Possible Bad File if strip nil')
+      gr.save!
     end
   end
 
@@ -47,13 +37,21 @@ class LoadGemRecordsCSV
     converter = lambda { |header| header.downcase }
     CSV.foreach(filename, headers: true, header_converters: converter) do |row|
       seqgradevent = row['seqgradevent'].strip
-      gr = GemRecord.find_by_seqgradevent(seqgradevent)
-      cm = CommitteeMember.new
-      cm.gem_record = gr
-      cm.first_name = row['firstname'].strip
-      cm.last_name = row['surname'].strip
-      cm.role = row['role'].strip
-      cm.save!
+      sisid = row['sisid'].strip
+      first_name = row['firstname'].strip
+      last_name = row['surname'].strip
+      role = row['role'].strip
+
+      if gr = GemRecord.find_by_seqgradevent(seqgradevent)
+        unless cm = CommitteeMember.find_by(gem_record_id: gr.id, first_name: first_name, last_name: last_name, role: role)
+          cm = CommitteeMember.new
+          cm.gem_record = gr
+          cm.first_name = first_name
+          cm.last_name = last_name
+          cm.role = role
+          cm.save!
+        end
+      end
     end
   end
 end
