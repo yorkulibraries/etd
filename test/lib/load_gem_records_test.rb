@@ -71,6 +71,9 @@ class LoadGemRecordsTest < ActiveSupport::TestCase
     # there should be 8 GEM records at this point
     assert_equal 8, GemRecord.count
 
+    # there should be 6 CommitteeMember
+    assert_equal 6, CommitteeMember.count
+
     # load 3 GEM records from the exact same CSV files AGAIN
     gem_load = LoadGemRecordsCSV.new
     gem_load.load_gem_records(LoadGemRecordsTest::GEM_RECORDS_FILE)
@@ -78,6 +81,9 @@ class LoadGemRecordsTest < ActiveSupport::TestCase
 
     # there should STILL be 8 GEM records at this point
     assert_equal 8, GemRecord.count
+
+    # there should STILL be 6 CommitteeMember
+    assert_equal 6, CommitteeMember.count
   end
 
   should "update existing and matching GEM records when loading GEM records from CSV" do
@@ -121,6 +127,9 @@ class LoadGemRecordsTest < ActiveSupport::TestCase
 
     # there should STILL be 3 GEM records at this point
     assert_equal 3, GemRecord.count
+
+    # there should STILL be 6 CommitteeMember
+    assert_equal 6, CommitteeMember.count
     
     # verify fields are updated from the CSV
     assert_equal 1, records[0].seqgradevent
