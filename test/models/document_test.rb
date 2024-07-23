@@ -120,8 +120,8 @@ class DocumentTest < ActiveSupport::TestCase
 
   should 'embargo file with usage in filename' do 
     t = create(:thesis)
-    embargo_document = create(:document_for_file_naming, file: fixture_file_upload('image-example.jpg'), usage: :embargo, supplemental: true, thesis: t)
 
+    embargo_document = create(:document_for_file_naming, file: fixture_file_upload('image-example.jpg'), usage: :embargo, supplemental: true, thesis: t)
     assert_match(/EMBARGO_.*\.\w+$/, t.documents.first.file.to_s)
 
     embargo_letter_document = create(:document_for_file_naming, file: fixture_file_upload('pdf-document.pdf'), usage: :embargo_letter, supplemental: true, thesis: t)
@@ -130,25 +130,49 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
     
-  should 'save files in sequence for supplementary' do
-  #   t = create(:thesis)
-    
-  #   d = create(:document_for_file_naming, file: fixture_file_upload('pdf-document.pdf'), usage: :thesis, supplemental: true, thesis: t)
-  #   d2 = create(:document_for_file_naming, file: fixture_file_upload('html-document.html'), usage: :thesis, supplemental: true, thesis: t)
-  #   d3 = create(:document_for_file_naming, file: fixture_file_upload('image-example.jpg'), usage: :thesis, supplemental: true, thesis: t)
+  should 'thesis supplementary files should be saved in sequence' do
 
-  #   # puts "\n\nDEBUGGING F1\n #{d.pretty_inspect()}"
-  #   # puts "\n\nDEBUGGING F2\n #{d2.pretty_inspect()}"
-  #   # puts "\n\nDEBUGGING F3\n #{d3.pretty_inspect()}"
+    # model.usage == thesis and upload type is supplementary
+    # Make the automatic naming convention text pull from the following:
+      # Primary file:
+      # FullNameField_Year_Degree_Primary.pdf
+      # Supplementary files:
+      # FullNameField_Year_Degree_Supplementary_1.file extension
+      # FullNameField_Year_Degree_Supplementary_2.file extension
+      # FullNameField_Year_Degree_Supplementary_3.file extension
+
+    t = create(:thesis)
+    document_name_1 = "pdf-document.pdf"
+    document_name_2 = "html-document.html"
+    document_name_3 = "image-example.jpg"
+
+    d = create(:document_for_file_naming, file: fixture_file_upload(document_name_1), usage: :thesis, supplemental: true, thesis: t)
+    d2 = create(:document_for_file_naming, file: fixture_file_upload(document_name_2), usage: :thesis, supplemental: true, thesis: t)
+    d3 = create(:document_for_file_naming, file: fixture_file_upload(document_name_3), usage: :thesis, supplemental: true, thesis: t)
+
+    expected_1 = Document.filename_by_convention(d.user.name, d.thesis.exam_date, d.thesis.degree_name, d.thesis.degree_level, document_name_1, d.supplemental, d.usage)
+    expected_2 = Document.filename_by_convention(d2.user.name, d2.thesis.exam_date, d2.thesis.degree_name, d2.thesis.degree_level, document_name_2, d.supplemental, d.usage)
+    expected_3 = Document.filename_by_convention(d3.user.name, d3.thesis.exam_date, d3.thesis.degree_name, d3.thesis.degree_level, document_name_3, d.supplemental, d.usage)
+    # assert_equal expected_1, d.file.filename
+    # assert_equal expected_2, d2.file.filename
+    # assert_equal expected_3, d3.file.filename        
+
+    assert_match(/_Supplemental_1\.\w+$/, t.documents.first.file.to_s)
+    assert_match(/_Supplemental_2\.\w+$/, t.documents[1].file.to_s)
+    assert_match(/_Supplemental_3\.\w+$/, t.documents[2].file.to_s)
+    # puts "\n\nDEBUGGING F1\n #{d.pretty_inspect()}"
+    # puts "\n\nDEBUGGING F2\n #{d2.pretty_inspect()}"
+    # puts "\n\nDEBUGGING F3\n #{d3.pretty_inspect()}"
 
   #   # Assert that the filename ends with "_1"
   #   assert_match(/_1\.\w+$/, t.documents.first.file.to_s)
   #   assert_match(/_3\.\w+$/, t.documents.last.file.to_s)
+  end
 
-  #   ## Count should still increment even if deleted because files are only flagged as deleted.
-  #   d.destroy
-  #   d4 = create(:document_for_file_naming, file: fixture_file_upload('papyrus-feature.png'), usage: :thesis, supplemental: true, thesis: t)
-  #   assert_match(/_4\.\w+$/, t.documents.last.file.to_s)
+  should "If Supplemental file is deleted, next uploaded file should continue the sequence" do
+    # d.destroy
+    # d4 = create(:document_for_file_naming, file: fixture_file_upload('papyrus-feature.png'), usage: :thesis, supplemental: true, thesis: t)
+    # assert_match(/_4\.\w+$/, t.documents.last.file.to_s)
   end
 
   should 'None naming convention for non-existence of usage' do
