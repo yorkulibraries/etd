@@ -4,16 +4,15 @@ require Rails.root.join('lib/tasks/load_gem_records_csv.rb')
 
 namespace :gem_records_csv do
   desc 'Loading Gem Records.'
-  # Usage: cat /file/with/gem_records.txt | rake gem_records:load
+  # bundle exec rake "gem_records_csv:load[/full/path/to/gem_records.csv,/full/path/to/committee_members.csv]"
 
   task :load, [:gem_record_file, :commitee_member_file] => :environment do |t, args|
-    gem_record_filename = Rails.root.join(args[:gem_record_file])
-    commitee_member_file = Rails.root.join(args[:commitee_member_file])
-    if gem_record_filename.nil? || gem_record_filename.empty?
-      puts "Error: Gem Record Filename is required"
+    if args[:gem_record_file].nil? || args[:commitee_member_file].nil?
+      puts "Usage: bundle exec rake \"gem_records_csv:load[/full/path/to/gem_records.csv,/full/path/to/committee_members.csv]\""
       exit 1
     end
-    #GemRecord.delete_all
+    gem_record_filename = args[:gem_record_file].strip
+    commitee_member_file = args[:commitee_member_file].strip
     gem_load = LoadGemRecordsCSV.new
     gem_load.load_gem_records(gem_record_filename)
     if !commitee_member_file.nil? || !commitee_member_file.empty?
