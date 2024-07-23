@@ -110,6 +110,26 @@ class DocumentTest < ActiveSupport::TestCase
     assert_match(/_Supplemental_.*\.\w+$/, t.documents.first.file.to_s)
   end
 
+  should 'licence files with usage in filename' do 
+    t = create(:thesis)
+    licence_document = create(:document_for_file_naming, file: fixture_file_upload('html-document.html'), usage: :licence, supplemental: true, thesis: t)
+
+    assert_match(/LICENCE_.*\.\w+$/, t.documents.first.file.to_s)
+
+  end
+
+  should 'embargo file with usage in filename' do 
+    t = create(:thesis)
+    embargo_document = create(:document_for_file_naming, file: fixture_file_upload('image-example.jpg'), usage: :embargo, supplemental: true, thesis: t)
+
+    assert_match(/EMBARGO_.*\.\w+$/, t.documents.first.file.to_s)
+
+    embargo_letter_document = create(:document_for_file_naming, file: fixture_file_upload('pdf-document.pdf'), usage: :embargo_letter, supplemental: true, thesis: t)
+    assert_match(/EMBARGO_LETTER.*\.\w+$/, t.documents[1].file.to_s)
+
+  end
+
+    
   should 'save files in sequence for supplementary' do
   #   t = create(:thesis)
     
