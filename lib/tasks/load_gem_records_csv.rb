@@ -33,8 +33,6 @@ class LoadGemRecordsCSV
   end
 
   def load_committee_members(filename)
-    count = 0
-
     converter = lambda { |header| header.downcase }
     CSV.foreach(filename, headers: true, header_converters: converter, skip_blanks: true) do |row|
       seqgradevent = row['seqgradevent'].strip unless row['seqgradevent'].nil?
@@ -50,7 +48,9 @@ class LoadGemRecordsCSV
           cm.first_name = first_name
           cm.last_name = last_name
           cm.role = role
-          cm.save!
+
+          # don't throw up if validation failed, just skip the bad committee member record
+          cm.save
         end
       end
     end
