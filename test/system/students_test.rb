@@ -13,7 +13,7 @@ class StudentsTest < ApplicationSystemTestCase
 
   test 'Creating a student based on Gem Records' do
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -22,7 +22,7 @@ class StudentsTest < ApplicationSystemTestCase
 
   test 'Starting a thesis' do
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -35,7 +35,7 @@ class StudentsTest < ApplicationSystemTestCase
 
   test 'Editing a student' do
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -51,7 +51,7 @@ class StudentsTest < ApplicationSystemTestCase
 
   test 'Gem Record has committee members' do
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
 
     assert_selector "h6", text: "Committee Members"
