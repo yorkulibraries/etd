@@ -23,51 +23,12 @@ $york-red-dark:    #8C0000;
 $york-light-blue:  #ACE6F8;
 $york-bright-blue: #3AC2EF;
 
-// Custom theme colors
-$primary: $york-red-pms-186;
-$secondary: $york-grey-dark;
-$success: #2e8540 !default; //#35B01C !default; //$green !default; $success: #3AC2EF;
-$info: darken($york-light-blue, 50%);
-$warning: #ffc107;
-$danger: $york-red-medium;
-$light: $york-grey-lighter;
-$dark: $york-grey-dark;
-
 // Additional custom styles
 $border-radius: .25rem;
 $btn-border-radius: .25rem;
 $btn-padding-y: .5rem;
 $btn-padding-x: 1rem;
 $btn-font-weight: 400;
-
-$theme-colors: (
- 'primary': $primary,
- 'secondary': $secondary,
- 'success': $success,
- 'info': $info,
- 'warning': $warning,
- 'danger': $danger,
- 'light': $light,
- 'dark': $dark,
-);
-
-$yorku-colors: (
- 'york-grey-dark': $york-grey-dark,
- 'york-grey-medium': $york-grey-medium,
- 'york-grey-pewter': $york-grey-pewter,
- 'york-grey-light': $york-grey-light,
- 'york-grey-lighter': $york-grey-lighter,
- 'york-red-pms-186': $york-red-pms-186,
- 'york-red-medium': $york-red-medium,
- 'york-red-dark': $york-red-dark,
- 'york-light-blue': $york-light-blue,
- 'york-bright-blue': $york-bright-blue
-);
-
-// Merge the maps
-$theme-colors: map-merge($theme-colors, $yorku-colors);
-$theme-colors-rgb: map-loop($theme-colors, to-rgb, "$value");
-
 
 @import "bootstrap/variables";
 @import "bootstrap/mixins";
@@ -103,6 +64,7 @@ $theme-colors-rgb: map-loop($theme-colors, to-rgb, "$value");
 		font-size: 1.25rem; // Adjust as needed
 	}
 }
+
 // Key-Value pairs in forms
 .dl-horizontal dt {
   font-weight: 500;
@@ -116,6 +78,7 @@ $theme-colors-rgb: map-loop($theme-colors, to-rgb, "$value");
 .page-header {
 	margin-bottom: 10px;
 }
+
 .student-view {
 	margin-top: 10px;
 }
@@ -139,18 +102,19 @@ $theme-colors-rgb: map-loop($theme-colors, to-rgb, "$value");
 }
 
 .simple_form {
-	// background-color: lighten($york-grey-pewter, 8%);
-	// background-color: $york-grey-pewter;
 	background-color: $light;
 	padding: 0.875rem;
 }
+
 .simple_form .form-control {
 	font-size: 1.1rem;
 	margin-bottom: 10px;
 }
+
 .simple_form .form-text {
 	margin-bottom: 0.25rem;
 }
+
 .container section {
 	padding-top: 15px;
 	padding-bottom: 15px;
