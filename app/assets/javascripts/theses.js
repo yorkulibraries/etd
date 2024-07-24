@@ -23,7 +23,7 @@ $(document).ready(function () {
 
 	$(".simple_form").on("click", ".remove_fields", function (event) {
 		$(this).prev("input[type=hidden]").val("1");
-		$(this).closest("fieldset").hide();
+		$(this).closest("fieldset").remove();
 		event.preventDefault();
 	});
 
