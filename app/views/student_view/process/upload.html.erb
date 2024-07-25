@@ -1,49 +1,50 @@
 <% title "#{@student.name}" %>
 
 <% title_html do %>
-	<h4 class="fw-lighter">My ETD Submission</h4>
-	<h1 class="border-bottom"><%= @student.name %></h1>
+	<h1>
+		<span class="fw-lighter text-secondary d-block lead ">My ETD Submission</span> 
+		<%= @student.name %>
+	</h1>
 <% end %>
 
 <%= progress_bar (Thesis::PROCESS_UPLOAD) %>
 
 <div class="student-view fitted upload">
-	<div class="thesis row">
+	<h2 class="text-success">Files and Documents</h2>
+	<div class="settings-content">
+		<%= raw(AppSettings.student_upload_files) %>
+	</div>
+	<h3 class="fw-bold" title="Thesis Title"><%= @thesis.title %></h3>
 
-		<div class="span9">
-			<h3 class="title" title="title"><%= @thesis.title %></h3>
-		</div>
+	<div class="thesis data-grid">
+		<hr/>
 	</div>
 
-
-	<h6 class="green">Files and Documents</h6>
 	<div class="documents">
-		<div class="alert alert-secondary" role="alert">
-			<%= raw(AppSettings.student_upload_files) %>
-		</div>
-
-		<h6>Primary &nbsp; &nbsp;
-				<%  unless block_thesis_changes?(@thesis) %>
-					<% if @primary_documents.count == 0 %>
-						<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#primary-file">Upload Primary File</button>
+		<div class="bg-light p-3">
+			<h4>Primary &nbsp; &nbsp;
+					<%  unless block_thesis_changes?(@thesis) %>
+						<% if @primary_documents.count == 0 %>
+							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#primary-file">Upload Primary File</button>
+						<% end %>
 					<% end %>
-				<% end %>
-		</h6>
+			</h4>
 
-		<% @primary_documents.each do | document | %>
-			<%= render partial: document %>
-		<% end %>
+			<% @primary_documents.each do | document | %>
+				<%= render partial: document %>
+			<% end %>
 
-		<% if @primary_documents.count == 0 %>
-			<p>There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
-		<% end %>
+			<% if @primary_documents.count == 0 %>
+				<p>There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
+			<% end %>
+		</div>
 
 		<div class="push-down"></div>
 
-		<div class="mt-3">
-			<h6>Supplementary</h6>
+		<div class="bg-light mt-3 p-3">
+			<h4>Supplementary</h4>
 				<%  unless block_thesis_changes?(@thesis) %>
-					<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#supplemental-files">Upload Supplementary Files</button>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#supplemental-files">Upload Supplementary Files</button>
 				<% end %>
 
 			<div class='mt-3'>
@@ -60,9 +61,11 @@
 
 	<%  unless block_thesis_changes?(@thesis) %>
 		<hr/>
-		<div class="process-nav float-start">
-			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="next-btn back btn btn-primary btn-lg " title="Update Details">
-				<i class="fa fa-angle-double-left"></i></a>
+		<div class="process-nav d-flex justify-content-end">
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="btn btn-lg btn-primary me-2" title="Begin Submission">
+				<i class="fa fa-angle-double-left"></i>
+			</a>
+
 			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn btn btn-success btn-lg" title="Continue to Review Details">
 	 			<i class="fa fa-angle-double-right"></i> Continue
 			</a>

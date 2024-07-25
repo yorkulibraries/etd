@@ -9,110 +9,16 @@
 
 @import "bootstrap/functions";
 
-//YorkU Colors
-/* 2021 YorkU colours */
-/* http://toolbox.info.yorku.ca/visual-identity/colours/ */
-$york-grey-dark:   #686260;
-$york-grey-medium: #B7AEA9;
-$york-grey-pewter: #D6CFCA;
-$york-grey-light:  #E8E4DF;
-$york-grey-lighter: #FAFAFA;
-$york-red-pms-186: #E31837;
-$york-red-medium:  #B82025;
-$york-red-dark:    #8C0000;
-$york-light-blue:  #ACE6F8;
-$york-bright-blue: #3AC2EF;
-
-// Custom theme colors
-$primary: $york-red-pms-186;
-$secondary: $york-grey-dark;
-$success: #2e8540 !default; //#35B01C !default; //$green !default; $success: #3AC2EF;
-$info: darken($york-light-blue, 50%);
-$warning: #ffc107;
-$danger: $york-red-medium;
-$light: $york-grey-lighter;
-$dark: $york-grey-dark;
-
-// Additional custom styles
-$border-radius: .25rem;
-$btn-border-radius: .25rem;
-$btn-padding-y: .5rem;
-$btn-padding-x: 1rem;
-$btn-font-weight: 400;
-
-$theme-colors: (
- 'primary': $primary,
- 'secondary': $secondary,
- 'success': $success,
- 'info': $info,
- 'warning': $warning,
- 'danger': $danger,
- 'light': $light,
- 'dark': $dark,
-);
-
-$yorku-colors: (
- 'york-grey-dark': $york-grey-dark,
- 'york-grey-medium': $york-grey-medium,
- 'york-grey-pewter': $york-grey-pewter,
- 'york-grey-light': $york-grey-light,
- 'york-grey-lighter': $york-grey-lighter,
- 'york-red-pms-186': $york-red-pms-186,
- 'york-red-medium': $york-red-medium,
- 'york-red-dark': $york-red-dark,
- 'york-light-blue': $york-light-blue,
- 'york-bright-blue': $york-bright-blue
-);
-
-// Merge the maps
-$theme-colors: map-merge($theme-colors, $yorku-colors);
-$theme-colors-rgb: map-loop($theme-colors, to-rgb, "$value");
-
+/* Custom theme colors go here */
+/* Set your own primary/secondary/info/success etc. colors here */
+/* e.g. $primary: #e31837 */
 
 @import "bootstrap/variables";
 @import "bootstrap/mixins";
 @import "bootstrap";
 
 // Headings customization
-.container { 
-
-	h1, .h1 {
-		color: $black;
-		font-weight: 700;
-	}
-
-	h2, .h2 {
-		color: $primary;
-		font-weight: 600;
-	}
-
-	h3, .h3 {
-		color: darken($info, 30%);
-		font-weight: 500;
-	}
-
-	h4, .h4, h5, .h5, h6, .h6 {
-		color: $secondary;
-		font-weight: 400;
-	}
-
-	// Subheadings customization
-	.subheading {
-		color: $secondary;
-		font-weight: 300;
-		font-size: 1.25rem; // Adjust as needed
-	}
-}
-// Key-Value pairs in forms
-.dl-horizontal dt {
-  font-weight: 500;
-  color: $primary;
-}
-
-.dl-horizontal dd {
-  color: $secondary;
-}
-
+.container { }
 .page-header {
 	margin-bottom: 10px;
 }
@@ -120,28 +26,35 @@ $theme-colors-rgb: map-loop($theme-colors, to-rgb, "$value");
 	margin-top: 10px;
 }
 
-// Custom styles can go here, if needed
-.record-data {
-	margin-top: 10px;
-	margin-bottom: 10px;
-	tr {
-		td:nth-child(1) {
-			@extend .lead;
-			// font-size: $small-font-size;
-			font-size: 1rem; 
-			color: $secondary;
-		}
-		td:nth-child(2) {
-			// color: $secondary;
-			font-weight: 600;
-		}
+//////////////////////////////////////////
+// Custom styles can go here, if needed //
+//////////////////////////////////////////
+
+.settings-content div {
+	margin-top: 0;
+	margin-bottom: 1rem;
+	font-size: 1.25rem;
+}
+
+.thesis, .data-grid {
+	h4 {
+		font-size: 1.25rem;
+		font-weight: 300;
+		color: $secondary;
+	}
+	p {
+		font-weight: bold;
 	}
 }
 
+.navbar-brand {
+	font-weight: 700;
+	color: #e31837;
+	// color: #af0d1a;
+}
+
+/* Simple Form basic styles */
 .simple_form {
-	// background-color: lighten($york-grey-pewter, 8%);
-	// background-color: $york-grey-pewter;
-	background-color: $light;
 	padding: 0.875rem;
 }
 .simple_form .form-control {
