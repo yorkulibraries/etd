@@ -5,6 +5,7 @@ require 'helpers/system_test_helper'
 
 class StudentsTest < ApplicationSystemTestCase
   #include SystemTestHelper  # Include the SystemTestHelper module here
+  #include SystemTestHelper  # Include the SystemTestHelper module here
 
   setup do
     @gem_record = FactoryGirl.create(:gem_record)
@@ -72,6 +73,7 @@ class StudentsTest < ApplicationSystemTestCase
       @gem_record.committee_members.each do |committee_member|
         assert_selector "p", text: committee_member.full_name
       end
+    end
     end
   end
 
@@ -176,6 +178,7 @@ class StudentsTest < ApplicationSystemTestCase
 
     ## Page 1: Welcome and Non-YorkU Email
 
+
     click_link("My ETD Submission")
     assert_selector "input#student_email_external"
     fill_in("Non-YorkU Email Address", with: "#{@thesis.student.username}@mailinator.com")
@@ -186,6 +189,19 @@ class StudentsTest < ApplicationSystemTestCase
     select "English", from: "thesis_language"
     fill_in "thesis_abstract", with: Faker::Lorem.paragraph
 
+
+    execute_script("document.getElementById('select_subjects_11').style.display = 'block';")
+    select "Accounting", from: 'select_subjects_11'
+
+    execute_script("document.getElementById('select_subjects_12').style.display = 'block';")
+    select "Management", from: 'select_subjects_12'
+
+    execute_script("document.getElementById('select_subjects_13').style.display = 'block';")
+    select "Finance", from: 'select_subjects_13'
+
+    select "Accounting", from: 'select_subjects_11'
+    select "Management", from: 'select_subjects_12'
+    select "Finance", from: 'select_subjects_13'
 
     execute_script("document.getElementById('select_subjects_11').style.display = 'block';")
     select "Accounting", from: 'select_subjects_11'
