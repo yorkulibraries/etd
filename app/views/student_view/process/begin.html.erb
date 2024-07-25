@@ -1,59 +1,59 @@
 <% title "#{@student.name}" %>
-
 <% title_html do %>
+	<h1>
+		<span class="fw-lighter text-secondary d-block lead ">My ETD Submission</span> 
+		<%= @student.name %>
+	</h1>
 	<% if @thesis.returned_message.present? && Thesis::RETURNED == @thesis.status %>
 		<div class="alert alert-danger" role="alert">
-		  <h4 class="alert-heading">Reason why your thesis was returned</h4>
-		  <%= @thesis.returned_message %>
+			<h2 class="alert-heading text-dark fs-3">Reason why your thesis was returned</h2>
+			<p><%= @thesis.returned_message %></p>
 		</div>
 	<% end %>
-	<h4 class="fw-lighter">My ETD Submission</h4>
-	<h1 class="border-bottom"><%= @student.name %></h1>
 <% end %>
 
 <%= progress_bar (Thesis::PROCESS_BEGIN) %>
 
-
-
-
-
 <div class="student-view begin fitted">
-	<h3>Hello <%= @student.name %></h3>
-	<%= raw(AppSettings.student_begin_submission) %>
-	<hr/>
-
-
-	<div class="thesis row">
-			<h4 class="title" title="title"><%= @thesis.title %></h4>
-
-			<div class="col-md-12 col-lg-4">
-				<h6>Supervisor</h6>
-				<p><%= format @thesis.supervisor %></p>
-				<h6>Email</h6>
-				<p><%= @student.email %></p>
-			</div>
-			<div class="col-md-12 col-lg-4">
-				<h6>Degree Name and Level</h6>
-				<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
-				<h6>Program</h6>
-				<p><%= format @thesis.program %></p>
-			</div>
-			<div class="col-md-12 col-lg-4">
-				<h6>Exam date</h6>
-				<p><%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
-			</div>
+	<h2 class="text-success">Hello <%= @student.name %></h2>
+	
+	<div class="settings-content">
+		<%= raw(AppSettings.student_begin_submission) %>
 	</div>
-	<hr/>
 
-	<%= simple_form_for @student, method: :post, url: organize_student_information_student_thesis_path(@student, @thesis), html: { class: "form-horizontal" } do |f| %>
-		<h6>Full Name</h6>
-		<p><%= @student.name %></p>
+	<h3 class="fw-bold" title="Thesis Title pb-2"><%= @thesis.title %></h3>
+	<hr/>
+	
+	<div class="thesis data-grid">
+		<div class="row mb-md-5 mb-3">
+				<div class="col-md-12 col-lg-4">
+					<h4>Full Name</h4>
+					<p><%= @student.name %></p>
+					<h4>Email</h4>
+					<p><%= @student.email %></p>
+				</div>
+				<div class="col-md-12 col-lg-4">
+					<h4>Supervisor</h4>
+					<p><%= format @thesis.supervisor %></p>
+					<h4>Program</h4>
+					<p><%= format @thesis.program %></p>
+				</div>
+				<div class="col-md-12 col-lg-4">
+					<h4>Degree Name and Level</h4>
+					<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+					<h4>Exam date</h4>
+					<p><%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
+				</div>
+		</div>
+	</div>
+
+	<%= simple_form_for @student, method: :post, url: organize_student_information_student_thesis_path(@student, @thesis), html: { class: "form-horizontal border border-2 bg-light" } do |f| %>
 		<%= f.input :email_external, label: "Non-YorkU Email Address", hint: "#{AppSettings.student_begin_external_non_yorku_email}", required: true %>
 
 		<div class="row">
 			<div class="pt-2">
 		  	<hr />
-				<%= f.button :button, class: "float-end btn btn-success" do %>
+				<%= f.button :button, class: "float-end btn btn-lg btn-success" do %>
 				<i class='fa fa-angle-double-right'></i> Continue
 				<% end %>
 			</div>

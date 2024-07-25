@@ -130,7 +130,7 @@ class StudentsTest < ApplicationSystemTestCase
     visit root_url
     click_link("My ETD Submission")
     assert_text(/#{Regexp.escape("Hello #{@thesis.student.first_name}")}/i)
-    assert_selector "h6", text: "Email", visible: :all
+    assert_selector "h4", text: "Email", visible: :all
     assert_selector "p", text: "#{@thesis.student.email}", visible: :all
   end
 
@@ -143,7 +143,7 @@ class StudentsTest < ApplicationSystemTestCase
     assert_no_selector "input#student_first_name"
     assert_no_selector "input#student_middle_name"
     assert_no_selector "input#student_last_name"
-    assert_selector "h6", text: "Full Name", visible: :all
+    assert_selector "h4", text: "Full Name", visible: :all
     assert_selector "p", text: "#{@thesis.student.name}", visible: :all
   end
 
