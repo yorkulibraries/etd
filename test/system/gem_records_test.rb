@@ -3,7 +3,7 @@
 require 'application_system_test_case'
 require 'helpers/system_test_helper'
 
-class StudentsTest < ApplicationSystemTestCase
+class GemRecordsTest < ApplicationSystemTestCase
   include SystemTestHelper  # Include the SystemTestHelper module here
 
   setup do

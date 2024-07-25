@@ -4,11 +4,24 @@ require 'application_system_test_case'
 require 'helpers/system_test_helper'
 
 class StudentsTest < ApplicationSystemTestCase
-  include SystemTestHelper  # Include the SystemTestHelper module here
-
+  #include SystemTestHelper  # Include the SystemTestHelper module here
 
   setup do
     @gem_record = FactoryGirl.create(:gem_record)
+  end
+
+  test 'Send student invitation email' do
+    user = FactoryGirl.create(:user, role: User::ADMIN)
+    login_as(user)
+    visit root_url
+    click_link('Gem Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+
+    click_link('Send invitation email')
+
+    assert_selector '.alert-success', text: "Sent an invitation email to #{@gem_record.studentname}"
   end
 
   test 'Creating a student based on Gem Records' do
@@ -59,7 +72,7 @@ class StudentsTest < ApplicationSystemTestCase
       @gem_record.committee_members.each do |committee_member|
         assert_selector "p", text: committee_member.full_name
       end
-    end  
+    end
   end
 
   test 'Log in as Student and add a thesis' do
@@ -206,14 +219,19 @@ class StudentsTest < ApplicationSystemTestCase
     select "English", from: "thesis_language"
     fill_in "thesis_abstract", with: Faker::Lorem.paragraph
 
-    select_option_value = 'Accounting'
-    select_chosen_option('#select_subjects_11_chosen', select_option_value)
 
-    select_option_value = 'Management'
-    select_chosen_option('#select_subjects_12_chosen', select_option_value)
+    execute_script("document.getElementById('select_subjects_11').style.display = 'block';")
+    select "Accounting", from: 'select_subjects_11'
 
-    select_option_value = 'Finance'
-    select_chosen_option('#select_subjects_13_chosen', select_option_value)
+    execute_script("document.getElementById('select_subjects_12').style.display = 'block';")
+    select "Management", from: 'select_subjects_12'
+
+    execute_script("document.getElementById('select_subjects_13').style.display = 'block';")
+    select "Finance", from: 'select_subjects_13'
+
+    select "Accounting", from: 'select_subjects_11'
+    select "Management", from: 'select_subjects_12'
+    select "Finance", from: 'select_subjects_13'
 
     fill_in "thesis_keywords", with: "accounting-kw, management-kw"
     click_on("Continue")
@@ -235,11 +253,11 @@ class StudentsTest < ApplicationSystemTestCase
 
 
     ## Page 4
-    
+
     # assert_text "LAC Supplementary Licence File Upload".upcase
     assert_text(/#{Regexp.escape("LAC Supplementary Licence File Upload")}/i)
 
-    
+
     # Initially, checkboxes should be disabled if not checked
     assert page.has_unchecked_field?('thesis_yorkspace_licence_agreement', disabled: true)
     assert page.has_unchecked_field?('thesis_etd_licence_agreement', disabled: true)

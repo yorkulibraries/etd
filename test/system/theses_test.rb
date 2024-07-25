@@ -83,6 +83,18 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector 'p', text: 'Testing Abstract', visible: true
   end
 
+  test 'Edit a thesis with errors' do
+    visit root_url
+    click_link(@thesis_01.title)
+    click_on('Make Changes')
+
+    fill_in "thesis_title", with: ""
+    fill_in "thesis_program", with: ""
+    click_button('Update Thesis')
+
+    assert_no_selector '.alert-success', text: 'Successfully updated thesis.'
+  end
+
   test 'Returning a thesis' do
     visit root_url
     click_link(@thesis_01.title)
@@ -130,11 +142,11 @@ class ThesesTest < ApplicationSystemTestCase
   end
 
   #### FILE UPLOADS FROM BACKEND #####
-  
+
   should "be able to upload primary document by admin/staff" do
     visit root_url
     click_link(@thesis_01.title)
-    
+
     click_on("Upload Primary File")
     assert_selector "p", text: "Your primary file should be in PDF format.", visible: :all
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
@@ -146,7 +158,7 @@ class ThesesTest < ApplicationSystemTestCase
   should "be able to upload supplementary document by admin/staff" do
     visit root_url
     click_link(@thesis_01.title)
-    
+
     click_on("Upload Supplementary Files")
     assert_selector "h1", text: "Upload Supplementary File", visible: :all
     attach_file("document_file", Rails.root.join('test/fixtures/files/pdf-document.pdf'))
@@ -154,7 +166,7 @@ class ThesesTest < ApplicationSystemTestCase
     select "Supplementary file or document attached to thesis/dissertation", from: 'Document type' #document_usage
     click_button('Upload')
     assert_selector(".supplemental", text: /Supplemental/) #Supplemental
-    
+
   end
 
   ###########################################################
@@ -164,7 +176,7 @@ class ThesesTest < ApplicationSystemTestCase
   should "be able to upload supplementary license document by admin/staff" do
     visit root_url
     click_link(@thesis_01.title)
-    
+
     click_on("Upload Licence Files")
     assert_selector "h1", text: "Upload Supplementary Licence File", visible: :all
     attach_file("document_file", Rails.root.join('test/fixtures/files/image-example.jpg'))
@@ -178,7 +190,7 @@ class ThesesTest < ApplicationSystemTestCase
   should "be able to upload supplementary embargo document [Request for embargo document] by admin/staff" do
     visit root_url
     click_link(@thesis_01.title)
-    
+
     page.driver.browser.manage.window.resize_to(1920, 2500)
     click_on("Upload Embargo Files")
     assert_selector "h1", text: "Upload Supplementary File", visible: :all
@@ -186,19 +198,19 @@ class ThesesTest < ApplicationSystemTestCase
 
     assert_selector "select#document_usage"
     select "Request for embargo document", from: 'Document type' #document_usage
-    
+
     click_button('Upload')
-    
+
     ## NOTE TO SELF, CHECK HERE FOR EMBARGO SPECIFIC
     # assert_selector(".supplemental", text: /Supplemental/) #Supplemental
     assert_not_empty find('.embargo-file').text, "The .embargo-file element is empty, no file"
-    
+
     # Take a screenshot
     save_screenshot('screenshot_with_dropdown.png')
   end
-  
+
   ###########################################################
   ################## END OF FILE UPLOADS ####################
   ###########################################################
-  
+
 end
