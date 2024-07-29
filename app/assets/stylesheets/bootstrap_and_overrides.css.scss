@@ -18,7 +18,15 @@
 @import "bootstrap";
 
 // Headings customization
-.container { }
+.container { 
+	h2 { 
+		font-weight: bold;
+		color: #E57524;
+	}
+	h3 {
+		font-weight: 600;
+	}
+}
 .page-header {
 	margin-bottom: 10px;
 }
