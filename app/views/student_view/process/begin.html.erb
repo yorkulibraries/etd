@@ -15,13 +15,13 @@
 <%= progress_bar (Thesis::PROCESS_BEGIN) %>
 
 <div class="student-view begin fitted">
-	<h2 class="text-success">Hello <%= @student.name %></h2>
+	<h2>Hello <%= @student.name %></h2>
 	
 	<div class="settings-content">
 		<%= raw(AppSettings.student_begin_submission) %>
 	</div>
 
-	<h3 class="fw-bold" title="Thesis Title pb-2"><%= @thesis.title %></h3>
+	<h3 title="Thesis Title pb-2"><%= @thesis.title %></h3>
 	<hr/>
 	
 	<div class="thesis data-grid">

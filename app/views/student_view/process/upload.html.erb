@@ -10,11 +10,11 @@
 <%= progress_bar (Thesis::PROCESS_UPLOAD) %>
 
 <div class="student-view fitted upload">
-	<h2 class="text-success">Files and Documents</h2>
+	<h2>Files and Documents</h2>
 	<div class="settings-content">
 		<%= raw(AppSettings.student_upload_files) %>
 	</div>
-	<h3 class="fw-bold" title="Thesis Title"><%= @thesis.title %></h3>
+	<h3 title="Thesis Title"><%= @thesis.title %></h3>
 
 	<div class="thesis data-grid">
 		<hr/>

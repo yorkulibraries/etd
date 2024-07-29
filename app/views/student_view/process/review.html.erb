@@ -16,11 +16,11 @@
 <% end %>
 
 <div class="student-view fitted submit">
-	<h2 class="text-success">Licence Review and Acceptance</h2>
+	<h2 title="Licence Review and Acceptance">Licence Review and Acceptance</h2>
 	<div class="settings-content">
 		<%= raw(AppSettings.student_review_license_info) %>
 	</div>
-	<h3 class="fw-bold" title="Thesis Title"><%= @thesis.title %></h3>
+	<h3 title="Thesis Title"><%= @thesis.title %></h3>
 	<hr/>
 
 		<%= simple_form_for([@current_user, @thesis], url: accept_licences_student_thesis_path(@current_user, @thesis), method: :post, html: { class: "p-0" }) do |f| %>
@@ -36,7 +36,7 @@
 			<% end %>
 
 			<div class="licence-box mb-5">
-				<h4>LAC Supplementary Licence File Upload</h4>
+				<h4 title="LAC Supplementary Licence File Upload" >LAC Supplementary Licence File Upload</h4>
 				<hr class="text-primary border-3">
 				<p class="small">You must scroll to enable the checkbox to acknowledge you have read the licence.</p>
 				
@@ -59,7 +59,7 @@
 			</div>
 
 			<div class="licence-box my-5" >
-				<h4>Yorkspace Distribution Licence</h4>
+				<h4 title="Yorkspace Distribution Licence">Yorkspace Distribution Licence</h4>
 				<p class="small">You must scroll to enable the checkbox to acknowledge you have read the licence.</p>
 				<hr class="text-success border-3">
 				<% if AppSettings.student_review_license_yorkspace.present? %>
@@ -73,7 +73,7 @@
 			</div>
 
 			<div class="licence-box my-5">
-				<h4>ETD Licence Agreement</h4>
+				<h4 title="ETD Licence Agreement">ETD Licence Agreement</h4>
 				<hr class="text-warning border-3">
 				<p class="small">You must scroll to enable the checkbox to acknowledge you have read the licence.</p>
 				<% if AppSettings.student_review_license_etd.present? %>
