@@ -117,7 +117,7 @@ class StudentsTest < ApplicationSystemTestCase
   end
 
   ## Page 2 and 3 tests
-  should "upload primary file" do
+  should "Successfully Submit Student Thesis" do
     @thesis = FactoryGirl.create(:thesis)
     create(:loc_subject, name: "Accounting", category: "BUSINESS")
     create(:loc_subject, name: "Management", category: "BUSINESS")
@@ -161,13 +161,14 @@ class StudentsTest < ApplicationSystemTestCase
     # Set Page size
     page.driver.browser.manage.window.resize_to(1920, 2500)
 
-    ## Page 1
+    ## Page 1: Welcome and Non-YorkU Email
+    
     click_link("My ETD Submission")
     assert_selector "input#student_email_external"
     fill_in("Non-YorkU Email Address", with: "#{@thesis.student.username}@mailinator.com")
     click_on("Continue")
 
-    ## Page 2
+    ## Page 2: Thesis Details
     select "English", from: "thesis_language"
     fill_in "thesis_abstract", with: Faker::Lorem.paragraph
 
@@ -183,7 +184,7 @@ class StudentsTest < ApplicationSystemTestCase
     fill_in "thesis_keywords", with: "accounting-kw, management-kw"
     click_on("Continue")
 
-    ## Page 3
+    ## Page 3: Files and Documents
 
     click_on("Upload Primary File")
     assert_selector "p", text: "Your primary file should be in PDF format.", visible: :all
@@ -199,37 +200,50 @@ class StudentsTest < ApplicationSystemTestCase
     click_on("Continue")
 
 
-    ## Page 4
+    ## Page 4: Licence Review
     
     # assert_text "LAC Supplementary Licence File Upload".upcase
-    assert_text(/#{Regexp.escape("LAC Supplementary Licence File Upload")}/i)
+    assert_text("LAC Supplementary Licence File Upload")
 
     
-    # Initially, checkboxes should be disabled if not checked
-    assert page.has_unchecked_field?('thesis_yorkspace_licence_agreement', disabled: true)
-    assert page.has_unchecked_field?('thesis_etd_licence_agreement', disabled: true)
+    # Check if checkbox present
+    # assert page.has_field?('thesis_yorkspace_licence_agreement')
+    # assert page.has_unchecked_field?('thesis_etd_licence_agreement')
 
+    # Yorkspace Licence
+    checkbox = find('#thesis_yorkspace_licence_agreement')
+    assert_not checkbox.disabled?
+    click_link('View YorkSpace Licence Agreement')
+    
+    save_screenshot()
     # Scroll through Yorkspace Licence
     assert page.has_selector?('#yorkspace-licence', visible: true), "ERROR: Yorkspace-licence not found."
 
-    # Wait for the Yorkspace Licence content to be rendered
-    # assert_selector '#yorkspace-licence', visible: true
+    # Check the checkbox
+    checkbox.check
+    # Verify that the checkbox is checked
+    assert checkbox.checked?, "ERROR: Yorkspace licence agreement checkbox is not checked."
 
-    # Scroll to the bottom of the scrollable content to enable the checkbox
-    page.execute_script('document.getElementById("yorkspace-licence").scrollTop = document.getElementById("yorkspace-licence").scrollHeight')
 
-    # Ensure the checkbox is enabled
-    # assert find('#thesis_yorkspace_licence_agreement').enabled?
-    # assert_not find('#thesis_yorkspace_licence_agreement').disabled?, "ERROR: Yorkspace licence agreement checkbox is not enabled."
-
-    checkbox = find('#thesis_yorkspace_licence_agreement')
-    assert_not checkbox.disabled?, "ERROR: Yorkspace licence agreement checkbox is not enabled."
+    # ETD Licence
+    checkbox = find('#thesis_etd_licence_agreement')
+    assert_not checkbox.disabled?
+    click_link('View ETD Licence Agreement')
+    
+    save_screenshot()
+    # Scroll through Yorkspace Licence
+    assert page.has_selector?('#etd-licence', visible: true), "ERROR: ETD licence not found."
 
     # Check the checkbox
     checkbox.check
-
     # Verify that the checkbox is checked
     assert checkbox.checked?, "ERROR: Yorkspace licence agreement checkbox is not checked."
+
+    click_button("Accept and Continue")
+
+
+    ## Page 5: Submission Review
+
 
   end
 end

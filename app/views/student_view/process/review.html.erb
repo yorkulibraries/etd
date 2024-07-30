@@ -35,7 +35,7 @@
 				</div>
 			<% end %>
 
-			<div class="licence-box mb-5">
+			<div class="licence-box my-5 mt-3 bg-light p-3" >
 				<h4 title="LAC Supplementary Licence File Upload" >LAC Supplementary Licence File Upload</h4>
 				<hr class="text-primary border-3">
 				<p class="small">You must scroll to enable the checkbox to acknowledge you have read the licence.</p>
@@ -58,29 +58,49 @@
 				</div>
 			</div>
 
-			<div class="licence-box my-5" >
+			<div class="licence-box my-5 bg-light p-3" >
 				<h4 title="Yorkspace Distribution Licence">Yorkspace Distribution Licence</h4>
-				<p class="small">You must scroll to enable the checkbox to acknowledge you have read the licence.</p>
-				<hr class="text-success border-3">
-				<% if AppSettings.student_review_license_yorkspace.present? %>
-					<div id="yorkspace-licence" class="scrollable-content bg-light p-3">
-						<p><%= raw(AppSettings.student_review_license_yorkspace) %></p>
+				<p class="small text-secondary">Please review the licence below and accept if you agree</p>
+				<hr class="text-primary border-3">
+				<p>
+					<a id="ydlButton" class="btn btn-primary" data-bs-toggle="collapse" href="#collapseYDL" role="button" aria-expanded="false" aria-controls="collapseYDL">
+						View YorkSpace Licence Agreement
+					</a>
+				</p>
+				<div class="collapse" id="collapseYDL">
+					<div class="card card-body">
+						<% if AppSettings.student_review_license_yorkspace.present? %>
+							<div id="yorkspace-licence" class="bg-light p-3">
+								<p><%= raw(AppSettings.student_review_license_yorkspace) %></p>
+							</div>
+						<% end %>
 					</div>
-				<% end %>
+				</div>
+				
 				<div class="bg-secondary-subtle p-2 fw-bold">
 					<%= f.input :yorkspace_licence_agreement, as: :boolean, label: "I agree to YorkSpace Distribution Licence" %>
 				</div>
 			</div>
 
-			<div class="licence-box my-5">
+			<div class="licence-box my-5 bg-light p-3" >
 				<h4 title="ETD Licence Agreement">ETD Licence Agreement</h4>
-				<hr class="text-warning border-3">
-				<p class="small">You must scroll to enable the checkbox to acknowledge you have read the licence.</p>
-				<% if AppSettings.student_review_license_etd.present? %>
-					<div id="etd-licence" class="scrollable-content bg-light p-3">
-						<p><%= raw(AppSettings.student_review_license_etd) %></p>
+				<p class="small text-secondary">Please review the licence below and accept if you agree</p>
+				<hr class="text-primary border-3">
+				<p>
+					<a id="etdButton" class="btn btn-primary" data-bs-toggle="collapse" href="#collapseETD" role="button" aria-expanded="false" aria-controls="collapseETD">
+						View ETD Licence Agreement
+					</a>
+				</p>
+				<div class="collapse" id="collapseETD">
+					<div class="card card-body">
+						<% if AppSettings.student_review_license_etd.present? %>
+							<div id="etd-licence" class="bg-light p-3">
+								<p><%= raw(AppSettings.student_review_license_etd) %></p>
+							</div>
+						<% end %>
 					</div>
-				<% end %>
+				</div>
+				
 				<div class="bg-secondary-subtle p-2 fw-bold">
 					<%= f.input :etd_licence_agreement, as: :boolean, label: "I agree to ETD Licence" %>
 				</div>
