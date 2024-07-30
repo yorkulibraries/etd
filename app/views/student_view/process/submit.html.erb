@@ -1,87 +1,93 @@
 <% title "#{@student.name}" %>
 
 <% title_html do %>
-	<h4 class="fw-lighter">My ETD Submission</h4>
-	<h1 class="border-bottom"><%= @student.name %></h1>
+	<h1>
+		<span class="fw-lighter text-secondary d-block lead ">My ETD Submission</span> 
+		<%= @student.name %>
+	</h1>
 <% end %>
 
 <%= progress_bar (Thesis::PROCESS_SUBMIT) %>
 
-<div class="thesis fitted student-view review">
-	<h3 class="title" title="title"><%= @thesis.title %></h3>
-	<div class="alert alert-secondary" role="alert">
+<div class="student-view fitted review">
+	<h2>Review Your Submission</h2>
+	<div class="settings-content">
 		<%= raw(AppSettings.student_submit_for_review) %>
 	</div>
-
-	<div class="row">
-	  <div class="col-md-12 col-lg-4">
-	  	<h6>Supervisor</h6>
-		<p><%= format @thesis.supervisor %></p>
-	  	<h6>Exam date</h6>
-		<p><%= @thesis.exam_date.strftime("%B %d, %Y") rescue nil %></p>
-		<h6>Publish on</h6>
-		<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
-	  </div>
-	  <div class="col-md-12 col-lg-4">
-	  	<div class="span5 committee" title="examining committee">
-			<h6>Examining committee</h6>
-			<table class="committee_members" id="committee_members">
+	<h3><%= @thesis.title %></h3>
+	<div class="thesis data-grid">
+		<hr/>
+		<div class="row">
+			<div class="col-md-12 col-lg-4">
+				<h4>Supervisor</h4>
+				<p><%= format @thesis.supervisor %></p>
+				<h4>Exam date</h4>
+				<p><%= @thesis.exam_date.strftime("%B %d, %Y") rescue nil %></p>
+				<h4>Publish on</h4>
+				<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
+			</div>
+			<div class="col-md-12 col-lg-4">
+				<h4>Degree Name and Level</h4>
+				<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+				<h4>Program</h4>
+					<p><%= format @thesis.program %></p>
+			</div>
+	  	<div class="col-md-12 col-lg-4">
+	  		<div class="span5 committee" title="examining committee">
+				<h4>Examining committee</h4>
+				<table class="committee_members" id="committee_members">
 				<% @thesis.committee_members.each do |committee_member| %>
 					<%= render "committee_members/committee_member_read", committee_member: committee_member %>
 				<% end %>
-			</table>
-		</div>
+				</table>
+			</div>
 	  </div>
-	  <div class="col-lg-4 d-none d-lg-block"></div>
 	</div>
 	<hr />
-
 	<div class="row">
 	  <div class="col-md-12 col-lg-4">
-		<h6>Degree Name and Level</h6>
-		<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+			<h4>Language</h4>
+			<p><%= format @thesis.language %></p>
+	  	
 	  </div>
 	  <div class="col-md-12 col-lg-4">
-	  	<h6>Program</h6>
-		<p><%= format @thesis.program %></p>
-	  </div>
-	  <div class="col-lg-4 d-none d-lg-block"></div>
-	</div>
-	<hr />
-
-	<div class="row">
-	  <div class="col-md-12 col-lg-4">
-		<h6>Language</h6>
-		<p><%= format @thesis.language %></p>
-	  	<h6>Subjects</h6>
-		<p><%= format @thesis.loc_subjects.map(&:name).join ', ' %></p>
-	  </div>
-	  <div class="col-md-12 col-lg-4">
-		<h6>Keywords</h6>
-		<p><%= format @thesis.keywords%></p>
-		<h6>Abstract</h6>
-		<p><%= format @thesis.abstract, true %></p>
-	  </div>
-	  <div class="col-lg-4 d-none d-lg-block">
+			<h4>Subjects</h4>
+			<p><%= format @thesis.loc_subjects.map(&:name).join ', ' %></p>
 		</div>
+		<div class="col-md-12 col-lg-4">
+			<h4>Keywords</h4>
+			<p><%= format @thesis.keywords%></p>
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="col-12 col-lg-12 d-none d-lg-block">
+			<h4>Abstract</h4>
+			<p><%= format @thesis.abstract, true %></p>
+		</div>
+	</div>
+
 	</div>
 </div>
 
 <div class="documents fitted student-view">
 
-	<h6 class="green pt-3">Files and Documents</h6>
+	<h3 class="fw-bold">Files and Documents</h3>
 	<p>You have uploaded the following files:</p>
-	<h6>Primary</h6>
-	<% @primary_documents.each do | document | %>
-		<%= render partial: document %>
-	<% end %>
+	<hr/>
 
-	<% if @primary_documents.count == 0 %>
-		<p>There are no <strong>primary</strong> files or documents attached to this thesis/dissertation.</p>
-	<% end %>
+	<div class="bg-light-subtle mt-3 p-3">
+		<h4>Primary</h4>
+		<% @primary_documents.each do | document | %>
+			<%= render partial: document %>
+		<% end %>
 
-	<div class="mt-3">
-		<h6>Supplementary Thesis Files</h6>
+		<% if @primary_documents.count == 0 %>
+			<p>There are no <strong>primary</strong> files or documents attached to this thesis/dissertation.</p>
+		<% end %>
+	</div>
+	
+	<div class="bg-light-subtle mt-3 p-3">
+		<h4>Supplementary Thesis Files</h4>
 		<% @supplemental_documents.each do | document | %>
 			<% if document.usage == 'thesis'%>
 				<%= render partial: document %>
@@ -91,8 +97,9 @@
 			<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
 		<% end %>
 	</div>
-	<div class="mt-3">
-		<h6>License Agreements</h6>
+	
+	<div class="bg-light-subtle mt-3 p-3">
+		<h4>License Agreements</h4>
 		<% @supplemental_licence_documents.each do | document | %>
 				<%= render partial: document %>
 		<% end %>
@@ -100,8 +107,9 @@
 			<p>There are no <strong>supplementary licence</strong> files or documents attached to this thesis/dissertation.</p>
 		<% end %>
 	</div>
-	<div class="mt-3">
-		<h6>Embargo Documents</h6>
+	
+	<div class="bg-light-subtle mt-3 p-3">
+		<h4>Embargo Documents</h4>
 		<% @supplemental_embargo_documents.each do | document | %>
 				<%= render partial: document %>
 		<% end %>
@@ -113,15 +121,19 @@
 	<div class="my-4">
 		<h4><%= Date.today.strftime("%B %d, %Y")%></h4>
 		<hr />
-				<%= simple_form_for([@current_user, @thesis], url: submit_for_review_student_thesis_path(@current_user, @thesis), method: :post) do |f| %>
-					<div class="field bg-secondary text-white border p-3">
-						<%= f.input :certify_content_correct, as: :boolean, label: "I certify that the content is correct" %>
-					</div>
-					<div class="process-nav mt-4">
-						<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn back btn btn-primary btn-lg" title="Review Thesis Details">
-						<i class="fa fa-angle-double-left"></i></a>
-						<%= f.button :submit, "I accept and send for review", class: "next-btn send btn btn-lg btn-danger", data: { confirm: "Are you sure? You will not be able to make further changes." } %>
-					</div>
+		<%= simple_form_for([@current_user, @thesis], url: submit_for_review_student_thesis_path(@current_user, @thesis), method: :post, html: { class: "form-horizontal border border-2 bg-light" }) do |f| %>
+			<div class="bg-secondary-subtle p-2 fw-bold">
+				<%= f.input :certify_content_correct, as: :boolean, label: "I certify that the content is correct" %>
+			</div>
+			<div class="process-nav d-flex justify-content-end mt-4">
+				<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="btn btn-lg btn-primary me-2" title="Review Thesis Details">
+				<i class="fa fa-angle-double-left"></i>
+				</a>
+		
+				<%= button_tag(type: 'submit', class: "next-btn btn btn-lg btn-success", data: { confirm: "Are you sure? You will not be able to make further changes." }) do %>
+					I accept and send for review <i class="fa fa-angle-double-right"></i>
 				<% end %>
+			</div>
+		<% end %>
 	</div>
 </div>

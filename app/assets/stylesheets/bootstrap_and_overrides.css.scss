@@ -9,26 +9,9 @@
 
 @import "bootstrap/functions";
 
-//YorkU Colors
-/* 2021 YorkU colours */
-/* http://toolbox.info.yorku.ca/visual-identity/colours/ */
-$york-grey-dark:   #686260;
-$york-grey-medium: #B7AEA9;
-$york-grey-pewter: #D6CFCA;
-$york-grey-light:  #E8E4DF;
-$york-grey-lighter: #FAFAFA;
-$york-red-pms-186: #E31837;
-$york-red-medium:  #B82025;
-$york-red-dark:    #8C0000;
-$york-light-blue:  #ACE6F8;
-$york-bright-blue: #3AC2EF;
-
-// Additional custom styles
-$border-radius: .25rem;
-$btn-border-radius: .25rem;
-$btn-padding-y: .5rem;
-$btn-padding-x: 1rem;
-$btn-font-weight: 400;
+/* Custom theme colors go here */
+/* Set your own primary/secondary/info/success etc. colors here */
+/* e.g. $primary: #e31837 */
 
 @import "bootstrap/variables";
 @import "bootstrap/mixins";
@@ -36,45 +19,14 @@ $btn-font-weight: 400;
 
 // Headings customization
 .container { 
-
-	h1, .h1 {
-		color: $black;
-		font-weight: 700;
+	h2 { 
+		font-weight: bold;
+		color: #E57524;
 	}
-
-	h2, .h2 {
-		color: $primary;
+	h3 {
 		font-weight: 600;
 	}
-
-	h3, .h3 {
-		color: darken($info, 30%);
-		font-weight: 500;
-	}
-
-	h4, .h4, h5, .h5, h6, .h6 {
-		color: $secondary;
-		font-weight: 400;
-	}
-
-	// Subheadings customization
-	.subheading {
-		color: $secondary;
-		font-weight: 300;
-		font-size: 1.25rem; // Adjust as needed
-	}
 }
-
-// Key-Value pairs in forms
-.dl-horizontal dt {
-  font-weight: 500;
-  color: $primary;
-}
-
-.dl-horizontal dd {
-  color: $secondary;
-}
-
 .page-header {
 	margin-bottom: 10px;
 }
@@ -83,26 +35,35 @@ $btn-font-weight: 400;
 	margin-top: 10px;
 }
 
-// Custom styles can go here, if needed
-.record-data {
-	margin-top: 10px;
-	margin-bottom: 10px;
-	tr {
-		td:nth-child(1) {
-			@extend .lead;
-			// font-size: $small-font-size;
-			font-size: 1rem; 
-			color: $secondary;
-		}
-		td:nth-child(2) {
-			// color: $secondary;
-			font-weight: 600;
-		}
+//////////////////////////////////////////
+// Custom styles can go here, if needed //
+//////////////////////////////////////////
+
+.settings-content div {
+	margin-top: 0;
+	margin-bottom: 1rem;
+	font-size: 1.25rem;
+}
+
+.thesis, .data-grid {
+	h4 {
+		font-size: 1.25rem;
+		font-weight: 300;
+		color: $secondary;
+	}
+	p {
+		font-weight: bold;
 	}
 }
 
+.navbar-brand {
+	font-weight: 700;
+	color: #e31837;
+	// color: #af0d1a;
+}
+
+/* Simple Form basic styles */
 .simple_form {
-	background-color: $light;
 	padding: 0.875rem;
 }
 

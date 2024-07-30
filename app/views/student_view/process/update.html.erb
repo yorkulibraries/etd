@@ -1,89 +1,85 @@
 <% title "#{@student.name}" %>
 
 <% title_html do %>
-	<h4 class="fw-lighter">My ETD Submission</h4>
-	<h1 class="border-bottom"><%= @student.name %></h1>
+	<h1>
+		<span class="fw-lighter text-secondary d-block lead ">My ETD Submission</span> 
+		<%= @student.name %>
+	</h1>
 <% end %>
 
 <%= progress_bar (Thesis::PROCESS_UPDATE) %>
 
 <div class="student-view fitted update">
+	<h2>Update Thesis Details</h2>
+	<div class="settings-content">
+		<%= raw(AppSettings.student_update_details_initial) %>
+	</div>
 	<h3><%= @thesis.title %></h3>
-	<%= raw(AppSettings.student_upload_files) %>
-
-<div class="card">
-  <div class="card-body">
+	<div class="thesis data-grid">
+		<hr/>
 		<div class="row">
 			<div class="col-md-12 col-lg-8">
-				<h6>Title</h6>
+				<h4>Title</h4>
 				<p><%= @thesis.title %></p>
 			</div>
 			<div class="col-md-6 col-lg-4">
-				<h6>Author</h6>
+				<h4>Author</h4>
 				<p><%= @student.name %></p>
 			</div>
 			<div class="col-md-6 col-lg-4">
-				<h6>Exam date</h6>
+				<h4>Exam date</h4>
 				<p><%= @thesis.exam_date.strftime("%B %d, %Y") %></p>
 			</div>
 			<div class="col-md-6 col-lg-4">
-				<h6>Supervisor</h6>
+				<h4>Supervisor</h4>
 				<p><%= format @thesis.supervisor %></p>
 			</div>
 			<div class="col-md-6 col-lg-4">
-				<h6>Publish On</h6>
+				<h4>Publish On</h4>
 				<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
 			</div>
 			<div class="col-md-6 col-lg-4">
-				<h6>Degree Name and Level</h6>
+				<h4>Degree Name and Level</h4>
 				<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
 			</div>
 			<div class="col-md-6 col-lg-4">
-				<h6>Program</h6>
+				<h4>Program</h4>
 				<p><%= format @thesis.program %></p>
 			</div>
 		</div>
-
 		<div class="row">
-		  <h6>Examination committee members</h6>
-		  <div class="row">
+			<h4>Examination committee members</h4>
+			<div class="row">
 				<div class="col-6" id="committee_members">
 					<% @thesis.committee_members.each do |committee_member| %>
 						<%= render committee_member %>
 					<% end %>
-					<div class="link_section pt-4">
-					</div>
+					<div class="link_section pt-4"></div>
 				</div>
-		  </div>
+			</div>
 		</div>
-  </div>
-</div>
-	
+	</div>
 
-<p class="pt-4">Please provide the information requested in the following fields. </p>
+	<%= simple_form_for [@student, @thesis], html: { class: "form-horizontal border border-2 bg-light" } do |f| %>
+		<h4 class="text-dark">Please provide the information requested in the following fields. </h4>
+		<%= render partial: "theses/form_student_editable", locals: { f: f } %>
+		<input type="submit" name="Save Details" value="" class="d-none" aria-label="Save Details">
+		<hr/>
+		
+		<div class="process-nav d-flex justify-content-end">
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_BEGIN) %>" class="btn btn-lg btn-primary me-2" title="Begin Submission">
+				<i class="fa fa-angle-double-left"></i>
+			</a>
 
-<%= simple_form_for [@student, @thesis], html: { class: "form-horizontal" } do |f| %>
-
-
-	<%= render partial: "theses/form_student_editable", locals: { f: f } %>
-
-	<input type="submit" name="Save Details" value="" class="d-none" aria-label="Save Details">
-	<hr/>
-
-	<div class="process-nav float-end">
-		<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_BEGIN) %>" class="next-btn back btn btn-primary" title="Begin Submission">
-			<i class="fa fa-angle-double-left"></i></a>
-
-			<a href="#" class="next-btn save btn btn-success" title="Save Details and Continue" onclick="$(this).closest('form').submit(); return false">
+			<a href="#" class="btn btn-lg btn-success" title="Save Details and Continue" onclick="$(this).closest('form').submit(); return false">
 				<i class='fa fa-angle-double-right'></i> Continue
 			</a>
-	</div>
+		</div>
 
-	<div class="d-none error_messages">
-		<%= f.error_messages %>
-	</div>
-
-<% end %>
+		<div class="d-none error_messages">
+			<%= f.error_messages %>
+		</div>
+	<% end %>
 </div>
 
 <% render partial: "theses/form_help_text" %>
