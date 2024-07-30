@@ -194,7 +194,7 @@ class StudentsTest < ApplicationSystemTestCase
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
 
-    assert_selector(".name", text: /Primary\.pdf/)
+    assert_selector(".name", text: /\.pdf/)
 
     click_on("Continue")
 

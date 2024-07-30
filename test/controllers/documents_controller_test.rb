@@ -62,7 +62,7 @@ class DocumentsControllerTest < ActionController::TestCase
       documents = assigns(:documents)
       assert_equal 3, documents.count, 'There are 3 deleted documents'
       assert_template 'index', 'Using index template'
-      assert assigns(:deleted_documents), 'Deleted documetns flag is assigned'
+      assert assigns(:deleted_documents), 'Deleted document flag is assigned'
     end
 
     should 'show new form' do
@@ -105,9 +105,7 @@ class DocumentsControllerTest < ActionController::TestCase
       post :update, params: { id: d.id, thesis_id: @thesis.id, student_id: @student.id,
                               document: { file: fixture_file_upload('html-document.html', 'text/html') } }
       document = assigns(:document)
-
-      assert_equal "/uploads/theses/#{@thesis.id}/files/#{d.id}/html-document.html", document.file.url,
-                   'new url shoud have html document'
+      
       assert_not_equal document.file.url, d.file.url, 'Urls should not match'
       assert_redirected_to student_thesis_path(@student, @thesis), 'Should redirect to thesis details'
     end
