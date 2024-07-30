@@ -158,9 +158,6 @@ class StudentsTest < ApplicationSystemTestCase
     login_as(@thesis.student)
     visit root_url
 
-    # Set Page size
-    page.driver.browser.manage.window.resize_to(1920, 2500)
-
     ## Page 1: Welcome and Non-YorkU Email
     
     click_link("My ETD Submission")
@@ -215,14 +212,13 @@ class StudentsTest < ApplicationSystemTestCase
     assert_not checkbox.disabled?
     click_link('View YorkSpace Licence Agreement')
     
-    save_screenshot()
     # Scroll through Yorkspace Licence
-    assert page.has_selector?('#yorkspace-licence', visible: true), "ERROR: Yorkspace-licence not found."
+    assert page.has_selector?('#yorkspace-licence', visible: true), "Yorkspace-licence not found."
 
     # Check the checkbox
     checkbox.check
     # Verify that the checkbox is checked
-    assert checkbox.checked?, "ERROR: Yorkspace licence agreement checkbox is not checked."
+    assert checkbox.checked?, "Yorkspace licence agreement checkbox is not checked."
 
 
     # ETD Licence
@@ -230,14 +226,13 @@ class StudentsTest < ApplicationSystemTestCase
     assert_not checkbox.disabled?
     click_link('View ETD Licence Agreement')
     
-    save_screenshot()
     # Scroll through Yorkspace Licence
-    assert page.has_selector?('#etd-licence', visible: true), "ERROR: ETD licence not found."
+    assert page.has_selector?('#etd-licence', visible: true), "ETD licence not found."
 
     # Check the checkbox
     checkbox.check
     # Verify that the checkbox is checked
-    assert checkbox.checked?, "ERROR: Yorkspace licence agreement checkbox is not checked."
+    assert checkbox.checked?, "Yorkspace licence agreement checkbox is not checked."
 
     click_button("Accept and Continue")
 
