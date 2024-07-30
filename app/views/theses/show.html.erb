@@ -182,15 +182,13 @@
 					<%  unless block_thesis_changes?(@thesis) %>
 						<button type="button" class="btn btn-dark mb-3 " data-bs-toggle="modal" data-bs-target="#supplemental-licence-files">Upload Licence Files</button>
 					<% end %>
-						<% @supplemental_documents.each do | document | %>
-							<% if document.usage == 'licence'%>
+						<% @licence_documents.each do | document | %>
 								<div class='licence-file'>
 									<%= render partial: document %>
 								</div>
-							<% end %>
 						<% end %>
-						<% if @supplemental_documents.where(usage: :licence).count == 0 %>
-							<p>There are no <strong>supplementary</strong> licence files or documents attached to this thesis/dissertation.</p>
+						<% if @licence_documents.count == 0 %>
+							<p>There are no <strong>licence</strong> files or documents attached to this thesis/dissertation.</p>
 						<% end %>
 				</div>
 				<div class='mt-4'>
@@ -198,19 +196,17 @@
 						<%  unless block_thesis_changes?(@thesis) %>
 							<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#supplemental-embargo-files">Upload Embargo Files</button>
 						<% end %>
-						<% @supplemental_documents.each do | document | %>
-							<% if document.usage == 'embargo' or document.usage == 'embargo_letter'%>
+						<% @embargo_documents.each do | document | %>
 								<div class='embargo-file'>
 									<%= render partial: document %>
 								</div>
-							<% end %>
 						<% end %>
-						<% if @supplemental_documents.where(usage: [:embargo, :embargo_letter]).count == 0 %>
-							<p>There are no <strong>supplementary</strong> embargo files or documents attached to this thesis/dissertation.</p>
+						<% if @embargo_documents.count == 0 %>
+							<p>There are no <strong>embargo</strong> files or documents attached to this thesis/dissertation.</p>
 						<% end %>
 				</div>
 			<% else %>
-				<h6>Primary</h5>
+				<h6>Primary</h6>
 					<% @primary_documents.each do | document | %>
 						<%= render partial: document %>
 					<% end %>
@@ -218,11 +214,29 @@
 					<% if @primary_documents.count == 0 %>
 						<p>There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
 					<% end %>
+
 					<% @supplemental_documents.each do | document | %>
 						<%= render partial: document %> 
 					<% end %>
-					<% if @supplemental_documents.where(usage: :licence).count == 0 %>
-						<p>There are no <strong>supplementary</strong> licence files or documents attached to this thesis/dissertation.</p>
+
+					<% if @supplemental_documents.count == 0 %>
+						<p>There are no <strong>supplemental</strong> files or documents attached to this thesis/dissertation.</p>
+					<% end %>
+
+					<% @licence_documents.each do | document | %>
+						<%= render partial: document %> 
+					<% end %>
+					
+					<% if @licence_documents.count == 0 %>
+						<p>There are no <strong>licence</strong> files or documents attached to this thesis/dissertation.</p>
+					<% end %>
+
+					<% @embargo_documents.each do | document | %>
+						<%= render partial: document %> 
+					<% end %>
+					
+					<% if @embargo_documents.count == 0 %>
+						<p>There are no <strong>embargo</strong> files or documents attached to this thesis/dissertation.</p>
 					<% end %>
 			<% end %>
 
