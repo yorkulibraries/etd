@@ -42,8 +42,7 @@ class DocumentTest < ActiveSupport::TestCase
     d.file = fixture_file_upload('html-document.html', 'text/html')
 
     assert d.save, 'Should save this properly'
-    assert_equal "/uploads/theses/#{d.thesis.id}/files/#{d.id}/html-document.html", d.file.url,
-                 'file should be uploaded'
+    assert File.exist?(d.file.path)
   end
 
   should 'update the file when it changes' do
@@ -51,13 +50,13 @@ class DocumentTest < ActiveSupport::TestCase
     d.file = fixture_file_upload('html-document.html', 'text/html')
     assert d.save, "should save properly #{d.errors.inspect}"
 
-    assert_equal "/uploads/theses/#{d.thesis.id}/files/#{d.id}/html-document.html", d.file.url
+    assert File.exist?(d.file.path)
   end
 
   should 'update the file when it changes' do
     d = create(:document, supplemental: false, file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 
-    assert_equal "/uploads/theses/#{d.thesis.id}/files/#{d.id}/Tony_Rich_E_2012_Phd.pdf", d.file.url
+    assert File.exist?(d.file.path)
   end
 
   should 'not destroy files, set deleted flag instead' do
@@ -88,97 +87,331 @@ class DocumentTest < ActiveSupport::TestCase
     assert d.image?, 'This one should be an image'
   end
 
-  should 'automatic naming for primary file FullNameField_Year_Degree_Primary.pdf' do
+  should 'supplemental files must follow file naming convention' do
+    t = create(:thesis)
+    assert_equal 0, t.documents.count
+
+    original_filename = 'pdf-document.pdf'
+    d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :thesis, supplemental: false, thesis: t)
     
-    document_name = 'pdf-document.pdf'
-    t = create(:thesis)
-    d = create(:document_for_file_naming, file: fixture_file_upload(document_name), usage: :thesis, supplemental: false, thesis: t)
-    expected = Document.filename_by_convention(d.user.name, d.thesis.exam_date, d.thesis.degree_name, d.thesis.degree_level, document_name, d.supplemental, d.usage)
+    # make sure the document is valid 
+    assert d.valid?, 'should be valid'
 
-    assert_equal expected, d.file.filename
-    assert_match(/_Primary\.\w+$/, t.documents.first.file.to_s)
-  end
+    # document should be primary
+    assert !d.supplemental, 'should not be supplimental'
+    assert_equal "primary", d.document_type
 
-  should 'automate naming for supplementary file FullNameField_Year_Degree_Supplementary_1.file extension' do 
+    assert d.usage, :thesis
+
+    # should only have 1 document so far
+    assert_equal 1, t.documents.count
+
+    # the uploaded file name should match
+    uploaded_filename = d.uploaded_filename(original_filename)
+    assert_equal uploaded_filename, d.file.filename
+
+    # the file name should start with student name
+    student_name = t.student.name.gsub(/[\s\.]/, '_')
+    assert_match /^#{student_name}_.+/, uploaded_filename, "file name should start with #{student_name}"
+
+    # the file name should end with Level.pdf
+    level = t.degree_level == 'Doctoral' ? 'PhD' : 'Masters'
+    assert_match /#{level}.pdf$/, uploaded_filename, "the file name should end with #{level}.pdf"
+
+    # the file name should contain _year_ 
+    year = t.exam_date.year
+    assert_match /_#{year}_/, uploaded_filename, "the file name should contain _#{year}_"
+
+    # the file name should contain _degree_name_ 
+    degree_name = t.degree_name.gsub(/[\s\.]/, '_')
+    assert_match /_#{degree_name}_/, uploaded_filename, "the file name should contain _#{degree_name}_"
+
+    # now upload first supplimentary file
+    d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :thesis, supplemental: true, thesis: t)
     
-    document_name = 'pdf-document.pdf'
-    t = create(:thesis)
-    d = create(:document_for_file_naming, file: fixture_file_upload(document_name), usage: :thesis, supplemental: true, thesis: t)
-    expected = Document.filename_by_convention(d.user.name, d.thesis.exam_date, d.thesis.degree_name, d.thesis.degree_level, document_name, d.supplemental, d.usage)
+    # make sure the document is valid 
+    assert d.valid?, 'should be valid'
 
-    assert_equal expected, d.file.filename
-    assert_match(/_Supplemental_.*\.\w+$/, t.documents.first.file.to_s)
+    # document should be supplimental
+    assert d.supplemental, 'should be supplimental'
+    assert_equal "supplemental", d.document_type
+
+    # now there should be 2 files
+    assert_equal 2, t.documents.count
+
+    # the uploaded file name should match
+    uploaded_filename = d.uploaded_filename(original_filename)
+    assert_equal uploaded_filename, d.file.filename
+
+    # file name should end with _supplemental_1.pdf
+    assert_match /_supplemental_1.pdf$/, uploaded_filename, "the file name should end with _supplemental_1.pdf"
+
+    # now upload 2nd supplementary file
+    d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :thesis, supplemental: true, thesis: t)
+
+    # make sure the document is valid 
+    assert d.valid?, 'should be valid'
+
+    # document should be supplimental
+    assert d.supplemental, 'should be supplimental'
+    assert_equal "supplemental", d.document_type
+
+    # now there should be 3 files
+    assert_equal 3, t.documents.count
+
+    # the uploaded file name should match
+    uploaded_filename = d.uploaded_filename(original_filename)
+    assert_equal uploaded_filename, d.file.filename
+
+    # file name should end with _supplemental_2.pdf
+    assert_match /_supplemental_2.pdf$/, uploaded_filename, "the file name should end with _supplemental_2.pdf"
+
+    # now "delete" the s2 file
+    d.destroy
+
+    # now there should STILL be 3 files because the file was only "marked as deleted"
+    assert_equal 3, t.documents.count
+
+    # but there should only be 2 not_deleted files
+    assert_equal 2, t.documents.not_deleted.count
+
+    # now upload 3rd supplementary file
+    d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :thesis, supplemental: true, thesis: t)
+
+    # document should be supplimental
+    assert d.supplemental, 'should be supplimental'
+    assert_equal "supplemental", d.document_type
+
+    # now there should be 4 files
+    assert_equal 4, t.documents.count
+
+    # but there should only be 3 not_deleted files
+    assert_equal 3, t.documents.not_deleted.count
+
+    # the uploaded file name should match
+    uploaded_filename = d.uploaded_filename(original_filename)
+    assert_equal uploaded_filename, d.file.filename
+
+    # file name should end with _supplemental_3.pdf
+    assert_match /_supplemental_3.pdf$/, uploaded_filename, "the file name should end with _supplemental_3.pdf"
   end
 
-  should 'licence files with usage in filename' do 
+  should 'licence files must follow file naming convention' do
     t = create(:thesis)
-    licence_document = create(:document_for_file_naming, file: fixture_file_upload('html-document.html'), usage: :licence, supplemental: true, thesis: t)
+    assert_equal 0, t.documents.count
 
-    assert_match(/LICENCE_.*\.\w+$/, t.documents.first.file.to_s)
-
-  end
-
-  should 'embargo file with usage in filename' do 
-    t = create(:thesis)
-
-    embargo_document = create(:document_for_file_naming, file: fixture_file_upload('image-example.jpg'), usage: :embargo, supplemental: true, thesis: t)
-    assert_match(/EMBARGO_.*\.\w+$/, t.documents.first.file.to_s)
-
-    embargo_letter_document = create(:document_for_file_naming, file: fixture_file_upload('pdf-document.pdf'), usage: :embargo_letter, supplemental: true, thesis: t)
-    assert_match(/EMBARGO_LETTER.*\.\w+$/, t.documents[1].file.to_s)
-
-  end
-
+    original_filename = 'pdf-document.pdf'
+    d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :thesis, supplemental: false, thesis: t)
     
-  should 'thesis supplementary files should be saved in sequence' do
+    # make sure the document is valid 
+    assert d.valid?, 'should be valid'
 
-    # model.usage == thesis and upload type is supplementary
-    # Make the automatic naming convention text pull from the following:
-      # Primary file:
-      # FullNameField_Year_Degree_Primary.pdf
-      # Supplementary files:
-      # FullNameField_Year_Degree_Supplementary_1.file extension
-      # FullNameField_Year_Degree_Supplementary_2.file extension
-      # FullNameField_Year_Degree_Supplementary_3.file extension
+    # document should be primary
+    assert !d.supplemental, 'should not be supplimental'
+    assert_equal "primary", d.document_type
 
+    assert d.usage, :thesis
+
+    # should only have 1 document so far
+    assert_equal 1, t.documents.count
+
+    # the uploaded file name should match
+    uploaded_filename = d.uploaded_filename(original_filename)
+    assert_equal uploaded_filename, d.file.filename
+
+    # the file name should start with student name
+    student_name = t.student.name.gsub(/[\s\.]/, '_')
+    assert_match /^#{student_name}_.+/, uploaded_filename, "file name should start with #{student_name}"
+
+    # the file name should end with Level.pdf
+    level = t.degree_level == 'Doctoral' ? 'PhD' : 'Masters'
+    assert_match /#{level}.pdf$/, uploaded_filename, "the file name should end with #{level}.pdf"
+
+    # the file name should contain _year_ 
+    year = t.exam_date.year
+    assert_match /_#{year}_/, uploaded_filename, "the file name should contain _#{year}_"
+
+    # the file name should contain _degree_name_ 
+    degree_name = t.degree_name.gsub(/[\s\.]/, '_')
+    assert_match /_#{degree_name}_/, uploaded_filename, "the file name should contain _#{degree_name}_"
+
+    # now upload first licence file
+    d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :licence, supplemental: true, thesis: t)
+    
+    # make sure the document is valid 
+    assert d.valid?, 'should be valid'
+
+    # document should be supplimental
+    assert d.supplemental, 'should be supplimental'
+    assert_equal "licence", d.document_type
+
+    # now there should be 2 files
+    assert_equal 2, t.documents.count
+
+    # the uploaded file name should match
+    uploaded_filename = d.uploaded_filename(original_filename)
+    assert_equal uploaded_filename, d.file.filename
+
+    # file name should end with _licence_1.pdf
+    assert_match /_licence_1.pdf$/, uploaded_filename, "the file name should end with _licence_1.pdf"
+
+    # now upload 2nd licence file
+    d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :licence, supplemental: true, thesis: t)
+
+    # make sure the document is valid 
+    assert d.valid?, 'should be valid'
+
+    # document should be supplimental
+    assert d.supplemental, 'should be supplimental'
+    assert_equal "licence", d.document_type
+
+    # now there should be 3 files
+    assert_equal 3, t.documents.count
+
+    # the uploaded file name should match
+    uploaded_filename = d.uploaded_filename(original_filename)
+    assert_equal uploaded_filename, d.file.filename
+
+    # file name should end with _licence_2.pdf
+    assert_match /_licence_2.pdf$/, uploaded_filename, "the file name should end with _licence_2.pdf"
+
+    # now "delete" the s2 file
+    d.destroy
+
+    # now there should STILL be 3 files because the file was only "marked as deleted"
+    assert_equal 3, t.documents.count
+
+    # but there should only be 2 not_deleted files
+    assert_equal 2, t.documents.not_deleted.count
+
+    # now upload 3rd licence file
+    d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :licence, supplemental: true, thesis: t)
+
+    # document should be supplimental
+    assert d.supplemental, 'should be supplimental'
+    assert_equal "licence", d.document_type
+
+    # now there should be 4 files
+    assert_equal 4, t.documents.count
+
+    # but there should only be 3 not_deleted files
+    assert_equal 3, t.documents.not_deleted.count
+
+    # the uploaded file name should match
+    uploaded_filename = d.uploaded_filename(original_filename)
+    assert_equal uploaded_filename, d.file.filename
+
+    # file name should end with _supplemental_3.pdf
+    assert_match /_licence_3.pdf$/, uploaded_filename, "the file name should end with _licence_3.pdf"
+  end
+
+  should 'embargo files must follow file naming convention' do
     t = create(:thesis)
-    document_name_1 = "pdf-document.pdf"
-    document_name_2 = "html-document.html"
-    document_name_3 = "image-example.jpg"
+    assert_equal 0, t.documents.count
 
-    d = create(:document_for_file_naming, file: fixture_file_upload(document_name_1), usage: :thesis, supplemental: true, thesis: t)
-    d2 = create(:document_for_file_naming, file: fixture_file_upload(document_name_2), usage: :thesis, supplemental: true, thesis: t)
-    d3 = create(:document_for_file_naming, file: fixture_file_upload(document_name_3), usage: :thesis, supplemental: true, thesis: t)
+    original_filename = 'pdf-document.pdf'
+    d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :thesis, supplemental: false, thesis: t)
+    
+    # make sure the document is valid 
+    assert d.valid?, 'should be valid'
 
-    expected_1 = Document.filename_by_convention(d.user.name, d.thesis.exam_date, d.thesis.degree_name, d.thesis.degree_level, document_name_1, d.supplemental, d.usage)
-    expected_2 = Document.filename_by_convention(d2.user.name, d2.thesis.exam_date, d2.thesis.degree_name, d2.thesis.degree_level, document_name_2, d.supplemental, d.usage)
-    expected_3 = Document.filename_by_convention(d3.user.name, d3.thesis.exam_date, d3.thesis.degree_name, d3.thesis.degree_level, document_name_3, d.supplemental, d.usage)
-    # assert_equal expected_1, d.file.filename
-    # assert_equal expected_2, d2.file.filename
-    # assert_equal expected_3, d3.file.filename        
+    # document should be primary
+    assert !d.supplemental, 'should not be supplimental'
+    assert_equal "primary", d.document_type
 
-    assert_match(/_Supplemental_1\.\w+$/, t.documents.first.file.to_s)
-    assert_match(/_Supplemental_2\.\w+$/, t.documents[1].file.to_s)
-    assert_match(/_Supplemental_3\.\w+$/, t.documents[2].file.to_s)
-    # puts "\n\nDEBUGGING F1\n #{d.pretty_inspect()}"
-    # puts "\n\nDEBUGGING F2\n #{d2.pretty_inspect()}"
-    # puts "\n\nDEBUGGING F3\n #{d3.pretty_inspect()}"
+    assert d.usage, :thesis
 
-  #   # Assert that the filename ends with "_1"
-  #   assert_match(/_1\.\w+$/, t.documents.first.file.to_s)
-  #   assert_match(/_3\.\w+$/, t.documents.last.file.to_s)
-  end
+    # should only have 1 document so far
+    assert_equal 1, t.documents.count
 
-  should "If Supplemental file is deleted, next uploaded file should continue the sequence" do
-    # d.destroy
-    # d4 = create(:document_for_file_naming, file: fixture_file_upload('papyrus-feature.png'), usage: :thesis, supplemental: true, thesis: t)
-    # assert_match(/_4\.\w+$/, t.documents.last.file.to_s)
-  end
+    # the uploaded file name should match
+    uploaded_filename = d.uploaded_filename(original_filename)
+    assert_equal uploaded_filename, d.file.filename
 
-  should 'None naming convention for non-existence of usage' do
-    document_name = 'html-document.html'
-    d = create(:document_for_naming, file: fixture_file_upload(document_name, 'text/html'))
-    assert_equal document_name, d.file.filename
+    # the file name should start with student name
+    student_name = t.student.name.gsub(/[\s\.]/, '_')
+    assert_match /^#{student_name}_.+/, uploaded_filename, "file name should start with #{student_name}"
+
+    # the file name should end with Level.pdf
+    level = t.degree_level == 'Doctoral' ? 'PhD' : 'Masters'
+    assert_match /#{level}.pdf$/, uploaded_filename, "the file name should end with #{level}.pdf"
+
+    # the file name should contain _year_ 
+    year = t.exam_date.year
+    assert_match /_#{year}_/, uploaded_filename, "the file name should contain _#{year}_"
+
+    # the file name should contain _degree_name_ 
+    degree_name = t.degree_name.gsub(/[\s\.]/, '_')
+    assert_match /_#{degree_name}_/, uploaded_filename, "the file name should contain _#{degree_name}_"
+
+    # now upload first licence file
+    d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :embargo, supplemental: true, thesis: t)
+    
+    # make sure the document is valid 
+    assert d.valid?, 'should be valid'
+
+    # document should be supplimental
+    assert d.supplemental, 'should be supplimental'
+    assert_equal "embargo", d.document_type
+
+    # now there should be 2 files
+    assert_equal 2, t.documents.count
+
+    # the uploaded file name should match
+    uploaded_filename = d.uploaded_filename(original_filename)
+    assert_equal uploaded_filename, d.file.filename
+
+    # file name should end with _embargo_1.pdf
+    assert_match /_embargo_1.pdf$/, uploaded_filename, "the file name should end with _embargo_1.pdf"
+
+    # now upload 2nd licence file
+    d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :embargo, supplemental: true, thesis: t)
+
+    # make sure the document is valid 
+    assert d.valid?, 'should be valid'
+
+    # document should be supplimental
+    assert d.supplemental, 'should be supplimental'
+    assert_equal "embargo", d.document_type
+
+    # now there should be 3 files
+    assert_equal 3, t.documents.count
+
+    # the uploaded file name should match
+    uploaded_filename = d.uploaded_filename(original_filename)
+    assert_equal uploaded_filename, d.file.filename
+
+    # file name should end with _embargo_2.pdf
+    assert_match /_embargo_2.pdf$/, uploaded_filename, "the file name should end with _embargo_2.pdf"
+
+    # now "delete" the s2 file
+    d.destroy
+
+    # now there should STILL be 3 files because the file was only "marked as deleted"
+    assert_equal 3, t.documents.count
+
+    # but there should only be 2 not_deleted files
+    assert_equal 2, t.documents.not_deleted.count
+
+    # now upload 3rd licence file
+    d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :embargo, supplemental: true, thesis: t)
+
+    # document should be supplimental
+    assert d.supplemental, 'should be supplimental'
+    assert_equal "embargo", d.document_type
+
+    # now there should be 4 files
+    assert_equal 4, t.documents.count
+
+    # but there should only be 3 not_deleted files
+    assert_equal 3, t.documents.not_deleted.count
+
+    # the uploaded file name should match
+    uploaded_filename = d.uploaded_filename(original_filename)
+    assert_equal uploaded_filename, d.file.filename
+
+    # file name should end with _embargo_3.pdf
+    assert_match /_embargo_3.pdf$/, uploaded_filename, "the file name should end with _embargo_3.pdf"
   end
 
   should 'list primary and suplemental files' do

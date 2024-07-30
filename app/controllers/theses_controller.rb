@@ -24,6 +24,8 @@ class ThesesController < ApplicationController
 
     @primary_documents = @thesis.documents.not_deleted.primary
     @supplemental_documents = @thesis.documents.not_deleted.supplemental
+    @licence_documents = @thesis.documents.not_deleted.licence
+    @embargo_documents = @thesis.documents.not_deleted.embargo
 
     authorize! :edit, @thesis
   end

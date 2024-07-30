@@ -152,7 +152,7 @@ class ThesesTest < ApplicationSystemTestCase
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
 
-    assert_selector(".name", text: /Primary\.pdf/)
+    assert_selector(".name", text: /\.pdf/)
   end
 
   should "be able to upload supplementary document by admin/staff" do
@@ -165,7 +165,7 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector "select#document_usage"
     select "Supplementary file or document attached to thesis/dissertation", from: 'Document type' #document_usage
     click_button('Upload')
-    assert_selector(".supplemental", text: /Supplemental/) #Supplemental
+    assert_selector(".supplemental", text: /_supplemental_/) #Supplemental
 
   end
 
