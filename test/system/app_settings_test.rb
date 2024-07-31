@@ -119,7 +119,7 @@ class AppSettingsTest < ApplicationSystemTestCase
       assert_text "Supplementary Upload files Text Test"
     end
   end
-  
+
   test 'Student submission Review Licences message' do
     user = FactoryGirl.create(:user, role: User::ADMIN)
     login_as(user)
@@ -152,58 +152,54 @@ class AppSettingsTest < ApplicationSystemTestCase
     click_button('Upload Primary File')
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
-    within('div.student-view') do
-      assert_text "Review License Info Text Test"
-      assert_text "LAC licence Text Test"
-      assert_text "YorkSpace Non-Exclusive Distribution Licence Text Test"
-      assert_text "YorkU ETD Licence Text Test"
-    end
-    click_link('Accept and Continue')
+    click_link('Continue')
+    assert_selector 'div.student-view.fitted.submit > div', text: 'Review License Info Text Test'
+
+    click_button('Accept and Continue')
   end
 
-  # test 'Student submission Submit Review message' do
-  #   user = FactoryGirl.create(:user, role: User::ADMIN)
-  #   login_as(user)
-  #   visit root_url
-  #   find('i.fa.fa-cog').click
-  #   click_link("App Settings")
-  #   click_button('Review Licenses')
-  #   fill_in 'app_settings_student_review_license_info', with: 'Review License Info Text Test'
-  #   fill_in 'app_settings_student_review_license_lac', with: 'LAC licence Text Test'
-  #   fill_in 'app_settings_student_review_license_etd', with: 'YorkU ETD Licence Text Test'
-  #   click_button('Save Settings')
-  #   visit root_url
-  #   click_link('Gem Records')
-  #   click_link(@gem_record.studentname)
-  #   click_link('Create ETD Student Record')
-  #   page.accept_alert
-  #   click_link('Start this thesis')
-  #   select "EMBA", from: "thesis_degree_name"
-  #   select "Master's", from: "thesis_degree_level"
-  #   click_button('Create Thesis')
-  #   assert_selector "a", text: @gem_record.studentname
-  #   click_link("Students")
-  #   click_link(@gem_record.studentname)
-  #   click_link("Login as this student")
-  #   fill_in 'student_email_external', with: 'test@test.com'
-  #   click_button('Continue')
-  #   fill_in 'app_settings_student_update_details_abstract', with: 'Abstract Text Test'
-  #   click_button('Continue')
-  #   click_button('Upload Primary File')
-  #   attach_file('document_file', Rails.root.join('test\fixtures\files\pdf-document.pdf'))
-  #   click_button('Upload')
-  #   click_button('Continue')
-  #   click_button('Upload License Files')
-  #   attach_file('document_file', Rails.root.join('test\fixtures\files\pdf-document.pdf'))
-  #   click_button('Upload')
-  #   check 'thesis_lac_licence_agreement'
-  #   assert_selector "input[type=checkbox][id=thesis_lac_licence_agreement]:checked"
-  #   check 'thesis_yorkspace_licence_agreement'
-  #   assert_selector "input[type=checkbox][id=thesis_yorkspace_licence_agreement]:checked"
-  #   check 'thesis_etd_licence_agreement'
-  #   assert_selector "input[type=checkbox][id=thesis_etd_licence_agreement]:checked"
-  #   click_button('Accept and Continue')
-  # end
+  test 'Student submission Submit Review message' do
+    user = FactoryGirl.create(:user, role: User::ADMIN)
+    login_as(user)
+    visit root_url
+    find('i.fa.fa-cog').click
+    click_link("App Settings")
+    click_button('Submit for Review')
+    find('trix-editor#app_settings_student_submit_for_review').click.set('Submit for Review Text Test')
+    click_button('Save Settings')
+    visit root_url
+    click_link('Gem Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+    click_link('Start this thesis')
+    select "EMBA", from: "thesis_degree_name"
+    select "Master's", from: "thesis_degree_level"
+    click_button('Create Thesis')
+    assert_selector "a", text: @gem_record.studentname
+    click_link("Students")
+    click_link(@gem_record.studentname)
+    click_link("Login as this student")
+    fill_in 'student_email_external', with: 'test@test.com'
+    click_button('Continue')
+    fill_in 'thesis_abstract', with: 'Abstract Text Test'
+    click_link('Continue')
+    click_button('Upload Primary File')
+    attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
+    click_button('Upload')
+    click_link('Continue')
+    click_button('Upload Licence Files')
+    attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
+    click_button('Upload')
+    check 'thesis_lac_licence_agreement'
+    assert_selector "input[type=checkbox][id=thesis_lac_licence_agreement]:checked"
+    check 'thesis_yorkspace_licence_agreement'
+    assert_selector "input[type=checkbox][id=thesis_yorkspace_licence_agreement]:checked"
+    check 'thesis_etd_licence_agreement'
+    assert_selector "input[type=checkbox][id=thesis_etd_licence_agreement]:checked"
+    click_button('Accept and Continue')
+    assert_selector 'div.alert .alert-secondary > div', text: 'Submit for Review Text Test'
+  end
 end
 
 ########################################

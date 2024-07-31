@@ -95,16 +95,22 @@ class ThesesControllerTest < ActionController::TestCase
     end
 
     should 'prepopulate the thesis if gem record id is passed and student ids match' do
-      record = create(:gem_record, sisid: @student.sisid)
+      record = create(:gem_record, sisid: @student.sisid, program: 'GS MA PSYC>CLDV - Faculty Of Graduate Studies, M.A., Psychology(Functional Area: Clinical-Developmental)')
 
-      get :new, params: { gem_record: record.id, student_id: @student.id }
+      get :new, params: { gem_record: record, student_id: @student.id }
 
       thesis = assigns(:thesis)
       assert thesis, 'ensure that thesis is assigned'
 
-      assert_equal record.committee_members.count, thesis.committee_members.count, 'Number of committee members should match'
+      post :create,
+           params: { student_id: @student.id,
+                     thesis: thesis.attributes, committee_member_ids: record.committee_members.pluck(:id)}
+
+      saved_thesis = assigns(:thesis)
+
+      assert_equal record.committee_members.count, saved_thesis.committee_members.count, 'Number of committee members should match'
       record.committee_members.each do |record_member|
-        thesis_member = thesis.committee_members.find { |tm| tm.first_name == record_member.first_name && tm.last_name == record_member.last_name && tm.role == record_member.role }
+        thesis_member = saved_thesis.committee_members.find { |tm| tm.first_name == record_member.first_name && tm.last_name == record_member.last_name && tm.role == record_member.role }
         assert thesis_member, "Committee member #{record_member.first_name} #{record_member.last_name} should be present in the thesis"
       end
       assert_equal record.title, thesis.title, 'Title should be prepopulated'
