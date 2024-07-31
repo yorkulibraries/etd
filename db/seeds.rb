@@ -24,5 +24,10 @@ if (Rails.env == 'development') && GemRecord.all.count.zero?
 end
 
 # Set the AppSettings values
-AppSettings.student_review_license_yorkspace = "YorkSpace Non-Exclusive Distribution Licence"
-AppSettings.student_review_license_etd = "YorkU ETD Licence"
+AppSettings.student_review_license_yorkspace = <<HEREDOC
+YorkSpace Non-Exclusive Distribution Licence
+HEREDOC
+
+AppSettings.student_review_license_etd = <<HEREDOC
+YorkU ETD Licence
+HEREDOC
