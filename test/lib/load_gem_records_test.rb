@@ -59,7 +59,7 @@ class LoadGemRecordsTest < ActiveSupport::TestCase
   end
 
   should "not delete existing GEM records when loading GEM records from CSV" do
-    # create 5 GEM records
+    # create 5 GEM records w/ 3 committee members in each record
     create_list(:gem_record, 5)
     assert_equal 5, GemRecord.count
 
@@ -72,7 +72,7 @@ class LoadGemRecordsTest < ActiveSupport::TestCase
     assert_equal 8, GemRecord.count
 
     # there should be 6 CommitteeMember
-    assert_equal 6, CommitteeMember.count
+    assert_equal 21, CommitteeMember.count
 
     # load 3 GEM records from the exact same CSV files AGAIN
     gem_load = LoadGemRecordsCSV.new
@@ -83,7 +83,7 @@ class LoadGemRecordsTest < ActiveSupport::TestCase
     assert_equal 8, GemRecord.count
 
     # there should STILL be 6 CommitteeMember
-    assert_equal 6, CommitteeMember.count
+    assert_equal 21, CommitteeMember.count
   end
 
   should "update existing and matching GEM records when loading GEM records from CSV" do
@@ -105,7 +105,7 @@ class LoadGemRecordsTest < ActiveSupport::TestCase
 
 
     records = GemRecord.order(:seqgradevent)
-    
+
     # verify fields are correct
     assert_equal 1, records[0].seqgradevent
     assert_equal 'John Doe', records[0].studentname
@@ -130,7 +130,7 @@ class LoadGemRecordsTest < ActiveSupport::TestCase
 
     # there should STILL be 6 CommitteeMember
     assert_equal 6, CommitteeMember.count
-    
+
     # verify fields are updated from the CSV
     assert_equal 1, records[0].seqgradevent
     assert_equal 'John Doe', records[0].studentname
