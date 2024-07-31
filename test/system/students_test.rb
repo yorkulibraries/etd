@@ -54,7 +54,7 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('GEM Records')
     click_link(@gem_record.studentname)
 
-    assert_selector "h6", text: "Committee Members"
+    assert_selector "td", text: "Committee Members"
     if @gem_record.committee_members.count > 1
       @gem_record.committee_members.each do |committee_member|
         assert_selector "p", text: committee_member.full_name

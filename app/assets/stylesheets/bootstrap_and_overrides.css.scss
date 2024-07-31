@@ -45,13 +45,13 @@
 	font-size: 1.25rem;
 }
 
-.thesis, .data-grid {
-	h4 {
+.thesis, .data-grid, .gem_record {
+	h4, .key {
 		font-size: 1.25rem;
 		font-weight: 300;
 		color: $secondary;
 	}
-	p {
+	p, .value {
 		font-weight: bold;
 	}
 }

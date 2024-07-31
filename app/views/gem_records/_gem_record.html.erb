@@ -1,46 +1,41 @@
-<div class="gem_record ">
-   <div class="py-3">
-	<div class="card">
-	  <% unless @gem_record %>
-	    <h5 class="card-header">
-	  	  <%= link_to gem_record.studentname, gem_record %>
-		</h5>
-	  <% end %>
-	  <div class="card-body">
-	   <% unless @gem_record %>
-	    <h5 class="card-title"><%= gem_record.title %></h5>
-	   <% end %>
-		<div class="row">
-		  <div class="col-4">
-			<h6>Student id</h6>
-			<p><%= gem_record.sisid%></p>
-			<h6>Email address</h6>
-			<p><%= gem_record.emailaddress %></p>
-			<h6>Supervisor</h6>
-			<p><%= gem_record.superv%></p>
-		  </div>
-		  <div class="col-4">
-			<h6>Event type</h6>
-			<p><%= gem_record.eventtype%></p>
-			<h6>Program</h6>
-			<p><%= gem_record.program %></p>
-			<h6>Committee Members</h6>
-			<% gem_record.committee_members.each do |committee_member| %>
-				<div class="row" id="committee_member_<%= committee_member.id %>">
-				<div class="col"><%= committee_member.name %> - <%= committee_member.role %></div>
-				</div>
-			<% end %>
-		  </div>
-		  <div class="col-4">
-			<h6>Event date</h6>
-			<p><%= gem_record.eventdate.to_date.strftime("%B %d, %Y") %></p>
-			<h6>Exam date</h6>
-			<p><%= gem_record.examdate.to_date.strftime("%B %d, %Y") rescue nil %></p>
-			<h6>Exam result</h6>
-			<p><%= gem_record.examresult%></p>
-		  </div>
-		</div>
-	  </div>
+<div class="gem_record border border-1 border-secondary-subtle rounded-2 p-3">
+	<% unless @gem_record %>
+		<h2><%= link_to gem_record.studentname, gem_record %></h2>
+		<h3><%= gem_record.title %></h3>
+	<% end %>
+	<div class="table-responsive">
+		<table class="table table-striped mb-0">
+			<tr>
+				<td class="key">Student id</td><td class="value"><%= gem_record.sisid%></td>
+				<td class="key">Email Address</td><td class="value"><%= gem_record.emailaddress %></td>
+			</tr>
+			<tr>
+				<td class="key">Supervisor</td><td class="value"><%= gem_record.superv%></td>
+				<td class="key">Program</td><td class="value"><%= gem_record.program %></td>
+		
+			</tr>
+			<tr>
+				<td class="key">Event Type</td><td class="value"><%= gem_record.eventtype %></td>
+				<td class="key">Event Date</td><td class="value"><%= gem_record.eventdate.to_date.strftime("%B %d, %Y") %></td>	
+			</tr>
+			<tr>
+				<td class="key">Exam Result</td><td class="value"><%= gem_record.examresult %></td>
+				<td class="key">Exam Date</td><td class="value"><%= gem_record.examdate.to_date.strftime("%B %d, %Y") rescue nil %></td>
+			</tr>
+			<tr>
+				<td class="key">Committee Members</td>
+				<td class="value">
+					<% gem_record.committee_members.each do |committee_member| %>
+							<div class="row" id="committee_member_<%= committee_member.id %>">
+								<div class="col"><%= committee_member.name %> - <%= committee_member.role %></div>
+							</div>
+					<% end %>
+				</td>
+				<td class="key"></td>
+				<td class="value"></td>
+			</tr>
+		</table>
 	</div>
-   </div>
+
 </div>
+<br/>
