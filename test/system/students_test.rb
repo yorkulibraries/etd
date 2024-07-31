@@ -74,7 +74,6 @@ class StudentsTest < ApplicationSystemTestCase
         assert_selector "p", text: committee_member.full_name
       end
     end
-    end
   end
 
   test 'Log in as Student and add a thesis' do
