@@ -236,7 +236,6 @@ class StudentsTest < ApplicationSystemTestCase
 
     ## Page 4: Licence Review
 
->>>>>>> 6359df5 (Remove Licence Scrolling into Collapseable)
     assert_text("LAC Supplementary Licence File Upload")
 
     # Yorkspace Licence
