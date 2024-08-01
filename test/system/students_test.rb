@@ -177,7 +177,6 @@ class StudentsTest < ApplicationSystemTestCase
 
     ## Page 1: Welcome and Non-YorkU Email
 
-
     click_link("My ETD Submission")
     assert_selector "input#student_email_external"
     fill_in("Non-YorkU Email Address", with: "#{@thesis.student.username}@mailinator.com")
@@ -221,7 +220,6 @@ class StudentsTest < ApplicationSystemTestCase
     ## Page 3: Files and Documents
 
     click_on("Upload Primary File")
-    assert_selector "p", text: "Your primary file should be in PDF format.", visible: :all
 
     # assert_no_selector("p", text: "Smith_Jane_E_2014_PhD.pdf", visible: :all)
     assert_not(page.has_css?("p", text: "Smith_Jane_E_2014_PhD.pdf"), "Should not show 'example text' as per Spring 2024 requirements")

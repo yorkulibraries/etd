@@ -63,6 +63,9 @@ class LoadGemRecordsTest < ActiveSupport::TestCase
     create_list(:gem_record, 5)
     assert_equal 5, GemRecord.count
 
+    # there should be 15 CommitteeMember
+    assert_equal 15, CommitteeMember.count
+
     # load 3 GEM records from CSV files
     gem_load = LoadGemRecordsCSV.new
     gem_load.load_gem_records(LoadGemRecordsTest::GEM_RECORDS_FILE)
@@ -71,7 +74,7 @@ class LoadGemRecordsTest < ActiveSupport::TestCase
     # there should be 8 GEM records at this point
     assert_equal 8, GemRecord.count
 
-    # there should be 6 CommitteeMember
+    # there should be 21 CommitteeMember
     assert_equal 21, CommitteeMember.count
 
     # load 3 GEM records from the exact same CSV files AGAIN
@@ -82,7 +85,7 @@ class LoadGemRecordsTest < ActiveSupport::TestCase
     # there should STILL be 8 GEM records at this point
     assert_equal 8, GemRecord.count
 
-    # there should STILL be 6 CommitteeMember
+    # there should STILL be 21 CommitteeMember
     assert_equal 21, CommitteeMember.count
   end
 
