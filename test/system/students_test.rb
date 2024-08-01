@@ -15,7 +15,7 @@ class StudentsTest < ApplicationSystemTestCase
     user = FactoryGirl.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -91,7 +91,7 @@ class StudentsTest < ApplicationSystemTestCase
 
   test 'Unblock a student' do
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -102,7 +102,7 @@ class StudentsTest < ApplicationSystemTestCase
 
   test 'Block a student' do
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -116,7 +116,7 @@ class StudentsTest < ApplicationSystemTestCase
 
   test 'View student audit trail' do
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert

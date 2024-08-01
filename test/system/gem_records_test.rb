@@ -12,7 +12,7 @@ class GemRecordsTest < ApplicationSystemTestCase
 
   test 'Committee Members shown in Gem Record' do
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     assert_selector "h6", text: "Committee Members"
     @gem_record.committee_members.each do |member|
@@ -20,12 +20,3 @@ class GemRecordsTest < ApplicationSystemTestCase
     end
   end
 end
-
-########################################
-## For Debugging and building tests ##
-# page.driver.browser.manage.window.resize_to(1920, 2500)
-# save_screenshot()
-## HTML Save
-# File.open("tmp/test-screenshots/error.html", "w") { |file| file.write(page.html) }
-# save_page()
-########################################

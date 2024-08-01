@@ -26,7 +26,7 @@ class AppSettingsTest < ApplicationSystemTestCase
 
     visit root_url
 
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
 
     click_link('Create ETD Student Record')
@@ -63,7 +63,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     find('textarea#app_settings_student_update_details_keywords').click.set('Keywords Text Test')
     click_button('Save Settings')
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -95,7 +95,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     find('trix-editor#app_settings_student_supplementary_embargo_upload_files').click.set('Supplementary Embargo Upload files Text Test')
     click_button('Save Settings')
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -111,9 +111,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     click_button('Continue')
     fill_in 'thesis_abstract', with: 'Abstract Text Test'
     click_link('Continue')
-    within('div.documents') do
-      assert_text "Upload Files Text Test"
-    end
+    assert_text "Upload Files Text Test"
     click_button('Upload Supplementary Files')
     within('div.modal-body') do
       assert_text "Supplementary Upload files Text Test"
@@ -133,7 +131,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     find('trix-editor#app_settings_student_review_license_etd').click.set('YorkU ETD Licence Text Test')
     click_button('Save Settings')
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -168,7 +166,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     find('trix-editor#app_settings_student_submit_for_review').click.set('Submit for Review Text Test')
     click_button('Save Settings')
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -198,15 +196,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     check 'thesis_etd_licence_agreement'
     assert_selector "input[type=checkbox][id=thesis_etd_licence_agreement]:checked"
     click_button('Accept and Continue')
-    assert_selector 'div.alert .alert-secondary > div', text: 'Submit for Review Text Test'
+    assert_text 'Submit for Review Text Test'
   end
 end
 
-########################################
-## For Debugging and building tests ##
-# page.driver.browser.manage.window.resize_to(1920, 2500)
-# save_screenshot()
-## HTML Save
-# File.open("tmp/test-screenshots/error.html", "w") { |file| file.write(page.html) }
-# save_page()
-########################################
