@@ -26,7 +26,7 @@ class AppSettingsTest < ApplicationSystemTestCase
 
     visit root_url
 
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
 
     click_link('Create ETD Student Record')
@@ -63,7 +63,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     find('textarea#app_settings_student_update_details_keywords').click.set('Keywords Text Test')
     click_button('Save Settings')
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -95,7 +95,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     find('trix-editor#app_settings_student_supplementary_embargo_upload_files').click.set('Supplementary Embargo Upload files Text Test')
     click_button('Save Settings')
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -133,7 +133,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     find('trix-editor#app_settings_student_review_license_etd').click.set('YorkU ETD Licence Text Test')
     click_button('Save Settings')
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -168,7 +168,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     find('trix-editor#app_settings_student_submit_for_review').click.set('Submit for Review Text Test')
     click_button('Save Settings')
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
