@@ -25,7 +25,7 @@ class StudentsTest < ApplicationSystemTestCase
     assert_selector '.alert-success', text: "Sent an invitation email to #{@gem_record.studentname}"
   end
 
-  test 'Creating a student based on Gem Records' do
+  test 'Creating a student based on GEM Records' do
     visit root_url
     click_link('GEM Records')
     click_link(@gem_record.studentname)
