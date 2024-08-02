@@ -2,94 +2,124 @@
 
 <div class="home fitted">
 	<%= render "nav" %>
-	<div class="row pb-5">
-		<div class="col-1">
-			<%= link_to "Prev", reports_review_thesis_path(id: @prev_id) unless @prev_id == 0  %>
+
+	<div class="d-flex justify-content-between">
+		<%= link_to "Prev", reports_review_thesis_path(id: @prev_id), class: "btn btn-secondary" unless @prev_id == 0 %>
+		<h2>Review Thesis Details</h2>
+		<%= link_to "Next", reports_review_thesis_path(id: @next_id), class: "btn btn-secondary" unless @next_id == @thesis.id || @next_id == nil %>
+	</div>
+	
+	<hr/>
+	<div class="thesis data-grid">
+		<div class="row mb-3">
+			<div class="col-md-12 col-lg-4">
+				<h4>Title</h4>
+				<p><%= @thesis.title %></p>
+				<h4>Author</h4>
+				<p><%= @thesis.author %></p>
+			</div>
+			<div class="col-md-12 col-lg-4">
+				<h4>Supervisor</h4>
+				<p><%= format @thesis.supervisor %></p>
+				<h4>Exam date</h4>
+				<p><%= @thesis.exam_date.strftime("%B %d, %Y") rescue nil %></p>
+			</div>
+			<div class="col-md-12 col-lg-4">
+				<h4>Publish on</h4>
+				<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
+				<h4>Degree Name and Level</h4>
+				<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+			</div>
 		</div>
-		<div class="col-10 text-center fw-bold">
-			Review Thesis Details
+		<div class="row">
+			<div class="col-md-12 col-lg-4">
+				<h4>Program</h4>
+				<p><%= format @thesis.program %></p>
+			</div>
+			<div class="col-md-12 col-lg-4">
+				<h4>Subjects</h4>
+				<p><%= format @thesis.loc_subjects.map(&:name).join ', ' %></p>
+			</div>
+			<div class="col-md-12 col-lg-4">
+				<h4>Language</h4>
+				<p><%= format @thesis.language %></p>
+			</div>
 		</div>
-		<div class="col-1 text-end">
-			<%= link_to "Next", reports_review_thesis_path(id: @next_id) unless @next_id == @thesis.id %>
+		<div class="row">
+			<div class="col-md-12 col-lg-4">
+				<h4>Program Shortened</h4>
+				<p><%= @thesis.program.split(".,").last.strip rescue nil %></p>
+			</div>
+	  	<div class="col-12 col-lg-8 d-none d-lg-block">
+				<h4>Keywords</h4>
+				<p><%= format @thesis.keywords%></p>
+			</div>
 		</div>
-		<div class="col-lg-12 col-sm-12 pt-3">
-			<h6>Title</h6>
-			<p><%= @thesis.title %></p>
+		<div class="row">
+			<div class="col-md-12 col-lg-12">
+				<h4>Abstract</h4>
+				<p><%= format @thesis.abstract, true %></p>
+			</div>
 		</div>
-		<div class="col-lg-4 col-sm-12">
-			<h6>Author</h6>
-			<p><%= @thesis.author %></p>
-		</div>
-		<div class="col-lg-4 col-sm-12">
-			<h6>Supervisor</h6>
-			<p><%= @thesis.supervisor %></p>
-		</div>
-		<div class="col-lg-12 col-sm-12">
-			<h6>Abstract</h6>
-			<p><%= @thesis.abstract %></p>
-		</div>
-		<div class="col-12">
-			<h6>Subject Keywords</h6>
-			<p><%= @thesis.keywords %></p>
-		</div>
-		<div class="col-lg-12 col-sm-12">
-			<h6>Subjects</h6>
-			<p><%=  @thesis.loc_subjects.collect { |s| s.name }.join(", ") %></p>
-		</div>
-		<div class="col-lg-4 col-sm-12">
-			<h6>Language</h6>
-			<p><%= @thesis.language %></p>
-		</div>
-		<div class="col-lg-4 col-sm-12">
-			<h6>Program</h6>
-			<p><%= @thesis.program %></p>
-		</div>
-		<div class="col-lg-4 col-sm-12">
-			<h6>Degree Name</h6>
-			<p><%= Thesis::DEGREENAME_FULL[@thesis.degree_name] %></p>
-		</div>
-		<div class="col-lg-4 col-sm-12">
-			<h6>Exam date</h6>
-			<p><%= @thesis.exam_date.strftime("%Y-%m-%d") %></p>
-		</div>
-		<div class="col-lg-4 col-sm-12">
-			<h6>Program Shortened</h6>
-			<p><%= @thesis.program.split(".,").last.strip rescue nil %></p>
-		</div>
-		<div class="col-lg-4 col-sm-12">
-			<h6>Degree Level</h6>
-			<p><%= @thesis.degree_level %></p>
-		</div>
+	</div>
+	<div class="row">
 		<div class="col-lg-12 col-sm-12 text-end">
-			<%= link_to "Go to record", [@thesis.student, @thesis], class: "btn btn-success pull-end" %>
+			<%= link_to "Go to record", [@thesis.student, @thesis], class: "btn btn-success" %>
 		</div>
 	</div>
 
-  		<% @student = @thesis.student %>
-  		<div class="documents fitted">
+	<div class="documents">
+		<h3 class="text-secondary" >Thesis Files and Documents</h3>
+		<hr/>
+		<% @student = @thesis.student %>
+		<div class="bg-light-subtle mt-3 p-3">
+			<h4>Primary</h4>
+			<% @primary_documents = @thesis.documents.not_deleted.primary %>
+				<% @primary_documents.each do | document | %>
+					<%= render partial: document %>
+				<% end %>
 
-  			<h6 class="green">Thesis Files and Documents</h6>
+				<% if @primary_documents.count == 0 %>
+					<p>There are no <strong>primary</strong> files or documents attached to this thesis/dissertation.</p>
+				<% end %>
+		</div>
+	
+		<div class="bg-light-subtle mt-3 p-3">
+			<h4>Supplementary Thesis Files</h4>
+			<!-- temp assignment as awaiting update from another dev -->
+			<% @supplemental_documents = @thesis.documents.not_deleted.supplemental %>
+			<% @supplemental_licence_documents = @thesis.documents.not_deleted.supplemental %>
+			<% @supplemental_embargo_documents = @thesis.documents.not_deleted.supplemental %>
+			
+			<% @supplemental_documents.each do | document | %>
+				<% if document.usage == 'thesis'%>
+					<%= render partial: document %>
+				<% end %>
+			<% end %>
+			<% if @supplemental_documents.count == 0 %>
+				<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
+			<% end %>
+		</div>
+	
+		<div class="bg-light-subtle mt-3 p-3">
+			<h4>License Agreements</h4>
+			<% @supplemental_licence_documents.each do | document | %>
+					<%= render partial: document %>
+			<% end %>
+			<% if @supplemental_licence_documents.count == 0 %>
+				<p>There are no <strong>supplementary licence</strong> files or documents attached to this thesis/dissertation.</p>
+			<% end %>
+		</div>
+	
+		<div class="bg-light-subtle mt-3 p-3">
+			<h4>Embargo Documents</h4>
+			<% @supplemental_embargo_documents.each do | document | %>
+					<%= render partial: document %>
+			<% end %>
+			<% if @supplemental_embargo_documents.count == 0 %>
+				<p>There are no <strong>embargo</strong> files or documents attached to this thesis/dissertation.</p>
+			<% end %>
+		</div>
 
-				<% @thesis.documents.not_deleted.primary.each do | document | %>
-  				<%= render partial: document %>
-  			<% end %>
-
-  			<% if @thesis.documents.not_deleted.primary.count == 0 %>
-  				<p>There are no <strong>primary</strong> files or documents attached to this thesis.</p>
-  			<% end %>
-
-
-
-  			<h6>Supplemental</h6>
-  			<% @thesis.documents.not_deleted.supplemental.each do | document | %>
-  				<%= render partial: document %>
-  			<% end %>
-  			<% if @thesis.documents.not_deleted.supplemental.count == 0 %>
-  				<p>There are no <strong>supplemental</strong> files or documents attached to this thesis.</p>
-  			<% end %>
-
-
-  		</div>
-
-
+	</div>
 </div>

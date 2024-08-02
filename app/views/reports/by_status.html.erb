@@ -5,22 +5,23 @@
 <div class="home fitted">
 	<%= render "nav" %>
 
-	<div id="reports">
+	
+	<div id="reports" class="p-3">
 
-		<p>Grouped by Publish On Date </p>
+		<h2>Grouped by Publish On Date </h2>
+		<hr />
 
 		<ul id="date_nav" class="nav nav-pills">
-			<li class="<%= "active" if @date == nil %>" data-date="nil">
-				<a class="btn btn-primary" href="<%= reports_by_status_path(status: @status, date: nil, order: @order) %>" data-remote="true">
+			<li class="nav-item" >
+				<a class="nav-link <%= "active" if @date == nil %>" href="<%= reports_by_status_path(status: @status, date: nil, order: @order) %>" data-remote="true" data-date="nil">
 					No Date Set
 					&nbsp; &nbsp;
 					<span class="badge bg-success" style="font-size: 11px; "><%= @null_date_count %></span>
 				</a>
 			</li>
-
 			<% @published_date_counts.each do |date, count| %>
-				<li class="<%= "active" if date == @date  %>"  data-date="<%= date %>">
-					<a class="btn btn-primary" href="<%= reports_by_status_path(status: @status, date: date, order: @order) %>" data-remote="true">
+				<li class="nav-item"  >
+					<a class="nav-link <%= "active" if date == @date  %>" href="<%= reports_by_status_path(status: @status, date: date, order: @order) %>" data-remote="true" data-date="<%= date %>">
 						<%= date == nil ? "No Date Set" : date.strftime("%b %d, %Y") %>
 						&nbsp; &nbsp;
 						<span class="badge bg-success" style="font-size: 11px; "><%= count %></span>
@@ -33,10 +34,6 @@
 		<div id="thesis_list">
 			<%= render partial: "thesis_list" %>
 		</div>
-
-	
-
-
 
 	</div>
 

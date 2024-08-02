@@ -80,3 +80,21 @@
 	padding-top: 15px;
 	padding-bottom: 15px;
 }
+
+.report-table {
+	.row:nth-child(odd) {
+		background: $light;
+	}
+	.row div {
+		padding: 10px;
+		text-align:center;
+	}
+}
+#reports {
+
+	.nav-pills {
+		.nav-link.active {
+			background-color: $dark;
+		}
+	}
+}
