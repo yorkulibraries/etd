@@ -47,7 +47,9 @@ class ThesesController < ApplicationController
     @thesis.exam_date = record.examdate
     @thesis.program = record.program
     @thesis.assign_degree_name_and_level
-    @thesis.committee_members = record.committee_members
+    @thesis.committee_members = record.committee_members.map do |cm|
+      CommitteeMember.new(full_name: cm.full_name, role: cm.role, gem_record: record)
+    end
 
   end
 
@@ -94,7 +96,7 @@ class ThesesController < ApplicationController
       if thesis_params.key?(:notes) && !thesis_params[:notes].blank?
         redirect_to [@student, @thesis], alert: 'You cannot edit thesis notes' and return
       end
-    end    
+    end
     # params[:thesis] = params[:thesis].reject { |p| Student::IMMUTABLE_THESIS_FIELDS.include?(p) } if current_user.role == User::STUDENT
     ## Need to check if thesis params are empty or not, if they are -> don't update
     if @thesis.update(thesis_params)

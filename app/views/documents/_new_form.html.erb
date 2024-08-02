@@ -6,7 +6,7 @@
 				<% if primary %>
         	<h1 class="modal-title fs-5" id="primary-file">Upload Primary File</h1>
 				<% else %>
-					<h1 class="modal-title fs-5" id="supplemental-files">Upload Supplementary File</h1>
+					<h1 class="modal-title fs-5" id="supplemental-files">Upload Supplementary Files</h1>
 				<% end %>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -14,34 +14,17 @@
 				<div class="modal-body">
 					<div class="alert alert-secondary" role="alert">
 						<% if primary %>
-							<p>Your primary file should be in <strong>PDF format.</strong></p>
+							<%= raw(AppSettings.student_upload_files) %>
 						<% else %>
-							<% if "#{AppSettings.student_supplementary_upload_files}" != '' %>
-								<%= raw(AppSettings.student_supplementary_upload_files) %>
-							<% else %>
-								<p>File size must be limited to acceptable formats include:</p>
-								<ul>
-								<li><strong>Documents:</strong> Portable Document Format (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).</li>
-								<li><strong>Images:</strong> Portable Network Graphics format (.png), Tagged Image File format (.tif), JPEG (.jpg)</li>
-								<li><strong>Data:</strong> Comma-separated values (.csv) or other delimited text, Extensible Markup Language (.xml)</li>
-								<li><strong>Video:</strong> 8-10 bit uncompressed AVI (.avi)</li>
-								<li><strong>Audio:</strong> Free Lossless Audio Codec or WAVE (.flac or .wav)</li>
-								</ul>
-							<% end %>
+							<%= raw(AppSettings.student_supplementary_upload_files) %>
 						<% end %>
 					</div>
 					<% f.input :name, required: false, input_html: { class: "span4", autocomplete: "off"} %>
 					<%= f.input :file, required: true, as: :file %>
-		
-					<% if primary %>
-						<%= f.hidden_field :usage, value: :thesis %>
-						<%= f.hidden_field :supplemental, value: false %>
-					<% else %>
-						<%= f.input :usage, label: "Document type", collection: Document.usages.keys.map(&:to_sym).reject { |usage| usage != :thesis }, required: true, label_html: { class: 'pt-2' } %>
-						<%= f.hidden_field :supplemental, value: true %>
-					<% end %>
-					
+					<%= f.hidden_field :usage, value: :thesis %>
+					<%= f.hidden_field :supplemental, value: !primary %>	
 				</div>
+
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 					<%= f.button :submit, "Upload", class: "btn btn-primary" %>

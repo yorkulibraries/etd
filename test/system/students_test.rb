@@ -4,11 +4,25 @@ require 'application_system_test_case'
 require 'helpers/system_test_helper'
 
 class StudentsTest < ApplicationSystemTestCase
-  include SystemTestHelper  # Include the SystemTestHelper module here
-
+  #include SystemTestHelper  # Include the SystemTestHelper module here
+  #include SystemTestHelper  # Include the SystemTestHelper module here
 
   setup do
     @gem_record = FactoryGirl.create(:gem_record)
+  end
+
+  test 'Send student invitation email' do
+    user = FactoryGirl.create(:user, role: User::ADMIN)
+    login_as(user)
+    visit root_url
+    click_link('GEM Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+
+    click_link('Send invitation email')
+
+    assert_selector '.alert-success', text: "Sent an invitation email to #{@gem_record.studentname}"
   end
 
   test 'Creating a student based on Gem Records' do
@@ -59,7 +73,7 @@ class StudentsTest < ApplicationSystemTestCase
       @gem_record.committee_members.each do |committee_member|
         assert_selector "p", text: committee_member.full_name
       end
-    end  
+    end
   end
 
   test 'Log in as Student and add a thesis' do
@@ -73,6 +87,41 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('Continue') #review
     assert_selector '.alert-warning', text: 'Error: You have to upload a primary file to continue'
     # page.accept_alert
+  end
+
+  test 'Unblock a student' do
+    visit root_url
+    click_link('GEM Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+    click_link('Unblock student')
+    page.accept_alert
+    assert_no_selector '.fa fa-ban text-danger'
+  end
+
+  test 'Block a student' do
+    visit root_url
+    click_link('GEM Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+    click_link('Unblock student')
+    page.accept_alert
+    assert_no_selector '.fa fa-ban text-danger'
+    click_link('Block student')
+    page.accept_alert
+    assert_selector '.fa-ban'
+  end
+
+  test 'View student audit trail' do
+    visit root_url
+    click_link('GEM Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+    click_link('Audit trail')
+    assert_selector "h3", text: "Audit Trail"
   end
 
   ## Page 1 tests
@@ -127,7 +176,7 @@ class StudentsTest < ApplicationSystemTestCase
     visit root_url
 
     ## Page 1: Welcome and Non-YorkU Email
-    
+
     click_link("My ETD Submission")
     assert_selector "input#student_email_external"
     fill_in("Non-YorkU Email Address", with: "#{@thesis.student.username}@mailinator.com")
@@ -138,14 +187,32 @@ class StudentsTest < ApplicationSystemTestCase
     select "English", from: "thesis_language"
     fill_in "thesis_abstract", with: Faker::Lorem.paragraph
 
-    select_option_value = 'Accounting'
-    select_chosen_option('#select_subjects_11_chosen', select_option_value)
 
-    select_option_value = 'Management'
-    select_chosen_option('#select_subjects_12_chosen', select_option_value)
+    execute_script("document.getElementById('select_subjects_11').style.display = 'block';")
+    select "Accounting", from: 'select_subjects_11'
 
-    select_option_value = 'Finance'
-    select_chosen_option('#select_subjects_13_chosen', select_option_value)
+    execute_script("document.getElementById('select_subjects_12').style.display = 'block';")
+    select "Management", from: 'select_subjects_12'
+
+    execute_script("document.getElementById('select_subjects_13').style.display = 'block';")
+    select "Finance", from: 'select_subjects_13'
+
+    select "Accounting", from: 'select_subjects_11'
+    select "Management", from: 'select_subjects_12'
+    select "Finance", from: 'select_subjects_13'
+
+    execute_script("document.getElementById('select_subjects_11').style.display = 'block';")
+    select "Accounting", from: 'select_subjects_11'
+
+    execute_script("document.getElementById('select_subjects_12').style.display = 'block';")
+    select "Management", from: 'select_subjects_12'
+
+    execute_script("document.getElementById('select_subjects_13').style.display = 'block';")
+    select "Finance", from: 'select_subjects_13'
+
+    select "Accounting", from: 'select_subjects_11'
+    select "Management", from: 'select_subjects_12'
+    select "Finance", from: 'select_subjects_13'
 
     fill_in "thesis_keywords", with: "accounting-kw, management-kw"
     click_on("Continue")
@@ -153,7 +220,6 @@ class StudentsTest < ApplicationSystemTestCase
     ## Page 3: Files and Documents
 
     click_on("Upload Primary File")
-    assert_selector "p", text: "Your primary file should be in PDF format.", visible: :all
 
     # assert_no_selector("p", text: "Smith_Jane_E_2014_PhD.pdf", visible: :all)
     assert_not(page.has_css?("p", text: "Smith_Jane_E_2014_PhD.pdf"), "Should not show 'example text' as per Spring 2024 requirements")
