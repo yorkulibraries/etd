@@ -176,6 +176,17 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector(".invalid-feedback", text: "Primary file must be a PDF")
   end
 
+  should "not upload supplmentary document with incorrect file format" do
+    visit root_url
+    click_link(@thesis_01.title)
+
+    click_on("Upload Supplementary Files")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/zip-file.zip'))
+    click_button('Upload')
+
+    assert_selector(".invalid-feedback", text: "Supplementary file be valid format")
+  end
+
   should "be able to upload supplementary document by admin/staff" do
     visit root_url
     click_link(@thesis_01.title)
