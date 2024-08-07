@@ -19,11 +19,32 @@
 	</div>
 	</div>
   </div>
-<div class="students mt-4">
+  
+<div class="table-responsive">
+	<table class="table">
+		<tr>
+			<th></th>
+			<th></th>
+			<th></th>
+		</tr>
+		<% @students.each do |student| %>
+		<tr>
+			<td><%= fa_stacked_icon "graduation-cap",base: "none", class: "fa-2x border rounded", style:"color:grey" %></td>
+			<td><h5><%= link_to student.name, student %></h5>created by <%= student.created_by.name %> on <%= student.created_at.strftime("%B %d, %Y") %></td>
+			<td> <b><%= student.sisid %></b></td>
+		</tr>
+		<% end %>
+	</table>
+</div>
+<%
+=begin%>
+ <div class="students mt-4">
 	<% @students.each do |student| %>
 		<%= render partial: student %>
 	<% end %>
-</div>
+</div> 
+<%
+=end%>
 
 
 <div class="pagination">

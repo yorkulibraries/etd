@@ -10,31 +10,33 @@
 <% end %>
 
 <div class="card mt-3">
-  <div class="card-body">
-   <div class="row">
-	  <div class="col-6">
-	  	<h6>Username</h6>
-		<p><%= @student.username%></p>
-	  	<h6>Email</h6>
-		<p><%= @student.email%></p>
-	  	<h6>Invitation</h6>
-		<p>
-		  <% if @student.invitation_sent_at.nil? %>
-		  	<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", send_invite_student_path(@student) %>
-		  <% else %>
-			Sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>
-			<span class="soft weak">(<%= link_to_if AppSettings.email_welcome_allow, "Send Again", send_invite_student_path(@student), class: "soft weak"%>)</span>
-		  <% end %>
-		</p>
-	  </div>
-	  <div class="col-6">
-	  	<h6>SISID</h6>
-		<p><%= @student.sisid %></p>
-	  	<h6>Joined on</h6>
-		<p><%= @student.created_at.strftime("%B %d, %Y")%></p>
-	  </div>
-	 </div>
-  </div>
+	<div class="card-body">
+		<div class="data-grid">
+			<div class="row">
+				<div class="col-6">
+					<h4>Username</h4>
+					<p><%= @student.username%></p>
+					<h4>Email</h4>
+					<p><%= @student.email%></p>
+					<h4>Invitation</h4>
+					<p>
+					<% if @student.invitation_sent_at.nil? %>
+						<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", send_invite_student_path(@student) %>
+					<% else %>
+						Sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>
+						<span class="soft weak">(<%= link_to_if AppSettings.email_welcome_allow, "Send Again", send_invite_student_path(@student), class: "soft weak"%>)</span>
+					<% end %>
+					</p>
+				</div>
+				<div class="col-6">
+					<h4>SISID</h4>
+					<p><%= @student.sisid %></p>
+					<h4>Joined on</h4>
+					<p><%= @student.created_at.strftime("%B %d, %Y")%></p>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div>
