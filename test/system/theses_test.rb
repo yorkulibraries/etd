@@ -165,6 +165,17 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector(".invalid-feedback", text: "Primary file must be a PDF")
   end
 
+  should "not upload primary document with incorrect file format" do
+    visit root_url
+    click_link(@thesis_01.title)
+
+    click_on("Upload Primary File")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/image-example.jpg'))
+    click_button('Upload')
+
+    assert_selector(".invalid-feedback", text: "Primary file must be a PDF")
+  end
+
   should "be able to upload supplementary document by admin/staff" do
     visit root_url
     click_link(@thesis_01.title)
@@ -216,6 +227,46 @@ class ThesesTest < ApplicationSystemTestCase
     click_button('Upload')
 
     assert_not_empty find('.embargo-file').text, "The .embargo-file element is empty, no file"
+  end
+
+  should "update primary thesis file" do
+    visit root_url
+    click_link(@thesis_01.title)
+
+    click_on("Upload Primary File")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
+    click_button('Upload')
+
+    click_link("Edit file")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
+    click_button('Upload')
+    assert_selector(".name", text: /\.pdf/)
+
+    click_link("Edit file")
+    click_link("Delete this file?")
+    page.accept_alert
+
+    assert_selector "p", text: "There is no primary file or document attached to this thesis/dissertation."
+  end
+
+  should "update supplementary file" do
+    visit root_url
+    click_link(@thesis_01.title)
+
+    click_on("Upload Supplementary Files")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
+    click_button('Upload')
+
+    click_link("Edit file")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
+    click_button('Upload')
+    assert_selector(".name", text: /\.pdf/)
+
+    click_link("Edit file")
+    click_link("Delete this file?")
+    page.accept_alert
+
+    assert_selector "p", text: "There are no supplementary files or documents attached to this thesis/dissertation."
   end
 
   ###########################################################
