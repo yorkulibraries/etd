@@ -14,7 +14,7 @@ class GemRecordsTest < ApplicationSystemTestCase
     visit root_url
     click_link('GEM Records')
     click_link(@gem_record.studentname)
-    assert_selector "h6", text: "Committee Members"
+    assert_selector "td", text: "Committee Members"
     @gem_record.committee_members.each do |member|
       assert_selector "div#committee_member_#{member.id} div.col", text: "#{member.last_name}, #{member.first_name} - #{member.role}"
     end
