@@ -11,6 +11,28 @@ class ThesesTest < ApplicationSystemTestCase
     @thesis_02 = FactoryGirl.create(:thesis, status: Thesis::UNDER_REVIEW)
   end
 
+  def wait_for_download(filename, timeout: 30)
+    Timeout.timeout(timeout) do
+      loop do
+        break if File.exist?(filename)
+        sleep 1
+      end
+    end
+  end
+
+  test "be able to download report" do
+    user = FactoryGirl.create(:user, role: User::ADMIN)
+    login_as(user)
+    visit root_url
+    click_link("Reports")
+    click_link("Under Review Theses")
+    assert_selector 'a', text: 'Download Excel'
+    click_link("Download Excel")
+    filename =  "tmp/test-screenshots/theses_report.xlsx"
+    wait_for_download(filename, timeout: 30)
+    assert File.exist?(filename), "Expected file #{filename} to be downloaded"
+  end
+
   test 'Assign a thesis to ME and unassign this' do
     visit root_url
     click_on('Unassigned')
@@ -176,7 +198,27 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector(".invalid-feedback", text: "Primary file must be a PDF")
   end
 
-  should "not upload supplmentary document with incorrect file format" do
+  should "not upload supplmentary document with incorrect file format as student" do
+    visit root_url
+    click_link("Students")
+    click_link(@thesis_01.student.name)
+
+    click_link("Login as this student")
+
+    fill_in("Non-YorkU Email Address", with: "#{@thesis_01.student.username}@mailinator.com")
+    click_on("Continue")
+
+    fill_in(".thesis_abstract", with: "Abstract Test")
+    click_on("Continue")
+
+    click_on("Upload Supplementary Files")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/zip-file.zip'))
+    click_button('Upload')
+
+    assert_selector(".invalid-feedback", text: "Supplementary file be valid format")
+  end
+
+  should "not upload supplmentary document with incorrect file format as admin" do
     visit root_url
     click_link(@thesis_01.title)
 
@@ -199,6 +241,7 @@ class ThesesTest < ApplicationSystemTestCase
 
   end
 
+<<<<<<< HEAD
   should "not be able to upload invalid supplementary document file type" do
     visit root_url
     click_link(@thesis_01.title)
@@ -210,6 +253,8 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector(".invalid-feedback", text: "Supplemental file must be a valid file type") #Supplemental
 
   end
+=======
+>>>>>>> 751a97d (new tests)
 
   ###########################################################
   ##### TESTS WILL NEED BE UPDATED WITH NEW FILE NAMES ######
