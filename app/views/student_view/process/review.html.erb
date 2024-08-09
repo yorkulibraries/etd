@@ -40,13 +40,13 @@
 				<hr class="text-primary border-3">
 				<p class="small">You must scroll to enable the checkbox to acknowledge you have read the licence.</p>
 				
-				<% if @supplemental_licence_documents.count == 0 %>
+				<% if @licence_documents.count == 0 %>
 					<p>There are no <strong>supplementary</strong> license files or documents attached to this thesis/dissertation.</p>
 				<% end %>
 				<% if AppSettings.student_review_lac_licence_instructions.present? %>
 					<p><%= raw(AppSettings.student_review_lac_licence_instructions) %></p>
 				<% end %>
-				<% @supplemental_licence_documents.each do | document | %>
+				<% @licence_documents.each do | document | %>
 					<%= render partial: document %>
 				<% end %>
 				<br/>

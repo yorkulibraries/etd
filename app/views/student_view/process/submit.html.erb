@@ -100,20 +100,20 @@
 	
 	<div class="bg-light-subtle mt-3 p-3">
 		<h4>License Agreements</h4>
-		<% @supplemental_licence_documents.each do | document | %>
+		<% @licence_documents.each do | document | %>
 				<%= render partial: document %>
 		<% end %>
-		<% if @supplemental_licence_documents.count == 0 %>
+		<% if @licence_documents.count == 0 %>
 			<p>There are no <strong>supplementary licence</strong> files or documents attached to this thesis/dissertation.</p>
 		<% end %>
 	</div>
 	
 	<div class="bg-light-subtle mt-3 p-3">
 		<h4>Embargo Documents</h4>
-		<% @supplemental_embargo_documents.each do | document | %>
+		<% @embargo_documents.each do | document | %>
 				<%= render partial: document %>
 		<% end %>
-		<% if @supplemental_embargo_documents.count == 0 %>
+		<% if @embargo_documents.count == 0 %>
 			<p>There are no <strong>embargo</strong> files or documents attached to this thesis/dissertation.</p>
 		<% end %>
 	</div>

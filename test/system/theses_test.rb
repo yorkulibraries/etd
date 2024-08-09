@@ -22,11 +22,11 @@ class ThesesTest < ApplicationSystemTestCase
 
   test 'Check thesis Under review and Overview on nav-tabs' do
     visit root_url
-    assert_selector 'h3', text: (/#{Regexp.escape("#{@thesis_01.title}")}/i)
+    assert_selector 'h2', text: (/#{Regexp.escape("#{@thesis_01.title}")}/i)
     click_link(@thesis_01.title)
     click_link('Overview')
     click_link('Under Review')
-    assert_selector 'h3', text: (/#{Regexp.escape("#{@thesis_02.title}")}/i)
+    assert_selector 'h2', text: (/#{Regexp.escape("#{@thesis_02.title}")}/i)
     click_link(@thesis_02.title)
   end
 
@@ -76,7 +76,7 @@ class ThesesTest < ApplicationSystemTestCase
     fill_in "thesis_abstract", with: "Testing Abstract"
     click_button('Update Thesis')
 
-    assert_selector 'h3', text: 'title 10 (test)', visible: true
+    assert_selector 'h2', text: 'title 10 (test)', visible: true
 
     assert_selector 'p', text: 'program 10 (test)', visible: true
 

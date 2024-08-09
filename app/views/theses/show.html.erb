@@ -6,248 +6,201 @@
 	<div class="col-12 py-0"><hr /></div>
 </div>
 	<% end %>
-<div class="row">
-	<div class="col-sm-12 col-lg-6">
-		<h5 class="author" title="author">By <%= @thesis.author %> | <%= number_with_delimiter(@thesis.student.sisid, delimiter: " ") %></h5>
-		<h3 class="title" title="title"><%= @thesis.title %></h3>
-	</div>
-	<div class="col-sm-12 col-lg">
-	  <div class="row">
-			<div class="col-4">
-				<% if current_user.role == User::STUDENT %>
-					<div id="status_menu">
-						<button id="" class="btn" title="Change Thesis Status">
-						Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span>
-						</button>
-					</div>
-				<% else %>
-					
-					<h6 class="text-black">Edit thesis</h6>
-					<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success btn-sm d-grid" %></div>
-					
-				</div>
-				<div class="col-5">
-					
-						<h6 class="text-black">Change status</h6>
-						<%= render partial: "status_menu"%>
-					
-				</div>
-				<div class="col">
-					
-						<h6 class="text-black">Assign to</h6>
-						<div class="span d-grid">
-							<%= render partial: "assigned_to", locals: { thesis: @thesis }%>
-						</div>
-					
-				</div>
-				<% end %>
-	  </div>
-	</div>
-</div>
 
 <div class="row">
-	<div class="col-12 pt-3">
-		<h6>Abstract</h6>
-		<p><%= format @thesis.abstract, true %></p>
-	</div>
-	<div class="col-sm-12 col-md-4">
-		
-			<h6>Supervisor</h6>
-			<p><%=  @thesis.supervisor %></p>
-			<h6>Exam date</h6>
-			<p><%= @thesis.exam_date ? @thesis.exam_date.strftime("%B %d, %Y") : format(@thesis.exam_date)  %></p>
-			
-		
-	</div>
-	<div class="col-sm-12 col-md-4">
-		
-			<h6>Examining committee</h6>
-			
-			<div class="committee_members" id="committee_members">
-				<% @thesis.committee_members.each do |committee_member| %>
-					<%= render "committee_members/committee_member_read", committee_member: committee_member %>
+		<div class="col-md-6">
+			<div class="fw-lighter text-secondary lead" title="student: <%= @thesis.author %> - <%= @thesis.student.sisid %>">
+				By <%= @thesis.author %> | <span class="badge bg-light text-secondary">STID: <%= number_with_delimiter(@thesis.student.sisid, delimiter: " ") %></span>
+			</div> 
+			<h2 class="title" title="title"><%= @thesis.title %></h2>
+		</div>
+		<div class="col-md-6">
+			<div class="row">
+				<% if current_user.role == User::STUDENT %>
+				<div class="col">
+					<div id="status_menu">
+						<button id="" class="btn" title="Change Thesis Status">
+							Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span>
+						</button>
+					</div>
+				</div>
+				<% else %>
+
+					<div class="col-4">
+						<h4 class="fs-6">Edit thesis</h4>
+						<div><%= link_to "Make Changes", edit_student_thesis_path(@student, @thesis), class: "btn btn-success btn-sm d-grid" %></div>	
+					</div>
+					<div class="col-4">
+							<h4 class="fs-6">Change status</h4>
+							<%= render partial: "status_menu"%>	
+					</div>
+					<div class="col-4">
+							<h4 class="fs-6">Assign to</h4>
+							<div class="span d-grid">
+								<%= render partial: "assigned_to", locals: { thesis: @thesis }%>
+							</div>
+					</div>
 				<% end %>
 			</div>
-		
-	</div>
-				
-	<% if @thesis.returned_message.present? && Thesis::RETURNED == @thesis.status %>
-		<div class="col-lg-4 col-sm-12">
-				<h6>Returned message</h6>
+		</div>
+</div>
+<hr />
+<%= render partial: "thesis_details" %>
+<hr />
+<% if current_user.role != User::STUDENT %>
+<div id="admin-fields">
+	<div class="row">
+		<div class="col-md-4">
+			<h4>Student Accepted Terms On</h4>
+			<p class="language"><%= format @thesis.student_accepted_terms_at %></p>
+		</div>
+		<div class="col-md-4">
+			<h4>Returned Message</h4>
+			<% if @thesis.returned_message.present? && Thesis::RETURNED == @thesis.status %>
 				<div class="alert alert-danger" role="alert">
 					<%= @thesis.returned_message %>
 				</div>
-	<% else %>
-		<div class="col-lg-4 d-none d-lg-block">
-	<% end %>
+			<% else %>
+				None.
+			<% end %>
 		</div>
-		<div class="col-12"><hr /></div>
-		</div>
-	<div class="row">
-		<div class="col-4">
-				<h6>Publish On</h6>
-				<p class="published_date">
-					<% if @thesis.embargoed == true %>
-						Never
-					<% else %>
-						<%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %>
-					<% end %>
-				</p>
-				<h6>Degree Name and Level</h6>
-				<p class="degree_level"><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
-				<h6>Program</h6>
-				<p class="program"><%= format @thesis.program %></p>
-		
-		</div>
-		<div class="col-4">
-				<h6>Language</h6>
-				<p class="language"><%= format @thesis.language %></p>
-				<h6>Student Accepted Terms On</h6>
-				<p class="language"><%= format @thesis.student_accepted_terms_at %></p>
-				<h6>Subjects</h6>
-				<p class="subjects"><%= format @thesis.loc_subjects.map(&:name).join ', ' %></p>
-				<h6>Keywords</h6>
-				<p class="keywords"><%= format @thesis.keywords%></p>
-		</div>
-		<div class="col-4">
-			<div class="row p-1">
-				<h6>Permanent Embargo</h6>
-				<% if @thesis.embargoed == true %>
+		<div class="col-md-4">
+			<h4>Permanent Embargo</h4>
+			<% if @thesis.embargoed == true %>
 				<div class="alert alert-warning" role="alert">This thesis has been placed under permanent embargo. It will not be published.
 					<hr />
 					<%= format @thesis.embargo, true, "Embargo explanation was not filled in..." %>
 				</div>
-				<% else  %>
+			<% else  %>
 					<div id="place_under_embargo_button">
 						<%= link_to new_student_thesis_embargo_path(@student, @thesis), class: "btn btn-warning", data: { remote: true } do %>
 							Place under permanent embargo?
 						<% end %>
 					</div>
-				<% end %>
-			</div>
+			<% end %>
 		</div>
 	</div>
-
+	<hr />
 	<div class="row">
-		<div class="col-12"><hr /></div>
-		<div class="col-3 span2 distinct strong"><h6>Last Under Review: </h6> <%= format @thesis.under_review_at %></div>
-		<div class="col-3 span2 distinct strong"><h6>Last Returned: </h6> <%= format @thesis.returned_at %></div>
-		<div class="col-3 span2 distinct strong"><h6>Thesis Accepted: </h6> <%= format @thesis.accepted_at %></span></div>
-		<div class="col-3 span2 distinct strong"><h6>Published: </h6> <%= format @thesis.published_at %></div>
-  </div>
+		<div class="col-6 col-md-3"><h4>Last Under Review: </h4> <p><%= format @thesis.under_review_at %></p></div>
+		<div class="col-6 col-md-3"><h4>Last Returned: </h4> <p><%= format @thesis.returned_at %></p></div>
+		<div class="col-6 col-md-3"><h4>Thesis Accepted: </h4> <p><%= format @thesis.accepted_at %></p></span></div>
+		<div class="col-6 col-md-3"><h4>Published: </h4> <p><%= format @thesis.published_at %></p></div>
+	</div>
+	<hr/>
+</div>
+<% end %>
+<div class="documents fitted student-view">
 
-	<div class="row">
-		<div class="documents fitted">
-			<h6 class="green pt-4">Thesis Files and Documents</h6>
+	<h3 class="fw-bold">Files and Documents</h3>
+	<p>You have uploaded the following files:</p>
+	<hr/>
 
-			<% if current_user.role != User::STUDENT %>
-				<div class="mt-4">
-					<h6>Primary</h5>
-					<%  unless block_thesis_changes?(@thesis) %>
-						<% if @primary_documents.count == 0 %>
-							<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#primary-file">Upload Primary File</button>
-						<% end %>
-					<% end %>
-
-
-					<% @primary_documents.each do | document | %>
-						<%= render partial: document %>
-					<% end %>
-
-					<% if @primary_documents.count == 0 %>
-						<p>There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
-					<% end %>
-
-					<div class="push-down"></div>
-				</div>
-				<div class="mt-4">
-					<h6>Supplementary</h6>
-						<%  unless block_thesis_changes?(@thesis) %>
-							<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#supplemental-files">Upload Supplementary Files</button>
-						<% end %>
-
-					<div class='mt-3'>
-						<% @supplemental_documents.each do | document | %>
-							<% if document.usage == "thesis" %>
-								<%= render partial: document %>
-							<% end %>
-						<% end %>
-						<% if @supplemental_documents.count == 0 %>
-							<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
-						<% end %>
-					</div>
-				</div>
-				<div class='mt-4'>
-					<h6>License Agreements</h6>
-					<%  unless block_thesis_changes?(@thesis) %>
-						<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#supplemental-licence-files">Upload Licence Files</button>
-					<% end %>
-						<% @licence_documents.each do | document | %>
-								<div class='licence-file'>
-									<%= render partial: document %>
-								</div>
-						<% end %>
-						<% if @licence_documents.count == 0 %>
-							<p>There are no <strong>licence</strong> files or documents attached to this thesis/dissertation.</p>
-						<% end %>
-				</div>
-				<div class='mt-4'>
-					<h6>Embargo Documents</h6>
-						<%  unless block_thesis_changes?(@thesis) %>
-							<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#supplemental-embargo-files">Upload Embargo Files</button>
-						<% end %>
-						<% @embargo_documents.each do | document | %>
-								<div class='embargo-file'>
-									<%= render partial: document %>
-								</div>
-						<% end %>
-						<% if @embargo_documents.count == 0 %>
-							<p>There are no <strong>embargo</strong> files or documents attached to this thesis/dissertation.</p>
-						<% end %>
-				</div>
-			<% else %>
-				<h6>Primary</h6>
-					<% @primary_documents.each do | document | %>
-						<%= render partial: document %>
-					<% end %>
-
-					<% if @primary_documents.count == 0 %>
-						<p>There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
-					<% end %>
-
-					<% @supplemental_documents.each do | document | %>
-						<%= render partial: document %> 
-					<% end %>
-
-					<% if @supplemental_documents.count == 0 %>
-						<p>There are no <strong>supplemental</strong> files or documents attached to this thesis/dissertation.</p>
-					<% end %>
-
-					<% @licence_documents.each do | document | %>
-						<%= render partial: document %> 
-					<% end %>
-					
-					<% if @licence_documents.count == 0 %>
-						<p>There are no <strong>licence</strong> files or documents attached to this thesis/dissertation.</p>
-					<% end %>
-
-					<% @embargo_documents.each do | document | %>
-						<%= render partial: document %> 
-					<% end %>
-					
-					<% if @embargo_documents.count == 0 %>
-						<p>There are no <strong>embargo</strong> files or documents attached to this thesis/dissertation.</p>
-					<% end %>
+	<% if current_user.role != User::STUDENT %>
+		<div class="bg-light-subtle mt-3 p-3">
+			<h4>Primary</h4>
+			<%  unless block_thesis_changes?(@thesis) %>
+				<% if @primary_documents.count == 0 %>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#primary-file">Upload Primary File</button>
+				<% end %>
 			<% end %>
 
-		
-		</div>
-  	</div>
+			<% @primary_documents.each do | document | %>
+				<%= render partial: document %>
+			<% end %>
 
+			<% if @primary_documents.count == 0 %>
+				<p>There are no <strong>primary</strong> files or documents attached to this thesis/dissertation.</p>
+			<% end %>
+		</div>
+		
+		<div class="bg-light-subtle mt-3 p-3">
+			<h4>Supplementary Thesis Files</h4>
+			<%  unless block_thesis_changes?(@thesis) %>
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#supplemental-files">Upload Supplementary Files</button>
+			<% end %>
+			<% @supplemental_documents.each do | document | %>
+				<% if document.usage == 'thesis'%>
+					<%= render partial: document %>
+				<% end %>
+			<% end %>
+			<% if @supplemental_documents.count == 0 %>
+				<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
+			<% end %>
+		</div>
+		
+		<div class="bg-light-subtle mt-3 p-3">
+			<h4>License Agreements</h4>
+			<%  unless block_thesis_changes?(@thesis) %>
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#supplemental-licence-files">Upload Licence Files</button>
+			<% end %>
+			<% @licence_documents.each do | document | %>
+				<div class='licence-file'>
+					<%= render partial: document %>
+				</div>
+			<% end %>
+			<% if @licence_documents.count == 0 %>
+				<p>There are no <strong>supplementary licence</strong> files or documents attached to this thesis/dissertation.</p>
+			<% end %>
+		</div>
+		
+		<div class="bg-light-subtle mt-3 p-3">
+			<h4>Embargo Documents</h4>
+			<%  unless block_thesis_changes?(@thesis) %>
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#supplemental-embargo-files">Upload Embargo Files</button>
+			<% end %>
+			<% @embargo_documents.each do | document | %>
+				<div class='embargo-file'>
+					<%= render partial: document %>
+				</div>
+			<% end %>
+			<% if @embargo_documents.count == 0 %>
+				<p>There are no <strong>embargo</strong> files or documents attached to this thesis/dissertation.</p>
+			<% end %>
+		</div>
+
+	<% else %>
+		<h4>Primary</h4>
+			<% @primary_documents.each do | document | %>
+				<%= render partial: document %>
+			<% end %>
+
+			<% if @primary_documents.count == 0 %>
+				<p>There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
+			<% end %>
+
+			<h4>Supplementary Thesis Files</h4>
+			<% @supplemental_documents.each do | document | %>
+				<%= render partial: document %> 
+			<% end %>
+
+			<% if @supplemental_documents.count == 0 %>
+				<p>There are no <strong>supplemental</strong> files or documents attached to this thesis/dissertation.</p>
+			<% end %>
+
+			<h4>License Agreements</h4>
+			<% @licence_documents.each do | document | %>
+				<%= render partial: document %> 
+			<% end %>
+			
+			<% if @licence_documents.count == 0 %>
+				<p>There are no <strong>licence</strong> files or documents attached to this thesis/dissertation.</p>
+			<% end %>
+
+			<h4>Embargo Documents</h4>
+			<% @embargo_documents.each do | document | %>
+				<%= render partial: document %> 
+			<% end %>
+			
+			<% if @embargo_documents.count == 0 %>
+				<p>There are no <strong>embargo</strong> files or documents attached to this thesis/dissertation.</p>
+			<% end %>
+	<% end %>
+</div>
 
 	<div class="row">
 		<div class="col-12"><hr /></div>
-		<h6>Notes</h6>
+		<h4>Thesis Notes</h4>
 		<div class="col-12">
 			<p><%= @thesis.notes %></p>
 	    </div>
@@ -260,5 +213,3 @@
 			<%= render partial: "documents/new_licence_form", locals: { primary: false } %>
 
 			<%= render partial: "documents/new_embargo_form", locals: { primary: false } %>
-
-<!-- </div> HTML structure is someone broken of divs. I need to review when working on GUI over hall.-->
