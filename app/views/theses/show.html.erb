@@ -162,7 +162,7 @@
 	<% else %>
 		<h4>Primary</h4>
 			<% @primary_documents.each do | document | %>
-				<%= render partial: document %>
+				<%= render partial: 'documents/document_view_only', locals: {document: document} %>
 			<% end %>
 
 			<% if @primary_documents.count == 0 %>
@@ -171,7 +171,7 @@
 
 			<h4>Supplementary Thesis Files</h4>
 			<% @supplemental_documents.each do | document | %>
-				<%= render partial: document %> 
+				<%= render partial: 'documents/document_view_only', locals: {document: document} %>
 			<% end %>
 
 			<% if @supplemental_documents.count == 0 %>
@@ -180,7 +180,7 @@
 
 			<h4>License Agreements</h4>
 			<% @licence_documents.each do | document | %>
-				<%= render partial: document %> 
+				<%= render partial: 'documents/document_view_only', locals: {document: document} %>
 			<% end %>
 			
 			<% if @licence_documents.count == 0 %>
@@ -189,7 +189,7 @@
 
 			<h4>Embargo Documents</h4>
 			<% @embargo_documents.each do | document | %>
-				<%= render partial: document %> 
+				<%= render partial: 'documents/document_view_only', locals: {document: document} %>
 			<% end %>
 			
 			<% if @embargo_documents.count == 0 %>
