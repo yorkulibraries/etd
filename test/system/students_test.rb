@@ -272,7 +272,7 @@ class StudentsTest < ApplicationSystemTestCase
     click_button("Accept and Continue")
 
     ## Page 5: Submission Review
-    assert_no_link('Edit File')
+    assert_no_link('Edit file')
     assert_no_link('Download')
     assert_no_link('Delete')
 
