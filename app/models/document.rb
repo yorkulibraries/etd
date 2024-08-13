@@ -11,6 +11,7 @@ class Document < ApplicationRecord
   #### VALIDATIONS
   validates_presence_of :file, :user, :thesis
   validate :primary_file_presence, on: :create
+  validate :supplemental_file_must_be_file_types
   validate :primary_file_must_be_pdf
 
   #### SCOPES
@@ -55,6 +56,20 @@ class Document < ApplicationRecord
     return if file.filename.downcase.end_with?('.pdf')
 
     errors.add(:file, 'Primary file must be a PDF')
+  end
+
+  def supplemental_file_must_be_file_types
+    valid_file_types = ['.pdf', '.doc', '.docx', '.txt', '.html', '.htm', '.odt', '.odp', '.ods', '.png', '.tif', '.jpg', '.csv', '.xml', '.avi', '.flac', '.wav', '.mp3', '.mp4']
+    
+    return unless file.filename.present? && supplemental
+
+    if (document_type == "licence")
+      return if file.filename.downcase.end_with?('.pdf')
+    end
+
+    return if valid_file_types.include?(File.extname(file.filename.downcase))
+
+    errors.add(:file, "#{document_type.capitalize} file must be a valid file type")
   end
   
   def document_type
