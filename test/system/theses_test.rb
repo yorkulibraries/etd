@@ -154,6 +154,17 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector(".name", text: /\.pdf/)
   end
 
+  should "not be able to upload invalid primary document file type" do
+    visit root_url
+    click_link(@thesis_01.title)
+
+    click_on("Upload Primary File")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/theses_report.zip'))
+    click_button('Upload')
+
+    assert_selector(".invalid-feedback", text: "Primary file must be a PDF")
+  end
+
   should "be able to upload supplementary document by admin/staff" do
     visit root_url
     click_link(@thesis_01.title)
@@ -163,6 +174,18 @@ class ThesesTest < ApplicationSystemTestCase
     attach_file("document_file", Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
     assert_selector(".supplemental", text: /_supplemental_/) #Supplemental
+
+  end
+
+  should "not be able to upload invalid supplementary document file type" do
+    visit root_url
+    click_link(@thesis_01.title)
+
+    click_on("Upload Supplementary Files")
+    assert_selector "h1", text: "Upload Supplementary File", visible: :all
+    attach_file("document_file", Rails.root.join('test/fixtures/files/theses_report.zip'))
+    click_button('Upload')
+    assert_selector(".invalid-feedback", text: "Supplemental file must be a valid file type") #Supplemental
 
   end
 
@@ -176,7 +199,7 @@ class ThesesTest < ApplicationSystemTestCase
 
     click_on("Upload Licence Files")
     assert_selector "h1", text: "Upload Licence File", visible: :all
-    attach_file("document_file", Rails.root.join('test/fixtures/files/image-example.jpg'))
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
     assert_not_empty find('.licence-file').text, "The .licence-file element is empty, no file"
 
@@ -189,10 +212,10 @@ class ThesesTest < ApplicationSystemTestCase
     click_on("Upload Embargo Files")
     assert_selector "h1", text: "Upload Supplementary File", visible: :all
 
-    attach_file("document_file", Rails.root.join('test/fixtures/files/papyrus-feature.png'))    
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
-    
-    assert_not_empty find('.embargo-file').text, "The .embargo-file element is empty, no file"    
+
+    assert_not_empty find('.embargo-file').text, "The .embargo-file element is empty, no file"
   end
 
   ###########################################################
