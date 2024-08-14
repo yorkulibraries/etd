@@ -4,20 +4,13 @@ require 'application_system_test_case'
 require 'helpers/system_test_helper'
 
 class ThesesTest < ApplicationSystemTestCase
+  include SystemTestHelper  # Include the SystemTestHelper module here
+
   setup do
     FactoryGirl.create(:user, role: User::ADMIN)
     FactoryGirl.create(:user, role: User::MANAGER)
     @thesis_01 = FactoryGirl.create(:thesis, degree_name: 'IMBA', degree_level: 'Master\'s')
     @thesis_02 = FactoryGirl.create(:thesis, status: Thesis::UNDER_REVIEW)
-  end
-
-  def wait_for_download(filename, timeout: 30)
-    Timeout.timeout(timeout) do
-      loop do
-        break if File.exist?(filename)
-        sleep 1
-      end
-    end
   end
 
   test "be able to download report" do
@@ -28,9 +21,10 @@ class ThesesTest < ApplicationSystemTestCase
     click_link("Under Review Theses")
     assert_selector 'a', text: 'Download Excel'
     click_link("Download Excel")
-    filename =  "tmp/test-screenshots/theses_report.xlsx"
-    wait_for_download(filename, timeout: 30)
+    filename =  "tmp/theses_report.xlsx"
+    wait_for_download(filename)
     assert File.exist?(filename), "Expected file #{filename} to be downloaded"
+    File.delete("tmp/theses_report.xlsx")
   end
 
   test 'Assign a thesis to ME and unassign this' do
@@ -176,17 +170,6 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector(".name", text: /\.pdf/)
   end
 
-  should "not be able to upload invalid primary document file type" do
-    visit root_url
-    click_link(@thesis_01.title)
-
-    click_on("Upload Primary File")
-    attach_file("document_file", Rails.root.join('test/fixtures/files/theses_report.zip'))
-    click_button('Upload')
-
-    assert_selector(".invalid-feedback", text: "Primary file must be a PDF")
-  end
-
   should "not upload primary document with incorrect file format" do
     visit root_url
     click_link(@thesis_01.title)
@@ -208,14 +191,14 @@ class ThesesTest < ApplicationSystemTestCase
     fill_in("Non-YorkU Email Address", with: "#{@thesis_01.student.username}@mailinator.com")
     click_on("Continue")
 
-    fill_in(".thesis_abstract", with: "Abstract Test")
+    fill_in("Abstract", with: "Abstract Test")
     click_on("Continue")
 
     click_on("Upload Supplementary Files")
     attach_file("document_file", Rails.root.join('test/fixtures/files/zip-file.zip'))
     click_button('Upload')
 
-    assert_selector(".invalid-feedback", text: "Supplementary file be valid format")
+    assert_selector(".invalid-feedback", text: "File Supplemental file must be a valid file type")
   end
 
   should "not upload supplmentary document with incorrect file format as admin" do
@@ -226,7 +209,7 @@ class ThesesTest < ApplicationSystemTestCase
     attach_file("document_file", Rails.root.join('test/fixtures/files/zip-file.zip'))
     click_button('Upload')
 
-    assert_selector(".invalid-feedback", text: "Supplementary file be valid format")
+    assert_selector(".invalid-feedback", text: "File Supplemental file must be a valid file type")
   end
 
   should "be able to upload supplementary document by admin/staff" do
@@ -240,22 +223,6 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector(".supplemental", text: /_supplemental_/) #Supplemental
 
   end
-
-<<<<<<< HEAD
-  should "not be able to upload invalid supplementary document file type" do
-    visit root_url
-    click_link(@thesis_01.title)
-
-    click_on("Upload Supplementary Files")
-    assert_selector "h1", text: "Upload Supplementary File", visible: :all
-    attach_file("document_file", Rails.root.join('test/fixtures/files/theses_report.zip'))
-    click_button('Upload')
-    assert_selector(".invalid-feedback", text: "Supplemental file must be a valid file type") #Supplemental
-
-  end
-=======
->>>>>>> 751a97d (new tests)
-
   ###########################################################
   ##### TESTS WILL NEED BE UPDATED WITH NEW FILE NAMES ######
   ###########################################################
@@ -302,7 +269,7 @@ class ThesesTest < ApplicationSystemTestCase
     click_link("Delete this file?")
     page.accept_alert
 
-    assert_selector "p", text: "There is no primary file or document attached to this thesis/dissertation."
+    assert_selector "p", text: "There are no primary files or documents attached to this thesis/dissertation."
   end
 
   should "update supplementary file" do
