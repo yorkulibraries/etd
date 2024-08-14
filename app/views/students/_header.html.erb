@@ -1,5 +1,5 @@
 	<div class="row">
-	  	<h4 class="fw-lighter my-0 fs-5">Student Record</h4>
+	  	<span class="fw-lighter text-secondary d-block lead ">Student Record</span> 
 		<div class="col-sm-12 col-lg-7">
 			<h1 title="<%= @student.sisid %>">
 				<%= link_to_unless controller.controller_name == "students" && controller.action_name == "show", @student.name, @student, title: @student.sisid %>
