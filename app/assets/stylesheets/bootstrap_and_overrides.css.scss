@@ -12,6 +12,7 @@
 /* Custom theme colors go here */
 /* Set your own primary/secondary/info/success etc. colors here */
 /* e.g. $primary: #e31837 */
+$primary: #0f69A0;
 $yorku_brand: #e31837;
 
 @import "bootstrap/variables";
@@ -27,6 +28,9 @@ $yorku_brand: #e31837;
 	h3 {
 		font-weight: 600;
 	}
+}
+.error_messages {
+	h2 { color: $black; }
 }
 .page-header {
 	margin-bottom: 10px;

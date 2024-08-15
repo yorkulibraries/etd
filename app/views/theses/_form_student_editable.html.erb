@@ -1,32 +1,32 @@
 
 
-<hr class="fitted"/>
+<hr/>
 
 <%= f.input :language, collection: Thesis::LANGUAGE, readonly: read_only_if_student("language"), input_html: { aria_label: "Language" }  %>
 
-<%= f.input :abstract, input_html: { class: "span6", rows: "8" }, readonly: read_only_if_student("abstract"),
-						hint: AppSettings.student_update_details_abstract.html_safe  %>
+<%= f.label :abstract, label: "Abstract", required: true, class: "d-block mb-1" %>
+<small class="form-text"><%= AppSettings.student_update_details_subjects.html_safe %></small>
+<%= f.input :abstract, input_html: { class: "", rows: "8" }, label: false, readonly: read_only_if_student("abstract") %>
 
-<hr class="fitted"/>
+<hr/>
 
-	<label class="text optional control-label">Subjects</label><br />
-		<small class="form-text text-muted"><%= AppSettings.student_update_details_subjects.html_safe %></small>		
+<%= f.label :loc_subject_ids, label: "Subjects", class: "d-block mb-1" %>
+<small class="form-text"><%= AppSettings.student_update_details_subjects.html_safe %></small>		
 
-		<div id="thesis_loc_subject_ids" class="span3 no-space">
+<div id="thesis_loc_subject_ids" class="span3 no-space">
+	<% @thesis.loc_subjects.each_with_index do |subject, index| %>
+			<%= select_tag "thesis[loc_subject_ids][]", options_from_collection_for_select(LocSubject.order(:name), "id", "name", subject.id),
+										include_blank: true, id: "select_subjects_#{index+1}", class: "select_subjects_fields", aria:{ label: "Subject #{index}" } %>
+			<br/><br/>
+	<% end %>
+	<% how_many = 3 - @thesis.loc_subjects.size %>
+	<% (1..how_many).each do |index| %>
+		<%= select_tag "thesis[loc_subject_ids][]", options_from_collection_for_select(LocSubject.order(:name), "id", "name"), include_blank: true,  id: "select_subjects_#{index+10}", class: "select_subjects_fields", aria:{ label: "Subject #{index}" } %>
+		<br/><br/>
+	<% end %>
 
-			<% @thesis.loc_subjects.each_with_index do |subject, index| %>
-					<%= select_tag "thesis[loc_subject_ids][]", options_from_collection_for_select(LocSubject.order(:name), "id", "name", subject.id),
-												include_blank: true, id: "select_subjects_#{index+1}", class: "select_subjects_fields", aria:{ label: "Subject #{index}" } %>
-					<br/><br/>
-			<% end %>
-
-			<% how_many = 3 - @thesis.loc_subjects.size %>
-			<% (1..how_many).each do |index| %>
-				<%= select_tag "thesis[loc_subject_ids][]", options_from_collection_for_select(LocSubject.order(:name), "id", "name"), include_blank: true,  id: "select_subjects_#{index+10}", class: "select_subjects_fields", aria:{ label: "Subject #{index}" } %>
-				<br/><br/>
-			<% end %>
-
-		</div>
+</div>
 		
-	<label class="text optional control-label">Keywords</label>
-	<%= f.input :keywords, label: false, input_html: { rows: "2",  aria:{ label: "Keywords" } }, readonly: read_only_if_student("keywords"), hint: AppSettings.student_update_details_keywords.html_safe %>
+<%= f.label :keywords, label: "Subjects", class: "d-block mb-1" %>
+<small class="form-text"><%= AppSettings.student_update_details_keywords.html_safe %></small>		
+<%= f.input :keywords, label: false, input_html: { rows: "2",  aria:{ label: "Keywords" } }, readonly: read_only_if_student("keywords") %>

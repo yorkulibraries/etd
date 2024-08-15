@@ -22,20 +22,19 @@
 
 	<div class="documents">
 		<div class="bg-light p-3">
-			<h4>Primary &nbsp; &nbsp;
-					<%  unless block_thesis_changes?(@thesis) %>
-						<% if @primary_documents.count == 0 %>
-							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#primary-file">Upload Primary File</button>
-						<% end %>
-					<% end %>
-			</h4>
+			<h4>Primary file (thesis/ dissertation):</h4>
+			<%  unless block_thesis_changes?(@thesis) %>
+				<% if @primary_documents.count == 0 %>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#primary-file">Upload Primary File</button>
+				<% end %>
+			<% end %>
 
 			<% @primary_documents.each do | document | %>
 				<%= render partial: document %>
 			<% end %>
 
 			<% if @primary_documents.count == 0 %>
-				<p>There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
+				<p class="mt-3">There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
 			<% end %>
 		</div>
 
@@ -54,7 +53,7 @@
 				<% end %>
 			<% end %>
 			<% if @supplemental_documents.count == 0 %>
-				<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
+				<p class="mt-3">There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
 			<% end %>
 		</diV>
 	</div>
