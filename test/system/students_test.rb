@@ -233,7 +233,7 @@ class StudentsTest < ApplicationSystemTestCase
 
     ## Page 4: Licence Review
 
-    assert_text("LAC Supplementary Licence File Upload")
+    assert_text("Library and Archives Canada License")
 
     # LAC Supplementary Licence File
     assert page.has_selector?('#thesis_lac_licence_agreement', visible: true), "#thesis_lac_licence_agreement not found."

@@ -5,7 +5,7 @@
 <%= f.input :language, collection: Thesis::LANGUAGE, readonly: read_only_if_student("language"), input_html: { aria_label: "Language" }  %>
 
 <%= f.label :abstract, label: "Abstract", required: true, class: "d-block mb-1" %>
-<small class="form-text"><%= AppSettings.student_update_details_subjects.html_safe %></small>
+<small class="form-text"><%= AppSettings.student_update_details_abstract.html_safe %></small>
 <%= f.input :abstract, input_html: { class: "", rows: "8" }, label: false, readonly: read_only_if_student("abstract") %>
 
 <hr/>
@@ -27,6 +27,6 @@
 
 </div>
 		
-<%= f.label :keywords, label: "Subjects", class: "d-block mb-1" %>
+<%= f.label :keywords, label: "Keywords", class: "d-block mb-1" %>
 <small class="form-text"><%= AppSettings.student_update_details_keywords.html_safe %></small>		
 <%= f.input :keywords, label: false, input_html: { rows: "2",  aria:{ label: "Keywords" } }, readonly: read_only_if_student("keywords") %>
