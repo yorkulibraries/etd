@@ -1,15 +1,20 @@
-  <button type="button" class="btn btn-warning btn-sm dropdown-toggle assign_to" data-bs-toggle="dropdown" aria-expanded="false">
-    <% if thesis.assigned? %>
-		<% name = (thesis.assigned_to.id == current_user.id) ? "I'm working on it" : thesis.assigned_to.name %>
-		<span  id="assigned_name_<%= thesis.id %>" title="name"><%= truncate(name, length: 25) %></span>
-	<% else %>
-		<span  id="assigned_name_<%= thesis.id %>" title="Unassigned">Unassigned</span>
-	<% end %>
-	<b class="caret"></b>
-  </button>
 
-		  <ul class="dropdown-menu user-selection">
-			<li id="auxilary-unassign_<%= thesis.id %>" 
+<div class="assign_to">
+	<% if thesis.assigned? %>
+		<% name = (thesis.assigned_to.id == current_user.id) ? "I'm working on it" : thesis.assigned_to.name %>
+		<button type="button" class="btn btn-info btn-sm dropdown-toggle assign_to" data-bs-toggle="dropdown" aria-expanded="false">
+			<span  id="assigned_name_<%= thesis.id %>" title="name"><%= truncate(name, length: 25) %></span>
+			<b class="caret"></b>
+		</button>
+	<% else %>
+		<button type="button" class="btn btn-warning btn-sm dropdown-toggle assign_to" data-bs-toggle="dropdown" aria-expanded="false">
+			<span  id="assigned_name_<%= thesis.id %>" title="Unassigned">Unassigned</span>
+			<b class="caret"></b>
+		</button>
+	<% end %>
+
+	<ul class="dropdown-menu user-selection">
+		<li id="auxilary-unassign_<%= thesis.id %>" 
 				class="d-none unassign"><%= link_to "Unassign This Thesis", unassign_student_thesis_path(thesis.student, thesis), method: :post, remote: true, class: "dropdown-item" %></li>
 			<% if thesis.assigned? %>			
 				<% if can_assign_to_anyone? || thesis.assigned_to == current_user %>
@@ -26,10 +31,11 @@
 					<li><%= link_to name, assign_student_thesis_path(thesis.student, thesis, to: user.id), method: :post, remote: true, class: "dropdown-item" %></li>
 				<% end %>
 			<% else %>
-				 <% unless thesis.assigned? %>
-				 	<li><%= link_to "Me (#{current_user.name})", assign_student_thesis_path(thesis.student, thesis, to: current_user.id), method: :post, remote: true, class: "dropdown-item" %></li>
-				 <% else %>
+				<% unless thesis.assigned? %>
+					<li><%= link_to "Me (#{current_user.name})", assign_student_thesis_path(thesis.student, thesis, to: current_user.id), method: :post, remote: true, class: "dropdown-item" %></li>
+				<% else %>
 					<li class="error">This thesis is already assigned.</li>
-				 <% end %>
+				<% end %>
 			<% end %>
-		</ul>
+	</ul>
+</div>

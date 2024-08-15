@@ -46,13 +46,13 @@ class StudentViewController < ApplicationController
     when Thesis::PROCESS_REVIEW
       @primary_documents = @thesis.documents.not_deleted.primary
       @supplemental_documents = @thesis.documents.not_deleted.supplemental
-      @supplemental_licence_documents = @thesis.documents.not_deleted.supplemental.licence_type
+      @licence_documents = @thesis.documents.not_deleted.licence
       render_according_to_validation('student_view/process/review')
     when Thesis::PROCESS_SUBMIT
       @primary_documents = @thesis.documents.not_deleted.primary
       @supplemental_documents = @thesis.documents.not_deleted.supplemental
-      @supplemental_licence_documents = @thesis.documents.not_deleted.supplemental.licence_type
-      @supplemental_embargo_documents = @thesis.documents.not_deleted.supplemental.embargo_type
+      @licence_documents = @thesis.documents.not_deleted.licence
+      @embargo_documents = @thesis.documents.not_deleted.embargo
       render_according_to_validation('student_view/process/submit')
     when Thesis::PROCESS_STATUS
       render_according_to_validation('student_view/process/status')

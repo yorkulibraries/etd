@@ -41,13 +41,15 @@
 	<div class="col border p-2 m-1 rounded step  <%= activate == Thesis::PROCESS_REVIEW  ? "bg-info-subtle border-info border-2" :"bg-light border-secondary border-1" %>">
 	  <div class="row">
 	   <div class="col-lg-2 d-none d-lg-block">
-		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_REVIEW ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
+		<i class="position-relative top-50 translate-middle ms-3 me-2 fa-2x <%= activate == Thesis::PROCESS_REVIEW ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
 	   </div>
 	   <div class="col-lg-10 col-sm-12">
-		<span class="text-black ms-2" title="Review licenses">
-				Review<br/>
-			<strong class="ms-2">licenses</strong>
-		</span>
+			<div class="ms-2">
+				<span class="text-black" title="Review licenses">
+						Review<br/>
+					<strong class="">distribution licenses</strong>
+				</span>
+			</div>
 	   </div>
 	  </div>
 	</div>

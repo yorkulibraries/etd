@@ -12,6 +12,8 @@
 /* Custom theme colors go here */
 /* Set your own primary/secondary/info/success etc. colors here */
 /* e.g. $primary: #e31837 */
+$primary: #0f69A0;
+$yorku_brand: #e31837;
 
 @import "bootstrap/variables";
 @import "bootstrap/mixins";
@@ -21,11 +23,14 @@
 .container { 
 	h2 { 
 		font-weight: bold;
-		color: #E57524;
+		color: $primary;
 	}
 	h3 {
 		font-weight: 600;
 	}
+}
+.error_messages {
+	h2 { color: $black; }
 }
 .page-header {
 	margin-bottom: 10px;
@@ -45,21 +50,40 @@
 	font-size: 1.25rem;
 }
 
-.thesis, .data-grid {
-	h4 {
+.thesis, .data-grid, .gem_record {
+	h4, .key {
 		font-size: 1.25rem;
 		font-weight: 300;
 		color: $secondary;
 	}
-	p {
+	p, .value {
 		font-weight: bold;
 	}
+	.status {
+		font-size: inherit;
+	}
+
+	.status-open { background-color: $dark; }
+	.status-accepted { background-color: $primary; } 
+	.status-published { background-color: $success; }
+	.status-under_review { background-color: $warning; color: $dark; }
+	.status-rejected { background-color: $danger; } 
+	.status-returned { background-color: darken($danger, 10%); }
+	
+	.assign_to {
+		ul.user-selection {
+			.unassign a { color: $danger }
+		}
+	}
+}
+
+.thesis-list:nth-child(even) {
+	background: $light;		
 }
 
 .navbar-brand {
 	font-weight: 700;
-	color: #e31837;
-	// color: #af0d1a;
+	color: $yorku_brand;
 }
 
 /* Simple Form basic styles */
@@ -79,4 +103,22 @@
 .container section {
 	padding-top: 15px;
 	padding-bottom: 15px;
+}
+
+.report-table {
+	.row:nth-child(odd) {
+		background: $light;
+	}
+	.row div {
+		padding: 10px;
+		text-align:center;
+	}
+}
+#reports {
+
+	.nav-pills {
+		.nav-link.active {
+			background-color: $dark;
+		}
+	}
 }

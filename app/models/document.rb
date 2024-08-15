@@ -11,6 +11,7 @@ class Document < ApplicationRecord
   #### VALIDATIONS
   validates_presence_of :file, :user, :thesis
   validate :primary_file_presence, on: :create
+  validate :supplemental_file_must_be_file_types
   validate :primary_file_must_be_pdf
 
   #### SCOPES
@@ -20,9 +21,7 @@ class Document < ApplicationRecord
   scope :supplemental, -> { where(usage: :thesis).where('supplemental = ? ', true) }
   scope :deleted, -> { where('deleted = ?', true) }
   scope :not_deleted, -> { where('deleted = ?', false) }
-  scope :licence_type, -> { where(usage: :licence) }
-  scope :embargo_type, -> { where(usage: [:embargo, :embargo_letter])}
-
+  
   scope :licence, -> { where(usage: :licence) }
   scope :embargo, -> { where(usage: [:embargo, :embargo_letter])}
 
@@ -58,7 +57,24 @@ class Document < ApplicationRecord
 
     errors.add(:file, 'Primary file must be a PDF')
   end
-  
+
+  def supplemental_file_must_be_file_types
+    supplemental_file_types = ['.pdf', '.doc', '.docx', '.txt', '.html', '.htm', '.odt', '.odp', '.ods', '.png', '.tif', '.jpg', '.csv', '.xml', '.avi', '.flac', '.wav', '.mp3', '.mp4']
+    embargo_file_types = ['.pdf', '.txt', '.html', '.htm', '.odt', '.odp', '.ods']
+
+    return unless file.filename.present? && supplemental
+
+    if document_type == "licence"
+      return if file.filename.downcase.end_with?('.pdf')
+    elsif document_type == "supplemental"
+      return if supplemental_file_types.include?(File.extname(file.filename.downcase))
+    elsif document_type == "embargo"
+      return if embargo_file_types.include?(File.extname(file.filename.downcase))
+    end
+
+    errors.add(:file, "#{document_type.capitalize} file must be a valid file type")
+  end
+
   def document_type
     return 'supplemental' if self.usage == "thesis" && self.supplemental?
     return 'primary' if self.usage == "thesis" && !self.supplemental?

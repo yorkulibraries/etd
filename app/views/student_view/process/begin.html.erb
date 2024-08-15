@@ -48,8 +48,11 @@
 	</div>
 
 	<%= simple_form_for @student, method: :post, url: organize_student_information_student_thesis_path(@student, @thesis), html: { class: "form-horizontal border border-2 bg-light" } do |f| %>
-		<%= f.input :email_external, label: "Non-YorkU Email Address", hint: "#{AppSettings.student_begin_external_non_yorku_email}", required: true %>
 
+		<%= f.label :email_external, label: "Non-YorkU Email Address", required: true, class: "d-block mb-1" %>
+		<p class="form-text"><%= AppSettings.student_begin_external_non_yorku_email %></p>
+		<%= f.input :email_external, label: false %>
+			
 		<div class="row">
 			<div class="pt-2">
 		  	<hr />

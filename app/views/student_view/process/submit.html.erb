@@ -10,7 +10,7 @@
 <%= progress_bar (Thesis::PROCESS_SUBMIT) %>
 
 <div class="student-view fitted review">
-	<h2>Review Your Submission</h2>
+	<h2>Review Details for Submission</h2>
 	<div class="settings-content">
 		<%= raw(AppSettings.student_submit_for_review) %>
 	</div>
@@ -65,6 +65,12 @@
 			<p><%= format @thesis.abstract, true %></p>
 		</div>
 	</div>
+	<div class="d-flex justify-content-end">
+		
+		<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn btn btn-link" title="Make Changes to Thesis Details">
+			<i class="fa fa-pencil"></i> Make Changes to Thesis Details
+		</a>
+	</div>
 
 	</div>
 </div>
@@ -78,7 +84,7 @@
 	<div class="bg-light-subtle mt-3 p-3">
 		<h4>Primary</h4>
 		<% @primary_documents.each do | document | %>
-			<%= render partial: document %>
+			<%= render partial: 'documents/document_view_only', locals: {document: document} %>
 		<% end %>
 
 		<% if @primary_documents.count == 0 %>
@@ -87,10 +93,15 @@
 	</div>
 	
 	<div class="bg-light-subtle mt-3 p-3">
-		<h4>Supplementary Thesis Files</h4>
+		<div class="d-flex flex-column flex-md-row align-items-start">
+			<h4 class="me-md-auto mb-2 mb-md-0">Supplementary Thesis Files</h4>
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD) %>" class="next-btn btn btn-link" title="Make Changes to Thesis Files">
+				<i class="fa fa-pencil"></i> Make Changes to Thesis Files
+			</a>
+		</div>
 		<% @supplemental_documents.each do | document | %>
 			<% if document.usage == 'thesis'%>
-				<%= render partial: document %>
+				<%= render partial: 'documents/document_view_only', locals: {document: document} %>
 			<% end %>
 		<% end %>
 		<% if @supplemental_documents.count == 0 %>
@@ -99,21 +110,27 @@
 	</div>
 	
 	<div class="bg-light-subtle mt-3 p-3">
-		<h4>License Agreements</h4>
-		<% @supplemental_licence_documents.each do | document | %>
-				<%= render partial: document %>
+		<div class="d-flex flex-column flex-md-row align-items-start">
+			<h4 class="me-md-auto mb-2 mb-md-0">License Agreements</h4>
+			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn btn btn-link" title="Make Changes to Licence Files">
+				<i class="fa fa-pencil"></i> Make Changes to Licence Files
+			</a>
+		</div>
+		
+		<% @licence_documents.each do | document | %>
+				<%= render partial: 'documents/document_view_only', locals: {document: document} %>
 		<% end %>
-		<% if @supplemental_licence_documents.count == 0 %>
+		<% if @licence_documents.count == 0 %>
 			<p>There are no <strong>supplementary licence</strong> files or documents attached to this thesis/dissertation.</p>
 		<% end %>
 	</div>
 	
 	<div class="bg-light-subtle mt-3 p-3">
 		<h4>Embargo Documents</h4>
-		<% @supplemental_embargo_documents.each do | document | %>
-				<%= render partial: document %>
+		<% @embargo_documents.each do | document | %>
+				<%= render partial: 'documents/document_view_only', locals: {document: document} %>
 		<% end %>
-		<% if @supplemental_embargo_documents.count == 0 %>
+		<% if @embargo_documents.count == 0 %>
 			<p>There are no <strong>embargo</strong> files or documents attached to this thesis/dissertation.</p>
 		<% end %>
 	</div>
@@ -131,7 +148,7 @@
 				</a>
 		
 				<%= button_tag(type: 'submit', class: "next-btn btn btn-lg btn-success", data: { confirm: "Are you sure? You will not be able to make further changes." }) do %>
-					I accept and send for review <i class="fa fa-angle-double-right"></i>
+					I accept and submit for review <i class="fa fa-angle-double-right"></i>
 				<% end %>
 			</div>
 		<% end %>

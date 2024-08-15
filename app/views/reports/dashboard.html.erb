@@ -4,44 +4,63 @@
 <% end %>
 <%= render "nav" %>
 
-<div class="container">
-  <div class="row grid gap-0 row-gap-2">
-    <div class="col-12">
-			<h4><i>Report on Theses</i></h4>
-    </div>
-		<div class="col-11 bg-body-secondary">Currently Open</div>
-		<div class="col-1 bg-body-secondary"><%= @theses_open_count %></div>
-		<div class="col-11">Currently Under Review</div>
-		<div class="col-1"><%= @theses_under_review_count %></div>
-		<div class="col-11 bg-body-secondary">Currently Rejected</div>
-		<div class="col-1 bg-body-secondary"><%= @theses_rejected_count %></div>
-		<div class="col-11">Currently Accepted</div>
-		<div class="col-1"><%= @theses_accepted_count %></div>
-		<div class="col-11 bg-body-secondary">Currently Published</div>
-		<div class="col-1 bg-body-secondary"><%= @theses_embargoed_count %></div>
-		<div class="col-11">Currently Permanently Embargoed</div>
-		<div class="col-1"><%= @theses_published_count %></div>
-		<div class="col-11 bg-body-secondary">Total Theses</div>
-		<div class="col-1 bg-body-secondary"><%= @theses_count %></div>
-		<div class="col-12">
-			<h4><i>Report on Students</i></h4>
-		</div>
-		<div class="col-11 bg-body-secondary">Total Students</div>
-		<div class="col-1 bg-body-secondary"><%= @total_students %></div>
-		<div class="col-12">
-			<h4><i>Report on GEM Records</i></h4>
-		</div>
-		<div class="col-11 bg-body-secondary">Total GEM Records</div>
-		<div class="col-1 bg-body-secondary"><%= @total_gem_records %></div>
-		<div class="col-12">
-			<h4><i>Report on Users</i></h4>
-		</div>
-		<div class="col-11 bg-body-secondary">Total Users</div>
-		<div class="col-1 bg-body-secondary"><%= @total_users %></div>
-		<div class="col-12">
-			<h4><i>Report on LOC Subjects</i></h4>
-		</div>
-		<div class="col-11 bg-body-secondary">Total LOC Subjects</div>
-		<div class="col-1 bg-body-secondary"><%= @total_loc_subjects %></div>
+<h2 class="fs-4">Report on Theses</h2>
+<hr class="bg-primary border-2 border-top border-primary"/>
+<div class="report-table container border mb-3">
+	<div class="row">
+		<div class="col-md-10 text-md-start ">Currently Open</div>
+		<div class="col-md-2 "><%= @theses_open_count %></div>
+	</div>
+	<div class="row">
+		<div class="col-md-10 text-md-start">Currently Under Review</div>
+		<div class="col-md-2 fw-bold"><%= @theses_under_review_count %></div>
+	</div>
+	<div class="row">
+		<div class="col-md-10 text-md-start">Currently Rejected</div>
+		<div class="col-md-2 fw-bold"><%= @theses_rejected_count %></div>
+	</div><div class="row">
+		<div class="col-md-10 text-md-start">Currently Accepted</div>
+		<div class="col-md-2 fw-bold"><%= @theses_accepted_count %></div>
+	</div><div class="row">
+		<div class="col-md-10 text-md-start">Currently Published</div>
+		<div class="col-md-2 fw-bold"><%= @theses_embargoed_count %></div>
+	</div><div class="row">
+		<div class="col-md-10 text-md-start">Currently Permanently Embargoed</div>
+		<div class="col-md-2 fw-bold"><%= @theses_published_count %></div>
+	</div><div class="row">
+		<div class="col-md-10 text-md-start">Total Theses</div>
+		<div class="col-md-2 fw-bold"><%= @theses_count %></div>
+	</div>
+</div>
+<h2 class="fs-4">Report on Students</h2>
+<hr class="bg-primary border-2 border-top border-primary"/>
+<div class="report-table container border mb-3">
+	<div class="row">
+		<div class="col-md-10 text-md-start">Total Students</div>
+		<div class="col-md-2 fw-bold"><%= @total_students %></div>
+	</div>
+</div>
+<h2 class="fs-4">Report on GEM Records</h2>
+<hr class="bg-primary border-2 border-top border-primary"/>
+<div class="report-table container border mb-3">
+	<div class="row">
+		<div class="col-md-10 text-md-start">Total GEM Records</div>
+		<div class="col-md-2 fw-bold"><%= @total_gem_records %></div>
+	</div>
+</div>
+<h2 class="fs-4">Report on Users</h2>
+<hr class="bg-primary border-2 border-top border-primary"/>
+<div class="report-table container border mb-3">
+	<div class="row">
+		<div class="col-md-10 text-md-start">Total Users</div>
+		<div class="col-md-2 fw-bold"><%= @total_users %></div>
+	</div>
+</div>
+<h2 class="fs-4">Report on LOC Subjects</h2>
+<hr class="bg-primary border-2 border-top border-primary"/>
+<div class="report-table container border mb-3">
+	<div class="row">
+		<div class="col-md-10 text-md-start">Total LOC Subjects</div>
+		<div class="col-md-2 fw-bold"><%= @total_loc_subjects %></div>
 	</div>
 </div>

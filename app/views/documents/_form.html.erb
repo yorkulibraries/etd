@@ -5,10 +5,11 @@
 		</div>
 	<% end %>
 	<%= f.input :file, as: :file, required: true, label_html: { class: 'py-4' } %>
-	<% if @document.supplemental == true %>
-		<%= f.input :usage, label: "Document type", collection: Document.usages.keys.map(&:to_sym), required: true %>
-	<% else %>
-		<%= f.hidden_field :usage, value: :thesis %>
+	<%= f.hidden_field :supplemental, value: @document.supplemental %>
+
+	<%= f.hidden_field :usage, value: @document.usage %>
+	<% if @document.supplemental != true %>
+		<%= f.hidden_field :usage, value: :thesis %>		
 	<% end %>
 
 		<hr />

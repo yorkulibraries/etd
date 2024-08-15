@@ -68,7 +68,7 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('GEM Records')
     click_link(@gem_record.studentname)
 
-    assert_selector "h6", text: "Committee Members"
+    assert_selector "td", text: "Committee Members"
     if @gem_record.committee_members.count > 1
       @gem_record.committee_members.each do |committee_member|
         assert_selector "p", text: committee_member.full_name
@@ -233,11 +233,19 @@ class StudentsTest < ApplicationSystemTestCase
 
     ## Page 4: Licence Review
 
-    assert_text("LAC Supplementary Licence File Upload")
+    assert_text("Library and Archives Canada License")
+
+    # LAC Supplementary Licence File
+    assert page.has_selector?('#thesis_lac_licence_agreement', visible: true), "#thesis_lac_licence_agreement not found."
+    checkbox = find('#thesis_lac_licence_agreement')
+    assert_not checkbox.disabled?
+    checkbox.check
+    assert checkbox.checked?, "#thesis_lac_licence_agreement checkbox is not checked."
+
 
     # Yorkspace Licence
     assert page.has_selector?('#thesis_yorkspace_licence_agreement', visible: true), "#thesis_yorkspace_licence_agreement not found."
-    checkbox = find('#thesis_yorkspace_licence_agreement')
+    checkbox = find('#thesis_yorkspace_licence_agreement', visible: true)
     assert_not checkbox.disabled?
     click_link('View YorkSpace Licence Agreement')
     assert page.has_selector?('#yorkspace-licence', visible: true), "#yorkspace-licence not found."
@@ -253,10 +261,20 @@ class StudentsTest < ApplicationSystemTestCase
     checkbox.check
     assert checkbox.checked?, "Yorkspace licence agreement checkbox is not checked."
 
+    # Ensure you can't go next without uploading LAC Document
+    click_button("Accept and Continue")
+    assert_selector(".alert-warning", text: "Missing Licence Document. Please upload LAC Licence Signed Doc.")
+
+    click_button('Upload Licence Files')
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
+    click_button('Upload')
+
     click_button("Accept and Continue")
 
     ## Page 5: Submission Review
-
+    assert_no_link('Edit file')
+    assert_no_link('Download')
+    assert_no_link('Delete')
 
   end
 end

@@ -1,0 +1,56 @@
+<div class="data-grid">
+  <div class="row">
+		<div class="col-md-12 col-lg-4">
+			<h4>Supervisor</h4>
+			<p><%= format @thesis.supervisor %></p>
+			<h4>Exam date</h4>
+      <p><%= @thesis.exam_date.strftime("%B %d, %Y") rescue nil %></p>
+      <h4>Publish on</h4>
+      <p>
+				<% if @thesis.embargoed == true %>
+						Never
+					<% else %>
+						<%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %>
+					<% end %>
+			</p>
+    </div>
+    <div class="col-md-12 col-lg-4">
+      <h4>Degree Name and Level</h4>
+      <p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
+      <h4>Program</h4>
+        <p><%= format @thesis.program %></p>
+    </div>
+    <div class="col-md-12 col-lg-4">
+      <div class="span5 committee" title="examining committee">
+      <h4>Examining committee</h4>
+      <table class="committee_members" id="committee_members">
+      <% @thesis.committee_members.each do |committee_member| %>
+        <%= render "committee_members/committee_member_read", committee_member: committee_member %>
+      <% end %>
+      </table>
+    </div>
+	</div> <!-- row -->
+
+<hr />
+	<div class="row">
+	  <div class="col-md-12 col-lg-4">
+			<h4>Language</h4>
+			<p><%= format @thesis.language %></p>
+	  	
+	  </div>
+	  <div class="col-md-12 col-lg-4">
+			<h4>Subjects</h4>
+			<p><%= format @thesis.loc_subjects.map(&:name).join ', ' %></p>
+		</div>
+		<div class="col-md-12 col-lg-4">
+			<h4>Keywords</h4>
+			<p><%= format @thesis.keywords%></p>
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="col-12 col-lg-12 d-none d-lg-block">
+			<h4>Abstract</h4>
+			<p><%= format @thesis.abstract, true %></p>
+		</div>
+	</div>
+</div>

@@ -1,5 +1,11 @@
 <%= simple_form_for [@student, @thesis], html: { class: "form-horizontal" } do |f| %>
 
+	<% if f.error_messages %>
+		<div class="alert alert-danger error_messages">
+			<%= f.error_messages %>
+		</div>
+	<% end %>
+
 	<%= render partial: "form_admin_editable", locals: { f: f } %>
 
 	<%= content_for :admin_editable_part_1 %>
@@ -16,10 +22,6 @@
 	
 	<div class="action controls">
 		<%= f.button :submit, class: "btn btn-success" %>  or <%= link_to "Cancel",  @thesis.new_record? ? @student :  [@student, @thesis] %>
-	</div>
-
-	<div class="hide error_messages">
-		<%= f.error_messages %>
 	</div>
 
 <% end %>

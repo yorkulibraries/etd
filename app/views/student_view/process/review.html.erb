@@ -16,7 +16,7 @@
 <% end %>
 
 <div class="student-view fitted submit">
-	<h2 title="Licence Review and Acceptance">Licence Review and Acceptance</h2>
+	<h2 title="Licence Review and Acceptance">Sign Copyright and Distribution Licences</h2>
 	<div class="settings-content">
 		<%= raw(AppSettings.student_review_license_info) %>
 	</div>
@@ -36,17 +36,16 @@
 			<% end %>
 
 			<div class="licence-box my-5 mt-3 bg-light p-3" >
-				<h4 title="LAC Supplementary Licence File Upload" >LAC Supplementary Licence File Upload</h4>
+				<h4 title="LAC Supplementary Licence File Upload">Library and Archives Canada License</h4>
 				<hr class="text-primary border-3">
-				<p class="small">You must scroll to enable the checkbox to acknowledge you have read the licence.</p>
-				
-				<% if @supplemental_licence_documents.count == 0 %>
-					<p>There are no <strong>supplementary</strong> license files or documents attached to this thesis/dissertation.</p>
-				<% end %>
 				<% if AppSettings.student_review_lac_licence_instructions.present? %>
 					<p><%= raw(AppSettings.student_review_lac_licence_instructions) %></p>
 				<% end %>
-				<% @supplemental_licence_documents.each do | document | %>
+				<% if @licence_documents.count == 0 %>
+					<p>There are no <strong>supplementary</strong> license files or documents attached to this thesis/dissertation.</p>
+				<% end %>
+				
+				<% @licence_documents.each do | document | %>
 					<%= render partial: document %>
 				<% end %>
 				<br/>

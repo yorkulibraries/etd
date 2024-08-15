@@ -4,11 +4,27 @@ require 'application_system_test_case'
 require 'helpers/system_test_helper'
 
 class ThesesTest < ApplicationSystemTestCase
+  include SystemTestHelper  # Include the SystemTestHelper module here
+
   setup do
     FactoryGirl.create(:user, role: User::ADMIN)
     FactoryGirl.create(:user, role: User::MANAGER)
     @thesis_01 = FactoryGirl.create(:thesis, degree_name: 'IMBA', degree_level: 'Master\'s')
     @thesis_02 = FactoryGirl.create(:thesis, status: Thesis::UNDER_REVIEW)
+  end
+
+  test "be able to download report" do
+    user = FactoryGirl.create(:user, role: User::ADMIN)
+    login_as(user)
+    visit root_url
+    click_link("Reports")
+    click_link("Under Review Theses")
+    assert_selector 'a', text: 'Download Excel'
+    click_link("Download Excel")
+    filename =  "tmp/theses_report.xlsx"
+    wait_for_download(filename)
+    assert File.exist?(filename), "Expected file #{filename} to be downloaded"
+    File.delete("tmp/theses_report.xlsx")
   end
 
   test 'Assign a thesis to ME and unassign this' do
@@ -22,11 +38,11 @@ class ThesesTest < ApplicationSystemTestCase
 
   test 'Check thesis Under review and Overview on nav-tabs' do
     visit root_url
-    assert_selector 'h3', text: (/#{Regexp.escape("#{@thesis_01.title}")}/i)
+    assert_selector 'h2', text: (/#{Regexp.escape("#{@thesis_01.title}")}/i)
     click_link(@thesis_01.title)
     click_link('Overview')
     click_link('Under Review')
-    assert_selector 'h3', text: (/#{Regexp.escape("#{@thesis_02.title}")}/i)
+    assert_selector 'h2', text: (/#{Regexp.escape("#{@thesis_02.title}")}/i)
     click_link(@thesis_02.title)
   end
 
@@ -76,7 +92,7 @@ class ThesesTest < ApplicationSystemTestCase
     fill_in "thesis_abstract", with: "Testing Abstract"
     click_button('Update Thesis')
 
-    assert_selector 'h3', text: 'title 10 (test)', visible: true
+    assert_selector 'h2', text: 'title 10 (test)', visible: true
 
     assert_selector 'p', text: 'program 10 (test)', visible: true
 
@@ -154,6 +170,48 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector(".name", text: /\.pdf/)
   end
 
+  should "not upload primary document with incorrect file format" do
+    visit root_url
+    click_link(@thesis_01.title)
+
+    click_on("Upload Primary File")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/image-example.jpg'))
+    click_button('Upload')
+
+    assert_selector(".invalid-feedback", text: "Primary file must be a PDF")
+  end
+
+  should "not upload supplmentary document with incorrect file format as student" do
+    visit root_url
+    click_link("Students")
+    click_link(@thesis_01.student.name)
+
+    click_link("Login as this student")
+
+    fill_in("Non-YorkU Email Address", with: "#{@thesis_01.student.username}@mailinator.com")
+    click_on("Continue")
+
+    fill_in("Abstract", with: "Abstract Test")
+    click_on("Continue")
+
+    click_on("Upload Supplementary Files")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/zip-file.zip'))
+    click_button('Upload')
+
+    assert_selector(".invalid-feedback", text: "File Supplemental file must be a valid file type")
+  end
+
+  should "not upload supplmentary document with incorrect file format as admin" do
+    visit root_url
+    click_link(@thesis_01.title)
+
+    click_on("Upload Supplementary Files")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/zip-file.zip'))
+    click_button('Upload')
+
+    assert_selector(".invalid-feedback", text: "File Supplemental file must be a valid file type")
+  end
+
   should "be able to upload supplementary document by admin/staff" do
     visit root_url
     click_link(@thesis_01.title)
@@ -165,7 +223,6 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector(".supplemental", text: /_supplemental_/) #Supplemental
 
   end
-
   ###########################################################
   ##### TESTS WILL NEED BE UPDATED WITH NEW FILE NAMES ######
   ###########################################################
@@ -176,7 +233,7 @@ class ThesesTest < ApplicationSystemTestCase
 
     click_on("Upload Licence Files")
     assert_selector "h1", text: "Upload Licence File", visible: :all
-    attach_file("document_file", Rails.root.join('test/fixtures/files/image-example.jpg'))
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
     assert_not_empty find('.licence-file').text, "The .licence-file element is empty, no file"
 
@@ -189,10 +246,50 @@ class ThesesTest < ApplicationSystemTestCase
     click_on("Upload Embargo Files")
     assert_selector "h1", text: "Upload Supplementary File", visible: :all
 
-    attach_file("document_file", Rails.root.join('test/fixtures/files/papyrus-feature.png'))    
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
-    
-    assert_not_empty find('.embargo-file').text, "The .embargo-file element is empty, no file"    
+
+    assert_not_empty find('.embargo-file').text, "The .embargo-file element is empty, no file"
+  end
+
+  should "update primary thesis file" do
+    visit root_url
+    click_link(@thesis_01.title)
+
+    click_on("Upload Primary File")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
+    click_button('Upload')
+
+    click_link("Edit file")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
+    click_button('Upload')
+    assert_selector(".name", text: /\.pdf/)
+
+    click_link("Edit file")
+    click_link("Delete this file?")
+    page.accept_alert
+
+    assert_selector "p", text: "There are no primary files or documents attached to this thesis/dissertation."
+  end
+
+  should "update supplementary file" do
+    visit root_url
+    click_link(@thesis_01.title)
+
+    click_on("Upload Supplementary Files")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
+    click_button('Upload')
+
+    click_link("Edit file")
+    attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
+    click_button('Upload')
+    assert_selector(".name", text: /\.pdf/)
+
+    click_link("Edit file")
+    click_link("Delete this file?")
+    page.accept_alert
+
+    assert_selector "p", text: "There are no supplementary files or documents attached to this thesis/dissertation."
   end
 
   ###########################################################
