@@ -8,51 +8,47 @@
 	<% end %>
 	<%= render partial: "header" %>
 <% end %>
-
-<div class="card mt-3">
-	<div class="card-body">
-		<div class="data-grid">
-			<div class="row">
-				<div class="col-6">
-					<h4>Username</h4>
-					<p><%= @student.username%></p>
-					<h4>Email</h4>
-					<p><%= @student.email%></p>
-					<h4>Invitation</h4>
-					<p>
-					<% if @student.invitation_sent_at.nil? %>
-						<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", send_invite_student_path(@student) %>
-					<% else %>
-						Sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>
-						<span class="soft weak">(<%= link_to_if AppSettings.email_welcome_allow, "Send Again", send_invite_student_path(@student), class: "soft weak"%>)</span>
-					<% end %>
-					</p>
-				</div>
-				<div class="col-6">
-					<h4>SISID</h4>
-					<p><%= @student.sisid %></p>
-					<h4>Joined on</h4>
-					<p><%= @student.created_at.strftime("%B %d, %Y")%></p>
-				</div>
-			</div>
+<hr/>
+<div class="data-grid p-3 pt-1">
+	<div class="row">
+		<div class="col-6">
+			<h4>Username</h4>
+			<p><%= @student.username%></p>
+			<h4>Email</h4>
+			<p><%= @student.email%></p>
+			<h4>Invitation</h4>
+			<p>
+			<% if @student.invitation_sent_at.nil? %>
+				<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", send_invite_student_path(@student) %>
+			<% else %>
+				Sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>
+				<span class="soft weak">(<%= link_to_if AppSettings.email_welcome_allow, "Send Again", send_invite_student_path(@student), class: "soft weak"%>)</span>
+			<% end %>
+			</p>
+		</div>
+		<div class="col-6">
+			<h4>SISID</h4>
+			<p><%= @student.sisid %></p>
+			<h4>Joined on</h4>
+			<p><%= @student.created_at.strftime("%B %d, %Y")%></p>
 		</div>
 	</div>
 </div>
 
 <div>
-	<section class="theses pt-4">
-
+	<section class="theses pt-3">
 		<% if @current_theses.size > 0 %>
 
-			<h6 class="heading green">Current <%= "thesis".pluralize(@current_theses.count )%></h6>
+			<h2 class="heading text-dark mb-3">Current <%= "thesis".pluralize(@current_theses.count )%></h2>
 			<% @current_theses.each do |thesis| %>
 				<%= render partial: thesis %>
 			<% end %>
-
+			
 		<% end %>
+		
 
 		<% if @available_theses.size > 0 %>
-			<h6 class='green heading clear'>Available <%= "thesis".pluralize(@available_theses.count )%></h6>
+			<h2 class='text-dark heading clear'>Available <%= "thesis".pluralize(@available_theses.count )%></h2>
 			<div class="row">
 			<% @available_theses.each do |record| %>
 				<div class="col-10">

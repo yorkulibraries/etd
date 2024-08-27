@@ -21,10 +21,10 @@ class ThesesTest < ApplicationSystemTestCase
     click_link("Under Review Theses")
     assert_selector 'a', text: 'Download Excel'
     click_link("Download Excel")
-    filename =  "tmp/theses_report.xlsx"
+    filename = "tmp/theses_report.xlsx"
     wait_for_download(filename)
     assert File.exist?(filename), "Expected file #{filename} to be downloaded"
-    File.delete("tmp/theses_report.xlsx")
+    File.delete(filename)
   end
 
   test 'Assign a thesis to ME and unassign this' do

@@ -43,8 +43,8 @@ jobs:
         run: |
           bundle exec rake db:reset
           bundle exec rake db:seed
-          bundle exec rake test
-          bundle exec rake test:system
+          bundle exec rake test TESTOPTS="-v"
+          bundle exec rake test:system TESTOPTS="-v"
       - name: Run tests with mysql
         env:
           RAILS_ENV: test
@@ -53,5 +53,5 @@ jobs:
         run: |
           bundle exec rake db:reset
           bundle exec rake db:seed
-          bundle exec rake test
-          bundle exec rake test:system
+          bundle exec rake test TESTOPTS="-v"
+          bundle exec rake test:system TESTOPTS="-v"
