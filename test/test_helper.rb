@@ -9,22 +9,17 @@ require 'factory_girl_rails'
 require 'minitest/unit'
 require 'mocha/minitest'
 require 'database_cleaner/active_record'
-require 'capybara/rails'
-require 'capybara/minitest'
 require 'rails-controller-testing'
 
 # Configure shoulda-matchers to use Minitest
 require 'shoulda/matchers'
+
 Rails::Controller::Testing.install
 
 DatabaseCleaner.url_allowlist = [
   %r{.*test.*}
 ]
 DatabaseCleaner.strategy = :truncation
-
-Capybara.server_host = '0.0.0.0'
-Capybara.app_host = "http://#{Socket.gethostname}:#{Capybara.server_port}"
-Capybara.default_max_wait_time = 20
 
 include ActionDispatch::TestProcess
 
@@ -49,18 +44,11 @@ module ActiveSupport
     include Warden::Test::Helpers
     Warden.test_mode!
 
-    # Make the Capybara DSL available in all integration tests
-    include Capybara::DSL
-    # Make `assert_*` methods behave like Minitest assertions
-    include Capybara::Minitest::Assertions
-
     setup do
       DatabaseCleaner.start
     end
 
     teardown do
-      Capybara.reset_sessions!
-      Capybara.use_default_driver
       DatabaseCleaner.clean
     end
   end

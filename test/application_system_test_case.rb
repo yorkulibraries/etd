@@ -3,13 +3,15 @@
 require 'test_helper'
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400] do |options|
-    options.add_argument('--disable-gpu')
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
+  selenium_remote_url = "http://#{ENV.fetch('SELENIUM_SERVER')}:4444"
+  
+  driven_by :selenium, using: :headless_chrome do |driver_option|
+    driver_option.add_argument('--disable-gpu')
+    driver_option.add_argument('--no-sandbox')
+    driver_option.add_argument('--disable-dev-shm-usage')
 
     # Add preferences
-    options.add_preference(:download, {
+    driver_option.add_preference(:download, {
       prompt_for_download: false,
       default_directory: File.join(Rails.root, 'tmp')
     })
@@ -18,16 +20,23 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     Capybara.register_driver :selenium do |app|
       Capybara::Selenium::Driver.new(app,
         browser: :remote,
-        url: "http://#{ENV.fetch('SELENIUM_SERVER')}:4444",
-        options: options
+        url: selenium_remote_url,
+        options: driver_option
       )
     end
   end
-
+  
   def setup
+    Capybara.server_host = "0.0.0.0"
+    Capybara.app_host = "http://#{IPSocket.getaddress(Socket.gethostname)}" if ENV["SELENIUM_SERVER"].present?
+    Capybara.default_max_wait_time = 5
+    Capybara.save_path = "tmp/test-screenshots"
+    Capybara.default_driver = :selenium
+
+    super
+
     user = FactoryGirl.create(:user)
-    login_as(user)
+    login_as(user, role: User::STAFF)
   end
 
-  Capybara.save_path = "tmp/test-screenshots"
 end
