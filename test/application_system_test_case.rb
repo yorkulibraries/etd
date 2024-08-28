@@ -15,15 +15,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       prompt_for_download: false,
       default_directory: File.join(Rails.root, 'tmp')
     })
-
-    # Remote driver setup
-    Capybara.register_driver :selenium do |app|
-      Capybara::Selenium::Driver.new(app,
-        browser: :remote,
-        url: selenium_remote_url,
-        options: driver_option
-      )
-    end
   end
   
   def setup
