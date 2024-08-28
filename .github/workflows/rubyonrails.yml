@@ -22,12 +22,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
-      chrome-server:
-        image: selenium/standalone-chrome:96.0
-        ports:
-          - 4444:4444
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
