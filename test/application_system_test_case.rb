@@ -3,9 +3,11 @@
 require 'test_helper'
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  selenium_remote_url = "http://#{ENV.fetch('SELENIUM_SERVER')}:4444"
-  
-  driven_by :selenium, using: :headless_chrome do |driver_option|
+  options = {
+    browser: ENV["SELENIUM_REMOTE_URL"].blank? ? :headless_chrome : :remote,
+    url: ENV["SELENIUM_REMOTE_URL"].blank? ? nil : ENV["SELENIUM_REMOTE_URL"]
+  }
+  driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400], options: options do |driver_option|
     driver_option.add_argument('--disable-gpu')
     driver_option.add_argument('--no-sandbox')
     driver_option.add_argument('--disable-dev-shm-usage')
@@ -19,7 +21,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   
   def setup
     Capybara.server_host = "0.0.0.0"
-    Capybara.app_host = "http://#{IPSocket.getaddress(Socket.gethostname)}" if ENV["SELENIUM_SERVER"].present?
+    Capybara.app_host = "http://#{IPSocket.getaddress(Socket.gethostname)}" if ENV["SELENIUM_REMOTE_URL"].present?
     Capybara.default_max_wait_time = 20
     Capybara.save_path = "tmp/test-screenshots"
     Capybara.default_driver = :selenium
