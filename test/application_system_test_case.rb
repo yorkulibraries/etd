@@ -4,7 +4,7 @@ require 'test_helper'
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   options = ENV["SELENIUM_REMOTE_URL"].present? ? { browser: :remote, url: ENV["SELENIUM_REMOTE_URL"] } : nil
-  driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400], options: options do |driver_option|
+  driven_by :selenium, using: :headless_chrome, options: options do |driver_option|
     driver_option.add_argument('--disable-gpu')
     driver_option.add_argument('--no-sandbox')
     driver_option.add_argument('--disable-dev-shm-usage')
@@ -25,6 +25,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     super
 
+    current_window.resize_to(1280, 800)
+    
     user = FactoryGirl.create(:user)
     login_as(user, role: User::STAFF)
   end
