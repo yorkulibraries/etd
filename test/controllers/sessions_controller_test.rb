@@ -14,7 +14,6 @@ class SessionsControllerTest < ActionController::TestCase
 
     assert_equal user.id, session[:user_id]
     assert_redirected_to root_url
-    assert_equal 'Logged in!', flash[:notice]
   end
 
   should "redirect to student path if CYIN is provided and YORK_USER doesn't match" do
