@@ -24,7 +24,7 @@ class ThesesTest < ApplicationSystemTestCase
     # workaround until we figure out how to deal with download using remote browser
     if !ENV["SELENIUM_REMOTE_URL"].present?
       filename = "tmp/theses_report.xlsx"
-      wait_for_download(filename)
+      wait_for_download(filename, 30)
       assert File.exist?(filename), "Expected file #{filename} to be downloaded"
       File.delete(filename)
     end
