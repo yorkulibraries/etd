@@ -249,17 +249,19 @@ class StudentsTest < ApplicationSystemTestCase
     assert_not checkbox.disabled?
     click_link('View YorkSpace Licence Agreement')
     assert page.has_selector?('#yorkspace-licence', visible: true), "#yorkspace-licence not found."
+    assert page.has_selector?('#thesis_yorkspace_licence_agreement', visible: true), "#thesis_yorkspace_licence_agreement not found."
     checkbox = find('#thesis_yorkspace_licence_agreement', visible: true)
     checkbox.check
     assert checkbox.checked?, "#thesis_yorkspace_licence_agreement checkbox is not checked."
 
     # ETD Licence
     assert page.has_selector?('#thesis_etd_licence_agreement', visible: true), "#thesis_etd_licence_agreement not found."
-    checkbox = find('#thesis_etd_licence_agreement')
+    checkbox = find('#thesis_etd_licence_agreement', visible: true)
     assert_not checkbox.disabled?
     click_link('View ETD Licence Agreement')
     assert page.has_selector?('#etd-licence', visible: true), "#etd-licence not found."
-    checkbox = find('#thesis_etd_licence_agreement')
+    assert page.has_selector?('#thesis_etd_licence_agreement', visible: true), "#thesis_etd_licence_agreement not found."
+    checkbox = find('#thesis_etd_licence_agreement', visible: true)
     checkbox.check
     assert checkbox.checked?, "#thesis_etd_licence_agreement checkbox is not checked."
 
