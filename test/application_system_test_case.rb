@@ -3,10 +3,7 @@
 require 'test_helper'
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  options = {
-    browser: ENV["SELENIUM_REMOTE_URL"].blank? ? nil : :remote,
-    url: ENV["SELENIUM_REMOTE_URL"].blank? ? nil : ENV["SELENIUM_REMOTE_URL"]
-  }
+  options = ENV["SELENIUM_REMOTE_URL"].present? ? { browser: :remote, url: ENV["SELENIUM_REMOTE_URL"] } : nil
   driven_by :selenium, using: :chrome, screen_size: [1400, 1400], options: options do |driver_option|
     driver_option.add_argument('--disable-gpu')
     driver_option.add_argument('--no-sandbox')
