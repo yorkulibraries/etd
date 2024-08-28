@@ -249,6 +249,7 @@ class StudentsTest < ApplicationSystemTestCase
     assert_not checkbox.disabled?
     click_link('View YorkSpace Licence Agreement')
     assert page.has_selector?('#yorkspace-licence', visible: true), "#yorkspace-licence not found."
+    checkbox = find('#thesis_yorkspace_licence_agreement', visible: true)
     checkbox.check
     assert checkbox.checked?, "#thesis_yorkspace_licence_agreement checkbox is not checked."
 
@@ -258,8 +259,9 @@ class StudentsTest < ApplicationSystemTestCase
     assert_not checkbox.disabled?
     click_link('View ETD Licence Agreement')
     assert page.has_selector?('#etd-licence', visible: true), "#etd-licence not found."
+    checkbox = find('#thesis_etd_licence_agreement')
     checkbox.check
-    assert checkbox.checked?, "Yorkspace licence agreement checkbox is not checked."
+    assert checkbox.checked?, "#thesis_etd_licence_agreement checkbox is not checked."
 
     # Ensure you can't go next without uploading LAC Document
     click_button("Accept and Continue")
