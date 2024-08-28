@@ -23,6 +23,7 @@ services:
       - RAILS_SERVE_STATIC_FILES=true
       - NODE_OPTIONS=--openssl-legacy-provider
       - SELENIUM_SERVER=chrome-server
+      - SELENIUM_REMOTE_URL=http://chrome-server:4444
     env_file:
       - path: ./override.env
         required: false

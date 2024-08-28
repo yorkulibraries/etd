@@ -21,19 +21,20 @@ class ThesesTest < ApplicationSystemTestCase
     click_link("Under Review Theses")
     assert_selector 'a', text: 'Download Excel'
     click_link("Download Excel")
-    filename = "tmp/theses_report.xlsx"
-    wait_for_download(filename)
-    assert File.exist?(filename), "Expected file #{filename} to be downloaded"
-    File.delete(filename)
+    # workaround until we figure out how to deal with download using remote browser
+    if !ENV["SELENIUM_REMOTE_URL"].present?
+      filename = "tmp/theses_report.xlsx"
+      wait_for_download(filename)
+      assert File.exist?(filename), "Expected file #{filename} to be downloaded"
+      File.delete(filename)
+    end
   end
 
-  test 'Assign a thesis to ME and unassign this' do
+  test 'Assign a thesis to Me' do
     visit root_url
     click_on('Unassigned')
     click_on('Me (')
     click_on("I'm working on it")
-    # click_on('Unassign This Thesis')
-    # refute_selector 'a', text: 'Unassign This Thesis'
   end
 
   test 'Check thesis Under review and Overview on nav-tabs' do
