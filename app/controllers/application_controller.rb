@@ -14,8 +14,7 @@ class ApplicationController < ActionController::Base
   def login_required
     return if current_user || controller_name == 'sessions'
 
-    redirect_to login_url,
-                alert: 'You must login before accessing this page'
+    redirect_to login_url
   end
 
   rescue_from CanCan::AccessDenied do |exception|
