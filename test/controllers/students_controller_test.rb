@@ -207,19 +207,26 @@ class StudentsControllerTest < ActionController::TestCase
       # search for existing John
       post :gem_search, params: { sisid: 'John' }
       students = assigns(:students)
-      existing_john_count = students.size
+      assert_equal 0, students.size, 'Number of students matching John'
 
-      # create some new students
       create(:gem_record, sisid: '222222222', studentname: 'Jeremy Smith')
       create(:gem_record, sisid: '333333333', studentname: 'Jeremy Clarkson')
-      create(:student, sisid: '111111111', name: 'John Smith')
-      create(:student, sisid: '444444444', name: 'John Clarkson')
 
+      # create some new students
+      create(:student, sisid: '111111111', name: 'John Smith')
+      students = assigns(:students)
+      assert_equal 1, students.size, 'Number of students matching John'
+
+      create(:student, sisid: '444444444', name: 'John Clarkson')
+      students = assigns(:students)
+      assert_equal 2, students.size, 'Number of students matching John'
+      
       # search name of student
       post :gem_search, params: { sisid: 'John' }
       assert assigns(:search_result), 'Indicate that this is a search result'
       students = assigns(:students)
-      assert_equal existing_john_count + 2, students.size, 'Number of students matching John'
+      assert_equal 2, students.size, 'Number of students matching John'
+
       assert_template 'students/index'
 
       # search sisid
