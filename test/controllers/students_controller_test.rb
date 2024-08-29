@@ -204,6 +204,12 @@ class StudentsControllerTest < ActionController::TestCase
 
     ### SHOULD FIND STUDENTS BASED ON NAME OR SISID ###
     should 'find students based on SISID or NAME, working for both gem record or regular student. if multiple, redirect to index of either models' do
+      # search for existing John
+      post :gem_search, params: { sisid: 'John' }
+      students = assigns(:students)
+      existing_john_count = students.size
+
+      # create some new students
       create(:gem_record, sisid: '222222222', studentname: 'Jeremy Smith')
       create(:gem_record, sisid: '333333333', studentname: 'Jeremy Clarkson')
       create(:student, sisid: '111111111', name: 'John Smith')
@@ -213,7 +219,7 @@ class StudentsControllerTest < ActionController::TestCase
       post :gem_search, params: { sisid: 'John' }
       assert assigns(:search_result), 'Indicate that this is a search result'
       students = assigns(:students)
-      assert_equal 2, students.size, 'Found two students'
+      assert_equal existing_john_count + 2, students.size, 'Number of students matching John'
       assert_template 'students/index'
 
       # search sisid
