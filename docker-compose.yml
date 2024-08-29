@@ -22,8 +22,7 @@ services:
       - TEST_DATABASE_URL=sqlite3:db/test.sqlite3
       - RAILS_SERVE_STATIC_FILES=true
       - NODE_OPTIONS=--openssl-legacy-provider
-      - SELENIUM_SERVER=chrome-server
-      - SELENIUM_REMOTE_URL=http://chrome-server:4444
+      - SELENIUM_REMOTE_URL=http://chrome:4444
     env_file:
       - path: ./override.env
         required: false
@@ -42,7 +41,7 @@ services:
     ports:
       - ${MAILCATCHER_HTTP:-4084}:1080
 
-  chrome-server:
+  chrome:
     image: selenium/standalone-chrome:96.0
     ports:
       - ${VNC_HTTP:-7904}:7900
