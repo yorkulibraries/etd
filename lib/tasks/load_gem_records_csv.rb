@@ -23,11 +23,12 @@ class LoadGemRecordsCSV
       gr.examresult = row['examresult'].strip unless row['examresult'].nil?
       gr.title = row['title'].strip unless row['title'].nil?
       gr.program = row['program'].strip unless row['program'].nil?
-      gr.superv = row['superv'].strip unless row['superv'].nil?
       gr.examdate = row['examdate'].strip unless row['examdate'].nil?
       gr.studentname = row['surname'].strip unless row['surname'].nil? 
       gr.studentname = gr.studentname + ', ' + row['firstname'].strip unless row['firstname'].nil?
       gr.studentname = gr.studentname + ' ' + row['middlename'].strip unless row['middlename'].nil?
+      gr.superv = row['supervisorsurname'].strip unless row['supervisorsurname'].nil?
+      gr.superv = gr.superv + ', ' + row['supervisorfirstname'].strip unless row['supervisorfirstname'].nil?
 
       # save without validation as GEM records may have incomplete data
       gr.save!(validate: false)
