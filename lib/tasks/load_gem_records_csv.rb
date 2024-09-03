@@ -16,7 +16,6 @@ class LoadGemRecordsCSV
         gr = GemRecord.new
       end
       gr.seqgradevent = seqgradevent
-      #gr.studentname = row['studentname'].strip unless row['studentname'].nil?
       gr.sisid = row['sisid'].strip unless row['sisid'].nil?
       gr.emailaddress = row['emailaddress'].strip unless row['emailaddress'].nil?
       gr.eventtype = row['eventtype'].strip unless row['eventtype'].nil?
@@ -26,8 +25,7 @@ class LoadGemRecordsCSV
       gr.program = row['program'].strip unless row['program'].nil?
       gr.superv = row['superv'].strip unless row['superv'].nil?
       gr.examdate = row['examdate'].strip unless row['examdate'].nil?
-
-      gr.studentname = row['surname'].strip + ', ' + row['firstname'].strip + ' ' + row['middlename'].strip
+      gr.studentname = row['surname'].strip + ', ' + row['firstname'].strip + ' ' + row['middlename'].strip unless row['surname'].nil? 
 
       # save without validation as GEM records may have incomplete data
       gr.save!(validate: false)
