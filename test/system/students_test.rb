@@ -78,7 +78,7 @@ class StudentsTest < ApplicationSystemTestCase
 
   test 'Create a new thesis and add/remove a committee member' do
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
@@ -154,7 +154,7 @@ class StudentsTest < ApplicationSystemTestCase
 
   test 'Creating a thesis, pressing back and attempting to save again' do
     visit root_url
-    click_link('Gem Records')
+    click_link('GEM Records')
     click_link(@gem_record.studentname)
     click_link('Create ETD Student Record')
     page.accept_alert
