@@ -59,9 +59,14 @@ class ThesesController < ApplicationController
     @thesis.student = @student
     @thesis.audit_comment = 'Starting a new thesis. Status: OPEN.'
 
-    @thesis.audit_comment = 'Starting a new thesis. Status: OPEN.'
-
     @thesis.status = Thesis::OPEN
+
+    if Thesis.exists?(title: @thesis.title, student: @student, degree_name: @thesis.degree_name, degree_level: @thesis.degree_level)
+      flash[:alert] = 'You cannot save the same thesis.'
+      render action: 'new'
+      return
+    end
+
     if @thesis.save
       if params[:committee_member_ids].present?
         params[:committee_member_ids].each do |committee_member_id|
