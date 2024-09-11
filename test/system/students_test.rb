@@ -4,8 +4,8 @@ require 'application_system_test_case'
 require 'helpers/system_test_helper'
 
 class StudentsTest < ApplicationSystemTestCase
-  #include SystemTestHelper  # Include the SystemTestHelper module here
-  #include SystemTestHelper  # Include the SystemTestHelper module here
+  include SystemTestHelper  # Include the SystemTestHelper module here
+
 
   setup do
     @gem_record = FactoryGirl.create(:gem_record)
@@ -76,6 +76,22 @@ class StudentsTest < ApplicationSystemTestCase
     end
   end
 
+  test 'Create a new thesis and add/remove a committee member' do
+    visit root_url
+    click_link('Gem Records')
+    click_link(@gem_record.studentname)
+    click_link('Create ETD Student Record')
+    page.accept_alert
+    click_link('Start this thesis')
+    select "EMBA", from: "thesis_degree_name"
+    select "Master's", from: "thesis_degree_level"
+    click_link('Add Committee Member')
+    click_link('Remove')
+    click_button('Create Thesis')
+    assert_selector '.alert-success', text: 'ETD record successfully created.'
+    # page.accept_alert
+  end
+
   test 'Log in as Student and add a thesis' do
     @thesis = FactoryGirl.create(:thesis)
     login_as(@thesis.student)
@@ -135,7 +151,7 @@ class StudentsTest < ApplicationSystemTestCase
     assert_selector "p", text: "#{@thesis.student.email}", visible: :all
   end
 
-  
+
   test 'Creating a thesis, pressing back and attempting to save again' do
     visit root_url
     click_link('Gem Records')
@@ -200,7 +216,7 @@ class StudentsTest < ApplicationSystemTestCase
   end
 
   ## Page 2 and 3 tests
-  should "Successfully Submit Student Thesis" do
+  should "upload primary file" do
     @thesis = FactoryGirl.create(:thesis)
     create(:loc_subject, name: "Accounting", category: "BUSINESS")
     create(:loc_subject, name: "Management", category: "BUSINESS")
@@ -209,8 +225,10 @@ class StudentsTest < ApplicationSystemTestCase
     login_as(@thesis.student)
     visit root_url
 
-    ## Page 1: Welcome and Non-YorkU Email
+    # Set Page size
+    page.driver.browser.manage.window.resize_to(1920, 2500)
 
+    ## Page 1
     click_link("My ETD Submission")
     assert_selector "input#student_email_external"
     fill_in("Non-YorkU Email Address", with: "#{@thesis.student.username}@mailinator.com")
