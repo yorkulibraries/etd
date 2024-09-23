@@ -1,4 +1,10 @@
 <%= simple_form_for [@student, @thesis, @document], html: { class: "document form-horizontal", multipart: true } do |f| %>
+	<% if @document.supplemental %> 
+		<div class="p-3 bg-info-subtle mb-3">
+			<%= raw(AppSettings.student_supplementary_upload_files) %>
+		</div>
+	<% end %>
+
 	<% if @document.file_url %>
 		<div class="controls"> 
 			<strong>Current file:</strong> <%= File.basename(@document.file_url)%>

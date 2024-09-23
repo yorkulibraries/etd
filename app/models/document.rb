@@ -59,7 +59,7 @@ class Document < ApplicationRecord
   end
 
   def supplemental_file_must_be_file_types
-    supplemental_file_types = ['.pdf', '.doc', '.docx', '.txt', '.html', '.htm', '.odt', '.odp', '.ods', '.png', '.tif', '.jpg', '.csv', '.xml', '.avi', '.flac', '.wav', '.mp3', '.mp4']
+    supplemental_file_types = ['.pdf', '.doc', '.docx', '.txt', '.html', '.htm', '.odt', '.odp', '.ods', '.png', '.tif', '.jpg', '.csv', '.xml', '.avi', '.flac', '.wav', '.mp3', '.mp4', '.mov']
     embargo_file_types = ['.pdf', '.txt', '.html', '.htm', '.odt', '.odp', '.ods']
 
     return unless file.filename.present? && supplemental
