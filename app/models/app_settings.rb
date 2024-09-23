@@ -30,10 +30,8 @@ class AppSettings < RailsSettings::Base
   field :dspace_live_collection_title, default: ENV['dspace_live_collection_title'] || ''
   field :student_begin_submission, default: "
   <p>Welcome to York University’s Electronic Thesis and Dissertation (ETD) application. This interface will enable you to upload and submit your final approved thesis or dissertation to the Graduate Milestones and Progression Coordinator in the Faculty of Graduate Studies. </p>
-
   <p>Once your submission is approved and all requirements for graduation are met, your thesis or dissertation will be submitted to YorkSpace, York University's digital library of research outputs and will be available for electronic viewing through Library and Archives Canada after it has been added to YorkSpace. </p>
-
-  <p>For step-by-step submission instructions and more information on ETD, please visit FGS\’s website. At any point while you are using the application, you may click on the help button next to each field for more information. </p>"
+  <p>For step-by-step submission instructions and more information on ETD, <a href='https://www.yorku.ca/gradstudies/students/current-students/thesis-and-dissertation/'>please visit FGS\’s website.</a></p>"
   field :student_begin_external_non_yorku_email, default: "Please provide a secondary email address for future contact. Please note that this needs to be a non-York email address, in the event that your York email address is deactivated after your completion."
   field :student_update_details_initial, default: ""
   field :student_update_details_abstract, default: "<p>Add an abstract for your submission. The abstract is typically a 150 to 250- word paragraph that provides a short summary of your research, including a summary of the problem or issue, a description of the research method and design, the major findings and the conclusion. Your abstract should include important key words that describe your research and research methodology, as these words will support discoverability of your research in search engines and research databases. </p>"
