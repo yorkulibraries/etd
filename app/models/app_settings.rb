@@ -31,7 +31,7 @@ class AppSettings < RailsSettings::Base
   field :student_begin_submission, default: "
   <p>Welcome to York University’s Electronic Thesis and Dissertation (ETD) application. This interface will enable you to upload and submit your final approved thesis or dissertation to the Graduate Milestones and Progression Coordinator in the Faculty of Graduate Studies. </p>
   <p>Once your submission is approved and all requirements for graduation are met, your thesis or dissertation will be submitted to YorkSpace, York University's digital library of research outputs and will be available for electronic viewing through Library and Archives Canada after it has been added to YorkSpace. </p>
-  <p>For step-by-step submission instructions and more information on ETD, <a href='https://www.yorku.ca/gradstudies/students/current-students/thesis-and-dissertation/'>please visit FGS\’s website.</a></p>"
+  <p>For step-by-step submission instructions and more information on ETD, <a href='https://www.yorku.ca/gradstudies/students/current-students/thesis-and-dissertation/' target='_blank'>please visit FGS\’s website.</a></p>"
   field :student_begin_external_non_yorku_email, default: "Please provide a secondary email address for future contact. Please note that this needs to be a non-York email address, in the event that your York email address is deactivated after your completion."
   field :student_update_details_initial, default: ""
   field :student_update_details_abstract, default: "<p>Add an abstract for your submission. The abstract is typically a 150 to 250- word paragraph that provides a short summary of your research, including a summary of the problem or issue, a description of the research method and design, the major findings and the conclusion. Your abstract should include important key words that describe your research and research methodology, as these words will support discoverability of your research in search engines and research databases. </p>"
@@ -49,7 +49,7 @@ class AppSettings < RailsSettings::Base
   <ul>
     <li><strong>Primary file (thesis/ dissertation):</strong>  Before uploading your thesis or dissertation, you will need to save it as a PDF file (.pdf), which must be compatible with Adobe Acrobat version 5.0 or higher  </li><br/>
     <li><strong>If needed, supplementary files:</strong> Supplementary files refer to items that are part of the approved thesis/dissertation that cannot be included in the PDF document (thesis/dissertation). Examples of these files include multi–media, sound, video or hypertext. A supplementary file is NOT an appendix. Regular appendices can be included in the PDF document of your thesis/dissertation.</li><br/>
-    <li>YorkSpace can accept a variety of file types. The file size should not exceed 4 GB. If you need to deposit larger files, contact <a href='mailto:diginit@yorku.ca'>diginit@yorku.ca</a> for a consultation. Please see the Library’s <a href='https://www.library.yorku.ca/web/about-us/library-policies/digital-preservation-policy/preservation-action-plan-theses/'>Preservation Action Plan – Theses</a> for recommended file formats. </li>
+    <li>YorkSpace can accept a variety of file types. The file size should not exceed 4 GB. If you need to deposit larger files, contact <a href='mailto:diginit@yorku.ca'>diginit@yorku.ca</a> for a consultation. Please see the Library’s <a href='https://www.library.yorku.ca/web/about-us/library-policies/digital-preservation-policy/preservation-action-plan-theses/' target='_blank'>Preservation Action Plan – Theses</a> for recommended file formats. </li>
   </ul> </p>"
   field :student_supplementary_upload_files, default: "
   <p>For preservation purposes, we recommend that supplementary files be in these formats to enable migration to new formats when a file format becomes obsolete: </p>
@@ -80,7 +80,7 @@ class AppSettings < RailsSettings::Base
   <p>This allows York University and LAC to make copies, including electronically formatted copies, and/or distribute worldwide all or part of the dissertation, subject to the conditions outlined in the licences. </p>
   <p>If applicable, you should submit copies of any required copyright permissions before the final dissertation submission to the Office of the Dean, Graduate Studies. You should also retain copies of all copyright permission requests and approvals.</p>"
   field :student_review_license_lac, default: ""
-  field :student_review_lac_licence_instructions, default: "<p>Please upload your completed Library and Archives Canada License document.</p><p> French or English versions of the license form can be downloaded from the <a href='https://www.yorku.ca/gradstudies/students/current-students/registration-enrolment/fgs-forms/#copyright'>Faculty of Graduate Studies’ Forms website.</a> </p>"
+  field :student_review_lac_licence_instructions, default: "<p>Please upload your completed Library and Archives Canada License document.</p><p> French or English versions of the license form can be downloaded from the <a href='https://www.yorku.ca/gradstudies/students/current-students/registration-enrolment/fgs-forms/#copyright' target='_blank'>Faculty of Graduate Studies’ Forms website.</a> </p>"
   field :student_review_license_yorkspace, default: ""
   field :student_review_license_etd, default: ""
   field :student_review_details, default: ""

@@ -32,10 +32,12 @@
 					<% end %>
 				</div>
 			<% else %>
-				<div class="col-sm-12 col-lg-4">
-					<%= link_to "Student Details", student_path(@student), class: "green" %><br/>
-					<span class="trivial">and thesis</span>
-				</div>
+				<% if current_user.role != User::STUDENT %>
+					<div class="col-sm-12 col-lg-4">
+						<%= link_to "Student Details", student_path(@student), class: "green" %><br/>
+						<span class="trivial">and thesis dddd</span>
+					</div>
+				<% end %>
 			 <% end %>
 			</div>
 		</div>

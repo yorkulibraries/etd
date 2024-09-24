@@ -44,10 +44,12 @@ $yorku_brand: #e31837;
 // Custom styles can go here, if needed //
 //////////////////////////////////////////
 
-.settings-content div {
-	margin-top: 0;
-	margin-bottom: 1rem;
+.settings-content {
 	font-size: 1.15rem;
+	div {
+		margin-top: 0;
+		margin-bottom: 1rem;
+	}
 }
 
 .thesis, .data-grid, .gem_record {

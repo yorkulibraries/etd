@@ -25,8 +25,8 @@
 
 		<%= simple_form_for([@current_user, @thesis], url: accept_licences_student_thesis_path(@current_user, @thesis), method: :post, html: { class: "p-0" }) do |f| %>
 			<% if @thesis.errors.any? %>
-				<div id="error_explanation">
-					<h2><%= pluralize(@thesis.errors.count, "error") %> prohibited this thesis from being saved:</h2>
+				<div id="error_explanation" class="p-3 bg-warning-subtle">
+					<h3><%= pluralize(@thesis.errors.count, "error") %> prohibited this thesis from being saved:</h2>
 					<ul>
 						<% @thesis.errors.full_messages.each do |message| %>
 							<li><%= message %></li>
@@ -42,7 +42,7 @@
 					<p><%= raw(AppSettings.student_review_lac_licence_instructions) %></p>
 				<% end %>
 				<% if @licence_documents.count == 0 %>
-					<p>There are no <strong>supplementary</strong> license files or documents attached to this thesis/dissertation.</p>
+					<!-- show nothing -->
 				<% end %>
 				
 				<% @licence_documents.each do | document | %>

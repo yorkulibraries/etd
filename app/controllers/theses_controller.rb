@@ -228,7 +228,10 @@ class ThesesController < ApplicationController
     else
 
       error_messages = @thesis.errors.full_messages.join(', ')
-      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: "There was an error submitting your thesis: #{error_messages}."
+      flash.now[:alert] = "There was an error submitting your thesis: #{error_messages}."
+      @licence_documents = @thesis.documents.not_deleted.licence
+
+      render 'student_view/process/review'
     end
 
   end

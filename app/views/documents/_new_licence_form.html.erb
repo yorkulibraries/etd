@@ -2,7 +2,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="supplemental-files">Upload Licence Files</h1>
+        <h1 class="modal-title fs-5" id="supplemental-files">Upload Licence File</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 			<%= simple_form_for [@student, @thesis, Document.new], html: { class: "document", multipart: true, id: "new_document_#{primary}" }, authenticity_token: true, remote: true do |f| %>
@@ -11,7 +11,7 @@
 						<% if "#{AppSettings.student_review_license_lac}" != '' %>
 							<%= raw(AppSettings.student_review_license_lac) %>
 						<% else %>
-							<p>Licence Info here</p>
+							<p>Please upload your LAC licence file.</p>
 						<% end %>
 					</div>
 					<% f.input :name, required: false, input_html: { class: "span4", autocomplete: "off"} %>
