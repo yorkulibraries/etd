@@ -333,4 +333,43 @@ class StudentsTest < ApplicationSystemTestCase
     assert_no_link('Delete')
 
   end
+
+  ## Supplementary Info displays on edit/error
+  should "Supplementary Info displays on edit/error" do
+    @thesis = FactoryGirl.create(:thesis)
+    create(:loc_subject, name: "Accounting", category: "BUSINESS")
+    create(:loc_subject, name: "Management", category: "BUSINESS")
+    create(:loc_subject, name: "Finance", category: "BUSINESS")
+
+    login_as(@thesis.student)
+    visit root_url
+
+    # Set Page size
+    page.driver.browser.manage.window.resize_to(1920, 2500)
+
+    ## Page 1
+    click_link("My ETD Submission")
+    assert_selector "input#student_email_external"
+    fill_in("Non-YorkU Email Address", with: "#{@thesis.student.username}@mailinator.com")
+    click_on("Continue")
+
+    ## Page 2: Thesis Details
+    select "English", from: "thesis_language"
+    fill_in "thesis_abstract", with: Faker::Lorem.paragraph
+    click_on("Continue")
+
+    ## Page 3: Upload Supplementary
+    click_on("Upload Supplementary Files")
+
+    # assert_no_selector("p", text: "Smith_Jane_E_2014_PhD.pdf", visible: :all)
+    # assert_not(page.has_css?("p", text: "Smith_Jane_E_2014_PhD.pdf"), "Should not show 'example text' as per Spring 2024 requirements")
+
+    ## Upload a file not accepted format. e.g. ruby .rb
+    attach_file("document_file", Rails.root.join('test/factories/thesis.rb'))
+    click_button('Upload')
+
+    assert_selector("div", text: /Please ensure that/)
+  end
+
+
 end
