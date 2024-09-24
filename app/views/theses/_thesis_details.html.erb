@@ -10,7 +10,12 @@
 				<% if @thesis.embargoed == true %>
 						Never
 					<% else %>
-						<%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %>
+						<%= if @thesis.published_date.present?
+							@thesis.published_date.strftime("%B %d, %Y")
+							else
+							"N/A"
+							end 
+						%>
 					<% end %>
 			</p>
     </div>

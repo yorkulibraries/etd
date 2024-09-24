@@ -9,7 +9,13 @@ class Thesis < ApplicationRecord
                         :exam_date
   validates_presence_of :student_id, message: 'A student must be selected before thesis can be created.'
   validates_presence_of :abstract, if: :updating_by_student?
-  validates_presence_of :certify_content_correct, if: :updating_by_student?, on: :submit_for_review
+  validates_presence_of :certify_content_correct_present, if: :updating_by_student?, on: :submit_for_review
+
+  def certify_content_correct_present
+    if certify_content_correct.blank?
+      errors.add(:base, "Please check the ‘I certify that the content is correct’ button to proceed.")
+    end
+  end
 
   validates_presence_of :lac_licence_agreement, :yorkspace_licence_agreement, :etd_licence_agreement, if: :updating_by_student?, on: :accept_licences
 

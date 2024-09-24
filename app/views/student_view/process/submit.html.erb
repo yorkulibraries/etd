@@ -23,8 +23,14 @@
 				<p><%= format @thesis.supervisor %></p>
 				<h4>Exam date</h4>
 				<p><%= @thesis.exam_date.strftime("%B %d, %Y") rescue nil %></p>
-				<h4>Publication Date</h4>
-				<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
+				<% if @thesis.published_date.present? %>
+					<div class="col-md-6 col-lg-4">
+					<h4>Publication Date</h4>
+					<p>
+						<%= @thesis.published_date.strftime("%B %d, %Y") %>
+					</p>
+					</div>
+			  	<% end %>	
 			</div>
 			<div class="col-md-12 col-lg-4">
 				<h4>Degree Name and Level</h4>
@@ -67,7 +73,7 @@
 	</div>
 	<div class="d-flex justify-content-end">
 		
-		<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="next-btn btn btn-link" title="Make Changes to Thesis Details">
+		<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="next-btn btn btn-link" title="Make Changes to Thesis Details">
 			<i class="fa fa-pencil"></i> Make Changes to Thesis Details
 		</a>
 	</div>
@@ -125,15 +131,14 @@
 		<% end %>
 	</div>
 	
-	<div class="bg-light-subtle mt-3 p-3">
-		<h4>Embargo Documents</h4>
-		<% @embargo_documents.each do | document | %>
-				<%= render partial: 'documents/document_view_only', locals: {document: document} %>
-		<% end %>
-		<% if @embargo_documents.count == 0 %>
-			<p>There are no <strong>embargo</strong> files or documents attached to this thesis/dissertation.</p>
-		<% end %>
-	</div>
+	<% if @embargo_documents.count > 0 %>
+		<div class="bg-light-subtle mt-3 p-3">
+			<h4>Embargo Documents</h4>
+			<% @embargo_documents.each do | document | %>
+					<%= render partial: 'documents/document_view_only', locals: {document: document} %>
+			<% end %>
+		</div>
+	<% end %>
 
 	<div class="my-4">
 		<h4><%= Date.today.strftime("%B %d, %Y")%></h4>

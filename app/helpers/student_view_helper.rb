@@ -6,7 +6,7 @@ module StudentViewHelper
   end
 
   def show_badge(specific_status)
-    @thesis.status == specific_status ? 'badge text-bg-primary' : 'badge text-bg-dark'
+    @thesis.status == specific_status ? 'badge text-bg-success' : 'badge text-bg-dark'
   end
 
   def collapse_accordion(specific_status)
