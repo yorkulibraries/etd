@@ -9,7 +9,7 @@ class Thesis < ApplicationRecord
                         :exam_date
   validates_presence_of :student_id, message: 'A student must be selected before thesis can be created.'
   validates_presence_of :abstract, if: :updating_by_student?
-  validates_presence_of :certify_content_correct_present, if: :updating_by_student?, on: :submit_for_review
+  validate :certify_content_correct_present, if: :updating_by_student?, on: :submit_for_review
 
   def certify_content_correct_present
     if certify_content_correct.blank?
