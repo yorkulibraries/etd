@@ -19,14 +19,14 @@
 		</div>
 	</div>
 	
-	<p class="bg-light p-2">Your Current Thesis/Dissertation Status: <span class="badge text-bg-primary"><%= @thesis.status.humanize %></span></p>
+	<p class="bg-light p-2">Your Current Thesis/Dissertation Status: <span class="badge text-bg-success" style="font-size: 16px;"><%= @thesis.status.humanize %></span></p>
 
 	<div class="accordion" id="accordionThesis">
 		<div class="accordion-item">
 			<h2 class="accordion-header">
 				<button class="<%= collapse_accordion(Thesis::OPEN) %>" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-controls="collapseOne">
 					<i class="fa fa-folder-open-o pe-2"></i>
-					<span class="<%= show_badge(Thesis::OPEN) %>">Open</span>
+					<span class="<%= show_badge(Thesis::OPEN) %>" style="font-size: 16px;">Open</span>
 				</button>
 			</h2>
 			<div id="collapseOne" class="<%= show_accordion(Thesis::OPEN) %>" data-bs-parent="#accordionThesis">
@@ -39,7 +39,7 @@
 			<h2 class="accordion-header">
 				<button class="<%= collapse_accordion(Thesis::UNDER_REVIEW) %>" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-controls="collapseTwo">
 					<i class="fa fa-eye pe-2"></i> 
-					<span class="<%= show_badge(Thesis::UNDER_REVIEW) %>">Under Review</span>
+					<span class="<%= show_badge(Thesis::UNDER_REVIEW) %>" style="font-size: 16px;">Under Review</span>
 				</button>
 			</h2>
 			<div id="collapseTwo" class="<%= show_accordion(Thesis::UNDER_REVIEW) %>" data-bs-parent="#accordionThesis">
@@ -52,7 +52,7 @@
 			<h2 class="accordion-header">
 				<button class="<%= collapse_accordion(Thesis::RETURNED) %>" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
 					<i class=" fa fa-share pe-2"></i>
-					<span class="<%= show_badge(Thesis::RETURNED) %>">Returned</span>
+					<span class="<%= show_badge(Thesis::RETURNED) %>" style="font-size: 16px;">Returned</span>
 				</button>
 			</h2>
 			<div id="collapseThree" class="<%= show_accordion(Thesis::RETURNED) %>" data-bs-parent="#accordionThesis">
@@ -65,7 +65,7 @@
 			<h2 class="accordion-header">
 				<button class="<%= collapse_accordion(Thesis::ACCEPTED) %>" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
 					<i class="fa fa-check pe-2"></i>
-					<span class="<%= show_badge(Thesis::ACCEPTED) %>">Accepted</span>
+					<span class="<%= show_badge(Thesis::ACCEPTED) %>" style="font-size: 16px;">Accepted</span>
 				</button>
 			</h2>
 			<div id="collapseFour" class="<%= show_accordion(Thesis::ACCEPTED) %>" data-bs-parent="#accordionThesis">
@@ -78,7 +78,7 @@
 			<h2 class="accordion-header">
 				<button class="<%= collapse_accordion(Thesis::PUBLISHED) %>" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
 					<i class="fa fa-book pe-2"></i>
-					<span class="<%= show_badge(Thesis::PUBLISHED) %>">Published</span>
+					<span class="<%= show_badge(Thesis::PUBLISHED) %>" style="font-size: 16px;">Published</span>
 				</button>
 			</h2>
 			<div id="collapseFive" class="<%= show_accordion(Thesis::PUBLISHED) %>" data-bs-parent="#accordionThesis">
@@ -91,7 +91,7 @@
 			<h2 class="accordion-header">
 				<button class="<%= collapse_accordion(Thesis::REJECTED) %>" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
 					<i class="fa fa-ban pe-2"></i>
-					<span class="<%= show_badge(Thesis::REJECTED) %>">Rejected</span>
+					<span class="<%= show_badge(Thesis::REJECTED) %>" style="font-size: 16px;">Rejected</span>
 				</button>
 			</h2>
 			<div id="collapseSix" class="<%= show_accordion(Thesis::REJECTED) %>" data-bs-parent="#accordionThesis">

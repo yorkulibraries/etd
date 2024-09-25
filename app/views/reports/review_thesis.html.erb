@@ -25,7 +25,7 @@
 				<p><%= @thesis.exam_date.strftime("%B %d, %Y") rescue nil %></p>
 			</div>
 			<div class="col-md-12 col-lg-4">
-				<h4>Publish on</h4>
+				<h4>Publication Date</h4>
 				<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
 				<h4>Degree Name and Level</h4>
 				<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>

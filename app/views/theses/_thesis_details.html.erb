@@ -5,12 +5,17 @@
 			<p><%= format @thesis.supervisor %></p>
 			<h4>Exam date</h4>
       <p><%= @thesis.exam_date.strftime("%B %d, %Y") rescue nil %></p>
-      <h4>Publish on</h4>
+      <h4>Publication Date</h4>
       <p>
 				<% if @thesis.embargoed == true %>
 						Never
 					<% else %>
-						<%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %>
+						<%= if @thesis.published_date.present?
+							@thesis.published_date.strftime("%B %d, %Y")
+							else
+							"N/A"
+							end 
+						%>
 					<% end %>
 			</p>
     </div>

@@ -8,10 +8,12 @@
                   method: :delete, class: "btn btn-close pull-right", remote: true, data: { confirm: "Are you sure?" } do %>&nbsp;<% end %>
     <% end %>
   <% else %> 
-      <%= hidden_field_tag "committee_member_ids[]", committee_member.id %>
-      <a href="#" class="btn btn-close pull-right" onclick="this.closest('.row').remove(); return false;" data-confirm="Are you sure?" rel="nofollow" data-remote="true">
-        &nbsp;
-      </a>
+      <% if current_user.role != User::STUDENT %>
+        <%= hidden_field_tag "committee_member_ids[]", committee_member.id %>
+        <a href="#" class="btn btn-close pull-right" onclick="this.closest('.row').remove(); return false;" data-confirm="Are you sure?" rel="nofollow" data-remote="true">
+          &nbsp;
+        </a>
+      <% end %>
   <% end %>
   </div>
 </div>

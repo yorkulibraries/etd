@@ -460,7 +460,7 @@ class ThesesControllerTest < ActionController::TestCase
       assigns(:thesis)
       assert_response :redirect
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
-      assert_equal "There was an error submitting your thesis: Certify content correct can't be blank.", flash[:alert]
+      assert_equal "There was an error submitting your thesis: Please check the ‘I certify that the content is correct’ button to proceed..", flash[:alert]
 
     end
 

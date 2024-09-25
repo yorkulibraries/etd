@@ -10,7 +10,7 @@
 <%= progress_bar (Thesis::PROCESS_UPDATE) %>
 
 <div class="student-view fitted update">
-	<h2>Update Thesis Details</h2>
+	<h2>Update ETD Details</h2>
 	<div class="settings-content">
 		<%= raw(AppSettings.student_update_details_initial) %>
 	</div>
@@ -34,10 +34,14 @@
 				<h4>Supervisor</h4>
 				<p><%= format @thesis.supervisor %></p>
 			</div>
-			<div class="col-md-6 col-lg-4">
-				<h4>Publish On</h4>
-				<p><%= @thesis.published_date ? @thesis.published_date.strftime("%B %d, %Y") : format(@thesis.published_date)  %></p>
-			</div>
+			<% if @thesis.published_date.present? %>
+				<div class="col-md-6 col-lg-4">
+				<h4>Publication Date</h4>
+				<p>
+					<%= @thesis.published_date.strftime("%B %d, %Y") %>
+				</p>
+				</div>
+		  	<% end %>		  
 			<div class="col-md-6 col-lg-4">
 				<h4>Degree Name and Level</h4>
 				<p><%= format @thesis.degree_name %> - <%= format @thesis.degree_level %></p>
