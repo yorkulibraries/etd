@@ -18,7 +18,7 @@
 
 	<div class="row">
 		<div class="span4">
-			<%= f.input :app_maintenance, as: :radio_buttons  %>
+			<%= f.input :app_maintenance, as: :radio_buttons, item_wrapper_class: 'form-check form-check-inline'  %>
 		</div>
 		<div class="span4">
 			<%= f.input :app_maintenance_message, as: :text, input_html:{ rows: 3 } %>
