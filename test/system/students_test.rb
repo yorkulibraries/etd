@@ -368,7 +368,7 @@ class StudentsTest < ApplicationSystemTestCase
     attach_file("document_file", Rails.root.join('test/factories/thesis.rb'))
     click_button('Upload')
 
-    assert_selector("div", text: /Please ensure that/)
+    assert page.has_selector?('#supplementary-help-info', visible: true), "#supplementary-help-info not found."
   end
 
 
