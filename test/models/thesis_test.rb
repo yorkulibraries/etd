@@ -16,7 +16,7 @@ class ThesisTest < ActiveSupport::TestCase
   # should have_many(:documents)
   
   ## VALIDATIONS
-  # Licenses are required fields
+  # Licences are required fields
 
   ## CERTIFY CONTENT CORRECT
   should 'validate presence of certify_content_correct if submitting_for_review_by_student?' do

@@ -80,7 +80,7 @@ class AppSettings < RailsSettings::Base
   <p>This allows York University and LAC to make copies, including electronically formatted copies, and/or distribute worldwide all or part of the dissertation, subject to the conditions outlined in the licences. </p>
   <p>If applicable, you should submit copies of any required copyright permissions before the final dissertation submission to the Office of the Dean, Graduate Studies. You should also retain copies of all copyright permission requests and approvals.</p>"
   field :student_review_license_lac, default: ""
-  field :student_review_lac_licence_instructions, default: "<p>Please upload your completed Library and Archives Canada License document.</p><p> French or English versions of the license form can be downloaded from the <a href='https://www.yorku.ca/gradstudies/students/current-students/registration-enrolment/fgs-forms/#copyright' target='_blank'>Faculty of Graduate Studies’ Forms website.</a> </p>"
+  field :student_review_lac_licence_instructions, default: "<p>Please upload your completed Library and Archives Canada Licence document.</p><p> French or English versions of the licence form can be downloaded from the <a href='https://www.yorku.ca/gradstudies/students/current-students/registration-enrolment/fgs-forms/#copyright' target='_blank'>Faculty of Graduate Studies’ Forms website.</a> </p>"
   field :student_review_license_yorkspace, default: ""
   field :student_review_license_etd, default: ""
   field :student_review_details, default: ""

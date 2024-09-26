@@ -130,7 +130,7 @@
 		</div>
 		
 		<div class="bg-light-subtle mt-3 p-3">
-			<h4>License Agreements</h4>
+			<h4>Licence Agreements</h4>
 			<%  unless block_thesis_changes?(@thesis) %>
 				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#supplemental-licence-files">Upload Licence Files</button>
 			<% end %>
@@ -178,7 +178,7 @@
 				<p>There are no <strong>supplemental</strong> files or documents attached to this thesis/dissertation.</p>
 			<% end %>
 
-			<h4>License Agreements</h4>
+			<h4>Licence Agreements</h4>
 			<% @licence_documents.each do | document | %>
 				<%= render partial: 'documents/document_view_only', locals: {document: document} %>
 			<% end %>

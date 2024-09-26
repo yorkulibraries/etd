@@ -124,8 +124,8 @@ class AppSettingsTest < ApplicationSystemTestCase
     visit root_url
     find('i.fa.fa-cog').click
     click_link("App Settings")
-    click_button('Review Licenses')
-    find('trix-editor#app_settings_student_review_license_info').click.set('Review License Info Text Test')
+    click_button('Review Licences')
+    find('trix-editor#app_settings_student_review_license_info').click.set('Review Licence Info Text Test')
     find('trix-editor#app_settings_student_review_license_lac').click.set('LAC licence Text Test')
     find('trix-editor#app_settings_student_review_license_yorkspace').click.set('YorkSpace Non-Exclusive Distribution Licence Text Test')
     find('trix-editor#app_settings_student_review_license_etd').click.set('YorkU ETD Licence Text Test')
@@ -151,7 +151,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
     click_link('Continue')
-    assert_selector 'div.student-view.fitted.submit > div', text: 'Review License Info Text Test'
+    assert_selector 'div.student-view.fitted.submit > div', text: 'Review Licence Info Text Test'
 
     click_button('Accept and Continue')
   end

@@ -228,7 +228,7 @@ class ThesesTest < ApplicationSystemTestCase
   ##### TESTS WILL NEED BE UPDATED WITH NEW FILE NAMES ######
   ###########################################################
 
-  should "be able to upload supplementary license document by admin/staff" do
+  should "be able to upload supplementary licence document by admin/staff" do
     visit root_url
     click_link(@thesis_01.title)
 
