@@ -33,10 +33,6 @@ class CommitteeMember < ApplicationRecord
   end
 
   def name
-    if first_name.blank? && last_name.blank?
-      full_name
-    else
-      "#{last_name}, #{first_name}"
-    end
+    "#{last_name}, #{first_name}"
   end
 end

@@ -24,21 +24,4 @@ class CommitteeMemberTest < ActiveSupport::TestCase
       member.destroy
     end
   end
-
-  should 'show full_name if first name or last name are empty' do
-    n = build(:committee_member, first_name: nil, last_name: nil, full_name: 'Something')
-    n.save(validate: false)
-    assert_equal 'Something', n.name
-
-    n2 = build(:committee_member, first_name: 'Test', last_name: nil, full_name: 'Something')
-    n2.save(validate: false)
-    assert_equal ', Test', n2.name
-
-    n3 = build(:committee_member, last_name: 'Test', first_name: nil, full_name: 'Something')
-    n3.save(validate: false)
-    assert_equal 'Test, ', n3.name
-
-    n4 = create(:committee_member, last_name: 'Test', first_name: 'Machine', full_name: 'Something')
-    assert_equal 'Test, Machine', n4.name
-  end
 end
