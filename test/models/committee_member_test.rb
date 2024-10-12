@@ -24,4 +24,11 @@ class CommitteeMemberTest < ActiveSupport::TestCase
       member.destroy
     end
   end
+
+  should 'committee member name should follow "lastname, firstname" format' do
+    member = build(:committee_member)
+    member.save
+
+    assert_equal "#{member.last_name}, #{member.first_name}", member.name
+  end
 end
