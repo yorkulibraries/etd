@@ -127,7 +127,7 @@ class Thesis < ApplicationRecord
     strings = program.split(' ')
 
     self.degree_name = DEGREENAME.select { |n| n.upcase.include?(strings[1].upcase) }.first
-    self.degree_level = (strings[1].upcase == 'PHD' ? 'Doctoral' : 'Masters')
+    self.degree_level = (strings[1].upcase == 'PHD' ? Thesis::DOCTORAL : Thesis::MASTERS)
   end
 
   def display_name

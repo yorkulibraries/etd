@@ -100,19 +100,19 @@ class ThesisTest < ActiveSupport::TestCase
     thesis.assign_degree_name_and_level
 
     assert_equal 'MA', thesis.degree_name
-    assert_equal 'Masters', thesis.degree_level
+    assert_equal Thesis::MASTERS, thesis.degree_level
 
     thesis.program = 'GS PHD ENVS - Faculty Of Graduate Studies, Ph.D., Environmental Studies'
     thesis.assign_degree_name_and_level
 
     assert_equal 'PhD', thesis.degree_name
-    assert_equal 'Doctoral', thesis.degree_level
+    assert_equal Thesis::DOCTORAL, thesis.degree_level
 
     thesis.program = 'GS MSC KAHS - Faculty Of Graduate Studies, M.Sc., Kinesiology & Health Science'
     thesis.assign_degree_name_and_level
 
     assert_equal 'MSc', thesis.degree_name
-    assert_equal 'Masters', thesis.degree_level
+    assert_equal Thesis::MASTERS, thesis.degree_level
   end
 
   should 'delete associated documents if thesis is deleted' do
@@ -202,7 +202,7 @@ class ThesisTest < ActiveSupport::TestCase
     assert_equal 'New Title', thesis.title
     assert_equal 'GS Med PSYC>BBCS - Faculty Of Graduate Studies', thesis.program
     assert_equal 'MEd', thesis.degree_name
-    assert_equal 'Masters', thesis.degree_level
+    assert_equal Thesis::MASTERS, thesis.degree_level
 
     thesis2 = create(:thesis, gem_record_event_id: 1, title: "Don't change me")
     thesis.update_from_gem_record
