@@ -189,6 +189,6 @@ class Thesis < ApplicationRecord
     self.audit_comment = 'Publishing this thesis. Status changed to published'
     self.published_at = published_date
     ChagingStatusMailer.published(student.email).deliver
-    save(valudate: false)
+    save(validate: false)
   end
 end
