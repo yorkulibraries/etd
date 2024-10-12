@@ -48,7 +48,7 @@ class ThesesController < ApplicationController
     @thesis.program = record.program
     @thesis.assign_degree_name_and_level
     @thesis.committee_members = record.committee_members.map do |cm|
-      CommitteeMember.new(full_name: cm.full_name, role: cm.role, gem_record: record)
+      CommitteeMember.new(first_name: cm.first_name, last_name: cm.last_name, role: cm.role, gem_record: record)
     end
 
   end
