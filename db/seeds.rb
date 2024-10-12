@@ -16,10 +16,66 @@ if (Rails.env != 'test') && User.all.count.zero?
 end
 
 if (Rails.env == 'development') && GemRecord.all.count.zero?
-  (10..19).each do |i|
-    g = GemRecord.create(studentname: "studentname #{i}", sisid: "6942000#{i}",
-                     emailaddress: "student-email#{i}@domain.com", eventtype: GemRecord::PHD_EXAM, eventdate: 45.days.ago.to_s, examresult: 'Accepted Pending Specified Revisions', title: "title #{i}", program: "program #{i}", superv: "superv #{i}", seqgradevent: "#{i}".to_i, examdate: Time.now)
+  (1..2).each do |i|
+    g = GemRecord.create(
+      studentname: "studentname #{i}",
+      sisid: "69420000#{i}",
+      emailaddress: "student-email#{i}@domain.com",
+      eventtype: GemRecord::PHD_EXAM,
+      eventdate: 45.days.ago.to_s,
+      examresult: 'Accepted Pending Specified Revisions',
+      title: "title #{i}",
+      program: "GS PHD MATS - Faculty of Graduate Studies, Ph.D., Mathematics & Statistic",
+      superv: "superv #{i}", 
+      seqgradevent: "#{i}".to_i,
+      examdate: 45.days.ago.to_s
+    )
     g.save!
+
+    cm = CommitteeMember.new
+    cm.gem_record = g
+    cm.first_name = "John #{i}"
+    cm.last_name = "Doe"
+    cm.role = CommitteeMember::CHAIR
+    cm.save
+
+    cm = CommitteeMember.new
+    cm.gem_record = g
+    cm.first_name = "Jane #{i}"
+    cm.last_name = "Doe"
+    cm.role = CommitteeMember::COMMITTEE_MEMBER
+    cm.save
+  end
+
+  (3..4).each do |i|
+    g = GemRecord.create(
+      studentname: "studentname #{i}",
+      sisid: "69420000#{i}",
+      emailaddress: "student-email#{i}@domain.com",
+      eventtype: GemRecord::MASTERS_EXAM,
+      eventdate: 45.days.ago.to_s,
+      examresult: 'Accepted Pending Specified Revisions',
+      title: "title #{i}",
+      program: "GS MSC KAHS - Faculty Of Graduate Studies, M.Sc., Kinesiology & Health Science",
+      superv: "superv #{i}", 
+      seqgradevent: "#{i}".to_i,
+      examdate: 45.days.ago.to_s
+    )
+    g.save!
+
+    cm = CommitteeMember.new
+    cm.gem_record = g
+    cm.first_name = "John #{i}"
+    cm.last_name = "Doe"
+    cm.role = CommitteeMember::CHAIR
+    cm.save
+
+    cm = CommitteeMember.new
+    cm.gem_record = g
+    cm.first_name = "Jane #{i}"
+    cm.last_name = "Doe"
+    cm.role = CommitteeMember::COMMITTEE_MEMBER
+    cm.save
   end
 end
 
