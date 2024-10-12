@@ -87,7 +87,7 @@ class Document < ApplicationRecord
 
     full_name = thesis.student.name
     year = thesis.exam_date.year
-    level = thesis.degree_level == 'Doctoral' ? 'PhD' : 'Masters'
+    level = thesis.degree_level
     deg_name = thesis.degree_name
     ext = File.extname(original_filename)
 
@@ -107,6 +107,6 @@ class Document < ApplicationRecord
     embargo_count = embargo_count + 1 if self.new_record?
     file_sequence = "_#{self.document_type}_#{embargo_count}" if document_type == 'embargo'
 
-    return "#{full_name}_#{year}_#{deg_name}_#{level}#{file_sequence}".gsub(/[\s\.]/, '_') + ext
+    return "#{full_name}_#{year}_#{deg_name}#{file_sequence}".gsub(/[\s\.]/, '_') + ext
   end
 end

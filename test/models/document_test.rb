@@ -114,17 +114,17 @@ class DocumentTest < ActiveSupport::TestCase
     student_name = t.student.name.gsub(/[\s\.]/, '_')
     assert_match /^#{student_name}_.+/, uploaded_filename, "file name should start with #{student_name}"
 
-    # the file name should end with Level.pdf
-    level = t.degree_level == 'Doctoral' ? 'PhD' : 'Masters'
-    assert_match /#{level}.pdf$/, uploaded_filename, "the file name should end with #{level}.pdf"
+    # the file name should end with degree_name.pdf
+    degree_name = t.degree_name.gsub(/[\s\.]/, '_')
+    assert_match /#{degree_name}.pdf$/, uploaded_filename, "the file name should end with #{degree_name}.pdf"
 
     # the file name should contain _year_ 
     year = t.exam_date.year
     assert_match /_#{year}_/, uploaded_filename, "the file name should contain _#{year}_"
 
-    # the file name should contain _degree_name_ 
+    # the file name should contain _degree_name
     degree_name = t.degree_name.gsub(/[\s\.]/, '_')
-    assert_match /_#{degree_name}_/, uploaded_filename, "the file name should contain _#{degree_name}_"
+    assert_match /_#{degree_name}/, uploaded_filename, "the file name should contain _#{degree_name}"
 
     # now upload first supplimentary file
     d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :thesis, supplemental: true, thesis: t)
@@ -223,17 +223,17 @@ class DocumentTest < ActiveSupport::TestCase
     student_name = t.student.name.gsub(/[\s\.]/, '_')
     assert_match /^#{student_name}_.+/, uploaded_filename, "file name should start with #{student_name}"
 
-    # the file name should end with Level.pdf
-    level = t.degree_level == 'Doctoral' ? 'PhD' : 'Masters'
-    assert_match /#{level}.pdf$/, uploaded_filename, "the file name should end with #{level}.pdf"
+    # the file name should end with degree_name.pdf
+    degree_name = t.degree_name.gsub(/[\s\.]/, '_')
+    assert_match /#{degree_name}.pdf$/, uploaded_filename, "the file name should end with #{degree_name}.pdf"
 
     # the file name should contain _year_ 
     year = t.exam_date.year
     assert_match /_#{year}_/, uploaded_filename, "the file name should contain _#{year}_"
 
-    # the file name should contain _degree_name_ 
+    # the file name should contain _degree_name
     degree_name = t.degree_name.gsub(/[\s\.]/, '_')
-    assert_match /_#{degree_name}_/, uploaded_filename, "the file name should contain _#{degree_name}_"
+    assert_match /_#{degree_name}/, uploaded_filename, "the file name should contain _#{degree_name}"
 
     # now upload first licence file
     d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :licence, supplemental: true, thesis: t)
@@ -332,17 +332,17 @@ class DocumentTest < ActiveSupport::TestCase
     student_name = t.student.name.gsub(/[\s\.]/, '_')
     assert_match /^#{student_name}_.+/, uploaded_filename, "file name should start with #{student_name}"
 
-    # the file name should end with Level.pdf
-    level = t.degree_level == 'Doctoral' ? 'PhD' : 'Masters'
-    assert_match /#{level}.pdf$/, uploaded_filename, "the file name should end with #{level}.pdf"
+    # the file name should end with degree_name.pdf
+    degree_name = t.degree_name.gsub(/[\s\.]/, '_')
+    assert_match /#{degree_name}.pdf$/, uploaded_filename, "the file name should end with #{degree_name}.pdf"
 
     # the file name should contain _year_ 
     year = t.exam_date.year
     assert_match /_#{year}_/, uploaded_filename, "the file name should contain _#{year}_"
 
-    # the file name should contain _degree_name_ 
+    # the file name should contain _degree_name
     degree_name = t.degree_name.gsub(/[\s\.]/, '_')
-    assert_match /_#{degree_name}_/, uploaded_filename, "the file name should contain _#{degree_name}_"
+    assert_match /_#{degree_name}/, uploaded_filename, "the file name should contain _#{degree_name}"
 
     # now upload first licence file
     d = create(:document_for_file_naming, file: fixture_file_upload(original_filename), usage: :embargo, supplemental: true, thesis: t)
