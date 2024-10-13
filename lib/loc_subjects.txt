@@ -14,7 +14,7 @@ Ethnic studies
 European studies 
 French Canadian culture 
 Gender studies 
-GLBT  studies 
+GLBT studies 
 Hispanic American studies 
 Holocaust studies 
 Islamic culture 
@@ -32,7 +32,7 @@ South African studies
 South Asian studies 
 Sub Saharan Africa studies 
 Women's studies 
->BUSINESS   
+>BUSINESS  
 Accounting 
 Arts management 
 Banking 
@@ -63,7 +63,7 @@ Performing arts
 Theater 
 Theater history 
 >EDUCATION 
-Adult  education 
+Adult education 
 Art education 
 Bilingual education 
 Business education 
@@ -259,8 +259,7 @@ Personality psychology
 Physiological psychology 
 Psychobiology 
 Psychology 
-Quantitative psychology and  
-psychometrics 
+Quantitative psychology and psychometrics 
 Social psychology 
 >BIOLOGICAL SCIENCES 
 Biochemistry 
@@ -337,7 +336,7 @@ Natural resource management
 Water resources management 
 Wildlife conservation 
 >GEOSCIENCES 
-Aeronomy  
+Aeronomy 
 Atmospheric chemistry 
 Atmospheric sciences 
 Biogeochemistry 
@@ -346,8 +345,7 @@ Chemical oceanography
 Continental dynamics 
 Geobiology 
 Geochemistry 
-Geographic information science  
-and geodesy 
+Geographic information science and geodesy 
 Geology 
 Geomorphology 
 Geophysics 
@@ -393,7 +391,7 @@ Pharmaceutical sciences
 Pharmacology 
 Physical therapy 
 Public health 
-Public health occupations  
+Public health occupations 
 education 
 Speech therapy 
 Surgery 
