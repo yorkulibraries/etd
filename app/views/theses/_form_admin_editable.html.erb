@@ -5,9 +5,6 @@
 
 <hr class="fitted"/>
 
-<div class="readonly-field">
-	 <%= @thesis.exam_date ? @thesis.exam_date.strftime("%B %d, %Y") : format(@thesis.exam_date)  %> <a href="#" data-id="thesis_exam_date">update</a>
-</div>
 <%= f.input :exam_date, as: :string, readonly:  read_only_if_student("exam_date"), input_html: { class: "hide", autocomplete: "off"} %>
 
 <hr class="fitted"/>

@@ -21,12 +21,10 @@ class ThesesController < ApplicationController
 
   def show
     @thesis = @student.theses.find(params[:id])
-
     @primary_documents = @thesis.documents.not_deleted.primary
     @supplemental_documents = @thesis.documents.not_deleted.supplemental
     @licence_documents = @thesis.documents.not_deleted.licence
     @embargo_documents = @thesis.documents.not_deleted.embargo
-
     authorize! :edit, @thesis
   end
 
@@ -47,36 +45,36 @@ class ThesesController < ApplicationController
     @thesis.exam_date = record.examdate
     @thesis.program = record.program
     @thesis.assign_degree_name_and_level
-    @thesis.committee_members = record.committee_members.map do |cm|
-      CommitteeMember.new(first_name: cm.first_name, last_name: cm.last_name, role: cm.role, gem_record: record)
-    end
-
+    @thesis.committee_members = record.committee_members
   end
 
   def create
     @thesis = Thesis.new(thesis_params)
 
-    @thesis.student = @student
-    @thesis.audit_comment = 'Starting a new thesis. Status: OPEN.'
-
-    @thesis.status = Thesis::OPEN
-
     if Thesis.exists?(title: @thesis.title, student: @student, degree_name: @thesis.degree_name, degree_level: @thesis.degree_level)
-      flash[:alert] = 'You cannot save the same thesis.'
+      flash[:alert] = "Unable to create thesis. Another identical thesis exists."
       render action: 'new'
       return
     end
 
+    @thesis.student = @student
+    @thesis.audit_comment = 'Starting a new thesis. Status: OPEN.'
+    @thesis.status = Thesis::OPEN
+
     if @thesis.save
+      tid = @thesis.id
+      logger.debug "Successfully saved thesis #{tid}"
       if params[:committee_member_ids].present?
         params[:committee_member_ids].each do |committee_member_id|
+          logger.debug "Finding CommitteeMember #{committee_member_id}"
           if committee_member_id.present?
             committee_member = CommitteeMember.find(committee_member_id)
+            logger.debug "Assigning CommitteeMember #{committee_member_id} to Thesis #{tid}"
             committee_member.update(thesis: @thesis)
           end
         end
       end
-      redirect_to [@student, @thesis], notice: 'ETD record successfully created.'
+      redirect_to [@student, @thesis], notice: 'Thesis successfully created.'
     else
       render action: 'new'
     end
@@ -89,10 +87,8 @@ class ThesesController < ApplicationController
 
   def update
     @thesis =  @student.theses.find(params[:id])
-
     @thesis.current_user = current_user # set the current_user for later validation
-
-    # puts "Thesis before update: #{@thesis.pretty_inspect}"
+    logger.debug "Thesis before update: #{@thesis.pretty_inspect}"
     authorize! :update, @thesis
 
     @thesis.audit_comment = 'Updating thesis details.'
@@ -102,23 +98,21 @@ class ThesesController < ApplicationController
         redirect_to [@student, @thesis], alert: 'You cannot edit thesis notes' and return
       end
     end
+
     # params[:thesis] = params[:thesis].reject { |p| Student::IMMUTABLE_THESIS_FIELDS.include?(p) } if current_user.role == User::STUDENT
     ## Need to check if thesis params are empty or not, if they are -> don't update
     if @thesis.update(thesis_params)
-
-      # puts "Thesis after update: #{@thesis.pretty_inspect}"
+      logger.debug "Thesis after update: #{@thesis.pretty_inspect}"
       if current_user.role == User::STUDENT
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
       else
         redirect_to [@student, @thesis], notice: 'Successfully updated thesis.'
       end
     elsif current_user.role == User::STUDENT
-
       @student = current_user
       render template: 'student_view/process/update'
     else
       render action: 'edit'
-
     end
   end
 
@@ -136,13 +130,10 @@ class ThesesController < ApplicationController
     @thesis = @student.theses.find(params[:id])
 
     if params[:status] && Thesis::STATUSES.include?(params[:status])
-
       @thesis.audit_comment = "Updating status from #{@thesis.status} to #{params[:status]}"
       old_status = @thesis.status
-
       @thesis.update_attribute(:status, params[:status])
       @message = "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
-
       @thesis.update_attribute(:under_review_at, Date.today) if params[:status] == Thesis::UNDER_REVIEW
       @thesis.update_attribute(:accepted_at, Date.today) if params[:status] == Thesis::ACCEPTED
       if params[:status] == Thesis::RETURNED
@@ -154,7 +145,6 @@ class ThesesController < ApplicationController
       if params[:notify_student].blank? == false
         additional_recipients = params[:notify_current_user] ? [current_user.email] : []
         custom_message ||= params[:custom_message]
-
         StudentMailer.status_change_email(@student, @thesis, old_status, @thesis.status, additional_recipients,
                                           custom_message).deliver_later
         additional_recipients << @student.email
@@ -210,27 +200,20 @@ class ThesesController < ApplicationController
     @thesis.pretty_inspect
 
     if @thesis.valid?(:accept_licences)
-
       if @thesis.update(thesis_params)
-
         if validate_licence_uplaod(@thesis.id)
-
           redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), notice: "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
         else
-
           redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: 'Missing Licence Document. Please upload LAC Licence Signed Doc.'
         end
       else
-
         error_messages = @thesis.errors.full_messages.join(', ')
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: "There was an error submitting your thesis: #{error_messages}."
       end
     else
-
       error_messages = @thesis.errors.full_messages.join(', ')
       flash.now[:alert] = "There was an error submitting your thesis: #{error_messages}."
       @licence_documents = @thesis.documents.not_deleted.licence
-
       render 'student_view/process/review'
     end
 

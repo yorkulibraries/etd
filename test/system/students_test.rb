@@ -88,7 +88,7 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('Add Committee Member')
     click_link('Remove')
     click_button('Create Thesis')
-    assert_selector '.alert-success', text: 'ETD record successfully created.'
+    assert_selector '.alert-success', text: 'Thesis successfully created.'
     # page.accept_alert
   end
 
