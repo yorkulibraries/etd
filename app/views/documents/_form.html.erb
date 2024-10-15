@@ -1,36 +1,57 @@
-<%= simple_form_for [@student, @thesis, @document], html: { class: "document form-horizontal", multipart: true } do |f| %>
-	
-	<% if @document.document_type == 'supplemental' %>
-		<div id="supplementary-help-info" class="p-3 bg-secondary-subtle mb-3">
-			<%= raw(AppSettings.student_supplementary_upload_files) %>
-		</div>
-	<% elsif @document.document_type == 'licence' %>
-		<div id="supplementary-help-info" class="p-3 bg-secondary-subtle mb-3">
-			<%= raw(AppSettings.student_review_license_lac) %>
-		</div>
-	<% elsif @document.document_type == 'embargo' %>
-		<div id="supplementary-help-info" class="p-3 bg-secondary-subtle mb-3">
-			<%= raw(AppSettings.student_supplementary_embargo_upload_files) %>
-		</div>
-	<% end %>
-	
-	<% if @document.file_url %>
-		<div class="controls"> 
-			<strong>Current file:</strong> <%= File.basename(@document.file_url)%>
-		</div>
-	<% end %>
-	<%= f.input :file, as: :file, required: true, label_html: { class: 'py-4' } %>
-	<%= f.hidden_field :supplemental, value: @document.supplemental %>
+<%= simple_form_for [@student, @thesis, @document], authenticity_token: true, html: {  multipart: true } do |f| %>
+  
+  <h2 class="fs-6">
+  	<% if @document.usage == 'thesis' && !@document.supplemental %>
+  	  Upload Primary Thesis File
+  	<% end %>
+  	<% if @document.usage == 'thesis' && @document.supplemental %>
+  	  Upload Supplementary Thesis Files
+  	<% end %>
+  	<% if @document.usage == 'licence' %>
+  		Upload Licence Agreements
+  	<% end %>
+  	<% if @document.usage == 'embargo' %>
+  	  Upload Embargo Documents
+  	<% end %>
+  </h2>
 
+	<div id="supplementary-help-info" class="alert alert-secondary" role="alert">
+		<% if @document.usage == 'thesis' && !@document.supplemental %>
+		  <%= raw(AppSettings.student_primary_upload_files) %>
+  	<% end %>
+  	<% if @document.usage == 'thesis' && @document.supplemental %>
+  	  <%= raw(AppSettings.student_supplementary_upload_files) %>
+  	<% end %>
+  	<% if @document.usage == 'licence' %>
+  	  <%= raw(AppSettings.student_supplementary_embargo_upload_files) %>
+  	<% end %>
+  	<% if @document.usage == 'embargo' %>
+  	  <%= raw(AppSettings.student_supplementary_embargo_upload_files) %>
+  	<% end %>
+	</div>
+
+  <% if @document.name %>
+    <div class="alert alert-warning" role="alert">
+      Replacing: <%= @document.name %>
+    </div>
+  <% end %>
+
+  <% f.input :name, required: true, input_html: { autocomplete: "off"} %>
+	<%= f.input :file, required: true, as: :file %>
 	<%= f.hidden_field :usage, value: @document.usage %>
-	<% if @document.supplemental != true %>
-		<%= f.hidden_field :usage, value: :thesis %>		
-	<% end %>
+	<%= f.hidden_field :supplemental, value: @document.supplemental %>
+  
+  <%= f.button :submit, "Upload", class: "btn btn-primary" %>        
 
-		<hr />
-		<div class="action controls">
-			<%= f.button :submit, "Upload", class: "btn btn-primary" %>  or <%= link_to "Cancel", :back %>
-		</div>
-	
+  <% if (defined? modal).nil? || !modal %>
+    <% if current_user.role == User::STUDENT && @document.usage == 'licence' %>
+      <a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="btn btn-secondary">Cancel</a>
+    <% elsif current_user.role == User::STUDENT && @document.usage != 'licence' %>
+      <a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD) %>" class="btn btn-secondary">Cancel</a>
+    <% elsif current_user.role != User::STUDENT %>
+      <a href="<%= student_thesis_path(@student, @thesis) %>" class="btn btn-secondary">Cancel</a>
+    <% end %>
+  <% else %>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Cancel">Cancel</button>
+  <% end %>
 <% end %>
-

@@ -23,7 +23,7 @@ $yorku_brand: #e31837;
 .container { 
 	h2 { 
 		font-weight: bold;
-		color: $primary;
+		color: $secondary;
 	}
 	h3 {
 		font-weight: 600;
@@ -53,7 +53,7 @@ $yorku_brand: #e31837;
 }
 
 .thesis, .data-grid, .gem_record {
-	h4, .key {
+	h4, h5, .key {
 		font-size: 1.25rem;
 		font-weight: 300;
 		color: $secondary;
@@ -116,10 +116,35 @@ $yorku_brand: #e31837;
 	}
 }
 #reports {
-
 	.nav-pills {
 		.nav-link.active {
 			background-color: $dark;
 		}
+	}
+}
+form.thesis-form {
+	label {
+		font-weight: bold;
+	}
+}
+#committee_members {
+	fieldset {
+		padding-bottom: 1rem;
+	}
+	legend {
+		font-size: 1rem;
+		font-weight: bold;
+	}
+	padding-bottom: 1rem;
+	.committee_member {
+		padding-left: 0.75rem;
+	}
+	.btn {
+		margin-left: 0.75rem;
+	}
+}
+.committee_member_role {
+	.form-check {
+		clear: both;
 	}
 }

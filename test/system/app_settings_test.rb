@@ -112,7 +112,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     fill_in 'thesis_abstract', with: 'Abstract Text Test'
     click_link('Continue')
     assert_text "Upload Files Text Test"
-    click_button('Upload Supplementary Files')
+    click_link_or_button('Upload Supplementary Thesis Files')
     within('div.modal-body') do
       assert_text "Supplementary Upload files Text Test"
     end
@@ -147,7 +147,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     click_button('Continue')
     fill_in 'thesis_abstract', with: 'Abstract Text Test'
     click_link('Continue')
-    click_button('Upload Primary File')
+    click_link_or_button('Upload Primary Thesis File')
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
     click_link('Continue')
@@ -182,11 +182,11 @@ class AppSettingsTest < ApplicationSystemTestCase
     click_button('Continue')
     fill_in 'thesis_abstract', with: 'Abstract Text Test'
     click_link('Continue')
-    click_button('Upload Primary File')
+    click_link_or_button('Upload Primary Thesis File')
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
     click_link('Continue')
-    click_button('Upload Licence Files')
+    click_link_or_button('Upload Licence Files')
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
     check 'thesis_lac_licence_agreement'

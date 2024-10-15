@@ -20,7 +20,7 @@ class LocSubjectTest < ActiveSupport::TestCase
   should 'load subjects from subjects file' do
     file = 'lib/loc_subjects.txt'
 
-    assert_difference 'LocSubject.count', 411, 'There are 432 lines in file and only 411 of them are categories' do
+    assert_difference 'LocSubject.count', 409, 'There are 430 lines in file and only 409 of them are categories' do
       LocSubject.load_from_file(file)
     end
 

@@ -47,10 +47,11 @@ class AppSettings < RailsSettings::Base
   </p>"
   field :student_upload_files, default: "<p>You will need to upload the following files: 
   <ul>
-    <li><strong>Primary file (thesis/ dissertation):</strong>  Before uploading your thesis or dissertation, you will need to save it as a PDF file (.pdf), which must be compatible with Adobe Acrobat version 5.0 or higher  </li><br/>
+    <li><strong>Primary file (thesis/dissertation):</strong>  Before uploading your thesis or dissertation, you will need to save it as a PDF file (.pdf), which must be compatible with Adobe Acrobat version 5.0 or higher  </li><br/>
     <li><strong>If needed, supplementary files:</strong> Supplementary files refer to items that are part of the approved thesis/dissertation that cannot be included in the PDF document (thesis/dissertation). Examples of these files include multi–media, sound, video or hypertext. A supplementary file is NOT an appendix. Regular appendices can be included in the PDF document of your thesis/dissertation.</li><br/>
     <li>YorkSpace can accept a variety of file types. The file size should not exceed 4 GB. If you need to deposit larger files, contact <a href='mailto:diginit@yorku.ca'>diginit@yorku.ca</a> for a consultation. Please see the Library’s <a href='https://www.library.yorku.ca/web/about-us/library-policies/digital-preservation-policy/preservation-action-plan-theses/' target='_blank'>Preservation Action Plan – Theses</a> for recommended file formats. </li>
   </ul> </p>"
+  field :student_primary_upload_files, default: "<p>Before uploading your thesis or dissertation, you will need to save it as a PDF file (.pdf), which must be compatible with Adobe Acrobat version 5.0 or higher.</p>"
   field :student_supplementary_upload_files, default: "
   <p>For preservation purposes, we recommend that supplementary files be in these formats to enable migration to new formats when a file format becomes obsolete: </p>
   <ul>

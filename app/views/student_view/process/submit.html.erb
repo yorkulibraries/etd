@@ -2,9 +2,11 @@
 
 <% title_html do %>
 	<h1>
-		<span class="fw-lighter text-secondary d-block lead ">My ETD Submission</span> 
-		<%= @student.name %>
+		<span class="text-secondary"><%= @student.name %></span>
 	</h1>
+	<h2>
+		<span class="fw-lighter text-secondary lead"><%= @thesis.title %></span>
+	</h2>
 <% end %>
 
 <%= progress_bar (Thesis::PROCESS_SUBMIT) %>
@@ -85,16 +87,15 @@
 
 	<h3 class="fw-bold">Files and Documents</h3>
 	<p>You have uploaded the following files:</p>
-	<hr/>
 
 	<div class="bg-light-subtle mt-3 p-3">
-		<h4>Primary</h4>
+		<h4>Primary Thesis File</h4>
 		<% @primary_documents.each do | document | %>
-			<%= render partial: 'documents/document_view_only', locals: {document: document} %>
+			<%= render partial: 'documents/document', locals: {document: document, view_only: true} %>
 		<% end %>
 
 		<% if @primary_documents.count == 0 %>
-			<p>There are no <strong>primary</strong> files or documents attached to this thesis/dissertation.</p>
+			<p>There are no primary thesis files.</p>
 		<% end %>
 	</div>
 	
@@ -107,11 +108,11 @@
 		</div>
 		<% @supplemental_documents.each do | document | %>
 			<% if document.usage == 'thesis'%>
-				<%= render partial: 'documents/document_view_only', locals: {document: document} %>
+				<%= render partial: 'documents/document', locals: {document: document, view_only: true} %>
 			<% end %>
 		<% end %>
 		<% if @supplemental_documents.count == 0 %>
-			<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
+			<p>There are no supplementary thesis files.</p>
 		<% end %>
 	</div>
 	
@@ -124,10 +125,10 @@
 		</div>
 		
 		<% @licence_documents.each do | document | %>
-				<%= render partial: 'documents/document_view_only', locals: {document: document} %>
+				<%= render partial: 'documents/document', locals: {document: document, view_only: true} %>
 		<% end %>
 		<% if @licence_documents.count == 0 %>
-			<p>There are no <strong>supplementary licence</strong> files or documents attached to this thesis/dissertation.</p>
+			<p>There are no licence agreements.</p>
 		<% end %>
 	</div>
 	
@@ -135,7 +136,7 @@
 		<div class="bg-light-subtle mt-3 p-3">
 			<h4>Embargo Documents</h4>
 			<% @embargo_documents.each do | document | %>
-					<%= render partial: 'documents/document_view_only', locals: {document: document} %>
+					<%= render partial: 'documents/document', locals: {document: document, view_only: true} %>
 			<% end %>
 		</div>
 	<% end %>

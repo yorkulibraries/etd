@@ -2,9 +2,11 @@
 
 <% title_html do %>
 	<h1>
-		<span class="fw-lighter text-secondary d-block lead ">My ETD Submission</span> 
-		<%= @student.name %>
+		<span class="text-secondary"><%= @student.name %></span>
 	</h1>
+	<h2>
+		<span class="fw-lighter text-secondary lead"><%= @thesis.title %></span>
+	</h2>
 <% end %>
 
 <%= progress_bar (Thesis::PROCESS_REVIEW) %>
@@ -20,154 +22,99 @@
 	<div class="settings-content">
 		<%= raw(AppSettings.student_review_license_info) %>
 	</div>
-	<h3 title="Thesis Title"><%= @thesis.title %></h3>
+	
 	<hr/>
 
-		<%= simple_form_for([@current_user, @thesis], url: accept_licences_student_thesis_path(@current_user, @thesis), method: :post, html: { class: "p-0" }) do |f| %>
-			<% if @thesis.errors.any? %>
-				<div id="error_explanation" class="p-3 bg-warning-subtle">
-					<h3><%= pluralize(@thesis.errors.count, "error") %> prohibited this thesis from being saved:</h2>
-					<ul>
-						<% @thesis.errors.full_messages.each do |message| %>
-							<li><%= message %></li>
-						<% end %>
-					</ul>
-				</div>
-			<% end %>
-
-			<div class="licence-box my-5 mt-3 bg-light p-3" >
-				<h4 title="LAC Supplementary Licence File Upload">Library and Archives Canada Licence</h4>
-				<hr class="text-primary border-3">
-				<% if AppSettings.student_review_lac_licence_instructions.present? %>
-					<p><%= raw(AppSettings.student_review_lac_licence_instructions) %></p>
-				<% end %>
-				<% if @licence_documents.count == 0 %>
-					<!-- show nothing -->
-				<% end %>
-				
-				<% @licence_documents.each do | document | %>
-					<%= render partial: document %>
-				<% end %>
-				<br/>
-				<%  unless block_thesis_changes?(@thesis) %>
-					<button type="button" class="btn btn-primary mb-3 " data-bs-toggle="modal" data-bs-target="#supplemental-licence-files">Upload Licence Files</button>
-				<% end %>
-				<div class="bg-secondary-subtle p-2 fw-bold">
-					<%= f.input :lac_licence_agreement, as: :boolean, input_html: {class: ""}, label: "I agree to and I have signed LAC Form" %>
-				</div>
-			</div>
-
-			<div class="licence-box my-5 bg-light p-3" >
-				<h4 title="Yorkspace Distribution Licence">Yorkspace Distribution Licence</h4>
-				<p class="small text-secondary">Please review the licence below and accept if you agree</p>
-				<hr class="text-primary border-3">
-				<p>
-					<a id="ydlButton" class="btn btn-primary" data-bs-toggle="collapse" href="#collapseYDL" role="button" aria-expanded="false" aria-controls="collapseYDL">
-						View YorkSpace Licence Agreement
-					</a>
-				</p>
-				<div class="collapse" id="collapseYDL">
-					<div class="card card-body">
-							<div id="yorkspace-licence" class="bg-light p-3">
-								<p><%= raw(AppSettings.student_review_license_yorkspace) %></p>
-							</div>
-					</div>
-				</div>
-				
-				<div class="bg-secondary-subtle p-2 fw-bold">
-					<%= f.input :yorkspace_licence_agreement, as: :boolean, label: "I agree to YorkSpace Distribution Licence" %>
-				</div>
-			</div>
-
-			<div class="licence-box my-5 bg-light p-3" >
-				<h4 title="ETD Licence Agreement">ETD Licence Agreement</h4>
-				<p class="small text-secondary">Please review the licence below and accept if you agree</p>
-				<hr class="text-primary border-3">
-				<p>
-					<a id="etdButton" class="btn btn-primary" data-bs-toggle="collapse" href="#collapseETD" role="button" aria-expanded="false" aria-controls="collapseETD">
-						View ETD Licence Agreement
-					</a>
-				</p>
-				<div class="collapse" id="collapseETD">
-					<div class="card card-body">
-							<div id="etd-licence" class="bg-light p-3">
-								<p><%= raw(AppSettings.student_review_license_etd) %></p>
-							</div>
-					</div>
-				</div>
-				
-				<div class="bg-secondary-subtle p-2 fw-bold">
-					<%= f.input :etd_licence_agreement, as: :boolean, label: "I agree to ETD Licence" %>
-				</div>
-			</div>
-			<%  unless block_thesis_changes?(@thesis) %>
-			<hr/>
-				<div class="process-nav d-flex justify-content-end">
-					<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD) %>" class="btn btn-lg btn-primary me-2" title="Begin Submission">
-						<i class="fa fa-angle-double-left"></i>
-					</a>
-					<%= button_tag(type: 'submit', class: "next-btn btn btn-lg btn-success") do %>
-						 Accept and Continue <i class="fa fa-angle-double-right"></i>
+	<%= simple_form_for([@current_user, @thesis], url: accept_licences_student_thesis_path(@current_user, @thesis), method: :post, html: { class: "p-0" }) do |f| %>
+		<% if @thesis.errors.any? %>
+			<div id="error_explanation" class="p-3 bg-warning-subtle">
+				<h3><%= pluralize(@thesis.errors.count, "error") %> prohibited this thesis from being saved:</h2>
+				<ul>
+					<% @thesis.errors.full_messages.each do |message| %>
+						<li><%= message %></li>
 					<% end %>
-				</div>
-			<% end %>
+				</ul>
+			</div>
 		<% end %>
 
-	
-
-		<!-- Modal L1_ -->
-		<div class="modal fade" id="L1_" tabindex="-1" aria-labelledby="L1_Label" aria-hidden="true">
-			<div class="modal-dialog modal-xl">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h1 class="modal-title fs-5" id="L1_Label">LAC licence</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<%= raw(AppSettings.student_review_license_lac) %>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					</div>
-				</div>
+		<div class="licence-box my-5 mt-3 bg-light p-3" >
+			<h4 title="LAC Supplementary Licence File Upload">Library and Archives Canada Licence</h4>
+			<hr class="text-primary border-3">
+			<% if AppSettings.student_review_lac_licence_instructions.present? %>
+				<p><%= raw(AppSettings.student_review_lac_licence_instructions) %></p>
+			<% end %>
+			<% if @licence_documents.count == 0 %>
+				<!-- show nothing -->
+			<% end %>
+			
+			<% @licence_documents.each do | document | %>
+				<%= render partial: document %>
+			<% end %>
+			<br/>
+			<%  unless block_thesis_changes?(@thesis) %>
+				<%= link_to new_student_thesis_document_path(@student, @thesis, usage: 'licence', supplemental: true), class: "btn btn-primary", remote: true do %>
+					Upload Licence Files
+			<% end %>
+			<% end %>
+			<div class="bg-secondary-subtle p-2 fw-bold">
+				<%= f.input :lac_licence_agreement, as: :boolean, input_html: {class: ""}, label: "I agree to and I have signed LAC Form" %>
 			</div>
 		</div>
 
-		<!-- Modal L2_ -->
-		<div class="modal fade" id="L2_" tabindex="-1" aria-labelledby="L2_Label" aria-hidden="true">
-			<div class="modal-dialog modal-xl">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h1 class="modal-title fs-5" id="L2_Label">YorkSpace Non-Exclusive Distribution Licence</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<%= raw(AppSettings.student_review_license_yorkspace) %>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					</div>
+		<div class="licence-box my-5 bg-light p-3" >
+			<h4 title="Yorkspace Distribution Licence">Yorkspace Distribution Licence</h4>
+			<p class="small text-secondary">Please review the licence below and accept if you agree</p>
+			<hr class="text-primary border-3">
+			<p>
+				<a id="ydlButton" class="btn btn-primary" data-bs-toggle="collapse" href="#collapseYDL" role="button" aria-expanded="false" aria-controls="collapseYDL">
+					View YorkSpace Licence Agreement
+				</a>
+			</p>
+			<div class="collapse" id="collapseYDL">
+				<div class="card card-body">
+						<div id="yorkspace-licence" class="bg-light p-3">
+							<p><%= raw(AppSettings.student_review_license_yorkspace) %></p>
+						</div>
 				</div>
+			</div>
+			
+			<div class="bg-secondary-subtle p-2 fw-bold">
+				<%= f.input :yorkspace_licence_agreement, as: :boolean, label: "I agree to YorkSpace Distribution Licence" %>
 			</div>
 		</div>
 
-		<!-- Modal L3_ -->
-		<div class="modal fade" id="L3_" tabindex="-1" aria-labelledby="L3_Label" aria-hidden="true">
-			<div class="modal-dialog modal-xl">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h1 class="modal-title fs-5" id="L3_Label">YorkU ETD Licence</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<%= raw(AppSettings.student_review_license_etd) %>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					</div>
+		<div class="licence-box my-5 bg-light p-3" >
+			<h4 title="ETD Licence Agreement">ETD Licence Agreement</h4>
+			<p class="small text-secondary">Please review the licence below and accept if you agree</p>
+			<hr class="text-primary border-3">
+			<p>
+				<a id="etdButton" class="btn btn-primary" data-bs-toggle="collapse" href="#collapseETD" role="button" aria-expanded="false" aria-controls="collapseETD">
+					View ETD Licence Agreement
+				</a>
+			</p>
+			<div class="collapse" id="collapseETD">
+				<div class="card card-body">
+						<div id="etd-licence" class="bg-light p-3">
+							<p><%= raw(AppSettings.student_review_license_etd) %></p>
+						</div>
 				</div>
+			</div>
+			
+			<div class="bg-secondary-subtle p-2 fw-bold">
+				<%= f.input :etd_licence_agreement, as: :boolean, label: "I agree to ETD Licence" %>
 			</div>
 		</div>
 
-		<%= render partial: "documents/new_licence_form", locals: { primary: false } %>
+		<%  unless block_thesis_changes?(@thesis) %>
+			<hr/>
+			<div class="process-nav d-flex justify-content-end">
+				<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD) %>" class="btn btn-lg btn-primary me-2" title="Begin Submission">
+					<i class="fa fa-angle-double-left"></i>
+				</a>
+				<%= button_tag(type: 'submit', class: "next-btn btn btn-lg btn-success") do %>
+					 Accept and Continue <i class="fa fa-angle-double-right"></i>
+				<% end %>
+			</div>
+		<% end %>
+	<% end %>
 </div>

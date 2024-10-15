@@ -1,9 +1,11 @@
 <% title "#{@student.name}" %>
 <% title_html do %>
 	<h1>
-		<span class="fw-lighter text-secondary d-block lead ">My ETD Submission</span> 
-		<%= @student.name %>
+		<span class="text-secondary"><%= @student.name %></span>
 	</h1>
+	<h2>
+		<span class="fw-lighter text-secondary lead"><%= @thesis.title %></span>
+	</h2>
 	<% if @thesis.returned_message.present? && Thesis::RETURNED == @thesis.status %>
 		<div class="alert alert-danger" role="alert">
 			<h2 class="alert-heading text-dark fs-3">Reason why your thesis was returned</h2>
@@ -21,7 +23,6 @@
 		<%= raw(AppSettings.student_begin_submission) %>
 	</div>
 
-	<h3 title="Thesis Title pb-2"><%= @thesis.title %></h3>
 	<hr/>
 	
 	<div class="thesis data-grid">

@@ -2,16 +2,18 @@
 
 <% title_html do %>
 	<h1>
-		<span class="fw-lighter text-secondary d-block lead ">My ETD Submission</span> 
-		<%= @student.name %>
+		<span class="text-secondary"><%= @student.name %></span>
 	</h1>
+	<h2>
+		<span class="fw-lighter text-secondary lead"><%= @thesis.title %></span>
+	</h2>
 <% end %>
 
 <%= progress_bar (Thesis::PROCESS_STATUS) %>
 
-<h2>Thesis Submission Status</h2>
 <div class="student-view fitted status">
-	<h3><%= @thesis.title %></h3>
+	<h2>Thesis Submission Status</h2>
+	<h3><span class="fw-lighter text-secondary lead"><%= @thesis.title %></span></h3>
 	<hr/>
 	<div>
 		<div class="settings-content">

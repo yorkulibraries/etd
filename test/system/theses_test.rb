@@ -48,6 +48,9 @@ class ThesesTest < ApplicationSystemTestCase
   end
 
   test 'Add committee member' do
+    user = FactoryGirl.create(:user, role: User::ADMIN)
+    login_as(user)
+
     visit root_url
     click_link(@thesis_01.title)
     click_on('Make Changes')
@@ -58,11 +61,14 @@ class ThesesTest < ApplicationSystemTestCase
     fill_in('First Name', with: 'test1')
     fill_in('Last Name', with: 'test2')
     choose('Committee Member')
-    click_on('Add Member')
+    click_on('Add')
     assert_selector 'span', text: 'test2, test1'
   end
 
   test 'Remove committee member' do
+    user = FactoryGirl.create(:user, role: User::ADMIN)
+    login_as(user)
+
     visit root_url
     click_link(@thesis_01.title)
     click_on('Make Changes')
@@ -73,12 +79,12 @@ class ThesesTest < ApplicationSystemTestCase
     fill_in('First Name', with: 'test1')
     fill_in('Last Name', with: 'test2')
     choose('Committee Member')
-    click_on('Add Member')
+    click_on('Add')
     assert_selector 'span', text: 'test2, test1'
 
-    accept_confirm do
-      find('span.fw-bold', text: 'test2, test1').find(:xpath, '../../div[@class="col-1"]/a[@class="btn btn-close pull-right"]').click
-    end
+    assert_selector 'a[data-delete="test2, test1 (Committee Member)"]', visible: true
+    
+    find('a[data-delete="test2, test1 (Committee Member)"]').click
 
     assert_no_selector 'span', text: 'test2, test1'
   end
@@ -164,7 +170,7 @@ class ThesesTest < ApplicationSystemTestCase
     visit root_url
     click_link(@thesis_01.title)
 
-    click_on("Upload Primary File")
+    click_on("Upload Primary Thesis File")
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
 
@@ -175,7 +181,7 @@ class ThesesTest < ApplicationSystemTestCase
     visit root_url
     click_link(@thesis_01.title)
 
-    click_on("Upload Primary File")
+    click_on("Upload Primary Thesis File")
     attach_file("document_file", Rails.root.join('test/fixtures/files/image-example.jpg'))
     click_button('Upload')
 
@@ -195,7 +201,7 @@ class ThesesTest < ApplicationSystemTestCase
     fill_in("Abstract", with: "Abstract Test")
     click_on("Continue")
 
-    click_on("Upload Supplementary Files")
+    click_on("Upload Supplementary Thesis Files")
     attach_file("document_file", Rails.root.join('test/fixtures/files/zip-file.zip'))
     click_button('Upload')
 
@@ -206,7 +212,7 @@ class ThesesTest < ApplicationSystemTestCase
     visit root_url
     click_link(@thesis_01.title)
 
-    click_on("Upload Supplementary Files")
+    click_on("Upload Supplementary Thesis Files")
     attach_file("document_file", Rails.root.join('test/fixtures/files/zip-file.zip'))
     click_button('Upload')
 
@@ -217,8 +223,8 @@ class ThesesTest < ApplicationSystemTestCase
     visit root_url
     click_link(@thesis_01.title)
 
-    click_on("Upload Supplementary Files")
-    assert_selector "h1", text: "Upload Supplementary File", visible: :all
+    click_on("Upload Supplementary Thesis Files")
+    assert_selector "h2", text: "Upload Supplementary Thesis File", visible: :all
     attach_file("document_file", Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
     assert_selector(".supplemental", text: /_supplemental_/) #Supplemental
@@ -232,8 +238,8 @@ class ThesesTest < ApplicationSystemTestCase
     visit root_url
     click_link(@thesis_01.title)
 
-    click_on("Upload Licence Files")
-    assert_selector "h1", text: "Upload Licence File", visible: :all
+    click_on("Upload Licence Agreements")
+    assert_selector "h2", text: "Upload Licence Agreements", visible: :all
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
     assert_not_empty find('.licence-file').text, "The .licence-file element is empty, no file"
@@ -244,8 +250,8 @@ class ThesesTest < ApplicationSystemTestCase
     visit root_url
     click_link(@thesis_01.title)
 
-    click_on("Upload Embargo Files")
-    assert_selector "h1", text: "Upload Supplementary File", visible: :all
+    click_on("Upload Embargo Documents")
+    assert_selector "h2", text: "Upload Embargo Documents", visible: :all
 
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
@@ -257,40 +263,38 @@ class ThesesTest < ApplicationSystemTestCase
     visit root_url
     click_link(@thesis_01.title)
 
-    click_on("Upload Primary File")
+    click_on("Upload Primary Thesis File")
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
 
-    click_link("Edit file")
+    click_link("Replace")
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
     assert_selector(".name", text: /\.pdf/)
 
-    click_link("Edit file")
-    click_link("Delete this file?")
+    click_link("Delete")
     page.accept_alert
 
-    assert_selector "p", text: "There are no primary files or documents attached to this thesis/dissertation."
+    assert_selector "p", text: "There are no primary thesis files."
   end
 
   should "update supplementary file" do
     visit root_url
     click_link(@thesis_01.title)
 
-    click_on("Upload Supplementary Files")
+    click_on("Upload Supplementary Thesis Files")
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
 
-    click_link("Edit file")
+    click_link("Replace")
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
     assert_selector(".name", text: /\.pdf/)
 
-    click_link("Edit file")
-    click_link("Delete this file?")
+    click_link("Delete")
     page.accept_alert
 
-    assert_selector "p", text: "There are no supplementary files or documents attached to this thesis/dissertation."
+    assert_selector "p", text: "There are no supplementary thesis files."
   end
 
   ###########################################################

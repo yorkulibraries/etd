@@ -1,0 +1,6 @@
+$('#file_upload_modal_container').remove();
+$('body').append('<div id="file_upload_modal_container"></div>');
+$('#file_upload_modal_container').append('<%= j render "file_upload_modal" %>');
+new bootstrap.Modal(document.getElementById('file_upload_modal'), {
+    backdrop: 'static'
+}).show();

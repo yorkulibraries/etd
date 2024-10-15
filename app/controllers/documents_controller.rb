@@ -20,22 +20,28 @@ class DocumentsController < ApplicationController
 
   def new
     @document = @thesis.documents.build
+    @document.usage = params[:usage]
+    @document.supplemental = params[:supplemental]
+    @document
   end
 
   def create
     @document = @thesis.documents.new(document_params)
     @document.thesis = @thesis
-    @document.user = current_user
-    @document.audit_comment = "Document was uploaded. File: #{@document.name} | #{@document.usage} | "
+    @document.user = @thesis.student
 
     if @document.save
+      @document.name = File.basename(@document.file_url)
+      @document.audit_comment = "Document was uploaded. File: #{@document.name} | #{@document.usage} | "
+      @document.save      
       if current_user.role == User::STUDENT && @document.usage == 'licence'
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW),
-                    notice: 'Successfully uploaded licence document'
+                    notice: 'File uploaded'
       elsif current_user.role == User::STUDENT && @document.usage != 'licence'
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
-                    notice: 'Successfully created document'else
-        redirect_to [@student, @thesis], notice: 'Successfully created document.'
+                    notice: 'File uploaded'
+      else
+        redirect_to [@student, @thesis], notice: 'File uploaded'
       end
     else
       respond_to do |format|
@@ -56,12 +62,12 @@ class DocumentsController < ApplicationController
     if @document.update(document_params)
       if current_user.role == User::STUDENT && @document.usage == 'licence'
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW),
-                    notice: 'Successfully updated licence document'
+                    notice: 'File uploaded'
       elsif current_user.role == User::STUDENT && @document.usage != 'licence'
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
-                    notice: 'Successfully updated document'
+                    notice: 'File uploaded'
       else
-        redirect_to [@student, @thesis], notice: 'Successfully updated document.'
+        redirect_to [@student, @thesis], notice: 'File uploaded'
       end
     else
       render action: 'edit'
@@ -75,12 +81,12 @@ class DocumentsController < ApplicationController
 
     if current_user.role == User::STUDENT && @document.usage == 'licence'
       redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW),
-                  notice: 'Successfully deleted licence document'
+                  notice: 'File deleted'
     elsif current_user.role == User::STUDENT && @document.usage != 'licence'
       redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
-                  notice: 'Successfully deleted the document'
+                  notice: 'File deleted'
     else
-      redirect_to student_thesis_url(@student, @thesis), notice: 'Successfully deleted the document.'
+      redirect_to student_thesis_url(@student, @thesis), notice: 'File deleted'
     end
   end
 

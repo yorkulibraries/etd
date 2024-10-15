@@ -2,9 +2,11 @@
 
 <% title_html do %>
 	<h1>
-		<span class="fw-lighter text-secondary d-block lead ">My ETD Submission</span> 
-		<%= @student.name %>
+		<span class="text-secondary"><%= @student.name %></span>
 	</h1>
+	<h2>
+		<span class="fw-lighter text-secondary lead"><%= @thesis.title %></span>
+	</h2>
 <% end %>
 
 <%= progress_bar (Thesis::PROCESS_UPLOAD) %>
@@ -14,51 +16,40 @@
 	<div class="settings-content">
 		<%= raw(AppSettings.student_upload_files) %>
 	</div>
-	<h3 title="Thesis Title"><%= @thesis.title %></h3>
-
-	<div class="thesis data-grid">
-		<hr/>
-	</div>
 
 	<div class="documents">
-		<div class="bg-light p-3">
-			<h4>Primary file (thesis/ dissertation):</h4>
-			<%  unless block_thesis_changes?(@thesis) %>
-				<% if @primary_documents.count == 0 %>
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#primary-file">Upload Primary File</button>
+		<h4>Primary Thesis File</h4>
+		<% if @primary_documents.count == 0 %>
+			<p>There are no primary thesis files.</p>
+		<% end %>
+		<% @primary_documents.each do | document | %>
+			<%= render partial: document %>
+		<% end %>
+		<%  unless block_thesis_changes?(@thesis) %>
+			<% if @primary_documents.count == 0 %>
+				<%= link_to new_student_thesis_document_path(@student, @thesis, usage: 'thesis', supplemental: false), class: "btn btn-primary", remote: true do %>
+					Upload Primary Thesis Files
 				<% end %>
 			<% end %>
+		<% end %>
 
-			<% @primary_documents.each do | document | %>
+		<h4>Supplementary Thesis Files</h4>
+		<% if @supplemental_documents.count == 0 %>
+			<p>There are no supplementary thesis files.</p>
+		<% end %>
+		<% @supplemental_documents.each do | document | %>
+			<% if document.usage == "thesis" %>
 				<%= render partial: document %>
 			<% end %>
-
-			<% if @primary_documents.count == 0 %>
-				<p class="mt-3">There is no <strong>primary</strong> file or document attached to this thesis/dissertation.</p>
+		<% end %>
+		<% unless block_thesis_changes?(@thesis) %>
+			<%= link_to new_student_thesis_document_path(@student, @thesis, usage: 'thesis', supplemental: true), class: "btn btn-primary", remote: true do %>
+					Upload Supplementary Thesis Files
 			<% end %>
-		</div>
-
-		<div class="push-down"></div>
-
-		<div class="bg-light mt-3 p-3">
-			<h4>Supplementary</h4>
-				<%  unless block_thesis_changes?(@thesis) %>
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#supplemental-files">Upload Supplementary Files</button>
-				<% end %>
-
-			<div class='mt-3'>
-			<% @supplemental_documents.each do | document | %>
-				<% if document.usage == "thesis" %>
-					<%= render partial: document %>
-				<% end %>
-			<% end %>
-			<% if @supplemental_documents.count == 0 %>
-				<p class="mt-3">There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>
-			<% end %>
-		</diV>
+		<% end %>
 	</div>
 
-	<%  unless block_thesis_changes?(@thesis) %>
+	<% unless block_thesis_changes?(@thesis) %>
 		<hr/>
 		<div class="process-nav d-flex justify-content-end">
 			<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="btn btn-lg btn-primary me-2" title="Begin Submission">
@@ -70,10 +61,4 @@
 			</a>
 		</div>
 	 <% end %>
-
 </div>
-
-
-	<%= render partial: "documents/new_form", locals: { primary: true } %>
-
-	<%= render partial: "documents/new_form", locals: { primary: false } %>

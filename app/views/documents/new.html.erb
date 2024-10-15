@@ -1,15 +1,7 @@
-<% title "Upload New Document File" %>
+<% title "Upload File" %>
 
 <% title_html do %>
-	<%= render partial: "students/header" %>
+  <%= render partial: "students/header" %>
 <% end %>
 
-<div class="card mt-3">
-  <div class="card-body">
-		<h5 class="card-title">Upload New Document File </h5>
-		<h6 class="card-subtitle mb-2 text-body-secondary"><%= @thesis.title %></h6>
-		<div class="card-text pt-2">
-			<%= render 'form' %>
-		</div>
-  </div>
-</div>
+<%= render "form" %>

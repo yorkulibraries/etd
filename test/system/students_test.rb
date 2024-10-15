@@ -85,8 +85,8 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('Start this thesis')
     select "EMBA", from: "thesis_degree_name"
     select "Master's", from: "thesis_degree_level"
-    click_link('Add Committee Member')
-    click_link('Remove')
+    #click_link('Add Committee Member')
+    #click_link('Remove')
     click_button('Create Thesis')
     assert_selector '.alert-success', text: 'Thesis successfully created.'
     # page.accept_alert
@@ -271,7 +271,7 @@ class StudentsTest < ApplicationSystemTestCase
 
     ## Page 3: Files and Documents
 
-    click_on("Upload Primary File")
+    click_on("Upload Primary Thesis File")
 
     # assert_no_selector("p", text: "Smith_Jane_E_2014_PhD.pdf", visible: :all)
     assert_not(page.has_css?("p", text: "Smith_Jane_E_2014_PhD.pdf"), "Should not show 'example text' as per Spring 2024 requirements")
@@ -319,17 +319,16 @@ class StudentsTest < ApplicationSystemTestCase
 
     # Ensure you can't go next without uploading LAC Document
     click_button("Accept and Continue")
-    assert_selector(".alert-warning", text: "Missing Licence Document. Please upload LAC Licence Signed Doc.")
+    assert_selector(".alert-warning", text: "Missing licence documents. Please upload signed licence documents.")
 
-    click_button('Upload Licence Files')
+    click_link_or_button('Upload Licence Files')
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
 
     click_button("Accept and Continue")
 
     ## Page 5: Submission Review
-    assert_no_link('Edit file')
-    assert_no_link('Download')
+    assert_no_link('Replace')
     assert_no_link('Delete')
 
   end
@@ -359,7 +358,7 @@ class StudentsTest < ApplicationSystemTestCase
     click_on("Continue")
 
     ## Page 3: Upload Supplementary
-    click_on("Upload Supplementary Files")
+    click_on("Upload Supplementary Thesis Files")
 
     # assert_no_selector("p", text: "Smith_Jane_E_2014_PhD.pdf", visible: :all)
     # assert_not(page.has_css?("p", text: "Smith_Jane_E_2014_PhD.pdf"), "Should not show 'example text' as per Spring 2024 requirements")

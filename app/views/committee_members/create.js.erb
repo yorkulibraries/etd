@@ -1,7 +1,7 @@
 <% if @committee_member.errors.size == 0 %>	
 	$("#add_committee_member_modal").modal('hide');
 	$("#add_committee_member").remove();
-	$("#committee_members .link_section").before("<%= j render @committee_member %>");
+	$("#committee_members .committee_members_list").append("<%= j render @committee_member %>");
 <% else %>
 	$("#add_committee_member").html("<%= j render "form" %>");
 <% end %>

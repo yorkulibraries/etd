@@ -14,17 +14,17 @@
 						<%= f.input :first_name, label: "First Name", required: true %>
 					</p>
 					<p id="member_last_name">
-						<%= f.input :last_name, label: "Last Name" %>
+						<%= f.input :last_name, label: "Last Name", required: true %>
 					</p>
-					<%= f.input :role, label: "Choose a Role:", required: true, collection: CommitteeMember::ROLES, as: :radio_buttons %>
+					<%= f.input :role, label: "Role", required: true, collection: CommitteeMember::ROLES, as: :radio_buttons %>
 				</div>
 				<div class="modal-footer">
+					<%= f.button :submit, "Add", class: "btn btn-primary" %>
 					<% if request.xhr? %>
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 					<% else %>
 						<%= link_to "Cancel", :back, class: "btn" %>
 					<% end %>
-						<%= f.button :submit, "Add Member", class: "btn btn-primary" %>
 				</div>
 			<% end %>
     </div>

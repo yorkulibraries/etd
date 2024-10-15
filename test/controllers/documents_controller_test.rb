@@ -65,14 +65,7 @@ class DocumentsControllerTest < ActionController::TestCase
       assert assigns(:deleted_documents), 'Deleted document flag is assigned'
     end
 
-    should 'show new form' do
-      get :new, params: { thesis_id: @thesis.id, student_id: @student.id }
-      assert_template 'new'
-
-      assert_select 'form.document', 1, 'The form should be there'
-    end
-
-    should 'create a new document, ensure thesis and current_user are assigned' do
+    should 'create a new document, ensure thesis and student are assigned' do
       assert_difference 'Document.count' do
         post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
                                 document: attributes_for(:document).except(:user, :thesis) }
@@ -80,7 +73,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
       document = assigns(:document)
 
-      assert_equal @user.id, document.user.id, 'Current user is the one created the document'
+      assert_equal @thesis.student.id, document.user.id, 'The Student owning the Thesis should own the Document'
       assert_equal @thesis.id, document.thesis.id, 'Current thesis should be set'
       assert_redirected_to student_thesis_path(@student, @thesis), 'Should redirect to thesis details view'
     end
@@ -118,7 +111,7 @@ class DocumentsControllerTest < ActionController::TestCase
       end
 
       assert_redirected_to student_thesis_path(@student, @thesis), 'Should redirect back to the thesis details'
-      assert_equal 'Successfully deleted the document.', flash[:notice]
+      assert_equal 'File deleted', flash[:notice]
     end
   end
 

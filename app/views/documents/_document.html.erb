@@ -1,4 +1,4 @@
-<div class="row border rounded mx-auto my-2">
+<div class="row border rounded mx-auto my-2" id="document_<%= document.id %>">
 	<div class="col-12 col-md-1 p-3">
 		<div class="d-flex align-items-center">
 			<div class="flex-shrink-0">
@@ -10,31 +10,26 @@
 	</div>
 
 	<div class="col-12 col-md-6 p-3">
-		<span class="name text-wrap text-break <%= "supplemental" if document.supplemental? %>" title="<%= File.basename(document.file_url) %>">
-					<%= URI.decode_www_form_component(File.basename(document.file_url)) %>
-				</span>
-				<% if document.name %>
-					<%= document.name %>
-					&nbsp; &nbsp;
-				<% end %>
+		<span class="name text-wrap text-break <%= "supplemental" if document.supplemental? %>">
+			<%= document.name %>
+			<span class="weak small">[<%=number_to_human_size document.file.file.size rescue nil %>]</span>
+		</span>
 	</div>
 
 	<div class="col-12 col-md-5 d-flex flex-column flex-md-row justify-content-md-end align-items-start align-items-md-center">
 		<% unless block_thesis_changes?(@thesis) %>
-				<% if document.usage != 'licence' %>
-					<%= link_to edit_student_thesis_document_path(@student, @thesis, document), class: "btn btn-info mx-2 my-2", title: "Edit File" do %>
-						<i class="fa fa-edit green"></i> Edit file 
-					<% end %>
+		    <% if (defined? view_only).nil? || !view_only %>
+				<%= link_to edit_student_thesis_document_path(@student, @thesis, document), class: "btn btn-info mx-2 my-2", title: "Replace", remote: true do %>
+					<i class="fa fa-edit"></i> Replace
 				<% end %>
-				<%= link_to document.file_url, class: 'btn btn-secondary mx-2 my-2', title: "Download file" do %>
-					<i class="fa fa-download"></i> Download
-					<span class="weak small">[<%=number_to_human_size document.file.file.size rescue nil%>]</span>
-				<% end %>		
-				<% unless block_thesis_changes?(@thesis) %>
-					<%= link_to [@student, @thesis, document], data: { confirm: 'Are you sure?' }, class: "btn btn-danger mx-2 my-2", :method => :delete do %>
-						<i class="fa fa-trash"></i> Delete
-					<% end %>
+					
+				<%= link_to [@student, @thesis, document], data: { confirm: 'Are you sure?' }, class: "btn btn-danger mx-2 my-2", :method => :delete do %>
+					<i class="fa fa-trash"></i> Delete
 				<% end %>
-			<% end %>
+		    <% end %>
+		<% end %>
+		<%= link_to document.file_url, class: 'btn btn-secondary mx-2 my-2', title: "Download", target: :_blank do %>
+			<i class="fa fa-download"></i> Download
+		<% end %>
 	</div>
 </div>

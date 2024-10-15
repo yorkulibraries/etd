@@ -173,7 +173,7 @@ class ThesesController < ApplicationController
       if @thesis.update(thesis_params)
         if validate_active_thesis(@thesis.id)
           @thesis.update(audit_comment: 'Submitting for review.', student_accepted_terms_at: Date.today, under_review_at: Date.today, status: Thesis::UNDER_REVIEW)
-          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS), notice: "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
+          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS)
         else
           redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), alert: 'Missing Primary Document'
         end
@@ -202,9 +202,9 @@ class ThesesController < ApplicationController
     if @thesis.valid?(:accept_licences)
       if @thesis.update(thesis_params)
         if validate_licence_uplaod(@thesis.id)
-          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), notice: "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
+          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
         else
-          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: 'Missing Licence Document. Please upload LAC Licence Signed Doc.'
+          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: 'Missing licence documents. Please upload signed licence documents.'
         end
       else
         error_messages = @thesis.errors.full_messages.join(', ')

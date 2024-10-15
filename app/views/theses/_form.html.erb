@@ -1,4 +1,4 @@
-<%= simple_form_for [@student, @thesis], html: { class: "form-horizontal" } do |f| %>
+<%= simple_form_for [@student, @thesis], html: { class: "form-horizontal thesis-form" } do |f| %>
 
 	<% if f.error_messages %>
 		<div class="alert alert-danger error_messages">
@@ -9,21 +9,16 @@
 	<%= render partial: "form_admin_editable", locals: { f: f } %>
 
 	<%= content_for :admin_editable_part_1 %>
-
-	<hr class="fitted" style="border-color: black;"/>
 	
 	<%= render partial: "form_student_editable", locals: { f: f } %>
 
 	<%= content_for :admin_editable_part_2 %>
 
 	<%= f.input :gem_record_event_id, as: :hidden %>
-	
-	<hr class="fitted"/>
-	
+		
 	<div class="action controls">
-		<%= f.button :submit, class: "btn btn-success" %>  or <%= link_to "Cancel",  @thesis.new_record? ? @student :  [@student, @thesis] %>
+	  <%= f.button :submit, class: "btn btn-success" %>  
+	  <%= link_to "Cancel",  @thesis.new_record? ? @student :  [@student, @thesis], class: "btn btn-secondary" %>
 	</div>
 
 <% end %>
-
-

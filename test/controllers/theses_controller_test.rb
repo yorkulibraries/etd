@@ -469,7 +469,7 @@ class ThesesControllerTest < ActionController::TestCase
       # thesis = create(:thesis, student: @student)
       patch :accept_licences, params: { student_id: @student.id, id: @thesis.id, thesis: { lac_licence_agreement: true, yorkspace_licence_agreement: true, etd_licence_agreement: true } }
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW)
-      assert_equal 'Missing Licence Document. Please upload LAC Licence Signed Doc.', flash[:alert]
+      assert_equal 'Missing licence documents. Please upload signed licence documents.', flash[:alert]
     end
 
     should "should accept licences with a licence document" do
@@ -478,7 +478,6 @@ class ThesesControllerTest < ActionController::TestCase
       create(:document_licence, thesis: @thesis, user: @student, deleted: false)
       patch :accept_licences, params: { student_id: @student.id, id: @thesis.id, thesis: { lac_licence_agreement: true, yorkspace_licence_agreement: true, etd_licence_agreement: true } }
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
-      assert_equal "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.reload.status]}", flash[:notice]
     end
 
   end
