@@ -20,7 +20,7 @@
 	<div class="thesis data-grid">
 		<hr/>
 		<div class="row">
-			<div class="col-md-12 col-lg-8">
+			<div class="col-md-12 col-lg-12">
 				<h4>Title</h4>
 				<p><%= @thesis.title %></p>
 			</div>
@@ -52,12 +52,12 @@
 				<h4>Program</h4>
 				<p><%= format @thesis.program %></p>
 			</div>
+			<div class="col-md-6 col-lg-4">
+				<h4>Examination committee members</h4>
+				<% @thesis.committee_members.each do |committee_member| %>
+					<%= render committee_member %>
+				<% end %>
 		</div>
-		<div class="row">
-			<h4>Examination committee members</h4>
-			<% @thesis.committee_members.each do |committee_member| %>
-				<%= render committee_member %>
-			<% end %>
 		</div>
 	</div>
 

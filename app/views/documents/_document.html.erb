@@ -1,17 +1,10 @@
 <div class="row border rounded mx-auto my-2" id="document_<%= document.id %>">
-	<div class="col-12 col-md-1 p-3">
-		<div class="d-flex align-items-center">
-			<div class="flex-shrink-0">
-				<i class="fa fa-file fa-2x me-2 text-warning"></i>
-			</div>
-		</div>
-	</div>
-
 	<div class="col-12 col-md-6 p-3">
+		<i class="fa fa-file fa-2x me-2 text-warning"></i>
 		<span class="name text-wrap text-break <%= "supplemental" if document.supplemental? %>">
 			<%= document.name %>
-			<span class="weak small">[<%=number_to_human_size document.file.file.size rescue nil %>]</span>
 		</span>
+		<span class="weak small">[<%=number_to_human_size document.file.file.size rescue nil %>]</span>
 	</div>
 
 	<div class="col-12 col-md-5 d-flex flex-column flex-md-row justify-content-md-end align-items-start align-items-md-center">

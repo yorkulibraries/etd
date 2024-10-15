@@ -77,6 +77,10 @@ $yorku_brand: #e31837;
 			.unassign a { color: $danger }
 		}
 	}
+
+	.committee-member-name {
+		font-weight: bold !important;
+	}
 }
 
 .thesis-list:nth-child(even) {
