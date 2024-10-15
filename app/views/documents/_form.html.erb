@@ -1,4 +1,4 @@
-<%= simple_form_for [@student, @thesis, @document], authenticity_token: true, html: {  multipart: true } do |f| %>
+<%= simple_form_for [@student, @thesis, @document], authenticity_token: true, html: {  multipart: true, class: "file-upload" } do |f| %>
   
   <h2 class="fs-6">
   	<% if @document.usage == 'thesis' && !@document.supplemental %>
@@ -41,7 +41,7 @@
 	<%= f.hidden_field :usage, value: @document.usage %>
 	<%= f.hidden_field :supplemental, value: @document.supplemental %>
   
-  <%= f.button :submit, "Upload", class: "btn btn-primary" %>        
+  <%= f.button :submit, "Upload", class: "btn btn-primary file-upload", disabled: true %>
 
   <% if (defined? modal).nil? || !modal %>
     <% if current_user.role == User::STUDENT && @document.usage == 'licence' %>

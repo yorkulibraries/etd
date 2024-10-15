@@ -39,23 +39,27 @@
 
 		<div class="licence-box my-5 mt-3 bg-light p-3" >
 			<h4 title="LAC Supplementary Licence File Upload">Library and Archives Canada Licence</h4>
-			<hr class="text-primary border-3">
+			
 			<% if AppSettings.student_review_lac_licence_instructions.present? %>
-				<p><%= raw(AppSettings.student_review_lac_licence_instructions) %></p>
+				<div class="small text-secondary">
+					<%= raw(AppSettings.student_review_lac_licence_instructions) %>
+				</div>
 			<% end %>
-			<% if @licence_documents.count == 0 %>
-				<!-- show nothing -->
-			<% end %>
+
+			<hr class="text-primary border-3">
 			
 			<% @licence_documents.each do | document | %>
 				<%= render partial: document %>
 			<% end %>
-			<br/>
+
 			<%  unless block_thesis_changes?(@thesis) %>
+				<p>
 				<%= link_to new_student_thesis_document_path(@student, @thesis, usage: 'licence', supplemental: true), class: "btn btn-primary", remote: true do %>
 					Upload Licence Files
+				<% end %>
+				</p>
 			<% end %>
-			<% end %>
+
 			<div class="bg-secondary-subtle p-2 fw-bold">
 				<%= f.input :lac_licence_agreement, as: :boolean, input_html: {class: ""}, label: "I agree to and I have signed LAC Form" %>
 			</div>

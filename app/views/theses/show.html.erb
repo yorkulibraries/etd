@@ -101,14 +101,15 @@
 		<h5>Primary Thesis File</h5>
 		<% if @primary_documents.count == 0 %>
 			<p>There are no primary thesis files.</p>
+
+			<%  unless block_thesis_changes?(@thesis) %>
+				<%= link_to new_student_thesis_document_path(@student, @thesis, usage: 'thesis', supplemental: false), class: "btn btn-primary", remote: true do %>
+						Upload Primary Thesis Files
+				<% end %>
+			<% end %>
 		<% end %>
 		<% @primary_documents.each do | document | %>
 			<%= render partial: document %>
-		<% end %>
-		<%  unless block_thesis_changes?(@thesis) %>
-			<%= link_to new_student_thesis_document_path(@student, @thesis, usage: 'thesis', supplemental: false), class: "btn btn-primary", remote: true do %>
-					Upload Primary Thesis Files
-			<% end %>
 		<% end %>
 	</div>
 	

@@ -37,4 +37,10 @@ $(document).ready(function () {
 			source: committee_member_names_list
 		});
 	});
+
+	$('form.file-upload input.file').change ( function() {
+	    if ($(this).val()) {
+	        $(this).parents('form:first').find('input:submit').removeAttr('disabled');
+	    } 
+	});
 });
