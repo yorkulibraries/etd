@@ -25,9 +25,9 @@ namespace :app_settings do
 
   task load: :environment do
     AppSettings.keys.each do |k|
-    v = eval("AppSettings.#{k}")
-    AppSettings.send("#{k}=", v)
-end
+      v = eval("AppSettings.#{k}")
+      AppSettings.send("#{k}=", v)
+    end
   end
 
 end
