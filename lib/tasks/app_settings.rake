@@ -24,6 +24,10 @@ namespace :app_settings do
   end
 
   task load: :environment do
+    AppSettings.keys.each do |k|
+    v = eval("AppSettings.#{k}")
+    AppSettings.send("#{k}=", v)
+end
   end
 
 end

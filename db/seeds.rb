@@ -131,9 +131,7 @@ Sincerely,
 Faculty of Graduate Studies
 HEREDOC
 
-AppSettings.email_status_change_allow = <<HEREDOC
-true
-HEREDOC
+AppSettings.email_status_change_allow = true
 
 AppSettings.email_status_change_subject = <<HEREDOC
 The status of your thesis has been changed.
