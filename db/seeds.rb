@@ -84,7 +84,6 @@ end
 ## seed settings
 #######################################
 
-
 AppSettings.app_name = <<HEREDOC
 ETD
 HEREDOC
@@ -96,7 +95,7 @@ HEREDOC
 AppSettings.app_maintenance = false
 
 AppSettings.app_maintenance_message = <<HEREDOC
-ETD Application will be taken down for maintenance tomorrow (May 13) from 7am to 8am.  We apologize for any inconvenience this may have caused.
+<div>ETD Application will be taken down for maintenance tomorrow (May 13) from 7am to 8am. We apologize for any inconvenience this may have caused.&nbsp;</div>
 HEREDOC
 
 AppSettings.email_allow = true
@@ -193,7 +192,7 @@ AppSettings.student_begin_submission = <<HEREDOC
 HEREDOC
 
 AppSettings.student_begin_external_non_yorku_email = <<HEREDOC
-Please provide a secondary email address for future contact. Please note that this needs to be a non-York email address, in the event that your York email address is deactivated after your completion.
+<div>Please provide a secondary email address for future contact. Please note that this needs to be a non-York email address, in the event that your York email address is deactivated after your completion.&nbsp;</div>
 HEREDOC
 
 AppSettings.student_update_details_initial = <<HEREDOC
@@ -201,27 +200,19 @@ AppSettings.student_update_details_initial = <<HEREDOC
 HEREDOC
 
 AppSettings.student_update_details_abstract = <<HEREDOC
-<p>Add an abstract for your submission. The abstract is typically a 150 to 250- word paragraph that provides a short summary of your research, including a summary of the problem or issue, a description of the research method and design, the major findings and the conclusion. Your abstract should include important key words that describe your research and research methodology, as these words will support discoverability of your research in search engines and research databases. </p>
+<div>Add an abstract for your submission. The abstract is typically a 150 to 250- word paragraph that provides a short summary of your research, including a summary of the problem or issue, a description of the research method and design, the major findings and the conclusion. Your abstract should include important key words that describe your research and research methodology, as these words will support discoverability of your research in search engines and research databases.&nbsp;<br><br></div>
 HEREDOC
 
 AppSettings.student_update_details_subjects = <<HEREDOC
-<p>You will be asked to select at least one subject heading from a drop-down menu that will be attributed to your thesis depending on your discipline. These terms are drawn from the Library of Congress subject headings and align with the degree names issued by the University. These terms relate to your area of study. </p>
+<div>You will be asked to select at least one subject heading from a drop-down menu that will be attributed to your thesis depending on your discipline. These terms are drawn from the Library of Congress subject headings and align with the degree names issued by the University. These terms relate to your area of study.&nbsp;<br><br></div>
 HEREDOC
 
 AppSettings.student_update_details_keywords = <<HEREDOC
-<p>
-  Choose up to ten key words or phrases that describe what your work is about. The keywords should repeat core concepts in your abstract. Capitalize each keyword or the first word of a keyword phrase and separate words or terms with commas. Select terms that your target audience might use when searching for your work. Keep in mind that: 
-  <ul>
-   <li>Terms that are too broad (e.g. 'Anthropology') or too narrow (e.g. 'fM space') may not help people find your work.</li>
-   <li>There is no need to add your subject terms as keywords. </li>
-   <li>Use the plural form of nouns (e.g., 'magazines' instead of 'magazine'). </li>
-   <li>Adding variations or synonyms for key words can be helpful for searchers but avoid common variations (e.g. employees or workers). </li>
-  </ul>
-  </p>
+<div>&nbsp;Choose up to ten key words or phrases that describe what your work is about. The keywords should repeat core concepts in your abstract. Capitalize each keyword or the first word of a keyword phrase and separate words or terms with commas. Select terms that your target audience might use when searching for your work. Keep in mind that:&nbsp;<br><br></div><ul><li>Terms that are too broad (e.g. 'Anthropology') or too narrow (e.g. 'fM space') may not help people find your work.</li><li>There is no need to add your subject terms as keywords.&nbsp;</li><li>Use the plural form of nouns (e.g., 'magazines' instead of 'magazine').&nbsp;</li><li>Adding variations or synonyms for key words can be helpful for searchers but avoid common variations (e.g. employees or workers).&nbsp;</li></ul>
 HEREDOC
 
 AppSettings.student_upload_files = <<HEREDOC
-<div>You will need to upload the following files:&nbsp;<br><br></div><ul><li><strong>Primary file (thesis/dissertation):</strong> Before uploading your thesis or dissertation, you will need to save it as a PDF file (.pdf), which must be compatible with Adobe Acrobat version 5.0 or higher&nbsp;</li></ul><div><br><br></div><ul><li><strong>If needed, supplementary files:</strong> Supplementary files refer to items that are part of the approved thesis/dissertation that cannot be included in the PDF document (thesis/dissertation). Examples of these files include multi–media, sound, video or hypertext. A supplementary file is NOT an appendix. Regular appendices can be included in the PDF document of your thesis/dissertation.</li></ul><div><br><br></div><ul><li>YorkSpace can accept a variety of file types. The file size should not exceed 4 GB. If you need to deposit larger files, contact <a href="mailto:diginit@yorku.ca">diginit@yorku.ca</a> for a consultation. Please see the Library’s <a href="https://www.library.yorku.ca/web/about-us/library-policies/digital-preservation-policy/preservation-action-plan-theses/">Preservation Action Plan – Theses</a> for recommended file formats.&nbsp;</li></ul>
+<div>You will need to upload the following files:&nbsp;</div><ul><li><strong>Primary file (thesis/dissertation):</strong> Before uploading your thesis or dissertation, you will need to save it as a PDF file (.pdf), which must be compatible with Adobe Acrobat version 5.0 or higher&nbsp;</li><li><strong>If needed, supplementary files:</strong> Supplementary files refer to items that are part of the approved thesis/dissertation that cannot be included in the PDF document (thesis/dissertation). Examples of these files include multi–media, sound, video or hypertext. A supplementary file is NOT an appendix. Regular appendices can be included in the PDF document of your thesis/dissertation.</li><li>YorkSpace can accept a variety of file types. The file size should not exceed 4 GB. If you need to deposit larger files, contact <a href="mailto:diginit@yorku.ca">diginit@yorku.ca</a> for a consultation. Please see the Library’s <a href="https://www.library.yorku.ca/web/about-us/library-policies/digital-preservation-policy/preservation-action-plan-theses/">Preservation Action Plan – Theses</a> for recommended file formats.&nbsp;</li></ul>
 HEREDOC
 
 AppSettings.student_primary_upload_files = <<HEREDOC
@@ -229,15 +220,15 @@ AppSettings.student_primary_upload_files = <<HEREDOC
 HEREDOC
 
 AppSettings.student_supplementary_upload_files = <<HEREDOC
-<div>For preservation purposes, we recommend that supplementary files be in these formats to enable migration to new formats when a file format becomes obsolete:&nbsp;<br><br></div><ul><li><strong>Documents:</strong> Portable Document Format (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).&nbsp;</li><li><strong>Images:</strong> Tagged Image File format (.tif)</li><li><strong>Data:</strong> Comma-separated values (.csv) or other delimited text, Extensible Markup Language (.xml)</li><li><strong>Video:</strong> MPEG-4 (.mp4) files are preferred, but we can also accept AVI (.avi) and MOV (.mov) file formats.</li><li><strong>Audio:</strong> MPEG-1 Audio Layer 3 (.mp3) file are preferred, but we can also accept Free Lossless Audio Codec (.flac) or WAVE (.wav) file formats.</li></ul><div>Please ensure that:&nbsp;<br><br></div><ul><li>You have permission from subjects appearing in media files.&nbsp;</li><li>The total size of your supplementary files does not exceed 4 gigabytes (4GB)</li><li>If you wish to upload a type of file that you do not see on this list, please email diginit@yorku.ca for support.</li></ul>
+<div>For preservation purposes, we recommend that supplementary files be in these formats to enable migration to new formats when a file format becomes obsolete:&nbsp;</div><ul><li><strong>Documents:</strong> Portable Document Format (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).&nbsp;</li><li><strong>Images:</strong> Tagged Image File format (.tif)</li><li><strong>Data:</strong> Comma-separated values (.csv) or other delimited text, Extensible Markup Language (.xml)</li><li><strong>Video:</strong> MPEG-4 (.mp4) files are preferred, but we can also accept AVI (.avi) and MOV (.mov) file formats.</li><li><strong>Audio:</strong> MPEG-1 Audio Layer 3 (.mp3) file are preferred, but we can also accept Free Lossless Audio Codec (.flac) or WAVE (.wav) file formats.</li></ul><div>Please ensure that:&nbsp;</div><ul><li>You have permission from subjects appearing in media files.&nbsp;</li><li>The total size of your supplementary files does not exceed 4 gigabytes (4GB)</li><li>If you wish to upload a type of file that you do not see on this list, please email diginit@yorku.ca for support.</li></ul>
 HEREDOC
 
 AppSettings.student_supplementary_embargo_upload_files = <<HEREDOC
-<div>&nbsp;Please Upload the following documents:<br><br></div><ul><li><strong>Supervisor Letter</strong></li><li><strong>Other Embargo Supporting Documents</strong></li><li><strong>Portable Document Format:</strong> (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).</li></ul>
+<div>&nbsp;Please Upload the following documents:</div><ul><li><strong>Supervisor Letter</strong></li><li><strong>Other Embargo Supporting Documents</strong></li><li><strong>Portable Document Format:</strong> (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).</li></ul>
 HEREDOC
 
 AppSettings.student_review_license_info = <<HEREDOC
-<div>By signing these non-exclusive distribution licences, you are confirming that:&nbsp;<br><br></div><ul><li>your dissertation is your original work;&nbsp;</li><li>that your dissertation does not infringe any rights of others;&nbsp;</li><li>and that as the copyright holder, you have the right to grant a non-exclusive distribution licence to York University, YorkSpace (the university’s institutional repository), and Library and Archives Canada (LAC).&nbsp;</li></ul><div>This allows York University and LAC to make copies, including electronically formatted copies, and/or distribute worldwide all or part of the dissertation, subject to the conditions outlined in the licences.&nbsp;<br><br></div><div>If applicable, you should submit copies of any required copyright permissions before the final dissertation submission to the Office of the Dean, Graduate Studies. You should also retain copies of all copyright permission requests and approvals.<br><br></div>
+<div>By signing these non-exclusive distribution licences, you are confirming that:&nbsp;</div><ul><li>your dissertation is your original work;&nbsp;</li><li>that your dissertation does not infringe any rights of others;&nbsp;</li><li>and that as the copyright holder, you have the right to grant a non-exclusive distribution licence to York University, YorkSpace (the university’s institutional repository), and Library and Archives Canada (LAC).&nbsp;</li></ul><div>This allows York University and LAC to make copies, including electronically formatted copies, and/or distribute worldwide all or part of the dissertation, subject to the conditions outlined in the licences.&nbsp;<br><br></div><div>If applicable, you should submit copies of any required copyright permissions before the final dissertation submission to the Office of the Dean, Graduate Studies. You should also retain copies of all copyright permission requests and approvals.<br><br></div>
 HEREDOC
 
 AppSettings.student_review_license_lac = <<HEREDOC
@@ -249,7 +240,7 @@ AppSettings.student_review_lac_licence_instructions = <<HEREDOC
 HEREDOC
 
 AppSettings.student_review_license_yorkspace = <<HEREDOC
-<div>YorkSpace Non-Exclusive Distribution Licence&nbsp;</div>
+<div>YORKSPACE NON-EXCLUSIVE DISTRIBUTION LICENSE</div><div><br></div><div>By signing and submitting this license, you (the author(s) or copyright</div><div>owner) grants to York University the non-exclusive right to reproduce,</div><div>translate (as defined below), and/or distribute your submission (including</div><div>the abstract) worldwide in print and electronic format and in any medium,</div><div>including but not limited to audio or video.</div><div><br></div><div>YorkSpace and your use of YorkSpace is governed by the terms and conditions of</div><div>the York University website posted at:</div><div>http://www.yorku.ca/web/about_yorku/privacy.html</div><div><br></div><div>You agree that York University may, without changing the content, translate the</div><div>submission to any medium or format for the purpose of preservation.</div><div><br></div><div>You also agree that York University may keep more than one copy of this submission for</div><div>purposes of security, back-up and preservation.</div><div><br></div><div>You represent that the submission is your original work, and that you have</div><div>the right to grant the rights contained in this license. You also represent</div><div>that your submission does not, to the best of your knowledge, infringe upon</div><div>anyone's copyright.</div><div><br></div><div>If the submission contains material for which you do not hold copyright,</div><div>you represent that you have obtained the unrestricted permission of the</div><div>copyright owner to grant York University the rights required by this license, and that</div><div>such third-party owned material is clearly identified and acknowledged</div><div>within the text or content of the submission.</div><div><br></div><div>IF THE SUBMISSION IS BASED UPON WORK THAT HAS BEEN SPONSORED OR SUPPORTED</div><div>BY AN AGENCY OR ORGANIZATION OTHER THAN YORK UNIVERSITY, YOU REPRESENT THAT YOU HAVE</div><div>FULFILLED ANY RIGHT OF REVIEW OR OTHER OBLIGATIONS REQUIRED BY SUCH</div><div>CONTRACT OR AGREEMENT.</div><div><br></div><div>York University will clearly identify your name(s) as the author(s) or owner(s) of the</div><div>submission, and will not make any alteration, other than as allowed by this</div><div>license, to your submission.</div>
 HEREDOC
 
 AppSettings.student_review_license_etd = <<HEREDOC
@@ -291,3 +282,5 @@ HEREDOC
 AppSettings.student_check_status_rejected = <<HEREDOC
 <div>Current status Rejected.</div>
 HEREDOC
+
+
