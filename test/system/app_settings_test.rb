@@ -58,9 +58,9 @@ class AppSettingsTest < ApplicationSystemTestCase
     click_link("App Settings")
     click_button('Update details')
     find('trix-editor#app_settings_student_update_details_initial').click.set('Initial Text Test')
-    find('textarea#app_settings_student_update_details_abstract').click.set('Abstract Text Test')
-    find('textarea#app_settings_student_update_details_subjects').click.set('Subjects Text Test')
-    find('textarea#app_settings_student_update_details_keywords').click.set('Keywords Text Test')
+    find('#app_settings_student_update_details_abstract').click.set('Abstract Text Test')
+    find('#app_settings_student_update_details_subjects').click.set('Subjects Text Test')
+    find('#app_settings_student_update_details_keywords').click.set('Keywords Text Test')
     click_button('Save Settings')
     visit root_url
     click_link('GEM Records')
