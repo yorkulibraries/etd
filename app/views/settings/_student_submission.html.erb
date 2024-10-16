@@ -11,13 +11,13 @@
 <div class="tab-content py-3" id="nav-for-submission">
   <div class="tab-pane fade show active" id="nav-begin" role="tabpanel" aria-labelledby="nav-begin-tab" tabindex="0">
     <%= f.input :student_begin_submission, as: :rich_text_area, label: "Welcome message", input_html: { rows: 15, class: "mb-4"  } %>
-    <%= f.input :student_begin_external_non_yorku_email, as: :text, label: "Non-YorkU email message", input_html: { rows: 3 } %>
+    <%= f.input :student_begin_external_non_yorku_email, as: :rich_text_area, label: "Non-YorkU email message", input_html: { rows: 3 } %>
   </div>
   <div class="tab-pane fade" id="nav-update" role="tabpanel" aria-labelledby="nav-update-tab" tabindex="0">
     <%= f.input :student_update_details_initial, as: :rich_text_area, label: "Initial information", input_html: { rows: 15, class: "mb-4"  } %>
-    <%= f.input :student_update_details_abstract, as: :text, label: "Abstract", input_html: { rows: 5, class: "mb-4"  } %>
-    <%= f.input :student_update_details_subjects, as: :text, label: "Subjects", input_html: { rows: 5, class: "mb-4"  } %>
-    <%= f.input :student_update_details_keywords, as: :text, label: "Keywords", input_html: { rows: 5 } %>
+    <%= f.input :student_update_details_abstract, as: :rich_text_area, label: "Abstract", input_html: { rows: 5, class: "mb-4"  } %>
+    <%= f.input :student_update_details_subjects, as: :rich_text_area, label: "Subjects", input_html: { rows: 5, class: "mb-4"  } %>
+    <%= f.input :student_update_details_keywords, as: :rich_text_area, label: "Keywords", input_html: { rows: 5 } %>
   </div>
   <div class="tab-pane fade" id="nav-upload" role="tabpanel" aria-labelledby="nav-upload-tab" tabindex="0">
       <%= f.input :student_upload_files, as: :rich_text_area, label: "Upload files message", input_html: { rows: 20 } %>
