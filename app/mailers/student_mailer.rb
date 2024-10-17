@@ -8,7 +8,6 @@ class StudentMailer < ApplicationMailer
     @date = Date.today.strftime('%b %e, %Y')
     @date_short = Date.today.strftime('%m-%d-%Y')
     @student = student
-
     @application_url = root_url
 
     @message_subject = AppSettings.email_welcome_subject
@@ -24,6 +23,7 @@ class StudentMailer < ApplicationMailer
     @old_status = old_status
     @new_status = new_status
     @custom_message = custom_message
+    @application_url = root_url
 
     @message_subject = AppSettings.email_status_change_subject
 
