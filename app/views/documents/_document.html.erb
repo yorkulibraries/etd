@@ -2,7 +2,7 @@
 	<div class="col-12 col-md-6 p-3">
 		<i class="fa fa-file fa-2x me-2 text-warning"></i>
 		<span class="name text-wrap text-break <%= "supplemental" if document.supplemental? %>">
-			<%= document.name %>
+			<%= document.name ? document.name : File.basename(document.file_url) %>
 		</span>
 		<span class="weak small">[<%=number_to_human_size document.file.file.size rescue nil %>]</span>
 	</div>

@@ -30,9 +30,9 @@
   	<% end %>
 	</div>
 
-  <% if @document.name %>
+  <% if @document.name || @document.file_url %>
     <div class="alert alert-warning" role="alert">
-      Replacing: <%= @document.name %>
+      Replacing: <%= @document.name ? @document.name : File.basename(@document.file_url) %>
     </div>
   <% end %>
 
