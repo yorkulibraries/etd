@@ -155,3 +155,15 @@ form.thesis-form {
 .navbar {
 	margin-bottom: 1rem;
 }
+.thesis-list {
+    h2 {
+        a {
+            font-size: 1.25rem;
+            text-decoration: none;
+            color: $secondary;
+        }
+        a:hover {
+        	text-decoration: underline;
+        }
+    }
+}
