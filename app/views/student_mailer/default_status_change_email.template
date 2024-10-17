@@ -5,12 +5,11 @@ Hi {{student_name}}
 {{custom_message}}
 
 
-
 Click on the url below to login to review your thesis status.
 
 You will need your Passport York I.D. to log in.
 
-http://etd.library.yorku.ca
+{{application_url}}
 
 Sincerely,
 Faculty of Graduate Studies
