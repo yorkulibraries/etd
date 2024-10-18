@@ -8,16 +8,18 @@ class HomeController < ApplicationController
     if current_user.is_a? Student
       redirect_to student_view_index_url
     else
-
       case params[:which]
+      when 'mine'
+        @theses = Thesis.assigned_to_user(current_user).order('updated_at desc')
+        @which = params[:which]
       when Thesis::UNDER_REVIEW
-        @theses = Thesis.under_review
+        @theses = Thesis.under_review.order('updated_at desc')
         @which = params[:which]
       when Thesis::ACCEPTED
-        @theses = Thesis.accepted
+        @theses = Thesis.accepted.order('updated_at desc')
         @which = params[:which]
       else
-        @theses = Thesis.open + Thesis.returned
+        @theses = Thesis.open_or_returned.order('updated_at desc')
         @which = Thesis::OPEN
       end
       render :index

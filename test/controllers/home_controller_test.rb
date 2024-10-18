@@ -39,6 +39,20 @@ class HomeControllerTest < ActionController::TestCase
       theses.each { |t| assert_equal Thesis::UNDER_REVIEW, t.status }
       assert_equal Thesis::UNDER_REVIEW, which, 'Under Review'
     end
+
+    should 'show thesis assigned to current user when params which=mine' do
+      create_list(:thesis, 1, status: Thesis::OPEN)
+      create_list(:thesis, 1, status: Thesis::RETURNED)
+      create_list(:thesis, 2, status: Thesis::UNDER_REVIEW).each { |t| t.assign_to(@user) }
+
+      get :index, params: { which: 'mine'}
+      theses = assigns(:theses)
+      which = assigns(:which)
+
+      assert_equal 2, theses.size
+      theses.each { |t| assert_equal Thesis::UNDER_REVIEW, t.status }
+      assert_equal 'mine', which
+    end
   end
 
   context 'as student' do
@@ -47,7 +61,7 @@ class HomeControllerTest < ActionController::TestCase
       log_user_in(@student)
     end
 
-    should 'redirect to student view' do
+    should 'redirect student user to student view' do
       get :index
       assert_response :redirect
       assert_redirected_to student_view_index_url

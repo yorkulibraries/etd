@@ -115,6 +115,7 @@ class Thesis < ApplicationRecord
   scope :returned, -> { where('status = ? ', RETURNED) }
   scope :with_embargo, -> { where('embargoed = ? ', true) }
   scope :without_embargo, -> { where('embargoed = ? ', false) }
+  scope :open_or_returned, -> { where('status = ? OR status = ?', OPEN, RETURNED) }
 
   def abstract=(text)
     text = '' if text.nil?
@@ -190,5 +191,9 @@ class Thesis < ApplicationRecord
     self.published_at = published_date
     ChagingStatusMailer.published(student.email).deliver
     save(validate: false)
+  end
+
+  def self.assigned_to_user(user)
+    Thesis.where('assigned_to_id = ?', user.id)
   end
 end

@@ -15,6 +15,9 @@
 		<li class="nav-item">
 			<%= active_link_to 'Accepted', root_path(which: Thesis::ACCEPTED), active: /accepted/, class:"nav-link" %>
 		</li>
+		<li class="nav-item">
+			<%= active_link_to 'Assigned to me', root_path(which: :mine), active: /mine/, class:"nav-link" %>
+		</li>
 	</ul>	
 	<div id="theses">
 		<% if @theses.size == 0 %>

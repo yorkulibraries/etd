@@ -228,6 +228,37 @@ class ThesisTest < ActiveSupport::TestCase
     assert_nil thesis.assigned_to, 'No one is assigned to the thesis'
   end
 
+  should 'return all thesis assigned to a user' do
+    user1 = create(:user)
+    user2 = create(:user)
+
+    unassigned_theses = create_list(:thesis, 2)
+
+    user1_theses = create_list(:thesis, 3)
+    user1_theses.each do |t|
+      t.title = "User #{user1.id} thesis #{t.id}"
+      t.save
+      t.assign_to(user1) 
+    end
+
+    user2_theses = create_list(:thesis, 4)
+    user2_theses.each do |t|
+      t.title = "User #{user2.id} thesis #{t.id}"
+      t.save
+      t.assign_to(user2) 
+    end
+    
+    assert_equal 3, Thesis.assigned_to_user(user1).count
+    Thesis.assigned_to_user(user1).each do |t|
+      assert_equal "User #{user1.id} thesis #{t.id}", t.title
+    end
+
+    assert_equal 4, Thesis.assigned_to_user(user2).count
+    Thesis.assigned_to_user(user2).each do |t|
+      assert_equal "User #{user2.id} thesis #{t.id}", t.title
+    end
+  end
+
   ## READY TO PUBLISH
   should 'return ready to publish theses' do
     create(:thesis, status: Thesis::OPEN)
