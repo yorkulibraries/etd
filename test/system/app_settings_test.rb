@@ -16,9 +16,7 @@ class AppSettingsTest < ApplicationSystemTestCase
 
     visit root_url
 
-    find('i.fa.fa-cog').click
-
-    click_link("App Settings")
+    click_link("Settings")
 
     find('trix-editor#app_settings_student_begin_submission').click.set('Welcome Message Text Test')
 
@@ -54,8 +52,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     user = FactoryGirl.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
-    find('i.fa.fa-cog').click
-    click_link("App Settings")
+    click_link("Settings")
     click_button('Update details')
     find('trix-editor#app_settings_student_update_details_initial').click.set('Initial Text Test')
     find('#app_settings_student_update_details_abstract').click.set('Abstract Text Test')
@@ -87,8 +84,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     user = FactoryGirl.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
-    find('i.fa.fa-cog').click
-    click_link("App Settings")
+    click_link("Settings")
     click_button('Upload files')
     find('trix-editor#app_settings_student_upload_files').click.set('Upload Files Text Test')
     find('trix-editor#app_settings_student_supplementary_upload_files').click.set('Supplementary Upload files Text Test')
@@ -122,8 +118,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     user = FactoryGirl.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
-    find('i.fa.fa-cog').click
-    click_link("App Settings")
+    click_link("Settings")
     click_button('Review Licences')
     find('trix-editor#app_settings_student_review_license_info').click.set('Review Licence Info Text Test')
     find('trix-editor#app_settings_student_review_license_lac').click.set('LAC licence Text Test')
@@ -160,8 +155,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     user = FactoryGirl.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
-    find('i.fa.fa-cog').click
-    click_link("App Settings")
+    click_link("Settings")
     click_button('Submit for Review')
     find('trix-editor#app_settings_student_submit_for_review').click.set('Submit for Review Text Test')
     click_button('Save Settings')

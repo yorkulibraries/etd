@@ -41,7 +41,7 @@ class ThesesTest < ApplicationSystemTestCase
     visit root_url
     assert_selector 'h2', text: (/#{Regexp.escape("#{@thesis_01.title}")}/i)
     click_link(@thesis_01.title)
-    click_link('Overview')
+    click_link('ETD')
     click_link('Under Review')
     assert_selector 'h2', text: (/#{Regexp.escape("#{@thesis_02.title}")}/i)
     click_link(@thesis_02.title)
