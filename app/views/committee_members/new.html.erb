@@ -1,5 +1,19 @@
-<% title "Add Committee Member", false %>
 
-<div class="fitted">
-	<%= render "form" %>
+<% title "#{@student.name} - Thesis" %>
+<% title_html do %>
+
+<div class="row">
+	<%= render partial: "students/header" %>
 </div>
+
+<hr />
+
+<h2><span class="fw-lighter text-secondary lead"><%= @thesis.title %></span></h2>
+
+<h2 class="modal-title fs-5">
+    Add Committee Member
+</h2>
+
+<%= render "form" %>
+
+<% end %>

@@ -16,10 +16,10 @@ class CommitteeMember < ApplicationRecord
   belongs_to :gem_record
 
   ## VALIDATIONS ##
-  validates_presence_of :first_name, message: 'Please choose a name.'
-  validates_presence_of :last_name, message: 'Please choose a name.'
+  validates_presence_of :first_name
+  validates_presence_of :last_name
   # validates_presence_of :thesis
-  validates_presence_of :role, message: 'Please choose a role for this member.'
+  validates_presence_of :role
 
   ## SCOPES ##
   scope :unique_names, -> { select('DISTINCT(full_name)').order('full_name asc') }

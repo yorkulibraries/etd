@@ -1,35 +1,16 @@
-<% remote = request.xhr? ? true : false %>
-<div class="modal" id="add_committee_member_modal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Add Committee Member</h5>
-				<% if request.xhr? %>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				<% end %>      
-      </div>
-			<%= simple_form_for [@student, @thesis, @committee_member], remote: remote do |f| %>
-				<div class="modal-body">
-					<p id="member_first_name">
-						<%= f.input :first_name, label: "First Name", required: true %>
-					</p>
-					<p id="member_last_name">
-						<%= f.input :last_name, label: "Last Name", required: true %>
-					</p>
-					<%= f.input :role, label: "Role", required: true, collection: CommitteeMember::ROLES, as: :radio_buttons %>
-				</div>
-				<div class="modal-footer">
-					<%= f.button :submit, "Add", class: "btn btn-primary" %>
-					<% if request.xhr? %>
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					<% else %>
-						<%= link_to "Cancel", :back, class: "btn" %>
-					<% end %>
-				</div>
-			<% end %>
-    </div>
-  </div>
-</div>
+<%= simple_form_for [@student, @thesis, @committee_member], remote: request.xhr? do |f| %>
+	<%= f.input :first_name, label: "First Name", required: true %>
+	<%= f.input :last_name, label: "Last Name", required: true %>
+	<%= f.input :role, label: "Role", required: true, collection: CommitteeMember::ROLES, as: :radio_buttons %>
+	<%= f.button :submit, "Add", class: "btn btn-primary" %>
 
-
-
+	<% if request.xhr? %>
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Cancel">Cancel</button>
+    <% else %>
+	    <% if current_user.role == User::STUDENT %>
+	    	<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE) %>" class="btn btn-secondary">Cancel</a>
+	    <% else %>
+	    	<a href="<%= edit_student_thesis_path(@student, @thesis) %>" class="btn btn-secondary">Cancel</a>
+	    <% end %>
+  	<% end %>
+<% end %>

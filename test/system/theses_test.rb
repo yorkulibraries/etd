@@ -55,8 +55,6 @@ class ThesesTest < ApplicationSystemTestCase
     click_link(@thesis_01.title)
     click_on('Make Changes')
     click_on('Add committee member')
-    click_on('Close')
-    click_on('Add committee member')
 
     fill_in('First Name', with: 'test1')
     fill_in('Last Name', with: 'test2')
@@ -72,8 +70,6 @@ class ThesesTest < ApplicationSystemTestCase
     visit root_url
     click_link(@thesis_01.title)
     click_on('Make Changes')
-    click_on('Add committee member')
-    click_on('Close')
     click_on('Add committee member')
 
     fill_in('First Name', with: 'test1')
