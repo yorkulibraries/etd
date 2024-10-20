@@ -36,15 +36,8 @@ jobs:
         run: |
           bundle exec rake db:reset
           bundle exec rake db:seed
-          #bundle exec rake test TESTOPTS="-v"
-          bundle exec rails test -v test/system/theses_test.rb:66
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: test-screenshots
-          path: /home/runner/work/etd/etd/tmp/test-screenshots
-          retention-days: 1
+          #bundle exec rails test TESTOPTS="-v"
+          bundle exec rails test:system TESTOPTS="-v"
       - name: Run tests with mysql
         env:
           RAILS_ENV: test
@@ -54,3 +47,10 @@ jobs:
           bundle exec rake db:seed
           bundle exec rake test TESTOPTS="-v"
           bundle exec rake test:system TESTOPTS="-v"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-screenshots
+          path: /home/runner/work/etd/etd/tmp/test-screenshots
+          retention-days: 1
