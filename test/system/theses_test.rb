@@ -76,6 +76,9 @@ class ThesesTest < ApplicationSystemTestCase
     fill_in('Last Name', with: 'l1')
     choose('Committee Member')
     click_on('Add')
+
+    sleep 5
+
     assert_selector 'span', text: 'l1, f1'
 
     click_on('Add committee member')
@@ -83,6 +86,9 @@ class ThesesTest < ApplicationSystemTestCase
     fill_in('Last Name', with: 'l2')
     choose('Chair')
     click_on('Add')
+
+    sleep 5
+    
     assert_selector 'span', text: 'l2, f2'
 
     remove1 = 'Remove l1, f1 (Committee Member)'
