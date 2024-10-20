@@ -37,7 +37,7 @@ jobs:
           bundle exec rails db:reset
           bundle exec rails db:seed
           #bundle exec rails test -v
-          bundle exec rails test -v test/system/theses_test.rb:66
+          bundle exec rails test:system TEST_OPTS="-v"
           ([ -d /home/runner/work/etd/etd/tmp/test-screenshots ] && gzip /home/runner/work/etd/etd/tmp/test-screenshots) || true
       - name: Upload sqlite3 test artifacts
         uses: actions/upload-artifact@v3
