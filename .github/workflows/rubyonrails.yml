@@ -38,7 +38,7 @@ jobs:
           bundle exec rails db:seed
           #bundle exec rails test -v
           bundle exec rails test:system TESTOPTS="-v"
-          ( cd /home/runner/work/etd/etd/tmp/test-screenshots && tar cvf ../sqlite3-test-screenshots.tar . ) || true
+          ( cd /home/runner/work/etd/etd/tmp && [ -d ./test-screenshots ] && tar cvf sqlite3-test-screenshots.tar ./test-screenshots ) || true
       - name: Upload sqlite3 test artifacts
         uses: actions/upload-artifact@v3
         if: always()
@@ -55,7 +55,7 @@ jobs:
           bundle exec rails db:seed
           #bundle exec rails test -v
           bundle exec rails test:system TESTOPTS="-v"
-          ( cd /home/runner/work/etd/etd/tmp/test-screenshots && tar cvf ../mysql-test-screenshots.tar . ) || true
+          ( cd /home/runner/work/etd/etd/tmp && [ -d ./test-screenshots ] && tar cvf mysql-test-screenshots.tar ./test-screenshots ) || true
       - name: Upload mysql test artifacts
         uses: actions/upload-artifact@v3
         if: always()
