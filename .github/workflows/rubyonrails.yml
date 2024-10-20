@@ -38,14 +38,7 @@ jobs:
           bundle exec rails db:seed
           #bundle exec rails test -v
           bundle exec rails test:system TESTOPTS="-v"
-          ( cd /home/runner/work/etd/etd/tmp && [ -d ./test-screenshots ] && tar cvf sqlite3-test-screenshots.tar ./test-screenshots ) || true
-      - name: Upload sqlite3 test artifacts
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: sqlite3-test-screenshots
-          path: /home/runner/work/etd/etd/tmp/sqlite3-test-screenshots.tar
-          retention-days: 1
+
       - name: Run tests with mysql
         env:
           RAILS_ENV: test
@@ -55,10 +48,14 @@ jobs:
           bundle exec rails db:seed
           #bundle exec rails test -v
           bundle exec rails test:system TESTOPTS="-v"
+
+      - name: Create tar archive of screenshots
+        run: |
           ( cd /home/runner/work/etd/etd/tmp && [ -d ./test-screenshots ] && tar cvf mysql-test-screenshots.tar ./test-screenshots ) || true
-      - name: Upload mysql test artifacts
+
+      - name: Upload screenshots
         uses: actions/upload-artifact@v3
         if: always()
         with:
           name: mysql-test-screenshots
-          path: /home/runner/work/etd/etd/tmp/mysql-test-screenshots.tar
+          path: /home/runner/work/etd/etd/tmp/test-screenshots.tar
