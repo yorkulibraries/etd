@@ -225,9 +225,6 @@ class StudentsTest < ApplicationSystemTestCase
     login_as(@thesis.student)
     visit root_url
 
-    # Set Page size
-    page.driver.browser.manage.window.resize_to(1920, 2500)
-
     ## Page 1
     click_link("My ETD Submission")
     assert_selector "input#student_email_external"
@@ -342,9 +339,6 @@ class StudentsTest < ApplicationSystemTestCase
 
     login_as(@thesis.student)
     visit root_url
-
-    # Set Page size
-    page.driver.browser.manage.window.resize_to(1920, 2500)
 
     ## Page 1
     click_link("My ETD Submission")

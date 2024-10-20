@@ -70,19 +70,35 @@ class ThesesTest < ApplicationSystemTestCase
     visit root_url
     click_link(@thesis_01.title)
     click_on('Make Changes')
+    
     click_on('Add committee member')
-
-    fill_in('First Name', with: 'test1')
-    fill_in('Last Name', with: 'test2')
+    fill_in('First Name', with: 'f1')
+    fill_in('Last Name', with: 'l1')
     choose('Committee Member')
     click_on('Add')
-    assert_selector 'span', text: 'test2, test1'
+    assert_selector 'span', text: 'l1, f1'
 
-    assert_selector 'a[data-delete="test2, test1 (Committee Member)"]', visible: true
+    click_on('Add committee member')
+    fill_in('First Name', with: 'f2')
+    fill_in('Last Name', with: 'l2')
+    choose('Chair')
+    click_on('Add')
+    assert_selector 'span', text: 'l2, f2'
+
+    remove1 = 'Remove l1, f1 (Committee Member)'
+    remove2 = 'Remove l2, f2 (Chair)'
+
+    assert has_link?(remove1)
+    assert has_link?(remove2)
+
+    click_link_or_button(remove1)
     
-    find('a[data-delete="test2, test1 (Committee Member)"]').click
+    assert_no_selector 'span', text: 'l1, f1'
+    assert_no_link(remove1)
 
-    assert_no_selector 'span', text: 'test2, test1'
+    assert_selector 'span', text: 'l2, f2'
+
+    assert has_link?(remove2)
   end
 
   test 'Edit a thesis' do
