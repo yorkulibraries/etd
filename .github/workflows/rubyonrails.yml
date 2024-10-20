@@ -51,3 +51,4 @@ jobs:
         with:
           name: my-artifact
           path: /home/runner/work/etd/etd/tmp/test-screenshots
+          if: ${{ !cancelled() }}
