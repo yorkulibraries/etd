@@ -37,7 +37,15 @@ jobs:
           bundle exec rails db:reset
           bundle exec rails db:seed
           bundle exec rails test -v
-          bundle exec rails test:system -v
+          bundle exec rails test:system TESTOPTS="-v"
+          cd /home/runner/work/etd/etd/tmp/ && tar cpvf ./sqlite3-test-screenshots.tar ./test-screenshots
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: sqlite3-test-screenshots
+          path: /home/runner/work/etd/etd/tmp/sqlite3-test-screenshots.tar
+          retention-days: 1
       - name: Run tests with mysql
         env:
           RAILS_ENV: test
@@ -46,5 +54,5 @@ jobs:
           bundle exec rails db:reset
           bundle exec rails db:seed
           bundle exec rails test -v
-          bundle exec rails test:system -v
+          bundle exec rails test:system TESTOPTS="-v"
       
