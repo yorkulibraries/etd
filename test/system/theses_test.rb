@@ -99,6 +99,8 @@ class ThesesTest < ApplicationSystemTestCase
     assert has_link?(remove1)
     assert has_link?(remove2)
 
+    save_screenshot
+    
     click_link_or_button(remove1)
     
     assert_no_selector 'span', text: 'l1, f1'
