@@ -42,8 +42,8 @@ jobs:
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: artifacts
-          path: artifacts
+          name: test-screenshots
+          path: /home/runner/work/etd/etd/tmp/test-screenshots
           if-no-files-found: error
           retention-days: 90
       - name: Run tests with mysql
