@@ -3,6 +3,8 @@
   <%= hidden_field_tag "committee_member_ids[]", committee_member.id %>
   <% if @thesis.id && can?(:destroy, committee_member) && @thesis.status != Thesis::PUBLISHED  %>
       <%= link_to student_thesis_committee_member_path(@student, @thesis, committee_member),
-        method: :delete, class: "btn btn-close", remote: true, "data-delete": "#{committee_member.name} (#{committee_member.role})" do %>&nbsp;<% end %>  
+        method: :delete, class: "btn btn-close", remote: true, "title": "Remove #{committee_member.name} (#{committee_member.role})", "data-delete": "#{committee_member.name} (#{committee_member.role})" do %>
+        <span class="sr-only">Remove <%= "#{committee_member.name} (#{committee_member.role})" %></span>
+        <% end %>  
   <% end %>
 </div>
