@@ -47,10 +47,4 @@ jobs:
           bundle exec rake db:seed
           bundle exec rake test TESTOPTS="-v"
           bundle exec rake test:system TESTOPTS="-v"
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: test-screenshots
-          path: /home/runner/work/etd/etd/tmp/test-screenshots
-          retention-days: 1
+      
