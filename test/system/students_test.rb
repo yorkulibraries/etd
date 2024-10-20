@@ -20,6 +20,8 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('Create ETD Student Record')
     page.accept_alert
 
+    sleep 3
+
     click_link('Send invitation email')
 
     assert_selector '.alert-success', text: "Sent an invitation email to #{@gem_record.studentname}"
