@@ -38,6 +38,10 @@ jobs:
           bundle exec rake db:seed
           #bundle exec rake test TESTOPTS="-v"
           bundle exec rails test test/system/theses_test.rb:66 TESTOPTS="-v"
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          path: /home/runner/work/etd/etd/tmp/test-screenshots
       - name: Run tests with mysql
         env:
           RAILS_ENV: test
@@ -47,8 +51,3 @@ jobs:
           bundle exec rake db:seed
           bundle exec rake test TESTOPTS="-v"
           bundle exec rake test:system TESTOPTS="-v"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: my-artifact
-          path: /home/runner/work/etd/etd/tmp/test-screenshots
-          if: always()
