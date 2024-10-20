@@ -38,6 +38,14 @@ jobs:
           bundle exec rake db:seed
           #bundle exec rake test TESTOPTS="-v"
           bundle exec rails test -v test/system/theses_test.rb:66
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: artifacts
+          path: artifacts
+          if-no-files-found: error
+          retention-days: 90
       - name: Run tests with mysql
         env:
           RAILS_ENV: test
