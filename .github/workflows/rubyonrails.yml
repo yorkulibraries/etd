@@ -47,9 +47,8 @@ jobs:
           bundle exec rake db:seed
           bundle exec rake test TESTOPTS="-v"
           bundle exec rake test:system TESTOPTS="-v"
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
           with:
-            name: my-artifact
+            name: test-screenshots
             path: /home/runner/work/etd/etd/tmp/test-screenshots
 
