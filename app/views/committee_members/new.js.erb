@@ -1,2 +1,2 @@
-$("body").append('<%= j render("modal") %>');
+$("body").remove('#add_committee_member_modal_container').append('<div id="add_committee_member_modal_container"></div>').append('<%= j render("modal") %>');
 (new bootstrap.Modal($('#add_committee_member_modal'))).show();
