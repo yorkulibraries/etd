@@ -91,10 +91,8 @@ class ThesesTest < ApplicationSystemTestCase
     assert has_link?(remove1)
     assert has_link?(remove2)
 
-    pp find_link(remove1).rect
-
-    click_link(remove1)
-
+    click_link_or_button(remove1)
+    
     assert_no_selector 'span', text: 'l1, f1'
     assert_no_link(remove1)
 

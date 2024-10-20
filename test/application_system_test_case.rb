@@ -25,7 +25,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
     super
 
-    current_window.resize_to(1400, 1400)
+    current_window.resize_to(1920, 4000)
     
     user = FactoryGirl.create(:user)
     login_as(user, role: User::STAFF)

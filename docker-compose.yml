@@ -41,7 +41,7 @@ services:
       - ${MAILCATCHER_HTTP:-4084}:1080
 
   chrome:
-    image: selenium/standalone-chrome:96.0
+    image: selenium/standalone-chrome:nightly
     ports:
       - ${VNC_HTTP:-7904}:7900
 
