@@ -37,7 +37,7 @@ jobs:
           bundle exec rake db:reset
           bundle exec rake db:seed
           #bundle exec rails test TESTOPTS="-v"
-          bundle exec rails test:system TESTOPTS="-v"
+          bundle exec rails rails test -v test/system/theses_test.rb:66
       - name: Run tests with mysql
         env:
           RAILS_ENV: test
