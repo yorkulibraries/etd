@@ -80,7 +80,7 @@ class ThesesTest < ApplicationSystemTestCase
 
     assert_selector 'a[data-delete="test2, test1 (Committee Member)"]', visible: true
     
-    find('a[data-delete="test2, test1 (Committee Member)"]').click(x: 5, y: 5)
+    find('a[data-delete="test2, test1 (Committee Member)"]').click(x: 12, y: 12)
 
     assert_no_selector 'span', text: 'test2, test1'
   end
