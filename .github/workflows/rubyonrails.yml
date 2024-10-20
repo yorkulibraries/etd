@@ -34,10 +34,10 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: sqlite3:db/test.sqlite3
         run: |
-          rails db:reset
-          rails db:seed
-          #rails test -v
-          rails test:system TESTOPTS="-v"
+          bundle exec rails db:reset
+          bundle exec rails db:seed
+          #bundle exec rails test -v
+          bundle exec rails test:system TESTOPTS="-v"
           ( cd /home/runner/work/etd/etd/tmp/test-screenshots && tar cvf ../sqlite3-test-screenshots.tar . ) || true
       - name: Upload sqlite3 test artifacts
         uses: actions/upload-artifact@v3
@@ -51,10 +51,10 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: mysql2://test:test@127.0.0.1:3306/test
         run: |
-          rails db:reset
-          rails db:seed
-          #rails test -v
-          rails test:system TESTOPTS="-v"
+          bundle exec rails db:reset
+          bundle exec rails db:seed
+          #bundle exec rails test -v
+          bundle exec rails test:system TESTOPTS="-v"
           ( cd /home/runner/work/etd/etd/tmp/test-screenshots && tar cvf ../mysql-test-screenshots.tar . ) || true
       - name: Upload mysql test artifacts
         uses: actions/upload-artifact@v3
