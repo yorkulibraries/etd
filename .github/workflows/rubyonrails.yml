@@ -34,17 +34,17 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: sqlite3:db/test.sqlite3
         run: |
-          bundle exec rake db:reset
-          bundle exec rake db:seed
-          #bundle exec rails test TESTOPTS="-v"
-          bundle exec rails test -v test/system/theses_test.rb:66
+          bundle exec rails db:reset
+          bundle exec rails db:seed
+          bundle exec rails test -v
+          bundle exec rails test:system -v
       - name: Run tests with mysql
         env:
           RAILS_ENV: test
           DATABASE_URL: mysql2://test:test@127.0.0.1:3306/test
         run: |
-          bundle exec rake db:reset
-          bundle exec rake db:seed
-          bundle exec rake test TESTOPTS="-v"
-          bundle exec rake test:system TESTOPTS="-v"
+          bundle exec rails db:reset
+          bundle exec rails db:seed
+          bundle exec rails test -v
+          bundle exec rails test:system -v
       
