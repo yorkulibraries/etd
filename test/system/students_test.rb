@@ -20,8 +20,6 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('Create ETD Student Record')
     page.accept_alert
 
-    sleep 5
-    
     save_screenshot
     
     click_link('Send invitation email')
@@ -317,8 +315,7 @@ class StudentsTest < ApplicationSystemTestCase
     checkbox = find('#thesis_etd_licence_agreement', visible: true)
     checkbox.check
 
-    # wait a little, this is necessary when running on Github actions
-    sleep 2
+    save_screenshot
 
     assert checkbox.checked?, "#thesis_etd_licence_agreement checkbox is not checked."
 

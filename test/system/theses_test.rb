@@ -77,8 +77,7 @@ class ThesesTest < ApplicationSystemTestCase
     choose('Committee Member')
     click_on('Add')
 
-    # wait for AJAX request to complete, this is necessary when running on Github actions
-    sleep 5
+    save_screenshot
 
     assert_selector 'span', text: 'l1, f1'
 
@@ -88,8 +87,7 @@ class ThesesTest < ApplicationSystemTestCase
     choose('Chair')
     click_on('Add')
 
-    # wait for AJAX request to complete, this is necessary when running on Github actions
-    sleep 5
+    save_screenshot
 
     assert_selector 'span', text: 'l2, f2'
 
