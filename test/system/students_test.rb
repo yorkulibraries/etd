@@ -24,6 +24,8 @@ class StudentsTest < ApplicationSystemTestCase
     
     assert_selector '#send_invitation_email', text: 'Send invitation email'
 
+    assert has_link?('Send invitation email')
+    
     click_link('Send invitation email')
 
     assert_selector '.alert-success', text: "Sent an invitation email to #{@gem_record.studentname}"
