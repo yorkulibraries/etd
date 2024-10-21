@@ -20,6 +20,8 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('Create ETD Student Record')
     page.accept_alert
 
+    sleep 5
+
     click_link('Send invitation email')
 
     assert_selector '.alert-success', text: "Sent an invitation email to #{@gem_record.studentname}"
@@ -225,9 +227,6 @@ class StudentsTest < ApplicationSystemTestCase
     login_as(@thesis.student)
     visit root_url
 
-    # Set Page size
-    page.driver.browser.manage.window.resize_to(1920, 2500)
-
     ## Page 1
     click_link("My ETD Submission")
     assert_selector "input#student_email_external"
@@ -315,6 +314,10 @@ class StudentsTest < ApplicationSystemTestCase
     assert page.has_selector?('#thesis_etd_licence_agreement', visible: true), "#thesis_etd_licence_agreement not found."
     checkbox = find('#thesis_etd_licence_agreement', visible: true)
     checkbox.check
+
+    # wait a little, this is necessary when running on Github actions
+    sleep 2
+
     assert checkbox.checked?, "#thesis_etd_licence_agreement checkbox is not checked."
 
     # Ensure you can't go next without uploading LAC Document
@@ -342,9 +345,6 @@ class StudentsTest < ApplicationSystemTestCase
 
     login_as(@thesis.student)
     visit root_url
-
-    # Set Page size
-    page.driver.browser.manage.window.resize_to(1920, 2500)
 
     ## Page 1
     click_link("My ETD Submission")
