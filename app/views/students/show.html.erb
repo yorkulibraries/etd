@@ -19,7 +19,7 @@
 			<h4>Invitation</h4>
 			<p>
 			<% if @student.invitation_sent_at.nil? %>
-				<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", html {id: "#send_invitation_email"}, send_invite_student_path(@student) %>
+				<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", { id: "#send_invitation_email" }, send_invite_student_path(@student) %>
 			<% else %>
 				Sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>
 				<span class="soft weak">(<%= link_to_if AppSettings.email_welcome_allow, "Send Again", send_invite_student_path(@student), class: "soft weak"%>)</span>
