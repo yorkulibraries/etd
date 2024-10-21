@@ -315,8 +315,8 @@ class StudentsTest < ApplicationSystemTestCase
     checkbox = find('#thesis_etd_licence_agreement', visible: true)
     checkbox.check
 
-    sleep 5
-    
+    sleep 1
+
     assert checkbox.checked?, "#thesis_etd_licence_agreement checkbox is not checked."
 
     # Ensure you can't go next without uploading LAC Document
