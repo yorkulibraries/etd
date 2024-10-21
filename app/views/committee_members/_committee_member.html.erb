@@ -1,8 +1,10 @@
 <div class="committee-member" id="committee_member_<%= committee_member.id %>">
-  <label><span class="committee-member-name fw-normal"><%= committee_member.name %></span> <span class="fw-normal fst-italic">(<%= committee_member.role %>)</span></label>
-  <%= hidden_field_tag "committee_member_ids[]", committee_member.id %>
+  <span class="committee-member-name fw-normal"><%= committee_member.name %></span> <span class="fw-normal fst-italic">(<%= committee_member.role %>)</span>
   <% if @thesis.id && can?(:destroy, committee_member) && @thesis.status != Thesis::PUBLISHED  %>
       <%= link_to student_thesis_committee_member_path(@student, @thesis, committee_member),
-        method: :delete, class: "btn btn-close", remote: true, "data-delete": "#{committee_member.name} (#{committee_member.role})" do %>&nbsp;<% end %>  
+        method: :delete, remote: true, class: "btn btn-close" do %>
+        <span class="sr-only">Remove <%= "#{committee_member.name} (#{committee_member.role})" %></span>
+        <% end %>  
   <% end %>
+  <%= hidden_field_tag "committee_member_ids[]", committee_member.id %>
 </div>

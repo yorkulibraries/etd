@@ -1,14 +1,14 @@
-<div class="modal fade" id="file_upload_modal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="add_committee_member_modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5">
-        	File Upload
+        	Add Committee Member
         </h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-      	<%= render partial: "form", locals: { modal: true} %>
+      	<%= render "form" %>
       </div>
     </div>
   </div>

@@ -16,7 +16,6 @@ class UsersTest < ApplicationSystemTestCase
     user = FactoryGirl.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
-    find('i.fa.fa-cog').click
     click_link("Users")
     click_link("New User")
     fill_in('Name *', with: "Test User")
@@ -34,7 +33,6 @@ class UsersTest < ApplicationSystemTestCase
     user = FactoryGirl.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
-    find('i.fa.fa-cog').click
     click_link("Users")
     click_link(@user1.name)
     fill_in('Name *', with: "Test User")
@@ -51,7 +49,6 @@ class UsersTest < ApplicationSystemTestCase
     user = FactoryGirl.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
-    find('i.fa.fa-cog').click
     click_link("Users")
     find(:xpath, ".//a[@href='/users/#{@user1.id}/block']").click
     page.accept_alert
@@ -64,7 +61,6 @@ class UsersTest < ApplicationSystemTestCase
     user = FactoryGirl.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
-    find('i.fa.fa-cog').click
     click_link("Users")
     find(:xpath, ".//a[@href='/users/#{@user1.id}/block']").click
     page.accept_alert
@@ -80,19 +76,9 @@ class UsersTest < ApplicationSystemTestCase
     user = FactoryGirl.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
-    find('i.fa.fa-cog').click
     click_link("Users")
     find(:xpath, ".//a[@href='/users/#{@user1.id}/activity']").click
 
     assert_selector 'h1', text: "#{@user1.name} - Activity"
   end
 end
-
-########################################
-## For Debugging and building tests ##
-# page.driver.browser.manage.window.resize_to(1920, 2500)
-# save_screenshot()
-## HTML Save
-# File.open("tmp/test-screenshots/error.html", "w") { |file| file.write(page.html) }
-# save_page()
-########################################

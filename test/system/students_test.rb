@@ -20,6 +20,8 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('Create ETD Student Record')
     page.accept_alert
 
+    sleep 2
+
     click_link('Send invitation email')
 
     assert_selector '.alert-success', text: "Sent an invitation email to #{@gem_record.studentname}"
@@ -225,9 +227,6 @@ class StudentsTest < ApplicationSystemTestCase
     login_as(@thesis.student)
     visit root_url
 
-    # Set Page size
-    page.driver.browser.manage.window.resize_to(1920, 2500)
-
     ## Page 1
     click_link("My ETD Submission")
     assert_selector "input#student_email_external"
@@ -342,9 +341,6 @@ class StudentsTest < ApplicationSystemTestCase
 
     login_as(@thesis.student)
     visit root_url
-
-    # Set Page size
-    page.driver.browser.manage.window.resize_to(1920, 2500)
 
     ## Page 1
     click_link("My ETD Submission")
