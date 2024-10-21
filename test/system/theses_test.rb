@@ -94,6 +94,9 @@ class ThesesTest < ApplicationSystemTestCase
     remove1 = 'Remove l1, f1 (Committee Member)'
     remove2 = 'Remove l2, f2 (Chair)'
 
+    page.find_link(remove1)
+    page.find_link(remove2)
+
     assert has_link?(remove1)
     assert has_link?(remove2)
     
