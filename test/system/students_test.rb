@@ -20,7 +20,7 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('Create ETD Student Record')
     page.accept_alert
 
-    sleep 2
+    sleep 5
 
     click_link('Send invitation email')
 
