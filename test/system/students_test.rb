@@ -12,6 +12,8 @@ class StudentsTest < ApplicationSystemTestCase
   end
 
   test 'Send student invitation email' do
+    AppSettings.email_welcome_allow = true
+
     user = FactoryGirl.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
