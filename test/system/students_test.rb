@@ -317,7 +317,7 @@ class StudentsTest < ApplicationSystemTestCase
     assert page.has_selector?('#etd-licence', visible: true), "#etd-licence not found."
     assert page.has_selector?('#thesis_etd_licence_agreement', visible: true), "#thesis_etd_licence_agreement not found."
     checkbox = find('#thesis_etd_licence_agreement', visible: true)
-    checkbox.check
+    checkbox.click
 
     save_screenshot
 
