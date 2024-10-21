@@ -314,6 +314,9 @@ class StudentsTest < ApplicationSystemTestCase
     assert page.has_selector?('#thesis_etd_licence_agreement', visible: true), "#thesis_etd_licence_agreement not found."
     checkbox = find('#thesis_etd_licence_agreement', visible: true)
     checkbox.check
+
+    sleep 5
+    
     assert checkbox.checked?, "#thesis_etd_licence_agreement checkbox is not checked."
 
     # Ensure you can't go next without uploading LAC Document
