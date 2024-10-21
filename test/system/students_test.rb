@@ -22,7 +22,7 @@ class StudentsTest < ApplicationSystemTestCase
 
     save_screenshot
     
-    assert_selector '#send_invitation_email', 'Send invitation email'
+    assert_selector '#send_invitation_email', text: 'Send invitation email'
 
     click_link('Send invitation email')
 
