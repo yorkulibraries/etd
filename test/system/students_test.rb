@@ -21,7 +21,9 @@ class StudentsTest < ApplicationSystemTestCase
     page.accept_alert
 
     sleep 5
-
+    
+    save_screenshot
+    
     click_link('Send invitation email')
 
     assert_selector '.alert-success', text: "Sent an invitation email to #{@gem_record.studentname}"
