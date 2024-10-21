@@ -315,7 +315,8 @@ class StudentsTest < ApplicationSystemTestCase
     checkbox = find('#thesis_etd_licence_agreement', visible: true)
     checkbox.check
 
-    sleep 1
+    # wait a little, this is necessary when running on Github actions
+    sleep 2
 
     assert checkbox.checked?, "#thesis_etd_licence_agreement checkbox is not checked."
 
