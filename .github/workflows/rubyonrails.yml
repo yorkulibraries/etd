@@ -57,5 +57,5 @@ jobs:
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: mysql-test-screenshots
+          name: test-screenshots
           path: /home/runner/work/etd/etd/tmp/test-screenshots.tar
