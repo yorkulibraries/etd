@@ -52,6 +52,7 @@ jobs:
       - name: Create tar archive of screenshots
         run: |
           ( cd /home/runner/work/etd/etd/tmp && [ -d ./test-screenshots ] && tar cvf test-screenshots.tar ./test-screenshots ) || true
+        if: always()
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v3
