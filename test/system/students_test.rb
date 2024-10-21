@@ -20,8 +20,8 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('Create ETD Student Record')
     page.accept_alert
 
-    sleep 5
-    
+    page.should have_selector?('send_invitation_email')
+
     save_screenshot
     
     click_link('Send invitation email')
