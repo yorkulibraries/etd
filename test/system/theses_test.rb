@@ -98,8 +98,6 @@ class ThesesTest < ApplicationSystemTestCase
 
     assert has_link?(remove1)
     assert has_link?(remove2)
-
-    save_screenshot
     
     click_link_or_button(remove1)
     
