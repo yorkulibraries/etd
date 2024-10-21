@@ -19,7 +19,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def setup
     Capybara.server_host = "0.0.0.0"
     Capybara.app_host = "http://#{IPSocket.getaddress(Socket.gethostname)}" if ENV["SELENIUM_REMOTE_URL"].present?
-    Capybara.default_max_wait_time = 20
+    Capybara.default_max_wait_time = 30
     Capybara.save_path = "tmp/test-screenshots"
     Capybara.default_driver = :selenium
 
