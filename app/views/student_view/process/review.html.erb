@@ -61,7 +61,7 @@
 			<% end %>
 
 			<div class="bg-secondary-subtle p-2 fw-bold">
-				<%= f.input :lac_licence_agreement, as: :boolean, input_html: {class: ""}, label: "I agree to and I have signed LAC Form" %>
+				<%= f.input :lac_licence_agreement, as: :boolean, input_html: {class: ""}, label: "I agree to and I have signed LAC Form", required: true %>
 			</div>
 		</div>
 
@@ -83,7 +83,7 @@
 			</div>
 			
 			<div class="bg-secondary-subtle p-2 fw-bold">
-				<%= f.input :yorkspace_licence_agreement, as: :boolean, label: "I agree to YorkSpace Distribution Licence" %>
+				<%= f.input :yorkspace_licence_agreement, as: :boolean, label: "I agree to YorkSpace Distribution Licence", required: true  %>
 			</div>
 		</div>
 
@@ -105,7 +105,7 @@
 			</div>
 			
 			<div class="bg-secondary-subtle p-2 fw-bold">
-				<%= f.input :etd_licence_agreement, as: :boolean, label: "I agree to ETD Licence" %>
+				<%= f.input :etd_licence_agreement, as: :boolean, label: "I agree to ETD Licence", required: true %>
 			</div>
 		</div>
 
