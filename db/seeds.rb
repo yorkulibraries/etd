@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 # rails db:seed
-LocSubject.load_from_file('lib/loc_subjects.txt') if LocSubject.all.count.zero?
+LocSubject.delete_all
+LocSubject.load_from_file('lib/loc_subjects.txt')
 
 if (Rails.env != 'test') && User.all.count.zero?
   [User::ADMIN, User::MANAGER, User::STAFF].each do |role|
