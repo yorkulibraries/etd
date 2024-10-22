@@ -29,6 +29,9 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     
     user = FactoryGirl.create(:user)
     login_as(user, role: User::STAFF)
+
+    LocSubject.delete_all
+    LocSubject.load_from_file('lib/loc_subjects.txt')
   end
 
 end
