@@ -242,32 +242,12 @@ class StudentsTest < ApplicationSystemTestCase
     select "English", from: "thesis_language"
     fill_in "thesis_abstract", with: Faker::Lorem.paragraph
 
-
-    execute_script("document.getElementById('select_subjects_11').style.display = 'block';")
-    select "Accounting", from: 'select_subjects_11'
-
-    execute_script("document.getElementById('select_subjects_12').style.display = 'block';")
-    select "Management", from: 'select_subjects_12'
-
-    execute_script("document.getElementById('select_subjects_13').style.display = 'block';")
-    select "Finance", from: 'select_subjects_13'
-
-    select "Accounting", from: 'select_subjects_11'
-    select "Management", from: 'select_subjects_12'
-    select "Finance", from: 'select_subjects_13'
-
-    execute_script("document.getElementById('select_subjects_11').style.display = 'block';")
-    select "Accounting", from: 'select_subjects_11'
-
-    execute_script("document.getElementById('select_subjects_12').style.display = 'block';")
-    select "Management", from: 'select_subjects_12'
-
-    execute_script("document.getElementById('select_subjects_13').style.display = 'block';")
-    select "Finance", from: 'select_subjects_13'
-
-    select "Accounting", from: 'select_subjects_11'
-    select "Management", from: 'select_subjects_12'
-    select "Finance", from: 'select_subjects_13'
+    find('#select_subjects_11_chosen a.chosen-default').click
+    find('#select_subjects_11_chosen .active-result:nth-child(1)').click
+    find('#select_subjects_12_chosen a.chosen-default').click
+    find('#select_subjects_12_chosen .active-result:nth-child(2)').click
+    find('#select_subjects_13_chosen a.chosen-default').click
+    find('#select_subjects_13_chosen .active-result:nth-child(3)').click
 
     save_screenshot
 

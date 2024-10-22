@@ -107,7 +107,11 @@ class AppSettingsTest < ApplicationSystemTestCase
     click_button('Continue')
     fill_in 'thesis_abstract', with: 'Abstract Text Test'
     find('#select_subjects_11_chosen a.chosen-default').click
-    first('#select_subjects_11_chosen .active-result').click
+    find('#select_subjects_11_chosen .active-result:nth-child(1)').click
+    find('#select_subjects_12_chosen a.chosen-default').click
+    find('#select_subjects_12_chosen .active-result:nth-child(2)').click
+    find('#select_subjects_13_chosen a.chosen-default').click
+    find('#select_subjects_13_chosen .active-result:nth-child(3)').click
     click_link('Continue')
     assert_text "Upload Files Text Test"
     click_link_or_button('Upload Supplementary Thesis Files')
@@ -144,7 +148,11 @@ class AppSettingsTest < ApplicationSystemTestCase
     click_button('Continue')
     fill_in 'thesis_abstract', with: 'Abstract Text Test'
     find('#select_subjects_11_chosen a.chosen-default').click
-    first('#select_subjects_11_chosen .active-result').click
+    find('#select_subjects_11_chosen .active-result:nth-child(1)').click
+    find('#select_subjects_12_chosen a.chosen-default').click
+    find('#select_subjects_12_chosen .active-result:nth-child(2)').click
+    find('#select_subjects_13_chosen a.chosen-default').click
+    find('#select_subjects_13_chosen .active-result:nth-child(3)').click
     click_link('Continue')
     click_link_or_button('Upload Primary Thesis File')
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
@@ -180,7 +188,11 @@ class AppSettingsTest < ApplicationSystemTestCase
     click_button('Continue')
     fill_in 'thesis_abstract', with: 'Abstract Text Test'
     find('#select_subjects_11_chosen a.chosen-default').click
-    first('#select_subjects_11_chosen .active-result').click
+    find('#select_subjects_11_chosen .active-result:nth-child(1)').click
+    find('#select_subjects_12_chosen a.chosen-default').click
+    find('#select_subjects_12_chosen .active-result:nth-child(2)').click
+    find('#select_subjects_13_chosen a.chosen-default').click
+    find('#select_subjects_13_chosen .active-result:nth-child(3)').click
     click_link('Continue')
     click_link_or_button('Upload Primary Thesis File')
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
