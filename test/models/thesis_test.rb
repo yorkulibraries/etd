@@ -34,7 +34,7 @@ class ThesisTest < ActiveSupport::TestCase
 
   should 'not validate presence of certify_content_correct if updating by student but not submitting for review' do
     student_user = create(:student)
-    thesis = build(:thesis, current_user: student_user, certify_content_correct: nil)
+    thesis = build(:thesis, current_user: student_user, certify_content_correct: nil, loc_subjects: create_list(:loc_subject, 1))
     assert thesis.valid?, 'Should validate thesis if certify_content_correct is missing for students when not submitting for review'
   end
   
@@ -68,7 +68,7 @@ class ThesisTest < ActiveSupport::TestCase
 
   should 'not validate presence of licence agreements if updating by student but not accepting licences' do
     student_user = create(:student)
-    thesis = build(:thesis, current_user: student_user, lac_licence_agreement: nil, yorkspace_licence_agreement: nil, etd_licence_agreement: nil)
+    thesis = build(:thesis, current_user: student_user, lac_licence_agreement: nil, yorkspace_licence_agreement: nil, etd_licence_agreement: nil, loc_subjects: create_list(:loc_subject, 1))
     assert thesis.valid?, 'Should validate thesis if licence agreements are missing for students when not accepting licences'
   end
 

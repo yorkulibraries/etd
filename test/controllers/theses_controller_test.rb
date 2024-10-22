@@ -345,7 +345,8 @@ class ThesesControllerTest < ActionController::TestCase
   context 'as a student' do
     setup do
       @student = create(:student)
-      @thesis = create(:thesis, student: @student, status: Thesis::OPEN)
+      @thesis = create(:thesis, student: @student, status: Thesis::OPEN, loc_subjects: create_list(:loc_subject, 1))
+
       log_user_in(@student)
     end
 

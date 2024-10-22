@@ -35,6 +35,7 @@ class Thesis < ApplicationRecord
 
   has_many :thesis_subjectships, dependent: :delete_all
   has_many :loc_subjects, through: :thesis_subjectships
+  validates_presence_of :loc_subjects, if: :updating_by_student?
 
   belongs_to :assigned_to, foreign_key: 'assigned_to_id', class_name: 'User'
   belongs_to :embargoed_by, foreign_key: 'embargoed_by_id', class_name: 'User'

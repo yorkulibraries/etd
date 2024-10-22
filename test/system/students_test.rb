@@ -106,6 +106,8 @@ class StudentsTest < ApplicationSystemTestCase
     visit root_url
     fill_in('Non-YorkU Email Address', with: Faker::Internet.email)
     click_button('Continue')
+    find('#select_subjects_11_chosen a.chosen-default').click
+    first('#select_subjects_11_chosen .active-result').click
     click_link('Continue') #update
     click_link('Continue') #upload
     click_link('Continue') #review
@@ -226,10 +228,6 @@ class StudentsTest < ApplicationSystemTestCase
   ## Page 2 and 3 tests
   should "upload primary file" do
     @thesis = FactoryGirl.create(:thesis)
-    create(:loc_subject, name: "Accounting", category: "BUSINESS")
-    create(:loc_subject, name: "Management", category: "BUSINESS")
-    create(:loc_subject, name: "Finance", category: "BUSINESS")
-
     login_as(@thesis.student)
     visit root_url
 
@@ -270,6 +268,8 @@ class StudentsTest < ApplicationSystemTestCase
     select "Accounting", from: 'select_subjects_11'
     select "Management", from: 'select_subjects_12'
     select "Finance", from: 'select_subjects_13'
+
+    save_screenshot
 
     fill_in "thesis_keywords", with: "accounting-kw, management-kw"
     click_on("Continue")
@@ -352,9 +352,6 @@ class StudentsTest < ApplicationSystemTestCase
   ## Supplementary Info displays on edit/error
   should "Supplementary Info displays on edit/error" do
     @thesis = FactoryGirl.create(:thesis)
-    create(:loc_subject, name: "Accounting", category: "BUSINESS")
-    create(:loc_subject, name: "Management", category: "BUSINESS")
-    create(:loc_subject, name: "Finance", category: "BUSINESS")
 
     login_as(@thesis.student)
     visit root_url
@@ -368,6 +365,10 @@ class StudentsTest < ApplicationSystemTestCase
     ## Page 2: Thesis Details
     select "English", from: "thesis_language"
     fill_in "thesis_abstract", with: Faker::Lorem.paragraph
+
+    find('#select_subjects_11_chosen a.chosen-default').click
+    first('#select_subjects_11_chosen .active-result').click
+    
     click_on("Continue")
 
     ## Page 3: Upload Supplementary
