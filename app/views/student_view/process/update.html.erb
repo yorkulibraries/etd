@@ -62,6 +62,17 @@
 	</div>
 
 	<%= simple_form_for [@student, @thesis], html: { class: "form-horizontal border border-2 bg-light" } do |f| %>
+		<% if @thesis.errors.any? %>
+			<div id="error_explanation" class="p-3 bg-warning-subtle">
+				<h4><%= pluralize(@thesis.errors.count, "error") %></h4>
+				<ul>
+					<% @thesis.errors.full_messages.each do |message| %>
+						<li><%= message %></li>
+					<% end %>
+				</ul>
+			</div>
+		<% end %>
+
 		<h4 class="text-dark">Please provide the information requested in the following fields. </h4>
 		<%= render partial: "theses/form_student_editable", locals: { f: f } %>
 		<input type="submit" name="Save Details" value="" class="d-none" aria-label="Save Details">

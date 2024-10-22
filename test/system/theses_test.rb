@@ -220,6 +220,10 @@ class ThesesTest < ApplicationSystemTestCase
     click_on("Continue")
 
     fill_in("Abstract", with: "Abstract Test")
+
+    find('#select_subjects_11_chosen a.chosen-default').click
+    first('#select_subjects_11_chosen .active-result').click
+    
     click_on("Continue")
 
     click_on("Upload Supplementary Thesis Files")
