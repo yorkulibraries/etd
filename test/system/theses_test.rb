@@ -264,7 +264,7 @@ class ThesesTest < ApplicationSystemTestCase
     click_link(@thesis_01.title)
 
     click_on("Upload Licence Agreements")
-    assert_selector "h2", text: "Upload Licence Agreements", visible: :all
+    assert_selector "h2", text: "Upload Licence File", visible: :all
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
     assert_not_empty find('.licence-file').text, "The .licence-file element is empty, no file"

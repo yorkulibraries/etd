@@ -197,7 +197,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
     click_link('Continue')
-    click_link_or_button('Upload Licence Files')
+    click_link_or_button('Upload Licence File')
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
     check 'thesis_lac_licence_agreement'
