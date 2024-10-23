@@ -74,10 +74,9 @@ class AppSettingsTest < ApplicationSystemTestCase
     click_link("Login as this student")
     fill_in 'student_email_external', with: 'test@test.com'
     click_button('Continue')
-    #assert_selector "small", text: 'Initial Text Test'
-    assert_selector "small", text: 'Abstract Text Test'
-    assert_selector "small", text: 'Subjects Text Test'
-    assert_selector "small", text: 'Keywords Text Test'
+    assert_selector "div", text: 'Abstract Text Test'
+    assert_selector "div", text: 'Subjects Text Test'
+    assert_selector "div", text: 'Keywords Text Test'
   end
 
   test 'Student submission Upload files message' do
