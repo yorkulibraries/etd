@@ -23,7 +23,7 @@ class ThesisTest < ActiveSupport::TestCase
     student_user = create(:student)
     thesis = build(:thesis, current_user: student_user, certify_content_correct: false)
     assert_not thesis.valid?(:submit_for_review), 'Should not validate thesis if certify_content_correct is missing for students submitting for review'
-    assert_includes thesis.errors[:base], "Please check the ‘I certify that the content is correct’ button to proceed."
+    assert_includes thesis.errors[:base], "Please check the ‘I certify that the content is correct’ button to proceed"
   end
 
   should 'not validate presence of certify_content_correct if not submitting_for_review_by_student?' do

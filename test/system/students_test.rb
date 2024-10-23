@@ -111,7 +111,7 @@ class StudentsTest < ApplicationSystemTestCase
     click_link('Continue') #update
     click_link('Continue') #upload
     click_link('Continue') #review
-    assert_selector '.alert-warning', text: 'Error: You have to upload a primary file to continue'
+    assert_selector '.alert-warning', text: 'Error: Please upload a Primary Thesis File.'
     # page.accept_alert
   end
 
@@ -315,7 +315,7 @@ class StudentsTest < ApplicationSystemTestCase
 
     # Ensure you can't go next without uploading LAC Document
     click_button("Accept and Continue")
-    assert_selector(".alert-warning", text: "Missing licence documents. Please upload signed licence documents.")
+    assert_selector(".alert-warning", text: "Please upload signed LAC licence documents.")
 
     click_link_or_button('Upload Licence Files')
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))

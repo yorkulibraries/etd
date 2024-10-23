@@ -11,7 +11,7 @@ class StudentViewController < ApplicationController
     if validate_active_thesis
       render(template:)
     else
-      flash[:error] = 'You have to upload a primary file to continue'
+      flash[:error] = 'Please upload a Primary Thesis File.'
       render template: 'student_view/process/upload'
     end
   end

@@ -95,7 +95,7 @@ class ThesesController < ApplicationController
 
     if current_user.role == User::STUDENT
       if thesis_params.key?(:notes) && !thesis_params[:notes].blank?
-        redirect_to [@student, @thesis], alert: 'You cannot edit thesis notes' and return
+        redirect_to [@student, @thesis], alert: 'You cannot edit thesis notes.' and return
       end
     end
 
@@ -130,10 +130,10 @@ class ThesesController < ApplicationController
     @thesis = @student.theses.find(params[:id])
 
     if params[:status] && Thesis::STATUSES.include?(params[:status])
-      @thesis.audit_comment = "Updating status from #{@thesis.status} to #{params[:status]}"
+      @thesis.audit_comment = "Updating status from #{@thesis.status} to #{params[:status]}."
       old_status = @thesis.status
       @thesis.update_attribute(:status, params[:status])
-      @message = "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}"
+      @message = "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}."
       @thesis.update_attribute(:under_review_at, Date.today) if params[:status] == Thesis::UNDER_REVIEW
       @thesis.update_attribute(:accepted_at, Date.today) if params[:status] == Thesis::ACCEPTED
       if params[:status] == Thesis::RETURNED
@@ -148,11 +148,11 @@ class ThesesController < ApplicationController
         StudentMailer.status_change_email(@student, @thesis, old_status, @thesis.status, additional_recipients,
                                           custom_message).deliver_later
         additional_recipients << @student.email
-        @email_sent = "Sent to #{additional_recipients.join(', ')}"
+        @email_sent = "Sent to #{additional_recipients.join(', ')}."
       end
 
     else
-      @message = 'Status was not updated'
+      @message = 'Status was not updated.'
     end
 
     redirect_to [@student, @thesis], notice: @message
@@ -175,15 +175,15 @@ class ThesesController < ApplicationController
           @thesis.update(audit_comment: 'Submitting for review.', student_accepted_terms_at: Date.today, under_review_at: Date.today, status: Thesis::UNDER_REVIEW)
           redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS)
         else
-          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), alert: 'Missing Primary Document'
+          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), alert: 'Please upload a Primary Thesis File.'
         end
       else
         error_messages = @thesis.errors.full_messages.join(', ')
-        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: "There was an error submitting your thesis: #{error_messages}."
+        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: "#{error_messages}."
       end
     else
       error_messages = @thesis.errors.full_messages.join(', ')
-      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: "There was an error submitting your thesis: #{error_messages}."
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: "#{error_messages}."
     end
   end
 
@@ -204,15 +204,15 @@ class ThesesController < ApplicationController
         if validate_licence_uplaod(@thesis.id)
           redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
         else
-          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: 'Missing licence documents. Please upload signed licence documents.'
+          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: 'Please upload signed LAC licence documents.'
         end
       else
         error_messages = @thesis.errors.full_messages.join(', ')
-        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: "There was an error submitting your thesis: #{error_messages}."
+        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), alert: "#{error_messages}"
       end
     else
       error_messages = @thesis.errors.full_messages.join(', ')
-      flash.now[:alert] = "There was an error submitting your thesis: #{error_messages}."
+      flash.now[:alert] = "#{error_messages}."
       @licence_documents = @thesis.documents.not_deleted.licence
       render 'student_view/process/review'
     end

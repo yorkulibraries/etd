@@ -23,4 +23,7 @@ en:
   activerecord:
     attributes:
       thesis:
-        loc_subjects: "Subject"
+        loc_subjects: "Subjects"
+        etd_licence_agreement: "ETD licence agreement"
+        yorkspace_licence_agreement: "YorkSpace licence agreement"
+        lac_licence_agreement: "LAC licence agreement"

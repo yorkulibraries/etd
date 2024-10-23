@@ -461,7 +461,7 @@ class ThesesControllerTest < ActionController::TestCase
       assigns(:thesis)
       assert_response :redirect
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
-      assert_equal "There was an error submitting your thesis: Please check the ‘I certify that the content is correct’ button to proceed..", flash[:alert]
+      assert_equal "Please check the ‘I certify that the content is correct’ button to proceed.", flash[:alert]
 
     end
 
@@ -470,7 +470,7 @@ class ThesesControllerTest < ActionController::TestCase
       # thesis = create(:thesis, student: @student)
       patch :accept_licences, params: { student_id: @student.id, id: @thesis.id, thesis: { lac_licence_agreement: true, yorkspace_licence_agreement: true, etd_licence_agreement: true } }
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW)
-      assert_equal 'Missing licence documents. Please upload signed licence documents.', flash[:alert]
+      assert_equal 'Please upload signed LAC licence documents.', flash[:alert]
     end
 
     should "should accept licences with a licence document" do

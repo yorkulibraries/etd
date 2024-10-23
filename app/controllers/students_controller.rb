@@ -19,18 +19,17 @@ class StudentsController < ApplicationController
         records = GemRecord.find_by_sisid_or_name(params[:sisid])
         if records.size == 1
           @gem_record = records.first
-          redirect_to @gem_record, notice: "This is still a Gem Record, it hasn't been converted to an ETD Record."
+          redirect_to @gem_record
         elsif records.empty?
-          redirect_to gem_records_path, alert: 'Student was not found. The student must exist in the Gem database.'
+          redirect_to gem_records_path, alert: 'Student was not found.'
         else
           @search_result = "Results for '#{params[:sisid]}' search"
           @gem_records = records.page(params[:page])
           render template: 'gem_records/index'
-
         end
       end
     else
-      redirect_to :back, notice: 'You must provide a valid SISID'
+      redirect_to :back
     end
   end
 
@@ -96,7 +95,7 @@ class StudentsController < ApplicationController
     @student.blocked = true
     @student.role = User::STUDENT
 
-    redirect_to @student, notice: "Converted #{@student.name} record from Gem." if @student.save
+    redirect_to @student, notice: "Created student record from GEM for #{@student.name}." if @student.save
   end
 
   def create
