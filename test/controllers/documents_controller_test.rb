@@ -111,7 +111,7 @@ class DocumentsControllerTest < ActionController::TestCase
       end
 
       assert_redirected_to student_thesis_path(@student, @thesis), 'Should redirect back to the thesis details'
-      assert_equal 'File deleted', flash[:notice]
+      assert_equal 'File deleted.', flash[:notice]
     end
   end
 

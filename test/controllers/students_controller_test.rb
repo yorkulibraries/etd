@@ -199,7 +199,7 @@ class StudentsControllerTest < ActionController::TestCase
       post :gem_search, params: { sisid: '333333333' }
 
       assert_redirected_to gem_records_path
-      assert_equal 'Student was not found. The student must exist in the Gem database.', flash[:alert]
+      assert_equal 'Student was not found.', flash[:alert]
     end
 
     ### SHOULD FIND STUDENTS BASED ON NAME OR SISID ###

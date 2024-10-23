@@ -13,7 +13,7 @@ class Thesis < ApplicationRecord
 
   def certify_content_correct_present
     if certify_content_correct.blank?
-      errors.add(:base, "Please check the ‘I certify that the content is correct’ button to proceed.")
+      errors.add(:base, "Please check the ‘I certify that the content is correct’ button to proceed")
     end
   end
 

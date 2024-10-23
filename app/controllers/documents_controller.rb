@@ -36,12 +36,12 @@ class DocumentsController < ApplicationController
       @document.save      
       if current_user.role == User::STUDENT && @document.usage == 'licence'
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW),
-                    notice: 'File uploaded'
+                    notice: 'File uploaded.'
       elsif current_user.role == User::STUDENT && @document.usage != 'licence'
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
-                    notice: 'File uploaded'
+                    notice: 'File uploaded.'
       else
-        redirect_to [@student, @thesis], notice: 'File uploaded'
+        redirect_to [@student, @thesis], notice: 'File uploaded.'
       end
     else
       respond_to do |format|
@@ -62,12 +62,12 @@ class DocumentsController < ApplicationController
     if @document.update(document_params)
       if current_user.role == User::STUDENT && @document.usage == 'licence'
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW),
-                    notice: 'File uploaded'
+                    notice: 'File uploaded.'
       elsif current_user.role == User::STUDENT && @document.usage != 'licence'
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
-                    notice: 'File uploaded'
+                    notice: 'File uploaded.'
       else
-        redirect_to [@student, @thesis], notice: 'File uploaded'
+        redirect_to [@student, @thesis], notice: 'File uploaded.'
       end
     else
       render action: 'edit'
@@ -81,12 +81,12 @@ class DocumentsController < ApplicationController
 
     if current_user.role == User::STUDENT && @document.usage == 'licence'
       redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW),
-                  notice: 'File deleted'
+                  notice: 'File deleted.'
     elsif current_user.role == User::STUDENT && @document.usage != 'licence'
       redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
-                  notice: 'File deleted'
+                  notice: 'File deleted.'
     else
-      redirect_to student_thesis_url(@student, @thesis), notice: 'File deleted'
+      redirect_to student_thesis_url(@student, @thesis), notice: 'File deleted.'
     end
   end
 

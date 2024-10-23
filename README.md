@@ -71,3 +71,14 @@ rt
 rts
 ```
 
+Run all tests in a specific test file
+```
+docker compose exec web bash
+rt test/controllers/students_controller_test.rb
+```
+
+Run a specific test
+```
+docker compose exec web bash
+rt test/system/students_test.rb:14
+```
