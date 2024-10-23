@@ -1,11 +1,11 @@
 <%= f.input :language, collection: Thesis::LANGUAGE, readonly: read_only_if_student("language"), input_html: { aria_label: "Language" }  %>
 
 <%= f.label :abstract, label: "Abstract", required: true, class: "d-block mb-1" %>
-<small class="form-text"><%= raw(AppSettings.student_update_details_abstract) %></small>
+<div class="form-text"><%= raw(AppSettings.student_update_details_abstract) %></div>
 <%= f.input :abstract, input_html: { class: "", rows: "8" }, label: false, readonly: read_only_if_student("abstract") %>
 
 <%= f.label :loc_subject_ids, label: "Subjects", class: "d-block mb-1" %>
-<small class="form-text"><%= raw(AppSettings.student_update_details_subjects) %></small>		
+<div class="form-text"><%= raw(AppSettings.student_update_details_subjects) %></div>		
 
 <div id="thesis_loc_subject_ids" class="span3 no-space">
 	<% @thesis.loc_subjects.each_with_index do |subject, index| %>
@@ -22,5 +22,5 @@
 </div>
 		
 <%= f.label :keywords, label: "Keywords", class: "d-block mb-1" %>
-<small class="form-text"><%= raw(AppSettings.student_update_details_keywords) %></small>		
+<div class="form-text"><%= raw(AppSettings.student_update_details_keywords) %></div>		
 <%= f.input :keywords, label: false, input_html: { rows: "2",  aria:{ label: "Keywords" } }, readonly: read_only_if_student("keywords") %>
