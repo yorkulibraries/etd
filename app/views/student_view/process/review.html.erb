@@ -41,7 +41,7 @@
 			<h4 title="LAC Supplementary Licence File Upload">Library and Archives Canada Licence</h4>
 			
 			<% if AppSettings.student_review_lac_licence_instructions.present? %>
-				<div class="small text-secondary">
+				<div class="form-text">
 					<%= raw(AppSettings.student_review_lac_licence_instructions) %>
 				</div>
 			<% end %>
@@ -55,7 +55,7 @@
 			<%  unless block_thesis_changes?(@thesis) %>
 				<p>
 				<%= link_to new_student_thesis_document_path(@student, @thesis, usage: 'licence', supplemental: true), class: "btn btn-primary", remote: true do %>
-					Upload Licence Files
+					Upload Licence File
 				<% end %>
 				</p>
 			<% end %>
@@ -67,7 +67,7 @@
 
 		<div class="licence-box my-5 bg-light p-3" >
 			<h4 title="Yorkspace Distribution Licence">Yorkspace Distribution Licence</h4>
-			<p class="small text-secondary">Please review the licence below and accept if you agree</p>
+			<div class="form-text">Please review the licence below and accept if you agree</div>
 			<hr class="text-primary border-3">
 			<p>
 				<a id="ydlButton" class="btn btn-primary" data-bs-toggle="collapse" href="#collapseYDL" role="button" aria-expanded="false" aria-controls="collapseYDL">
@@ -89,7 +89,7 @@
 
 		<div class="licence-box my-5 bg-light p-3" >
 			<h4 title="ETD Licence Agreement">ETD Licence Agreement</h4>
-			<p class="small text-secondary">Please review the licence below and accept if you agree</p>
+			<div class="form-text">Please review the licence below and accept if you agree</div>
 			<hr class="text-primary border-3">
 			<p>
 				<a id="etdButton" class="btn btn-primary" data-bs-toggle="collapse" href="#collapseETD" role="button" aria-expanded="false" aria-controls="collapseETD">

@@ -317,7 +317,7 @@ class StudentsTest < ApplicationSystemTestCase
     click_button("Accept and Continue")
     assert_selector(".alert-warning", text: "Please upload signed LAC licence documents.")
 
-    click_link_or_button('Upload Licence Files')
+    click_link_or_button('Upload Licence File')
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
 
