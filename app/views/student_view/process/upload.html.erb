@@ -28,7 +28,7 @@
 		<%  unless block_thesis_changes?(@thesis) %>
 			<% if @primary_documents.count == 0 %>
 				<%= link_to new_student_thesis_document_path(@student, @thesis, usage: 'thesis', supplemental: false), class: "btn btn-primary", remote: true do %>
-					Upload Primary Thesis Files
+					Upload Primary Thesis File
 				<% end %>
 			<% end %>
 		<% end %>

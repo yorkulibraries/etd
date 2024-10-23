@@ -247,11 +247,71 @@ AppSettings.student_review_lac_licence_instructions = <<HEREDOC
 HEREDOC
 
 AppSettings.student_review_license_yorkspace = <<HEREDOC
-<div>YORKSPACE NON-EXCLUSIVE DISTRIBUTION LICENSE</div><div><br></div><div>By signing and submitting this license, you (the author(s) or copyright</div><div>owner) grants to York University the non-exclusive right to reproduce,</div><div>translate (as defined below), and/or distribute your submission (including</div><div>the abstract) worldwide in print and electronic format and in any medium,</div><div>including but not limited to audio or video.</div><div><br></div><div>YorkSpace and your use of YorkSpace is governed by the terms and conditions of</div><div>the York University website posted at:</div><div>http://www.yorku.ca/web/about_yorku/privacy.html</div><div><br></div><div>You agree that York University may, without changing the content, translate the</div><div>submission to any medium or format for the purpose of preservation.</div><div><br></div><div>You also agree that York University may keep more than one copy of this submission for</div><div>purposes of security, back-up and preservation.</div><div><br></div><div>You represent that the submission is your original work, and that you have</div><div>the right to grant the rights contained in this license. You also represent</div><div>that your submission does not, to the best of your knowledge, infringe upon</div><div>anyone's copyright.</div><div><br></div><div>If the submission contains material for which you do not hold copyright,</div><div>you represent that you have obtained the unrestricted permission of the</div><div>copyright owner to grant York University the rights required by this license, and that</div><div>such third-party owned material is clearly identified and acknowledged</div><div>within the text or content of the submission.</div><div><br></div><div>IF THE SUBMISSION IS BASED UPON WORK THAT HAS BEEN SPONSORED OR SUPPORTED</div><div>BY AN AGENCY OR ORGANIZATION OTHER THAN YORK UNIVERSITY, YOU REPRESENT THAT YOU HAVE</div><div>FULFILLED ANY RIGHT OF REVIEW OR OTHER OBLIGATIONS REQUIRED BY SUCH</div><div>CONTRACT OR AGREEMENT.</div><div><br></div><div>York University will clearly identify your name(s) as the author(s) or owner(s) of the</div><div>submission, and will not make any alteration, other than as allowed by this</div><div>license, to your submission.</div>
+<pre>
+YORKSPACE NON-EXCLUSIVE DISTRIBUTION LICENCE
+
+By signing and submitting this licence, you (the author(s) or copyright
+owner) grant to York University the non-exclusive right to reproduce,
+translate (as defined below), and/or distribute your submission (including
+the abstract) worldwide in print and electronic format and in any medium,
+including but not limited to audio or video.
+
+YorkSpace and your use of YorkSpace is governed by the terms and conditions of
+the York University website posted at:
+http://www.yorku.ca/web/about_yorku/privacy.html
+
+You agree that York University may, without changing the content, translate the
+submission to any medium or format for the purpose of preservation.
+
+You also agree that York University may keep more than one copy of this submission for
+purposes of security, back-up and preservation.
+
+You represent that the submission is your original work, and that you have
+the right to grant the rights contained in this licence. You also represent
+that your submission does not, to the best of your knowledge, infringe upon
+anyone's copyright.
+
+If the submission contains material for which you do not hold copyright,
+you represent that you have obtained the unrestricted permission of the
+copyright owner to grant York University the rights required by this licence, and that
+such third-party owned material is clearly identified and acknowledged
+within the text or content of the submission.
+
+IF THE SUBMISSION IS BASED UPON WORK THAT HAS BEEN SPONSORED OR SUPPORTED
+BY AN AGENCY OR ORGANIZATION OTHER THAN YORK UNIVERSITY, YOU REPRESENT THAT YOU HAVE
+FULFILLED ANY RIGHT OF REVIEW OR OTHER OBLIGATIONS REQUIRED BY SUCH
+CONTRACT OR AGREEMENT.
+
+York University will clearly identify your name(s) as the author(s) or owner(s) of the
+submission, and will not make any alteration, other than as allowed by this
+licence, to your submission.
+</pre>
 HEREDOC
 
 AppSettings.student_review_license_etd = <<HEREDOC
-<p>YorkU ETD Licence</p>
+<pre>
+Non-Exclusive License to York University
+
+In the interests of facilitating research and contributing to scholarship at York University (“York”) and elsewhere, the author (“Author”) hereby grants to York a non-exclusive, royalty free and irrevocable license on the following terms:
+
+- York is permitted to reproduce, copy, store, archive, distribute, translate, publish and loan  to the public the Author’s thesis or dissertation, including the abstract and metadata  (“the Work”), in whole or in part, anywhere in the world, for non-commercial purposes, in any format and in any medium.  Distribution may be in any form, including, but not limited to, the right to transmit or publish the Work through the Internet or any other telecommunications device; to digitize, photocopy and microfiche the Work; or through library, interlibrary and public loans.  York is permitted to sub-license or assign any of the rights mentioned in this agreement to third party agents to act on York's behalf.
+
+- York may keep more than one copy of the Work and convert the Work from its original format into any medium or format for the purposes of security, back-up, and preservation or to facilitate the exercise of York’s rights under this license.
+
+- York may collect cost-recovery fees for reproducing or otherwise making the Work available.
+
+- The Author confirms that the Work is the approved and final version, in whole and without alteration, submitted to the Faculty of Graduate Studies, York University, as a requirement of the York degree program. 
+
+- The Author confirms that the Work is their original work, that they have the right and authority to grant the rights set out in this license and that the Work does not infringe copyright or other intellectual property rights of any other person or institution.  If the Work contains material to which the Author does not hold copyright it is clearly identified and acknowledged. Copyright–protected material not in the public domain is included either under the "fair dealing" provisions of the Copyright Act (Canada) or the Author has obtained and retained copies of written permission from the copyright holder(s) to include the material and to grant to York the rights set out in this license.
+
+- York will clearly identify the Author as the copyright holder of the Work and will not make any alteration, other than as allowed by this license, to the Work. All copies of the Work will include a statement to the effect that the copy is being made available in this form by authority of the Author and copyright owner solely for the purpose of private study and research and may not be copied, further distributed or altered for any purpose, except as permitted by copyright law, without written authority from the Author.
+
+- A nonexclusive license in no way limits the Author as the copyright holder in making other nonexclusive uses of the Work. The Author otherwise retains all rights in the Work subject to the nonexclusive grants and conditions of this license and accordingly holds sole responsibility for complying with copyright and other legal requirements.
+
+- The Author agrees that York is not responsible for any misuse of the Work by third parties who access the Work through YorkSpace, York's Institutional Repository.
+
+- I have reviewed and agree to accept the conditions and regulations of the Faculty of Graduate Studies as outlined in the Thesis and Dissertation Handbook.
+</pre>
 HEREDOC
 
 AppSettings.student_review_details = <<HEREDOC
