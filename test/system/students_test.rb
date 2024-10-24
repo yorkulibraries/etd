@@ -226,7 +226,7 @@ class StudentsTest < ApplicationSystemTestCase
   end
 
   ## Page 2 and 3 tests
-  should "upload primary file" do
+  should "upload files" do
     @thesis = FactoryGirl.create(:thesis)
     login_as(@thesis.student)
     visit root_url
@@ -262,6 +262,9 @@ class StudentsTest < ApplicationSystemTestCase
     assert_not(page.has_css?("p", text: "Smith_Jane_E_2014_PhD.pdf"), "Should not show 'example text' as per Spring 2024 requirements")
 
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
+
+    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
+
     click_button('Upload')
 
     assert_selector(".name", text: /\.pdf/)
@@ -281,7 +284,6 @@ class StudentsTest < ApplicationSystemTestCase
     check('I agree to and I have signed LAC Form', allow_label_click: true)
 
     assert checkbox.checked?, "#thesis_lac_licence_agreement checkbox is not checked."
-
 
     # Yorkspace Licence
     assert page.has_selector?('#thesis_yorkspace_licence_agreement', visible: true), "#thesis_yorkspace_licence_agreement not found."
@@ -319,6 +321,9 @@ class StudentsTest < ApplicationSystemTestCase
 
     click_link_or_button('Upload Licence File')
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
+
+    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
+
     click_button('Upload')
 
     click_button("Accept and Continue")
@@ -359,6 +364,9 @@ class StudentsTest < ApplicationSystemTestCase
 
     ## Upload a file not accepted format. e.g. ruby .rb
     attach_file("document_file", Rails.root.join('test/factories/thesis.rb'))
+
+    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
+
     click_button('Upload')
 
     assert page.has_selector?('#supplementary-help-info', visible: true), "#supplementary-help-info not found."

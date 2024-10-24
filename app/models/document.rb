@@ -37,8 +37,20 @@ class Document < ApplicationRecord
   LICENCE_FILE_EXT = [ '.pdf' ].freeze
 
   #### ADDITIONAL METHODS
-  def allowed_extensions 
-    list = SUPPLEMENTAL_FILE_EXT
+  def allowed_extensions
+    list = PRIMARY_FILE_EXT
+
+    case document_type
+    when 'primary'
+      list = PRIMARY_FILE_EXT
+    when 'supplemental'
+      list = SUPPLEMENTAL_FILE_EXT
+    when 'licence'
+      list = LICENCE_FILE_EXT
+    when 'embargo'
+      list = EMBARGO_FILE_EXT
+    end
+
     return list
   end
 

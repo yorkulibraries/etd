@@ -422,4 +422,32 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal 4, Document.supplemental.count, 'The should be 4 supplemental documents'
     assert_equal 2, Document.primary.count, 'There should be 5 primary documents'
   end
+
+  should 'allowed_extensions should match document usage' do
+    d = Document.new
+    
+    d.usage = 'thesis'
+    d.supplemental = false
+    assert_equal Document::PRIMARY_FILE_EXT, d.allowed_extensions
+
+    d.usage = 'thesis'
+    d.supplemental = true
+    assert_equal Document::SUPPLEMENTAL_FILE_EXT, d.allowed_extensions
+
+    d.usage = 'licence'
+    d.supplemental = false
+    assert_equal Document::LICENCE_FILE_EXT, d.allowed_extensions
+
+    d.usage = 'licence'
+    d.supplemental = true
+    assert_equal Document::LICENCE_FILE_EXT, d.allowed_extensions
+
+    d.usage = 'embargo'
+    d.supplemental = false
+    assert_equal Document::EMBARGO_FILE_EXT, d.allowed_extensions
+
+    d.usage = 'embargo'
+    d.supplemental = true
+    assert_equal Document::EMBARGO_FILE_EXT, d.allowed_extensions
+  end
 end

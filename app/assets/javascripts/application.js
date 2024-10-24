@@ -24,12 +24,10 @@
 
 
 $(document).ready(function () {
-
 	$('.dropdown-toggle').dropdown();
 
 	// disable in browser form validations
 	$('form').find('input').removeAttr('required');
-
 
 	$('.theses .options a').click(function (e) {
 		e.preventDefault();
@@ -37,7 +35,6 @@ $(document).ready(function () {
 		$(".theses .options a").removeClass("active")
 		$(this).addClass("active")
 	})
-
 });
 
 $(document).on('change', 'form.file-upload input.file', function() {
@@ -45,7 +42,7 @@ $(document).on('change', 'form.file-upload input.file', function() {
         var allowed = $(this).data('ext').split(',');
         var ext = '.' + $(this).val().split('.').pop().toLowerCase();
         if($.inArray(ext, allowed) == -1) {
-            alert('File extension "' + ext + '" is not allowed for this upload.');
+            alert('File extension ' + ext + ' is not allowed.');
             $(this).parents('form:first').find('input:submit').prop('disabled', true);
         } else {
             $(this).parents('form:first').find('input:submit').prop('disabled', false);
