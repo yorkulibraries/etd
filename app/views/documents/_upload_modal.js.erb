@@ -1,3 +1,4 @@
+$('#file_upload_modal').remove();
 $('body').append('<%= j render "modal" %>');
 $('#file_upload_modal .invalid-feedback').empty().hide();
 (new bootstrap.Modal($('#file_upload_modal'))).show();
