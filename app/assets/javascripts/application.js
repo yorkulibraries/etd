@@ -37,15 +37,19 @@ $(document).ready(function () {
 	})
 });
 
-$(document).on('change', 'form.file-upload input.file', function() {
-    if ($(this).val()) {
-        var allowed = $(this).data('ext').split(',');
-        var ext = '.' + $(this).val().split('.').pop().toLowerCase();
+$(document).on('click', '#file_upload_button', function(e) {
+	file = $(this).parents('form:first').find('input:file');
+    if (file.val()) {
+        var allowed = file.data('ext').split(',');
+        var ext = '.' + file.val().split('.').pop().toLowerCase();
         if($.inArray(ext, allowed) == -1) {
             alert('File extension ' + ext + ' is not allowed.');
-            $(this).parents('form:first').find('input:submit').prop('disabled', true);
         } else {
-            $(this).parents('form:first').find('input:submit').prop('disabled', false);
+            return true;
         }
+    } else {
+    	alert('Please choose a file to upload.');
     }
+    e.preventDefault();
+    return false;
 });

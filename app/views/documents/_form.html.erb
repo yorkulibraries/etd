@@ -42,7 +42,7 @@ html: {  multipart: true, class: "file-upload" } do |f| %>
 	<%= f.hidden_field :usage, value: @document.usage %>
 	<%= f.hidden_field :supplemental, value: @document.supplemental %>
   
-  <%= f.button :submit, "Upload", class: "btn btn-primary file-upload", disabled: true %>
+  <%= f.button :submit, "Upload", class: "btn btn-primary file-upload", id: "file_upload_button", disabled: false %>
 
   <% if (defined? modal).nil? || !modal %>
     <% if current_user.role == User::STUDENT && @document.usage == 'licence' %>

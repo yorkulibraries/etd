@@ -193,7 +193,6 @@ class ThesesTest < ApplicationSystemTestCase
 
     click_on("Upload Primary Thesis File")
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
-    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
     click_button('Upload')
 
     assert_selector(".name", text: /\.pdf/)
@@ -205,7 +204,6 @@ class ThesesTest < ApplicationSystemTestCase
 
     click_on("Upload Primary Thesis File")
     attach_file("document_file", Rails.root.join('test/fixtures/files/image-example.jpg'))
-    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
     click_button('Upload')
 
     assert_selector(".invalid-feedback", text: "Primary file must be a PDF")
@@ -230,7 +228,6 @@ class ThesesTest < ApplicationSystemTestCase
 
     click_on("Upload Supplementary Thesis Files")
     attach_file("document_file", Rails.root.join('test/fixtures/files/zip-file.zip'))
-    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
     click_button('Upload')
 
     assert_selector(".invalid-feedback", text: "File Supplemental file must be a valid file type")
@@ -242,7 +239,6 @@ class ThesesTest < ApplicationSystemTestCase
 
     click_on("Upload Supplementary Thesis Files")
     attach_file("document_file", Rails.root.join('test/fixtures/files/zip-file.zip'))
-    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
     click_button('Upload')
 
     assert_selector(".invalid-feedback", text: "File Supplemental file must be a valid file type")
@@ -255,7 +251,6 @@ class ThesesTest < ApplicationSystemTestCase
     click_on("Upload Supplementary Thesis Files")
     assert_selector "h2", text: "Upload Supplementary Thesis File", visible: :all
     attach_file("document_file", Rails.root.join('test/fixtures/files/pdf-document.pdf'))
-    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
     click_button('Upload')
     assert_selector(".supplemental", text: /_supplemental_/) #Supplemental
 
@@ -271,7 +266,6 @@ class ThesesTest < ApplicationSystemTestCase
     click_on("Upload Licence Agreements")
     assert_selector "h2", text: "Upload Licence File", visible: :all
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
-    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
     click_button('Upload')
     assert_not_empty find('.licence-file').text, "The .licence-file element is empty, no file"
 
@@ -285,7 +279,6 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector "h2", text: "Upload Embargo Documents", visible: :all
 
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
-    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
     click_button('Upload')
 
     assert_not_empty find('.embargo-file').text, "The .embargo-file element is empty, no file"
@@ -297,12 +290,10 @@ class ThesesTest < ApplicationSystemTestCase
 
     click_on("Upload Primary Thesis File")
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
-    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
     click_button('Upload')
 
     click_link("Replace")
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
-    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
     click_button('Upload')
     assert_selector(".name", text: /\.pdf/)
 
@@ -318,12 +309,10 @@ class ThesesTest < ApplicationSystemTestCase
 
     click_on("Upload Supplementary Thesis Files")
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
-    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
     click_button('Upload')
 
     click_link("Replace")
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
-    execute_script("$('#document_file').parents('form:first').find('input:submit').prop('disabled', false);")
     click_button('Upload')
     assert_selector(".name", text: /\.pdf/)
 
