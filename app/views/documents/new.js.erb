@@ -1,8 +1,2 @@
 $('body').append('<%= j render "modal" %>');
 (new bootstrap.Modal($('#file_upload_modal'))).show();
-
-$('form.file-upload input.file').change ( function() {
-    if ($(this).val()) {
-        $(this).parents('form:first').find('input:submit').removeAttr('disabled');
-    } 
-});

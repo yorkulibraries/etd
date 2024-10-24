@@ -1,4 +1,5 @@
-<%= simple_form_for [@student, @thesis, @document], authenticity_token: true, html: {  multipart: true, class: "file-upload" } do |f| %>
+<%= simple_form_for [@student, @thesis, @document], authenticity_token: true, 
+html: {  multipart: true, class: "file-upload" } do |f| %>
   
   <h2 class="fs-6">
   	<% if @document.usage == 'thesis' && !@document.supplemental %>
@@ -37,7 +38,7 @@
   <% end %>
 
   <% f.input :name, required: true, input_html: { autocomplete: "off"} %>
-	<%= f.input :file, required: true, as: :file %>
+	<%= f.input :file, required: true, as: :file, input_html: { "data-ext": "#{@document.allowed_extensions.join(',')}" } %>
 	<%= f.hidden_field :usage, value: @document.usage %>
 	<%= f.hidden_field :supplemental, value: @document.supplemental %>
   

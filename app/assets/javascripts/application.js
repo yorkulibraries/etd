@@ -39,3 +39,16 @@ $(document).ready(function () {
 	})
 
 });
+
+$(document).on('change', 'form.file-upload input.file', function() {
+    if ($(this).val()) {
+        var allowed = $(this).data('ext').split(',');
+        var ext = '.' + $(this).val().split('.').pop().toLowerCase();
+        if($.inArray(ext, allowed) == -1) {
+            alert('File extension "' + ext + '" is not allowed for this upload.');
+            $(this).parents('form:first').find('input:submit').prop('disabled', true);
+        } else {
+            $(this).parents('form:first').find('input:submit').prop('disabled', false);
+        }
+    }
+});
