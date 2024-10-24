@@ -79,7 +79,7 @@ class Document < ApplicationRecord
 
     return if file.filename.downcase.end_with?('.pdf')
 
-    errors.add(:file, 'Primary file must be a PDF')
+    errors.add(:file, "extension #{ext} is not allowed.")
   end
 
   def supplemental_file_must_be_file_types
@@ -87,6 +87,8 @@ class Document < ApplicationRecord
     embargo_file_types = EMBARGO_FILE_EXT
 
     return unless file.filename.present? && supplemental
+
+    ext = '.' + file.filename.downcase.split('.').pop
 
     if document_type == "licence"
       return if file.filename.downcase.end_with?('.pdf')
@@ -96,7 +98,7 @@ class Document < ApplicationRecord
       return if embargo_file_types.include?(File.extname(file.filename.downcase))
     end
 
-    errors.add(:file, "#{document_type.capitalize} file must be a valid file type")
+    errors.add(:file, "extension #{ext} is not allowed.")
   end
 
   def document_type

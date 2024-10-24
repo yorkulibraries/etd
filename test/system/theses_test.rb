@@ -206,7 +206,7 @@ class ThesesTest < ApplicationSystemTestCase
     attach_file("document_file", Rails.root.join('test/fixtures/files/image-example.jpg'))
     click_button('Upload')
 
-    assert_selector(".invalid-feedback", text: "Primary file must be a PDF")
+    assert_selector(".invalid-feedback", text: "File extension .jpg is not allowed.")
   end
 
   should "not upload supplmentary document with incorrect file format as student" do
@@ -228,9 +228,10 @@ class ThesesTest < ApplicationSystemTestCase
 
     click_on("Upload Supplementary Thesis Files")
     attach_file("document_file", Rails.root.join('test/fixtures/files/zip-file.zip'))
-    click_button('Upload')
 
-    assert_selector(".invalid-feedback", text: "File Supplemental file must be a valid file type")
+    click_button('Upload')
+        
+    assert_selector(".invalid-feedback", text: "File extension .zip is not allowed.")
   end
 
   should "not upload supplmentary document with incorrect file format as admin" do
@@ -241,7 +242,7 @@ class ThesesTest < ApplicationSystemTestCase
     attach_file("document_file", Rails.root.join('test/fixtures/files/zip-file.zip'))
     click_button('Upload')
 
-    assert_selector(".invalid-feedback", text: "File Supplemental file must be a valid file type")
+    assert_selector(".invalid-feedback", text: "File extension .zip is not allowed.")
   end
 
   should "be able to upload supplementary document by admin/staff" do

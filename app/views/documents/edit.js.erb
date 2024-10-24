@@ -1,2 +1,1 @@
-$('body').append('<%= j render "modal" %>');
-(new bootstrap.Modal($('#file_upload_modal'))).show();
+<%= render partial: 'upload_modal', formats: :js %>

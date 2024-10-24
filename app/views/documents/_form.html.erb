@@ -39,10 +39,12 @@ html: {  multipart: true, class: "file-upload" } do |f| %>
 
   <% f.input :name, required: true, input_html: { autocomplete: "off"} %>
 	<%= f.input :file, required: true, as: :file, input_html: { "data-ext": "#{@document.allowed_extensions.join(',')}" } %>
+  <div class="invalid-feedback"></div>
+
 	<%= f.hidden_field :usage, value: @document.usage %>
 	<%= f.hidden_field :supplemental, value: @document.supplemental %>
-  
-  <%= f.button :submit, "Upload", class: "btn btn-primary file-upload", id: "file_upload_button", disabled: false %>
+
+  <%= f.button :submit, "Upload", class: "btn btn-primary file-upload", id: "file_upload_button" %>
 
   <% if (defined? modal).nil? || !modal %>
     <% if current_user.role == User::STUDENT && @document.usage == 'licence' %>
