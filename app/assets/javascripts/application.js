@@ -43,7 +43,7 @@ $(document).on('click', '#file_upload_button', function(e) {
         var allowed = file.data('ext').split(',');
         var ext = '.' + file.val().split('.').pop().toLowerCase();
         if($.inArray(ext, allowed) == -1) {
-            alert('File extension ' + ext + ' is not allowed.');
+            console.log('File extension ' + ext + ' is not allowed.');
         } else {
             return true;
         }
