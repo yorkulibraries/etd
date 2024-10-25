@@ -350,4 +350,18 @@ AppSettings.student_check_status_rejected = <<HEREDOC
 <p>Current status Rejected.</p>
 HEREDOC
 
+AppSettings.primary_thesis_file_extensions = <<HEREDOC
+.pdf
+HEREDOC
 
+AppSettings.supplemental_thesis_file_extensions = <<HEREDOC
+.pdf, .doc, .docx, .txt, .html, .htm, .odt, .odp, .ods, .png, .tif, .jpg, .csv, .xml, .avi, .flac, .wav, .mp3, .mp4, .mov
+HEREDOC
+
+AppSettings.licence_file_extensions = <<HEREDOC
+.pdf
+HEREDOC
+
+AppSettings.embargo_file_extensions = <<HEREDOC
+.pdf, .txt, .html, .htm, .odt, .odp, .ods
+HEREDOC

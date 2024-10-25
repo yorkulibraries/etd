@@ -48,4 +48,8 @@ class AppSettings < RailsSettings::Base
   field :student_check_status_accepted
   field :student_check_status_published
   field :student_check_status_rejected
+  field :primary_thesis_file_extensions
+  field :supplemental_thesis_file_extensions
+  field :licence_file_extensions
+  field :embargo_file_extensions
 end
