@@ -197,4 +197,8 @@ class Thesis < ApplicationRecord
   def self.assigned_to_user(user)
     Thesis.where('assigned_to_id = ?', user.id)
   end
+
+  def has_primary_file?
+    return documents.primary.not_deleted.size > 0
+  end
 end
