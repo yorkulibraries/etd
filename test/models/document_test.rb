@@ -25,6 +25,31 @@ class DocumentTest < ActiveSupport::TestCase
     assert !build(:document, file: nil).valid?, 'File is required'
     assert !build(:document, user: nil).valid?, 'User/owner is required'
     assert !build(:document, thesis: nil).valid?, 'Thesis is required'
+
+    # should not be able to create a primary file with extension .jpg 
+    doc = build(:document, usage: 'thesis', supplemental: false, file: fixture_file_upload('image-example.jpg'))
+    assert '.jpg', doc.file_extension
+    assert !doc.valid_extension?, 'extension .jpg should not be valid for primary file'
+    assert doc.primary?, "must be primary"
+    assert !doc.supplemental?, "must not be supplemental"
+    assert_equal 'thesis', doc.usage, 'usage must be "thesis"'
+    assert !doc.valid?, 'Should not be valid, extension cannot be .jpg'
+
+    # should not be able to create a primary file with usage "licence"
+    doc = build(:document, usage: 'licence', supplemental: false, file: fixture_file_upload('pdf-document.pdf'))
+    assert '.pdf', doc.file_extension
+    assert doc.valid_extension?, 'extension should be valid'
+    assert doc.primary?, "must be primary"
+    assert_equal 'licence', doc.usage, 'usage must be "licence"'
+    assert !doc.valid?, 'Should not be valid, usage can not be "licence" AND not supplemental'
+
+    # should not be able to create a primary file with usage "embargo"
+    doc = build(:document, usage: 'embargo', supplemental: false, file: fixture_file_upload('pdf-document.pdf'))
+    assert '.pdf', doc.file_extension
+    assert doc.valid_extension?, 'extension should be valid'
+    assert doc.primary?, "must be primary"
+    assert_equal 'embargo', doc.usage, 'usage must be "embargo"'
+    assert !doc.valid?, 'Should not be valid, usage can not be "embargo" AND not supplemental'
   end
 
   should 'only allow one primary file per thesis, and it should ignore deleted' do

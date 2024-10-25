@@ -10,9 +10,9 @@ class Document < ApplicationRecord
 
   #### VALIDATIONS
   validates_presence_of :file, :user, :thesis
-  validate :primary_file_presence, on: :create
-  validate :supplemental_file_must_be_file_types
-  validate :primary_file_must_be_pdf
+  validate :one_primary_file_per_thesis, on: :create
+  validate :validate_extension
+  validate :validate_usage
 
   #### SCOPES
   scope :newest, -> { order('created_at desc') }
@@ -28,7 +28,8 @@ class Document < ApplicationRecord
   enum usage: %i[thesis embargo embargo_letter licence]
 
   attribute :usage, default: :thesis
-
+  attribute :supplemental, default: true
+  attribute :deleted, default: false
 
   PRIMARY_FILE_EXT = [ '.pdf' ].freeze
   SUPPLEMENTAL_FILE_EXT = ['.pdf', '.doc', '.docx', '.txt', '.html', '.htm', '.odt', '.odp',
@@ -41,14 +42,14 @@ class Document < ApplicationRecord
     list = PRIMARY_FILE_EXT
 
     case document_type
-    when 'primary'
-      list = PRIMARY_FILE_EXT
     when 'supplemental'
       list = SUPPLEMENTAL_FILE_EXT
     when 'licence'
       list = LICENCE_FILE_EXT
     when 'embargo'
       list = EMBARGO_FILE_EXT
+    else
+      list = PRIMARY_FILE_EXT
     end
 
     return list
@@ -67,43 +68,48 @@ class Document < ApplicationRecord
     name
   end
 
+  def primary?
+    return !supplemental?
+  end
+
   ### CUSTOM VALIDATIONS
-  def primary_file_presence
-    if thesis && (thesis.documents.primary.not_deleted.size.positive? && supplemental? == false && deleted? == false)
-      errors.add(:file, 'You can only upload one primary file per thesis')
+  def one_primary_file_per_thesis
+    if primary? && !deleted? && thesis && thesis.has_primary_file?
+      errors.add(:file, 'Only one primary file allowed.')
     end
   end
 
-  def primary_file_must_be_pdf
-    return unless file.filename.present? && !supplemental
-
-    return if file.filename.downcase.end_with?('.pdf')
-
-    errors.add(:file, "extension #{ext} is not allowed.")
-  end
-
-  def supplemental_file_must_be_file_types
-    supplemental_file_types = SUPPLEMENTAL_FILE_EXT
-    embargo_file_types = EMBARGO_FILE_EXT
-
-    return unless file.filename.present? && supplemental
-
+  def file_extension
+    return nil unless file.filename.present?
     ext = '.' + file.filename.downcase.split('.').pop
+  end
 
-    if document_type == "licence"
-      return if file.filename.downcase.end_with?('.pdf')
-    elsif document_type == "supplemental"
-      return if supplemental_file_types.include?(File.extname(file.filename.downcase))
-    elsif document_type == "embargo"
-      return if embargo_file_types.include?(File.extname(file.filename.downcase))
+  def validate_extension
+    if !valid_extension?
+      errors.add(:file, "Extension #{file_extension} is not allowed.")
     end
+  end
 
-    errors.add(:file, "extension #{ext} is not allowed.")
+  def valid_extension?
+    return allowed_extensions.include? file_extension
+  end
+
+  def validate_usage
+    if !valid_usage?
+      errors.add(:usage, 'Primary file usage must be "thesis".')
+    end
+  end
+
+  def valid_usage?
+    if primary? && usage != 'thesis'
+      return false
+    end
+    return true
   end
 
   def document_type
     return 'supplemental' if self.usage == "thesis" && self.supplemental?
-    return 'primary' if self.usage == "thesis" && !self.supplemental?
+    return 'primary' if self.usage == "thesis" && self.primary?
     return 'embargo' if self.usage == "embargo" || self.usage == "embargo_letter"
     return 'licence' if self.usage == "licence"
   end
