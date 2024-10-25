@@ -365,3 +365,8 @@ HEREDOC
 AppSettings.embargo_file_extensions = <<HEREDOC
 .pdf, .txt, .html, .htm, .odt, .odp, .ods
 HEREDOC
+
+AppSettings.keys.each do |k|
+  v = eval("AppSettings.#{k}")
+  AppSettings.send("#{k}=", v)
+end
