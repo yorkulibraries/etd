@@ -31,32 +31,38 @@ class Document < ApplicationRecord
   attribute :supplemental, default: true
   attribute :deleted, default: false
 
-  PRIMARY_FILE_EXT = [ '.pdf' ].freeze
-  SUPPLEMENTAL_FILE_EXT = ['.pdf', '.doc', '.docx', '.txt', '.html', '.htm', '.odt', '.odp',
-    '.ods', '.png', '.tif', '.jpg', '.csv', '.xml', '.avi', '.flac', '.wav', '.mp3', '.mp4', '.mov'].freeze
-  EMBARGO_FILE_EXT = ['.pdf', '.txt', '.html', '.htm', '.odt', '.odp', '.ods'].freeze
-  LICENCE_FILE_EXT = [ '.pdf' ].freeze
-
   #### ADDITIONAL METHODS
+  def self.primary_thesis_file_extensions
+    AppSettings.primary_thesis_file_extensions.split(',').map(&:strip)
+  end
+
+  def self.supplemental_thesis_file_extensions
+    AppSettings.supplemental_thesis_file_extensions.split(',').map(&:strip)
+  end
+
+  def self.licence_file_extensions
+    AppSettings.licence_file_extensions.split(',').map(&:strip)
+  end
+
+  def self.embargo_file_extensions
+    AppSettings.embargo_file_extensions.split(',').map(&:strip)
+  end
+
   def allowed_extensions
-    list = PRIMARY_FILE_EXT
+    list = Document.primary_thesis_file_extensions
 
     case document_type
     when 'supplemental'
-      list = SUPPLEMENTAL_FILE_EXT
+      list = Document.supplemental_thesis_file_extensions
     when 'licence'
-      list = LICENCE_FILE_EXT
+      list = Document.licence_file_extensions
     when 'embargo'
-      list = EMBARGO_FILE_EXT
+      list = Document.embargo_file_extensions
     else
-      list = PRIMARY_FILE_EXT
+      list = Document.primary_thesis_file_extensions
     end
 
     return list
-  end
-
-  def image?
-    file.to_s.include?('.gif') or file.to_s.include?('.png') or file.to_s.include?('.jpg')
   end
 
   def destroy

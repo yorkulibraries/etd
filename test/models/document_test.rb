@@ -102,16 +102,6 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal 2, Document.deleted.count, '2 deleted'
   end
 
-  should 'tell if file is image or not' do
-    d = create(:document, file: fixture_file_upload('html-document.html', 'text/html'))
-
-    assert !d.image?, 'Should not be an image'
-
-    d = create(:document, file: fixture_file_upload('image-example.jpg', 'image/jpg'))
-
-    assert d.image?, 'This one should be an image'
-  end
-
   should 'supplemental files must follow file naming convention' do
     t = create(:thesis)
     assert_equal 0, t.documents.count
@@ -453,26 +443,26 @@ class DocumentTest < ActiveSupport::TestCase
     
     d.usage = 'thesis'
     d.supplemental = false
-    assert_equal Document::PRIMARY_FILE_EXT, d.allowed_extensions
+    assert_equal Document.primary_thesis_file_extensions, d.allowed_extensions
 
     d.usage = 'thesis'
     d.supplemental = true
-    assert_equal Document::SUPPLEMENTAL_FILE_EXT, d.allowed_extensions
+    assert_equal Document.supplemental_thesis_file_extensions, d.allowed_extensions
 
     d.usage = 'licence'
     d.supplemental = false
-    assert_equal Document::LICENCE_FILE_EXT, d.allowed_extensions
+    assert_equal Document::licence_file_extensions, d.allowed_extensions
 
     d.usage = 'licence'
     d.supplemental = true
-    assert_equal Document::LICENCE_FILE_EXT, d.allowed_extensions
+    assert_equal Document.licence_file_extensions, d.allowed_extensions
 
     d.usage = 'embargo'
     d.supplemental = false
-    assert_equal Document::EMBARGO_FILE_EXT, d.allowed_extensions
+    assert_equal Document.embargo_file_extensions, d.allowed_extensions
 
     d.usage = 'embargo'
     d.supplemental = true
-    assert_equal Document::EMBARGO_FILE_EXT, d.allowed_extensions
+    assert_equal Document.embargo_file_extensions, d.allowed_extensions
   end
 end

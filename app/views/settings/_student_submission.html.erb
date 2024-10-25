@@ -23,6 +23,10 @@
       <%= f.input :student_upload_files, as: :rich_text_area, label: "Upload files message", input_html: { rows: 20 } %>
       <%= f.input :student_supplementary_upload_files, as: :rich_text_area, label: "Supplementary Upload files message", input_html: { rows: 30 } %>
       <%= f.input :student_supplementary_embargo_upload_files, as: :rich_text_area, label: "Supplementary Embargo Upload files message", input_html: { rows: 30 } %>
+      <%= f.input :primary_thesis_file_extensions, as: :text, label: "Primary Thesis File Extensions", input_html: { rows: 3 } %>
+      <%= f.input :supplemental_thesis_file_extensions, as: :text, label: "Supplementary Thesis File Extensions", input_html: { rows: 3 } %>
+      <%= f.input :licence_file_extensions, as: :text, label: "Licence File Extensions", input_html: { rows: 3 } %>
+      <%= f.input :embargo_file_extensions, as: :text, label: "Embargo File Extensions", input_html: { rows: 3 } %>
   </div>
   <div class="tab-pane fade" id="nav-review" role="tabpanel" aria-labelledby="nav-review-tab" tabindex="0">
       <%= f.input :student_review_license_info, as: :rich_text_area, label: "Information", input_html: { rows: 20, class: "mb-4" } %>
