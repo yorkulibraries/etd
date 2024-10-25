@@ -24,12 +24,10 @@
 
 
 $(document).ready(function () {
-
 	$('.dropdown-toggle').dropdown();
 
 	// disable in browser form validations
 	$('form').find('input').removeAttr('required');
-
 
 	$('.theses .options a').click(function (e) {
 		e.preventDefault();
@@ -37,5 +35,4 @@ $(document).ready(function () {
 		$(".theses .options a").removeClass("active")
 		$(this).addClass("active")
 	})
-
 });

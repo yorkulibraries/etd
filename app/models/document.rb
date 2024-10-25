@@ -29,7 +29,31 @@ class Document < ApplicationRecord
 
   attribute :usage, default: :thesis
 
+
+  PRIMARY_FILE_EXT = [ '.pdf' ].freeze
+  SUPPLEMENTAL_FILE_EXT = ['.pdf', '.doc', '.docx', '.txt', '.html', '.htm', '.odt', '.odp',
+    '.ods', '.png', '.tif', '.jpg', '.csv', '.xml', '.avi', '.flac', '.wav', '.mp3', '.mp4', '.mov'].freeze
+  EMBARGO_FILE_EXT = ['.pdf', '.txt', '.html', '.htm', '.odt', '.odp', '.ods'].freeze
+  LICENCE_FILE_EXT = [ '.pdf' ].freeze
+
   #### ADDITIONAL METHODS
+  def allowed_extensions
+    list = PRIMARY_FILE_EXT
+
+    case document_type
+    when 'primary'
+      list = PRIMARY_FILE_EXT
+    when 'supplemental'
+      list = SUPPLEMENTAL_FILE_EXT
+    when 'licence'
+      list = LICENCE_FILE_EXT
+    when 'embargo'
+      list = EMBARGO_FILE_EXT
+    end
+
+    return list
+  end
+
   def image?
     file.to_s.include?('.gif') or file.to_s.include?('.png') or file.to_s.include?('.jpg')
   end
@@ -55,14 +79,16 @@ class Document < ApplicationRecord
 
     return if file.filename.downcase.end_with?('.pdf')
 
-    errors.add(:file, 'Primary file must be a PDF')
+    errors.add(:file, "extension #{ext} is not allowed.")
   end
 
   def supplemental_file_must_be_file_types
-    supplemental_file_types = ['.pdf', '.doc', '.docx', '.txt', '.html', '.htm', '.odt', '.odp', '.ods', '.png', '.tif', '.jpg', '.csv', '.xml', '.avi', '.flac', '.wav', '.mp3', '.mp4', '.mov']
-    embargo_file_types = ['.pdf', '.txt', '.html', '.htm', '.odt', '.odp', '.ods']
+    supplemental_file_types = SUPPLEMENTAL_FILE_EXT
+    embargo_file_types = EMBARGO_FILE_EXT
 
     return unless file.filename.present? && supplemental
+
+    ext = '.' + file.filename.downcase.split('.').pop
 
     if document_type == "licence"
       return if file.filename.downcase.end_with?('.pdf')
@@ -72,7 +98,7 @@ class Document < ApplicationRecord
       return if embargo_file_types.include?(File.extname(file.filename.downcase))
     end
 
-    errors.add(:file, "#{document_type.capitalize} file must be a valid file type")
+    errors.add(:file, "extension #{ext} is not allowed.")
   end
 
   def document_type
