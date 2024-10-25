@@ -1,0 +1,22 @@
+$('#file_upload_modal').remove();
+$('body').append('<%= j render partial: "modal", formats: :html %>');
+$('#file_upload_modal .invalid-feedback').empty().hide();
+(new bootstrap.Modal($('#file_upload_modal'))).show();
+
+$(document).on('click', '#file_upload_button', function(e) {
+    file = $(this).parents('form:first').find('input:file');
+    if (file.val()) {
+        var allowed = file.data('ext').split(',');
+        var ext = '.' + file.val().split('.').pop().toLowerCase();
+        if($.inArray(ext, allowed) == -1) {
+            div = $(this).parents('form:first').find('div.invalid-feedback');
+            var error = '<p>File extension ' + ext + ' is not allowed.</p>';
+            div.empty().append(error);
+            div.show();
+        } else {
+            return true;
+        }
+    }
+    e.preventDefault();
+    return false;
+});
