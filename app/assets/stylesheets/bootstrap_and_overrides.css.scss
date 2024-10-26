@@ -167,3 +167,9 @@ form.thesis-form {
         }
     }
 }
+a.header-student-name:link {
+	text-decoration: none;
+}
+a.header-student-name:hover {
+	text-decoration: underline;
+}
