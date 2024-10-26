@@ -2,7 +2,7 @@
 	  	<span class="fw-lighter text-secondary d-block lead ">Student Record</span> 
 		<div class="col-sm-12 col-lg-7">
 			<h1 title="<%= @student.sisid %>">
-				<%= link_to_unless controller.controller_name == "students" && controller.action_name == "show", @student.name, @student, title: @student.sisid %>
+				<%= link_to_unless controller.controller_name == "students" && controller.action_name == "show", @student.name, @student, title: @student.sisid, class: "header-student-name" %>
 				<% if @student.blocked? %><i class="fa fa-ban text-danger" title="blocked"></i><% end %>
 			</h1>
 			<p class="trivial fw-light text-warning-emphasis mb-0">Created by <%= @student.created_by.name%>
