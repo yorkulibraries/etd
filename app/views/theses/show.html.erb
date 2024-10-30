@@ -19,7 +19,7 @@
 			<% if current_user.role == User::STUDENT %>
 				<div class="col">
 					<div id="status_menu">
-						<button id="" class="btn" title="Change Thesis Status">
+						<button id="" class="btn" title="Thesis Status">
 							Status: <span class="status status-<%= @thesis.status %>"><%= @thesis.status.humanize %></span>
 						</button>
 					</div>
