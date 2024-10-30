@@ -33,6 +33,7 @@ class AppSettings < RailsSettings::Base
   field :student_upload_files
   field :student_primary_upload_files
   field :student_supplementary_upload_files
+  field :student_supplementary_licence_upload_files
   field :student_supplementary_embargo_upload_files
   field :student_review_license_info
   field :student_review_license_lac

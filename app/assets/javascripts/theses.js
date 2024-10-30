@@ -37,4 +37,11 @@ $(document).ready(function () {
 			source: committee_member_names_list
 		});
 	});
+
+	$('div.student-view div.settings-content a').each(function () {
+		var class_attr = $(this).attr('class');
+		if (typeof class_attr === typeof undefined || class_attr == '') {
+			$(this).attr('target', '_blank');
+		}
+	});
 });

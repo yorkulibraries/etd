@@ -24,7 +24,7 @@ html: {  multipart: true, class: "file-upload" } do |f| %>
   	  <%= raw(AppSettings.student_supplementary_upload_files) %>
   	<% end %>
   	<% if @document.usage == 'licence' %>
-  	  <%= raw(AppSettings.student_supplementary_embargo_upload_files) %>
+  	  <%= raw(AppSettings.student_supplementary_licence_upload_files) %>
   	<% end %>
   	<% if @document.usage == 'embargo' %>
   	  <%= raw(AppSettings.student_supplementary_embargo_upload_files) %>
