@@ -226,6 +226,10 @@ AppSettings.student_supplementary_upload_files = <<HEREDOC
 <ul><li><strong>Documents:</strong> Portable Document Format (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).&nbsp;</li><li><strong>Images:</strong> Tagged Image File format (.tif)</li><li><strong>Data:</strong> Comma-separated values (.csv) or other delimited text, Extensible Markup Language (.xml)</li><li><strong>Video:</strong> MPEG-4 (.mp4) files are preferred, but we can also accept AVI (.avi) and MOV (.mov) file formats.</li><li><strong>Audio:</strong> MPEG-1 Audio Layer 3 (.mp3) file are preferred, but we can also accept Free Lossless Audio Codec (.flac) or WAVE (.wav) file formats.</li></ul><div>Please ensure that:&nbsp;</div><ul><li>You have permission from subjects appearing in media files.&nbsp;</li><li>The total size of your supplementary files does not exceed 4 gigabytes (4GB)</li><li>If you wish to upload a type of file that you do not see on this list, please email diginit@yorku.ca for support.</li></ul>
 HEREDOC
 
+AppSettings.student_supplementary_licence_upload_files = <<HEREDOC
+<p>Please upload PDF files only.</p>
+HEREDOC
+
 AppSettings.student_supplementary_embargo_upload_files = <<HEREDOC
 <p>Please Upload the following documents:</p>
 <ul><li><strong>Supervisor Letter</strong></li><li><strong>Other Embargo Supporting Documents</strong></li><li><strong>Portable Document Format:</strong> (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).</li></ul>
