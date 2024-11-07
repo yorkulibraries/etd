@@ -32,7 +32,7 @@
 				</button>
 			</h2>
 			<div id="collapseOne" class="<%= show_accordion(Thesis::OPEN) %>" data-bs-parent="#accordionThesis">
-				<div class="accordion-body">
+				<div class="accordion-body settings-content">
 					<%= raw(AppSettings.student_check_status_open) %>
 				</div>
 			</div>
@@ -45,7 +45,7 @@
 				</button>
 			</h2>
 			<div id="collapseTwo" class="<%= show_accordion(Thesis::UNDER_REVIEW) %>" data-bs-parent="#accordionThesis">
-				<div class="accordion-body">
+				<div class="accordion-body settings-content">
 					<%= raw(AppSettings.student_check_status_under_review) %>
 				</div>
 			</div>
@@ -58,7 +58,7 @@
 				</button>
 			</h2>
 			<div id="collapseThree" class="<%= show_accordion(Thesis::RETURNED) %>" data-bs-parent="#accordionThesis">
-				<div class="accordion-body">
+				<div class="accordion-body settings-content">
 					<%= raw(AppSettings.student_check_status_returned) %>
 				</div>
 			</div>
@@ -71,7 +71,7 @@
 				</button>
 			</h2>
 			<div id="collapseFour" class="<%= show_accordion(Thesis::ACCEPTED) %>" data-bs-parent="#accordionThesis">
-				<div class="accordion-body">
+				<div class="accordion-body settings-content">
 					<%= raw(AppSettings.student_check_status_accepted) %>
 				</div>
 			</div>
@@ -84,7 +84,7 @@
 				</button>
 			</h2>
 			<div id="collapseFive" class="<%= show_accordion(Thesis::PUBLISHED) %>" data-bs-parent="#accordionThesis">
-				<div class="accordion-body">
+				<div class="accordion-body settings-content">
 					<%= raw(AppSettings.student_check_status_published) %>
 				</div>
 			</div>
@@ -97,7 +97,7 @@
 				</button>
 			</h2>
 			<div id="collapseSix" class="<%= show_accordion(Thesis::REJECTED) %>" data-bs-parent="#accordionThesis">
-				<div class="accordion-body">
+				<div class="accordion-body settings-content">
 					<%= raw(AppSettings.student_check_status_rejected) %>
 				</div>
 			</div>
