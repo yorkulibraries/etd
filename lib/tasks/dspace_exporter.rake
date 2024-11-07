@@ -32,7 +32,7 @@ namespace :dspace do
     elsif ENV["THESIS_ANY"] != nil
       theses = Thesis.where(id: ENV["THESIS_ANY"])
     else
-      theses = Thesis.accepted.without_embargo.where(published_date: publish_date)
+      theses = Thesis.accepted.without_embargo.where("published_date <= ?", publish_date)
     end
 
     log "FOUND: #{theses.size} theses"
@@ -103,7 +103,7 @@ namespace :dspace do
       end
     end
 
-    entry.add_dublin_core_extension!("abstract", thesis.abstract)
+    entry.add_dublin_core_extension!("abstract", thesis.abstract.tr("\u0002\u000B\u000C\u000E\u000F",''))
     entry.add_dublin_core_extension!("language", language_to_iso(thesis.language))
     entry.add_dublin_core_extension!("name", Thesis::DEGREENAME_FULL[thesis.degree_name])
     entry.add_dublin_core_extension!("level", thesis.degree_level)
