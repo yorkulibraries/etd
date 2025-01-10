@@ -9,3 +9,5 @@ cat drop.sql | rails db -p
 cat import.sql | rails db -p
 
 rails db:migrate
+
+rails db:seed
