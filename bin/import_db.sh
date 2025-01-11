@@ -1,7 +1,9 @@
 #!/bin/bash
 dump=$1
 
-echo 'show tables;' | rails db -p | grep -v "Tables_in_" | xargs -i -n 1 echo "DROP TABLE IF EXISTS \`{}\`;" > drop.sql 
+echo 'SET foreign_key_checks = 0;' > drop.sql 
+
+echo 'show tables;' | rails db -p | grep -v "Tables_in_" | xargs -i -n 1 echo "DROP TABLE IF EXISTS \`{}\`;" >> drop.sql 
 
 cat drop.sql | rails db -p
 
