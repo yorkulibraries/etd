@@ -187,10 +187,14 @@ class Thesis < ApplicationRecord
   def publish
     return unless embargoed == false
 
+    thesis = self
+    old_status = self.status
+
     self.status = Thesis::PUBLISHED
     self.audit_comment = 'Publishing this thesis. Status changed to published'
     self.published_at = published_date
-    ChagingStatusMailer.published(student.email).deliver
+    
+    StudentMailer.status_change_email(student, thesis, old_status, thesis.status).deliver_later
     save(validate: false)
   end
 
