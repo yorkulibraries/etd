@@ -12,7 +12,15 @@ class StudentMailer < ApplicationMailer
 
     @message_subject = AppSettings.email_welcome_subject
 
-    mail to: @student.email, subject: @message_subject if AppSettings.email_welcome_allow
+    recipients = []
+    recipients << student.email
+    if student.email_external.present?
+      student.email_external.split(/[\s,]+/).each do |address|
+        recipients << address
+      end
+    end
+
+    mail to: map_recipients(recipients), subject: @message_subject if AppSettings.email_welcome_allow
   end
 
   def status_change_email(student, thesis, old_status, new_status, additional_recipients = [], custom_message = nil)
@@ -28,7 +36,23 @@ class StudentMailer < ApplicationMailer
     @message_subject = AppSettings.email_status_change_subject
 
     recipients = additional_recipients << student.email
+    if student.email_external.present?
+      student.email_external.split(/[\s,]+/).each do |address|
+        recipients << address
+      end
+    end
 
-    mail to: recipients, subject: @message_subject if AppSettings.email_status_change_allow
+    mail to: map_recipients(recipients), subject: @message_subject if AppSettings.email_status_change_allow
+  end
+
+  def map_recipients(recipients)
+    filtered = []
+    recipients.each do |r|
+      email = r.gsub("stu@etd.library.yorku.ca", "@yorku.ca")
+      if email =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
+        filtered << email
+      end
+    end
+    return filtered
   end
 end
