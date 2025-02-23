@@ -2,7 +2,7 @@
 <% statuses = [Thesis::RETURNED, Thesis::ACCEPTED] if Thesis::UNDER_REVIEW == @thesis.status %>
 <% statuses = [Thesis::UNDER_REVIEW, Thesis::ACCEPTED] if Thesis::RETURNED == @thesis.status %>
 <% statuses = [Thesis::RETURNED] if [Thesis::REJECTED, Thesis::ACCEPTED].include?(@thesis.status) %>
-<% statuses = [] if Thesis::PUBLISHED == @thesis.status %>
+<% statuses = [Thesis::ACCEPTED] if Thesis::PUBLISHED == @thesis.status %>
 
 <div id="status_menu">
 	<div class="dropdown d-grid">
