@@ -8,7 +8,9 @@ class StudentMailerTest < ActionMailer::TestCase
       @user = create(:user, role: User::ADMIN)
       @student = create(:student, email: 'stu1@me.ca', name: 'John Daily')
       AppSettings.email_welcome_allow = true
+      AppSettings.email_welcome_subject = "email_welcome_subject"
       AppSettings.email_status_change_allow = true
+      AppSettings.email_status_change_subject = "email_status_change_subject"
 
       # Empty every thing out
       ActionMailer::Base.deliveries = []
@@ -18,9 +20,9 @@ class StudentMailerTest < ActionMailer::TestCase
       mail = StudentMailer.invitation_email(@student).deliver_now
       assert !ActionMailer::Base.deliveries.empty?, "Shouldn't be empty"
 
-      # assert_equal AppSettings.email_welcome_subject, mail.subject
+      assert_equal AppSettings.email_welcome_subject, mail.subject
       assert_equal ['stu1@me.ca'], mail.to
-      # assert_equal AppSettings.email_from, mail.from.first
+      assert_equal AppSettings.email_from, mail.from.first
       # assert_match @student.name, mail.body.encoded ##FIXME
     end
 
@@ -32,9 +34,9 @@ class StudentMailerTest < ActionMailer::TestCase
                                                'custom message').deliver_now
       assert !ActionMailer::Base.deliveries.empty?
 
-      # assert_equal AppSettings.email_status_change_subject, mail.subject
+      assert_equal AppSettings.email_status_change_subject, mail.subject
       assert_equal ( ['stu1@me.ca', 'stu2@me.ca'] << @student.email).size, mail.to.size
-      # assert_equal  AppSettings.email_from, mail.from.first
+      assert_equal  AppSettings.email_from, mail.from.first
       # assert_match "custom message", mail.body.encoded ## FIXME
       # assert_match Thesis::OPEN, mail.body.encoded ## FIXME
       # assert_match @student.name, mail.body.encoded ## FIXME
