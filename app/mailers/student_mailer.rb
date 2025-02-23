@@ -49,7 +49,7 @@ class StudentMailer < ApplicationMailer
     filtered = []
     recipients.each do |r|
       email = r.gsub("stu@etd.library.yorku.ca", "@yorku.ca")
-      email = r.gsub("stu@etd.gmail.com", "@yorku.ca")
+      email = email.gsub("stu@etd.gmail.com", "@yorku.ca")
       if email =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
         filtered << email
       end
