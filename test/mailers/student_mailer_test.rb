@@ -11,6 +11,7 @@ class StudentMailerTest < ActionMailer::TestCase
       AppSettings.email_welcome_subject = "email_welcome_subject"
       AppSettings.email_status_change_allow = true
       AppSettings.email_status_change_subject = "email_status_change_subject"
+      AppSettings.email_from = "noreply@yorku.ca"
 
       # Empty every thing out
       ActionMailer::Base.deliveries = []
