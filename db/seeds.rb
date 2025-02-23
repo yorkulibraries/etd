@@ -101,7 +101,7 @@ HEREDOC
 AppSettings.email_allow = true
 
 AppSettings.email_from = <<HEREDOC
-noreply@yorku.ca
+York University ETD <noreply@yorku.ca>
 HEREDOC
 
 AppSettings.email_welcome_subject = <<HEREDOC
@@ -159,7 +159,7 @@ AppSettings.errors_email_subject_prefix = <<HEREDOC
 HEREDOC
 
 AppSettings.errors_email_from = <<HEREDOC
-noreply@yorku.ca
+York University ETD <noreply@yorku.ca>
 HEREDOC
 
 AppSettings.errors_email_to = <<HEREDOC
