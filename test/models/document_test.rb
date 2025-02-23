@@ -126,11 +126,11 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal uploaded_filename, d.file.filename
 
     # the file name should start with student name
-    student_name = t.student.name.gsub(/[\s\.]/, '_')
+    student_name = t.student.name.gsub(/[\s\.\,]/, '_').gsub(/_+/, '_') 
     assert_match /^#{student_name}_.+/, uploaded_filename, "file name should start with #{student_name}"
 
     # the file name should end with degree_name.pdf
-    degree_name = t.degree_name.gsub(/[\s\.]/, '_')
+    degree_name = t.degree_name.gsub(/[\s\.\,]/, '_').gsub(/_+/, '_') 
     assert_match /#{degree_name}.pdf$/, uploaded_filename, "the file name should end with #{degree_name}.pdf"
 
     # the file name should contain _year_ 
@@ -138,7 +138,7 @@ class DocumentTest < ActiveSupport::TestCase
     assert_match /_#{year}_/, uploaded_filename, "the file name should contain _#{year}_"
 
     # the file name should contain _degree_name
-    degree_name = t.degree_name.gsub(/[\s\.]/, '_')
+    degree_name = t.degree_name.gsub(/[\s\.\,]/, '_').gsub(/_+/, '_') 
     assert_match /_#{degree_name}/, uploaded_filename, "the file name should contain _#{degree_name}"
 
     # now upload first supplimentary file
@@ -344,11 +344,11 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal uploaded_filename, d.file.filename
 
     # the file name should start with student name
-    student_name = t.student.name.gsub(/[\s\.]/, '_')
+    student_name = t.student.name.gsub(/[\s\.\,]/, '_').gsub(/_+/, '_')
     assert_match /^#{student_name}_.+/, uploaded_filename, "file name should start with #{student_name}"
 
     # the file name should end with degree_name.pdf
-    degree_name = t.degree_name.gsub(/[\s\.]/, '_')
+    degree_name = t.degree_name.gsub(/[\s\.\,]/, '_').gsub(/_+/, '_') 
     assert_match /#{degree_name}.pdf$/, uploaded_filename, "the file name should end with #{degree_name}.pdf"
 
     # the file name should contain _year_ 
@@ -356,7 +356,7 @@ class DocumentTest < ActiveSupport::TestCase
     assert_match /_#{year}_/, uploaded_filename, "the file name should contain _#{year}_"
 
     # the file name should contain _degree_name
-    degree_name = t.degree_name.gsub(/[\s\.]/, '_')
+    degree_name = t.degree_name.gsub(/[\s\.\,]/, '_').gsub(/_+/, '_') 
     assert_match /_#{degree_name}/, uploaded_filename, "the file name should contain _#{degree_name}"
 
     # now upload first licence file
