@@ -145,6 +145,6 @@ class Document < ApplicationRecord
     embargo_count = embargo_count + 1 if self.new_record?
     file_sequence = "_#{self.document_type}_#{embargo_count}" if document_type == 'embargo'
 
-    return "#{full_name}_#{year}_#{deg_name}#{file_sequence}".gsub(/[\s\.\,]/, '_') + ext
+    return "#{full_name}_#{year}_#{deg_name}#{file_sequence}".gsub(/[\s\.\,]/, '_').gsub(/_+/, '_') + ext
   end
 end
