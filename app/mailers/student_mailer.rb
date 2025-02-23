@@ -20,7 +20,7 @@ class StudentMailer < ApplicationMailer
       end
     end
 
-    mail to: map_recipients(recipients), subject: @message_subject if AppSettings.email_welcome_allow
+    mail to: map_recipients(recipients), subject: @message_subject.strip if AppSettings.email_welcome_allow
   end
 
   def status_change_email(student, thesis, old_status, new_status, additional_recipients = [], custom_message = nil)
@@ -42,7 +42,7 @@ class StudentMailer < ApplicationMailer
       end
     end
 
-    mail to: map_recipients(recipients), subject: @message_subject if AppSettings.email_status_change_allow
+    mail to: map_recipients(recipients), subject: @message_subject.strip if AppSettings.email_status_change_allow
   end
 
   def map_recipients(recipients)
