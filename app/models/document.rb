@@ -22,14 +22,17 @@ class Document < ApplicationRecord
   scope :deleted, -> { where('deleted = ?', true) }
   scope :not_deleted, -> { where('deleted = ?', false) }
   
-  scope :licence, -> { where(usage: :licence) }
-  scope :embargo, -> { where(usage: [:embargo, :embargo_letter])}
+  scope :licence, -> { where(usage: :licence).where('supplemental = ? ', true) }
+  scope :embargo, -> { where(usage: [:embargo, :embargo_letter]).where('supplemental = ? ', true) }
 
   enum usage: %i[thesis embargo embargo_letter licence]
 
   attribute :usage, default: :thesis
   attribute :supplemental, default: true
   attribute :deleted, default: false
+
+  # This callback will be called after a Document is destroyed.
+  after_destroy :update_file_sequence
 
   #### ADDITIONAL METHODS
   def self.primary_thesis_file_extensions
@@ -149,5 +152,16 @@ class Document < ApplicationRecord
       s[d.id] = i + 1
     end
     return s
+  end
+
+  def update_file_sequence
+    docs = []
+    docs = thesis.documents.not_deleted.supplemental if document_type == 'supplemental'
+    docs = thesis.documents.not_deleted.embargo if document_type == 'embargo'
+    docs = thesis.documents.not_deleted.licence if document_type == 'licence'
+    docs.each do |d|
+      d.file = File.open(d.file.path)
+      d.save validate: false
+    end
   end
 end
