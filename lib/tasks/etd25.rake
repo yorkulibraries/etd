@@ -3,27 +3,30 @@ namespace :etd25 do
     Thesis.open.each do |t|
       t.documents.each do |d|
         puts d.file.path + "\n"
-        f = File.open(d.file.path)
-        d.file = f
-        d.save!
+        d.file = File.open(d.file.path)
+        d.save! validate: false
+        d.name = File.basename(d.file.path)
+        d.save! validate: false
         puts d.file.path + "\n\n"
       end
     end
     Thesis.returned.each do |t|
       t.documents.each do |d|
         puts d.file.path + "\n"
-        f = File.open(d.file.path)
-        d.file = f
-        d.save!
+        d.file = File.open(d.file.path)
+        d.save! validate: false
+        d.name = File.basename(d.file.path)
+        d.save! validate: false
         puts d.file.path + "\n\n"
       end
     end
     Thesis.under_review.each do |t|
       t.documents.each do |d|
         puts d.file.path + "\n"
-        f = File.open(d.file.path)
-        d.file = f
-        d.save!
+        d.file = File.open(d.file.path)
+        d.save! validate: false
+        d.name = File.basename(d.file.path)
+        d.save! validate: false
         puts d.file.path + "\n\n"
       end
     end
