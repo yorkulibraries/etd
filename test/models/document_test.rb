@@ -207,8 +207,8 @@ class DocumentTest < ActiveSupport::TestCase
     uploaded_filename = d.uploaded_filename(original_filename)
     assert_equal uploaded_filename, d.file.filename
 
-    # file name should end with _supplemental_3.pdf
-    assert_match /_supplemental_3.pdf$/, uploaded_filename, "the file name should end with _supplemental_3.pdf"
+    # file name should end with _supplemental_2.pdf
+    assert_match /_supplemental_2.pdf$/, uploaded_filename, "the file name should end with _supplemental_2.pdf"
   end
 
   should 'licence files must follow file naming convention' do
@@ -316,8 +316,8 @@ class DocumentTest < ActiveSupport::TestCase
     uploaded_filename = d.uploaded_filename(original_filename)
     assert_equal uploaded_filename, d.file.filename
 
-    # file name should end with _supplemental_3.pdf
-    assert_match /_licence_3.pdf$/, uploaded_filename, "the file name should end with _licence_3.pdf"
+    # file name should end with _licence_2.pdf
+    assert_match /_licence_2.pdf$/, uploaded_filename, "the file name should end with _licence_2.pdf"
   end
 
   should 'embargo files must follow file naming convention' do
@@ -425,8 +425,8 @@ class DocumentTest < ActiveSupport::TestCase
     uploaded_filename = d.uploaded_filename(original_filename)
     assert_equal uploaded_filename, d.file.filename
 
-    # file name should end with _embargo_3.pdf
-    assert_match /_embargo_3.pdf$/, uploaded_filename, "the file name should end with _embargo_3.pdf"
+    # file name should end with _embargo_2.pdf
+    assert_match /_embargo_2.pdf$/, uploaded_filename, "the file name should end with _embargo_2.pdf"
   end
 
   should 'list primary and suplemental files' do

@@ -22,14 +22,17 @@ class Document < ApplicationRecord
   scope :deleted, -> { where('deleted = ?', true) }
   scope :not_deleted, -> { where('deleted = ?', false) }
   
-  scope :licence, -> { where(usage: :licence) }
-  scope :embargo, -> { where(usage: [:embargo, :embargo_letter])}
+  scope :licence, -> { where(usage: :licence).where('supplemental = ? ', true) }
+  scope :embargo, -> { where(usage: [:embargo, :embargo_letter]).where('supplemental = ? ', true) }
 
   enum usage: %i[thesis embargo embargo_letter licence]
 
   attribute :usage, default: :thesis
   attribute :supplemental, default: true
   attribute :deleted, default: false
+
+  # This callback will be called after a Document is destroyed.
+  after_destroy :update_file_sequence
 
   #### ADDITIONAL METHODS
   def self.primary_thesis_file_extensions
@@ -129,22 +132,36 @@ class Document < ApplicationRecord
     deg_name = thesis.degree_name
     ext = File.extname(original_filename)
 
+    sequence = document_sequence(document_type)
+    max = sequence.values.max.nil? ? 0 : sequence.values.max
+    number = self.new_record? ? max + 1 : sequence[self.id]
 
-    # count how many supplemental files the thesis already has
-    supplemental_count = thesis.documents.supplemental.count
-    supplemental_count = supplemental_count + 1 if self.new_record?
-    file_sequence =  "_#{self.document_type}_#{supplemental_count}" if document_type == 'supplemental'
-
-    # count how many licence files the thesis already has
-    licence_count = thesis.documents.licence.count
-    licence_count = licence_count + 1 if self.new_record?
-    file_sequence = "_#{self.document_type}_#{licence_count}" if document_type == 'licence'
-
-    # count how many embargo files the thesis already has
-    embargo_count = thesis.documents.embargo.count
-    embargo_count = embargo_count + 1 if self.new_record?
-    file_sequence = "_#{self.document_type}_#{embargo_count}" if document_type == 'embargo'
+    file_sequence = self.supplemental? ? "_#{self.document_type}_#{number}" : ""
 
     return "#{full_name}_#{year}_#{deg_name}#{file_sequence}".gsub(/[\s\.\,]/, '_').gsub(/_+/, '_') + ext
+  end
+
+  def document_sequence(type)
+    docs = []
+    docs = thesis.documents.not_deleted.supplemental.order('id') if type == 'supplemental'
+    docs = thesis.documents.not_deleted.licence.order('id') if type == 'licence'
+    docs = thesis.documents.not_deleted.embargo.order('id') if type == 'embargo'
+
+    s = Hash.new
+    docs.each_with_index do |d, i|
+      s[d.id] = i + 1
+    end
+    return s
+  end
+
+  def update_file_sequence
+    docs = []
+    docs = thesis.documents.not_deleted.supplemental if document_type == 'supplemental'
+    docs = thesis.documents.not_deleted.embargo if document_type == 'embargo'
+    docs = thesis.documents.not_deleted.licence if document_type == 'licence'
+    docs.each do |d|
+      d.file = File.open(d.file.path)
+      d.save validate: false
+    end
   end
 end
