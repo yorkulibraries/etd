@@ -130,7 +130,7 @@ class Document < ApplicationRecord
     ext = File.extname(original_filename)
 
     sequence = document_sequence(document_type)
-    max = sequence.values.empty ? 0 : sequence.values.max
+    max = sequence.values.max.nil? ? 0 : sequence.values.max
     number = self.new_record? ? max + 1 : sequence[self.id]
 
     file_sequence = self.supplemental? ? "_#{self.document_type}_#{number}" : ""
