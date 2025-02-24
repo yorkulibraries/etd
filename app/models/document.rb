@@ -31,9 +31,6 @@ class Document < ApplicationRecord
   attribute :supplemental, default: true
   attribute :deleted, default: false
 
-  # This callback will be called after a Document is destroyed.
-  after_destroy :update_file_sequence
-
   #### ADDITIONAL METHODS
   def self.primary_thesis_file_extensions
     AppSettings.primary_thesis_file_extensions.split(',').map(&:strip)
@@ -71,6 +68,7 @@ class Document < ApplicationRecord
   def destroy
     self.deleted = true
     save(validate: false)
+    update_file_sequence
   end
 
   def display_name
