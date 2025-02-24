@@ -1,5 +1,5 @@
 default: &default
-  encoding: utf8
+  encoding: utf8mb4
   adapter: <%= ENV["DB_ADAPTER"] || "mysql2" %>
   url: <%= ENV["DATABASE_URL"] %>
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
