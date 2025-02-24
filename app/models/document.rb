@@ -159,9 +159,12 @@ class Document < ApplicationRecord
     docs = thesis.documents.not_deleted.supplemental if document_type == 'supplemental'
     docs = thesis.documents.not_deleted.embargo if document_type == 'embargo'
     docs = thesis.documents.not_deleted.licence if document_type == 'licence'
+    puts document_type
     docs.each do |d|
       d.file = File.open(d.file.path)
-      d.save validate: false
+      d.save! validate: false
+      d.name = File.basename(d.file.path)
+      d.save! validate: false
     end
   end
 end
