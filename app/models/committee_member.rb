@@ -33,6 +33,9 @@ class CommitteeMember < ApplicationRecord
   end
 
   def name
-    "#{last_name}, #{first_name}"
+    if !last_name.nil? && !first_name.nil?
+      return "#{last_name}, #{first_name}"
+    end
+    return full_name
   end
 end
