@@ -68,7 +68,7 @@ Rails.application.routes.draw do
     get 'audit_trail', on: :member
     post 'unblock', on: :member
     post 'block', on: :member
-    post 'gem_search', on: :collection
+    get 'gem_search', on: :collection
   end
 
   root to: 'home#index'

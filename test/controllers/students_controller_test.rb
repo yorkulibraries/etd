@@ -186,17 +186,17 @@ class StudentsControllerTest < ActionController::TestCase
       gem_record = create(:gem_record, sisid: '202202202')
       create(:student, sisid: '111111111')
 
-      post :gem_search, params: { sisid: '202202202' }
+      get :gem_search, params: { sisid: '202202202' }
 
       assert_redirected_to gem_record_path(gem_record), 'Student is not in the database but is in GemRecords'
 
-      post :gem_search, params: { sisid: '111111111' }
+      get :gem_search, params: { sisid: '111111111' }
       s = assigns(:student)
       assert_redirected_to student_path(s), 'Should redirect to student details, since student is already registerd.'
     end
 
     should 'Should redirect to Gem Records with a message that student is not allowed to be added if there is no corresponding GemRecord' do
-      post :gem_search, params: { sisid: '333333333' }
+      get :gem_search, params: { sisid: '333333333' }
 
       assert_redirected_to gem_records_path
       assert_equal 'Student was not found.', flash[:alert]
@@ -205,7 +205,7 @@ class StudentsControllerTest < ActionController::TestCase
     ### SHOULD FIND STUDENTS BASED ON NAME OR SISID ###
     should 'find students based on SISID or NAME, working for both gem record or regular student. if multiple, redirect to index of either models' do
       # search for existing John
-      post :gem_search, params: { sisid: 'Johnx' }
+      get :gem_search, params: { sisid: 'Johnx' }
       students = assigns(:students)
       assert_equal 0, students.size, 'Number of students matching Johnx'
 
@@ -222,7 +222,7 @@ class StudentsControllerTest < ActionController::TestCase
       assert_equal 2, students.size, 'Number of students matching Johnx'
       
       # search name of student
-      post :gem_search, params: { sisid: 'Johnx' }
+      get :gem_search, params: { sisid: 'Johnx' }
       assert assigns(:search_result), 'Indicate that this is a search result'
       students = assigns(:students)
       assert_equal 2, students.size, 'Number of students matching Johnx'
@@ -230,18 +230,18 @@ class StudentsControllerTest < ActionController::TestCase
       assert_template 'students/index'
 
       # search sisid
-      post :gem_search, params: { sisid: '111111111' }
+      get :gem_search, params: { sisid: '111111111' }
       student = assigns(:student)
       assert_redirected_to student_path(student), 'Redirects to student record'
 
       # search name in gem record
-      post :gem_search, params: { sisid: 'Jeremy' }
+      get :gem_search, params: { sisid: 'Jeremy' }
       assert assigns(:search_result), 'Indicate that this is a search result'
       gem_records = assigns(:gem_records)
       assert_equal 2, gem_records.size, 'Found two Jeremys'
       assert_template 'gem_records/index'
 
-      post :gem_search, params: { sisid: '222222222' }
+      get :gem_search, params: { sisid: '222222222' }
       gem_record = assigns(:gem_record)
       assert_redirected_to gem_record_path(gem_record), 'Redirects to gem record '
     end

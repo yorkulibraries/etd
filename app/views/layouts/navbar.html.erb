@@ -31,7 +31,7 @@
 		</ul>
 		<div class="d-none d-lg-block">
 			<% if can? :manage, Thesis %>
-				<%= form_tag gem_search_students_path, class: "navbar-form pull-left", method: "post " do |f| %>
+				<%= form_tag gem_search_students_path, class: "navbar-form pull-left", method: "get" do |f| %>
 					<input name="sisid" class="form-control" placeholder="Enter SISID or Name">
 				<% end %>
 			<% end %>
