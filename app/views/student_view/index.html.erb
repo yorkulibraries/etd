@@ -17,11 +17,13 @@
 	<section class="theses fitted">
 			<% if @theses.size > 0 %>
 				<p>Select which thesis you want to work on:</p>
+				<ol>
 				<% @theses.each do |thesis| %>
-					<h4 class="title clearfix" title="title">
+					<li class="mb-2">
 						<%= link_to thesis.title, student_view_thesis_process_path(thesis, Thesis::PROCESS_BEGIN) %>
-					</h4>
+					</li>
 				<% end %>
+				</ol>
 			<% else %>
 				<p>Currently you do not have an open thesis or dissertation. Once you have successfully defended your oral exam, a Thesis Coordinator will open an ETD record for you and you will be notified by email, with instructions on how to submit.</p>
 			<% end %>
