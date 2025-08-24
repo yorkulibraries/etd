@@ -172,11 +172,14 @@ class StudentsTest < ApplicationSystemTestCase
     select "EMBA", from: "thesis_degree_name"
     select "Master's", from: "thesis_degree_level"
     click_button('Create Thesis')
+    assert_selector '.alert-success', text: 'Thesis successfully created.'
     page.go_back
     click_button('Create Thesis')
+    assert_selector '.alert-warning', text: 'Unable to create thesis. Another identical thesis exists.'
+
     visit root_url
 
-    thesis_elements = all('a')
+    thesis_elements = all('a.thesis-link')
 
     thesis_titles = thesis_elements.map(&:text)
 

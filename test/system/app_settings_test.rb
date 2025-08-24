@@ -44,7 +44,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     click_link("Login as this student")
 
     within('div.student-view') do
-      assert_text "Welcome Message Text Tes"
+      assert_text "Welcome Message Text Test"
     end
   end
 

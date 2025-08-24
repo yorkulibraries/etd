@@ -7,7 +7,7 @@
 					<% unless @student %>
 						<span class="fw-lighter text-secondary d-block lead" title="student id: <%= thesis.student.sisid %>">By <%= link_to thesis.student.name, student_thesis_path(thesis.student, thesis) %></span> 
 					<% end %>
-					<%= link_to thesis.title, student_thesis_path(thesis.student, thesis) %>
+					<%= link_to thesis.title, student_thesis_path(thesis.student, thesis), id: "thesis_link_#{thesis.id}", class: "thesis-link" %>
 				</h2>
 			</div>
 			<div class="col-md-3">

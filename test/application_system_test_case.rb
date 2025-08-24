@@ -17,21 +17,23 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
   
   def setup
+    LocSubject.delete_all
+    LocSubject.load_from_file('lib/loc_subjects.txt')
+
     Capybara.server_host = "0.0.0.0"
     Capybara.app_host = "http://#{IPSocket.getaddress(Socket.gethostname)}" if ENV["SELENIUM_REMOTE_URL"].present?
-    Capybara.default_max_wait_time = 30
+    Capybara.default_max_wait_time = 60
     Capybara.save_path = "tmp/test-screenshots"
     Capybara.default_driver = :selenium
 
     super
-
-    current_window.resize_to(1920, 1080)
     
     user = FactoryGirl.create(:user)
     login_as(user, role: User::STAFF)
 
-    LocSubject.delete_all
-    LocSubject.load_from_file('lib/loc_subjects.txt')
+    current_window.resize_to(1920, 1080)
+
+    find('body', wait: Capybara.default_max_wait_time) # Ensure page is stable
   end
 
 end
