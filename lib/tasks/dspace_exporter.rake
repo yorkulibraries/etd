@@ -105,7 +105,7 @@ namespace :dspace do
 
     entry.add_dublin_core_extension!("abstract", thesis.abstract.tr("\u0002\u000B\u000C\u000E\u000F",''))
     entry.add_dublin_core_extension!("language", language_to_iso(thesis.language))
-    entry.add_dublin_core_extension!("name", Thesis::DEGREENAME_FULL[thesis.degree_name])
+    entry.add_dublin_core_extension!("name", thesis.degree_name_full)
     entry.add_dublin_core_extension!("level", thesis.degree_level)
 
     entry.add_dublin_core_extension!("discipline", short_program_name(thesis.program))
@@ -117,6 +117,13 @@ namespace :dspace do
     entry.add_dublin_core_extension!("rights", "Author owns copyright, except where explicitly noted. Please contact the author directly with licensing requests.")
 
     return entry
+  end
+
+  def degree_name_to_full_degree_name(d)
+  end
+
+  def degree_names_full_upcased
+    DEGREENAME_FULL.transform_keys(&:upcase).freeze
   end
 
   def language_to_iso(language)

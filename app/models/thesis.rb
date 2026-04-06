@@ -205,4 +205,14 @@ class Thesis < ApplicationRecord
   def has_primary_file?
     return documents.primary.not_deleted.size > 0
   end
+
+  def degree_name_full
+    key = degree_name
+    return nil if key.nil? || key.to_s.strip.empty?
+
+    # Build the upcased hash only the first time this method is called
+    @upcased_degree_names ||= DEGREENAME_FULL.transform_keys(&:upcase).freeze
+
+    @upcased_degree_names[key.to_s.upcase]
+  end
 end
