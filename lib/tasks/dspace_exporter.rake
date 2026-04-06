@@ -119,13 +119,6 @@ namespace :dspace do
     return entry
   end
 
-  def degree_name_to_full_degree_name(d)
-  end
-
-  def degree_names_full_upcased
-    DEGREENAME_FULL.transform_keys(&:upcase).freeze
-  end
-
   def language_to_iso(language)
     language = "" if language.blank?
 
