@@ -49,7 +49,7 @@ namespace :dspace do
 
         receipt = exporter.deposit(entry: entry, files: files, zipped: zipped, complete: complete_thesis?)
 
-        log("Deposited: #{receipt.status_code}: #{receipt.status_message}")
+        log("Deposited. status_code:  #{receipt.status_code}. status_message:  #{receipt.status_message}")
 
         # 3) set status of each thesis to publish after it has been published
         if (receipt != nil)
