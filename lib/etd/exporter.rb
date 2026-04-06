@@ -13,6 +13,8 @@ module ETD
   class Exporter
     attr_reader :username, :password, :service_document_url, :collection_uri, :collection_title, :collection, :service
 
+    TWO_GIGABYTES = 2 * 1024**3
+
     # Create a new instance of Exporter and tell it where to deposit Theses to
     # Options:
     # username: The user name to use
@@ -96,17 +98,16 @@ module ETD
 
       # 2) Deposit Media if any (zip first if required)
       if options.files.size.positive? && deposit_receipt.status_code.to_i >= 200
-        if options.zipped
-          @zipped_file = zip_files("/tmp/etd-#{Time.now.to_i}.zip", options.files)
-          e = deposit_receipt.entry
-          deposit_receipt.entry.post_media!(filepath: @zipped_file, content_type: 'application/zip', packaging: 'http://purl.org/net/sword/package/SimpleZip')
-        else
           # if there are files to send and original entry has been successfully deposited
           options.files.each do |file_path|
-            e = deposit_receipt.entry
-            deposit_receipt.entry.post_media!(filepath: file_path, content_type: get_content_type(file_path))
+            file_size = File.size(file_path)
+            if File.exist?(file_path) && file_size < TWO_GIGABYTES
+              e = deposit_receipt.entry
+              deposit_receipt.entry.post_media!(filepath: file_path, content_type: get_content_type(file_path))
+            else
+              puts "Skipping #{file_path}. Size: #{file_size}"
+            end 
           end
-        end
       end
 
       # 3) Send a completed signal if required
