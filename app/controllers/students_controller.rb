@@ -29,7 +29,7 @@ class StudentsController < ApplicationController
         end
       end
     else
-      redirect_to :back
+      redirect_back(fallback_location: students_path)
     end
   end
 

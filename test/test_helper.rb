@@ -5,7 +5,7 @@
 ENV['RAILS_ENV'] = 'test'
 require File.expand_path('../config/environment', __dir__)
 require 'rails/test_help'
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 require 'minitest/unit'
 require 'mocha/minitest'
 require 'database_cleaner/active_record'
@@ -40,7 +40,7 @@ module ActiveSupport
     # fixtures :all
 
     # Add more helper methods to be used by all tests here...
-    include FactoryGirl::Syntax::Methods
+    include FactoryBot::Syntax::Methods
     include Warden::Test::Helpers
     Warden.test_mode!
 

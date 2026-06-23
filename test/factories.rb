@@ -3,7 +3,7 @@
 require 'faker'
 ## COMMON METHODS
 
-FactoryGirl.define do
+FactoryBot.define do
   sequence(:random_name) { |n| "#{Faker::Name.name} #{n}" }
   sequence(:random_string) { |_n| Faker::Lorem.sentence }
   sequence(:random_email) { |n| "#{n}_#{Faker::Internet.email}" }

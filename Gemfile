@@ -10,7 +10,7 @@ gem 'rails', '~> 7.0', '>= 7.0.3.1'
 gem 'mysql2'
 
 ## CSS AND JAVASCRIPT ##
-gem 'actiontext', '~> 7.0', '>= 7.0.3.1'
+gem 'actiontext'
 gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails', '4.5.0'
 gem 'jquery-tablesorter', '~> 1.27', '>= 1.27.2'
@@ -30,13 +30,13 @@ gem 'font-awesome-rails', '~> 4.7'
 gem 'simple_form', '~> 5.3'
 
 ## AUDITS ##
-gem 'audited', '~> 5.0', '>= 5.0.2'
+gem 'audited', '~> 5.8'
 
 ## APP SETTINGS ##
 gem 'rails-settings-cached', '~> 2.8', '>= 2.8.2'
 
 ## EXCEPTION NOTIFICATIONS ##
-gem 'exception_notification', '~> 4.5'
+gem 'exception_notification', '>= 4.6', '< 6'
 
 # SWORD API SUPPORT - Modified LCS version ##
 gem 'sword2ruby', git: 'https://github.com/yorkulcs/sword2ruby.git'
@@ -59,7 +59,7 @@ gem 'ostruct'
 gem 'rexml', '~> 3.2', '>= 3.2.5'
 gem 'rubyzip', '~> 1.3.0'
 gem 'unicode', '~> 0.4.4.4'
-gem 'validates_timeliness', github: 'mitsuru/validates_timeliness', branch: 'rails7'
+gem 'validates_timeliness'
 
 ## EXEL EXPORT ##
 gem 'caxlsx', '3.2.0'
@@ -84,7 +84,7 @@ group :test do
   gem 'byebug', '~> 11.1', '>= 11.1.3'
   gem 'capybara', '~> 3.39', '>= 3.39.2'
   gem 'database_cleaner-active_record'
-  gem 'factory_girl_rails', '4.8.0'
+  gem 'factory_bot_rails', '~> 6.4'
   gem 'guard-minitest', '2.4.6'
   gem 'minitest', '~> 5.20'
   gem 'mocha', '~> 2.1'

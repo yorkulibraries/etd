@@ -250,13 +250,15 @@ Expected: one commit containing only Ruby/runtime/lockfile changes.
 **Files:**
 - Modify: `Gemfile`
 - Modify: `Gemfile.lock`
+- Modify: `bin/rails`
+- Modify: `config/application.rb`
 - Modify: `test/test_helper.rb`
 - Modify: `test/factories.rb`
 - Modify: `test/factories/*.rb`
 - Modify: `test/**/*.rb`
 - Modify: `app/controllers/students_controller.rb`
 
-- [ ] **Step 1: Replace legacy factory gem**
+- [x] **Step 1: Replace legacy factory gem**
 
 In `Gemfile`, replace:
 
@@ -270,7 +272,7 @@ with:
 gem 'factory_bot_rails', '~> 6.4'
 ```
 
-- [ ] **Step 2: Loosen Rails-blocking gem constraints**
+- [x] **Step 2: Loosen Rails-blocking gem constraints**
 
 In `Gemfile`, make these dependency edits:
 
@@ -289,7 +291,7 @@ gem 'validates_timeliness', github: 'mitsuru/validates_timeliness', branch: 'rai
 
 This keeps Rails 7.0 resolvable while allowing later rungs to pick Rails-compatible versions. Do not force `exception_notification 5.x` until Rails is at least 7.1. Do not force `validates_timeliness 8.x` until Rails is at least 8.0.
 
-- [ ] **Step 3: Let Rails own Action Text versioning**
+- [x] **Step 3: Let Rails own Action Text versioning**
 
 In `Gemfile`, replace:
 
@@ -303,7 +305,7 @@ with:
 gem 'actiontext'
 ```
 
-- [ ] **Step 4: Update factory helper setup**
+- [x] **Step 4: Update factory helper setup**
 
 In `test/test_helper.rb`, replace:
 
@@ -329,7 +331,7 @@ with:
 include FactoryBot::Syntax::Methods
 ```
 
-- [ ] **Step 5: Rename factory constants**
+- [x] **Step 5: Rename factory constants**
 
 Run inside Docker so the command uses the project Ruby:
 
@@ -347,7 +349,7 @@ rg -n "FactoryGirl|factory_girl" test Gemfile Gemfile.lock
 
 Expected: no output.
 
-- [ ] **Step 6: Replace removed redirect API**
+- [x] **Step 6: Replace removed redirect API**
 
 In `app/controllers/students_controller.rb`, replace:
 
@@ -361,7 +363,7 @@ with:
 redirect_back(fallback_location: students_path)
 ```
 
-- [ ] **Step 7: Resolve dependency updates before Rails changes**
+- [x] **Step 7: Resolve dependency updates before Rails changes**
 
 Run:
 
@@ -378,7 +380,7 @@ activerecord (>= 5.0, < 7.2)
 
 The `actionmailer < 8`, `activesupport < 8`, and `railties < 8.0` caps may remain on Rails 7.0 because their compatible replacements are handled after the Rails 7.1 and pre-Rails-8 steps below.
 
-- [ ] **Step 8: Run tests after dependency cleanup**
+- [x] **Step 8: Run tests after dependency cleanup**
 
 Run:
 

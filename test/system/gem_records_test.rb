@@ -7,7 +7,7 @@ class GemRecordsTest < ApplicationSystemTestCase
   include SystemTestHelper  # Include the SystemTestHelper module here
 
   setup do
-    @gem_record = FactoryGirl.create(:gem_record)
+    @gem_record = FactoryBot.create(:gem_record)
   end
 
   test 'Committee Members shown in Gem Record' do

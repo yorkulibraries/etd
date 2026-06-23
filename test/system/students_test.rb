@@ -8,13 +8,13 @@ class StudentsTest < ApplicationSystemTestCase
 
 
   setup do
-    @gem_record = FactoryGirl.create(:gem_record)
+    @gem_record = FactoryBot.create(:gem_record)
   end
 
   test 'Send student invitation email' do
     AppSettings.email_welcome_allow = true
 
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
     click_link('GEM Records')
@@ -101,7 +101,7 @@ class StudentsTest < ApplicationSystemTestCase
   end
 
   test 'Log in as Student and add a thesis' do
-    @thesis = FactoryGirl.create(:thesis)
+    @thesis = FactoryBot.create(:thesis)
     login_as(@thesis.student)
     visit root_url
     fill_in('Non-YorkU Email Address', with: Faker::Internet.email)
@@ -152,7 +152,7 @@ class StudentsTest < ApplicationSystemTestCase
 
   ## Page 1 tests
   should "display student email on thesis begin_step" do
-    @thesis = FactoryGirl.create(:thesis)
+    @thesis = FactoryBot.create(:thesis)
     login_as(@thesis.student)
     visit root_url
     click_link("My ETD Submission")
@@ -199,7 +199,7 @@ class StudentsTest < ApplicationSystemTestCase
   end
 
   should "display full name instead of first, middle and last name" do
-    @thesis = FactoryGirl.create(:thesis)
+    @thesis = FactoryBot.create(:thesis)
     login_as(@thesis.student)
     visit root_url
     click_link("My ETD Submission")
@@ -212,7 +212,7 @@ class StudentsTest < ApplicationSystemTestCase
   end
 
   should "not allow student to add committee members" do
-    @thesis = FactoryGirl.create(:thesis)
+    @thesis = FactoryBot.create(:thesis)
     login_as(@thesis.student)
     visit root_url
     click_link("My ETD Submission")
@@ -230,7 +230,7 @@ class StudentsTest < ApplicationSystemTestCase
 
   ## Page 2 and 3 tests
   should "upload primary file" do
-    @thesis = FactoryGirl.create(:thesis)
+    @thesis = FactoryBot.create(:thesis)
     login_as(@thesis.student)
     visit root_url
 
@@ -334,7 +334,7 @@ class StudentsTest < ApplicationSystemTestCase
 
   ## Supplementary Info displays on edit/error
   should "Supplementary Info displays on edit/error" do
-    @thesis = FactoryGirl.create(:thesis)
+    @thesis = FactoryBot.create(:thesis)
 
     login_as(@thesis.student)
     visit root_url

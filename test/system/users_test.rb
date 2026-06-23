@@ -7,13 +7,13 @@ class UsersTest < ApplicationSystemTestCase
   include SystemTestHelper  # Include the SystemTestHelper module here
 
   setup do
-    @user1 = FactoryGirl.create(:user)
-    @user2 = FactoryGirl.create(:user)
-    @user3 = FactoryGirl.create(:user)
+    @user1 = FactoryBot.create(:user)
+    @user2 = FactoryBot.create(:user)
+    @user3 = FactoryBot.create(:user)
   end
 
   test 'Create a user' do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
     click_link("Users")
@@ -30,7 +30,7 @@ class UsersTest < ApplicationSystemTestCase
   end
 
   test 'Update a user' do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
     click_link("Users")
@@ -46,7 +46,7 @@ class UsersTest < ApplicationSystemTestCase
   end
 
   test 'Block a user' do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
     click_link("Users")
@@ -58,7 +58,7 @@ class UsersTest < ApplicationSystemTestCase
   end
 
   test 'Unblock a user' do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
     click_link("Users")
@@ -73,7 +73,7 @@ class UsersTest < ApplicationSystemTestCase
   end
 
   test 'Viewing user activity' do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
     click_link("Users")

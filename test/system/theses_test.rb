@@ -7,14 +7,14 @@ class ThesesTest < ApplicationSystemTestCase
   include SystemTestHelper  # Include the SystemTestHelper module here
 
   setup do
-    FactoryGirl.create(:user, role: User::ADMIN)
-    FactoryGirl.create(:user, role: User::MANAGER)
-    @thesis_01 = FactoryGirl.create(:thesis, degree_name: 'IMBA', degree_level: 'Master\'s')
-    @thesis_02 = FactoryGirl.create(:thesis, status: Thesis::UNDER_REVIEW)
+    FactoryBot.create(:user, role: User::ADMIN)
+    FactoryBot.create(:user, role: User::MANAGER)
+    @thesis_01 = FactoryBot.create(:thesis, degree_name: 'IMBA', degree_level: 'Master\'s')
+    @thesis_02 = FactoryBot.create(:thesis, status: Thesis::UNDER_REVIEW)
   end
 
   test "be able to download report" do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
     click_link("Reports")
@@ -48,7 +48,7 @@ class ThesesTest < ApplicationSystemTestCase
   end
 
   test 'Add committee member' do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
 
     visit root_url
@@ -64,7 +64,7 @@ class ThesesTest < ApplicationSystemTestCase
   end
 
   test 'Remove committee member' do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
 
     visit root_url

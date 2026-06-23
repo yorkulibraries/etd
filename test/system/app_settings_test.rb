@@ -7,11 +7,11 @@ class AppSettingsTest < ApplicationSystemTestCase
   include SystemTestHelper  # Include the SystemTestHelper module here
 
   setup do
-    @gem_record = FactoryGirl.create(:gem_record)
+    @gem_record = FactoryBot.create(:gem_record)
   end
 
   test 'Student submission Begin Submission message' do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
 
     visit root_url
@@ -49,7 +49,7 @@ class AppSettingsTest < ApplicationSystemTestCase
   end
 
   test 'Student submission Update Details message' do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
     click_link("Settings")
@@ -80,7 +80,7 @@ class AppSettingsTest < ApplicationSystemTestCase
   end
 
   test 'Student submission Upload files message' do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
     click_link("Settings")
@@ -120,7 +120,7 @@ class AppSettingsTest < ApplicationSystemTestCase
   end
 
   test 'Student submission Review Licences message' do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
     click_link("Settings")
@@ -163,7 +163,7 @@ class AppSettingsTest < ApplicationSystemTestCase
   end
 
   test 'Student submission Submit Review message' do
-    user = FactoryGirl.create(:user, role: User::ADMIN)
+    user = FactoryBot.create(:user, role: User::ADMIN)
     login_as(user)
     visit root_url
     click_link("Settings")
