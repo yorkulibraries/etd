@@ -169,10 +169,11 @@ Expected: one commit containing only the baseline evidence file.
 **Files:**
 - Modify: `.ruby-version`
 - Modify: `Dockerfile`
+- Modify: `Gemfile`
 - Modify: `Gemfile.lock`
 - Modify: `.github/workflows/rubyonrails.yml`
 
-- [ ] **Step 1: Update `.ruby-version`**
+- [x] **Step 1: Update `.ruby-version`**
 
 Replace the file with:
 
@@ -180,7 +181,7 @@ Replace the file with:
 3.4.9
 ```
 
-- [ ] **Step 2: Update the Docker image**
+- [x] **Step 2: Update the Docker image**
 
 Change the first line of `Dockerfile` from:
 
@@ -194,7 +195,7 @@ to:
 FROM ruby:3.4.9-bookworm
 ```
 
-- [ ] **Step 3: Keep GitHub Actions on the repo Ruby**
+- [x] **Step 3: Keep GitHub Actions on the repo Ruby**
 
 Edit `.github/workflows/rubyonrails.yml` so the Ruby setup step is explicit:
 
@@ -206,7 +207,7 @@ Edit `.github/workflows/rubyonrails.yml` so the Ruby setup step is explicit:
           bundler-cache: true
 ```
 
-- [ ] **Step 4: Rebuild bundle metadata on Ruby 3.4.9**
+- [x] **Step 4: Rebuild bundle metadata on Ruby 3.4.9**
 
 Run:
 
@@ -218,7 +219,7 @@ docker compose run --rm web bundle install
 
 Expected: `Gemfile.lock` `RUBY VERSION` changes to `ruby 3.4.9`.
 
-- [ ] **Step 5: Run baseline tests on Ruby 3.4.9 with Rails 7.0**
+- [x] **Step 5: Run baseline tests on Ruby 3.4.9 with Rails 7.0**
 
 Run:
 
@@ -231,7 +232,7 @@ docker compose run --rm web bundle exec rails assets:precompile
 
 Expected: all commands pass before changing Rails.
 
-- [ ] **Step 6: Commit the Ruby runtime upgrade**
+- [x] **Step 6: Commit the Ruby runtime upgrade**
 
 Run:
 
