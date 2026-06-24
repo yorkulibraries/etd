@@ -575,7 +575,7 @@ Expected: one commit for the Rails 7.1 gem/config update.
 - Modify: `config/initializers/new_framework_defaults_7_1.rb`
 - Modify: `config/initializers/cookies_serializer.rb`
 
-- [ ] **Step 1: Review Rails 7.1 defaults file**
+- [x] **Step 1: Review Rails 7.1 defaults file**
 
 Run:
 
@@ -585,7 +585,7 @@ sed -n '1,260p' config/initializers/new_framework_defaults_7_1.rb
 
 Expected: every generated default is visible before editing.
 
-- [ ] **Step 2: Enable one default at a time**
+- [x] **Step 2: Enable one default at a time**
 
 For each commented setting in `config/initializers/new_framework_defaults_7_1.rb`, uncomment one setting, then run:
 
@@ -595,7 +595,7 @@ docker compose run --rm web bundle exec rails test -v
 
 Expected: the unit/controller/model test suite passes after each uncommented default.
 
-- [ ] **Step 3: Run the full gate after all Rails 7.1 defaults are enabled**
+- [x] **Step 3: Run the full gate after all Rails 7.1 defaults are enabled**
 
 Run:
 
@@ -607,7 +607,7 @@ docker compose run --rm web bundle exec rails assets:precompile
 
 Expected: all commands pass.
 
-- [ ] **Step 4: Advance `load_defaults` to 7.1**
+- [x] **Step 4: Advance `load_defaults` to 7.1**
 
 In `config/application.rb`, replace:
 
@@ -623,7 +623,7 @@ config.load_defaults 7.1
 
 Then remove `config/initializers/new_framework_defaults_7_1.rb` only after the full gate passes.
 
-- [ ] **Step 5: Commit Rails 7.1 defaults**
+- [x] **Step 5: Commit Rails 7.1 defaults**
 
 Run:
 
