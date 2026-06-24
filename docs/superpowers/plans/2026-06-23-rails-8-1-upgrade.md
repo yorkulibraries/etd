@@ -498,7 +498,7 @@ Expected: one commit removes the Rails-8-blocking gem without changing visible i
 - Modify: `config/environments/production.rb`
 - Create/modify: `config/initializers/new_framework_defaults_7_1.rb`
 
-- [ ] **Step 1: Change Rails constraints to 7.1**
+- [x] **Step 1: Change Rails constraints to 7.1**
 
 In `Gemfile`, replace:
 
@@ -512,7 +512,7 @@ with:
 gem 'rails', '~> 7.1.0'
 ```
 
-- [ ] **Step 2: Update Rails and Rails-managed gems**
+- [x] **Step 2: Update Rails and Rails-managed gems**
 
 Run:
 
@@ -522,7 +522,7 @@ docker compose run --rm web bundle update rails actiontext
 
 Expected: `Gemfile.lock` resolves Rails `7.1.x`.
 
-- [ ] **Step 3: Run the Rails update task**
+- [x] **Step 3: Run the Rails update task**
 
 Run:
 
@@ -532,7 +532,7 @@ docker compose run --rm web bin/rails app:update
 
 Expected: Rails offers conflicts for existing config files. For each conflict, choose the merge option, keep ETD-specific SMTP, database, Sprockets, and YAML permitted class settings, and accept new Rails comments/default initializer files.
 
-- [ ] **Step 4: Keep defaults pinned during runtime validation**
+- [x] **Step 4: Keep defaults pinned during runtime validation**
 
 Verify `config/application.rb` still contains:
 
@@ -542,7 +542,7 @@ config.load_defaults 7.0
 
 Expected: framework defaults are not advanced in the same commit as the gem version.
 
-- [ ] **Step 5: Run Rails 7.1 tests**
+- [x] **Step 5: Run Rails 7.1 tests**
 
 Run:
 
@@ -555,7 +555,7 @@ docker compose run --rm web bundle exec rails assets:precompile
 
 Expected: all commands pass.
 
-- [ ] **Step 6: Commit Rails 7.1 runtime upgrade**
+- [x] **Step 6: Commit Rails 7.1 runtime upgrade**
 
 Run:
 
