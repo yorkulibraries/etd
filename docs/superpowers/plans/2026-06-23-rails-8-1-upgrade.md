@@ -421,7 +421,7 @@ Expected: one commit containing dependency compatibility and factory rename work
 - Create: `vendor/assets/fonts/fontawesome-webfont.woff`
 - Create: `vendor/assets/fonts/fontawesome-webfont.woff2`
 
-- [ ] **Step 1: Copy Font Awesome 4 assets from the installed gem**
+- [x] **Step 1: Copy Font Awesome 4 assets from the installed gem**
 
 Run:
 
@@ -431,7 +431,7 @@ docker compose run --rm web sh -lc 'mkdir -p vendor/assets/stylesheets vendor/as
 
 Expected: `vendor/assets/stylesheets/font-awesome.css.erb` and `vendor/assets/fonts/fontawesome-webfont.*` exist in the repo. Keep the copied ERB asset helpers intact so Sprockets can fingerprint the font files.
 
-- [ ] **Step 2: Remove helper usage supplied by font-awesome-rails**
+- [x] **Step 2: Remove helper usage supplied by font-awesome-rails**
 
 In `app/views/students/_student.html.erb`, replace:
 
@@ -447,7 +447,7 @@ with:
 
 In `app/views/students/index.html.erb`, make the same replacement.
 
-- [ ] **Step 3: Remove the Rails-8-blocking gem**
+- [x] **Step 3: Remove the Rails-8-blocking gem**
 
 In `Gemfile`, delete:
 
@@ -463,7 +463,7 @@ docker compose run --rm web bundle install
 
 Expected: `Gemfile.lock` contains no `font-awesome-rails` dependency and `app/assets/stylesheets/application.css` can still `require font-awesome` from `vendor/assets/stylesheets/font-awesome.css.erb`.
 
-- [ ] **Step 4: Verify icons and assets still compile**
+- [x] **Step 4: Verify icons and assets still compile**
 
 Run:
 
@@ -474,7 +474,7 @@ docker compose run --rm web bundle exec rails assets:precompile
 
 Expected: system tests and asset precompile pass.
 
-- [ ] **Step 5: Commit Font Awesome vendoring**
+- [x] **Step 5: Commit Font Awesome vendoring**
 
 Run:
 
