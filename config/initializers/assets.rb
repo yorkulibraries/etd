@@ -8,6 +8,13 @@ Rails.application.config.assets.version = '1.0'
 # Add additional assets to the asset load path.
 # Rails.application.config.assets.paths << Emoji.images_path
 
+chosen_rails_path = Gem.loaded_specs['chosen-rails']&.full_gem_path
+if chosen_rails_path
+  Rails.application.config.assets.paths << File.join(chosen_rails_path, 'vendor/assets/javascripts')
+  Rails.application.config.assets.paths << File.join(chosen_rails_path, 'vendor/assets/stylesheets')
+  Rails.application.config.assets.paths << File.join(chosen_rails_path, 'vendor/assets/images')
+end
+
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in the app/assets
 # folder are already added.

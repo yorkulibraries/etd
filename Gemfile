@@ -4,7 +4,7 @@ source 'http://rubygems.org'
 ruby File.read('.ruby-version').strip
 
 gem 'puma', '~> 6.4', '>= 6.4.2'
-gem 'rails', '~> 7.2.0'
+gem 'rails', '~> 8.0.0'
 
 ## DATABASES ##
 gem 'mysql2'

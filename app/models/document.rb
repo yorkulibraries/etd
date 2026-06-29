@@ -25,7 +25,7 @@ class Document < ApplicationRecord
   scope :licence, -> { where(usage: :licence).where('supplemental = ? ', true) }
   scope :embargo, -> { where(usage: [:embargo, :embargo_letter]).where('supplemental = ? ', true) }
 
-  enum usage: %i[thesis embargo embargo_letter licence]
+  enum :usage, %i[thesis embargo embargo_letter licence]
 
   attribute :usage, default: :thesis
   attribute :supplemental, default: true

@@ -752,7 +752,7 @@ Expected: one commit for Rails 7.2 runtime and defaults.
 - Modify: `config/environments/production.rb`
 - Create/modify: `config/initializers/new_framework_defaults_8_0.rb`
 
-- [ ] **Step 1: Change Rails constraints to 8.0**
+- [x] **Step 1: Change Rails constraints to 8.0**
 
 In `Gemfile`, replace:
 
@@ -766,7 +766,7 @@ with:
 gem 'rails', '~> 8.0.0'
 ```
 
-- [ ] **Step 2: Update Rails 8.0 and known blockers**
+- [x] **Step 2: Update Rails 8.0 and known blockers**
 
 Run:
 
@@ -776,7 +776,7 @@ docker compose run --rm web bundle update rails actiontext exception_notificatio
 
 Expected: `Gemfile.lock` resolves Rails `8.0.x`, `exception_notification 5.x`, `validates_timeliness 8.x`, and contains no dependency line with `railties < 8.0`, `actionmailer < 8`, `activesupport < 8`, or `activemodel < 8`.
 
-- [ ] **Step 3: Run Rails app update**
+- [x] **Step 3: Run Rails app update**
 
 Run:
 
@@ -786,7 +786,7 @@ docker compose run --rm web bin/rails app:update
 
 Expected: merge config conflicts, keep Sprockets enabled through `require 'sprockets/railtie'`, and keep the current Action Text/Sprockets asset strategy.
 
-- [ ] **Step 4: Keep defaults pinned during validation**
+- [x] **Step 4: Keep defaults pinned during validation**
 
 Verify `config/application.rb` still contains:
 
@@ -794,7 +794,7 @@ Verify `config/application.rb` still contains:
 config.load_defaults 7.2
 ```
 
-- [ ] **Step 5: Run Rails 8.0 tests**
+- [x] **Step 5: Run Rails 8.0 tests**
 
 Run:
 
@@ -807,7 +807,7 @@ docker compose run --rm web bundle exec rails assets:precompile
 
 Expected: all commands pass.
 
-- [ ] **Step 6: Enable Rails 8.0 defaults**
+- [x] **Step 6: Enable Rails 8.0 defaults**
 
 Uncomment one setting at a time in `config/initializers/new_framework_defaults_8_0.rb`, running:
 
@@ -817,7 +817,7 @@ docker compose run --rm web bundle exec rails test -v
 
 Expected: tests pass after each setting.
 
-- [ ] **Step 7: Advance `load_defaults` to 8.0**
+- [x] **Step 7: Advance `load_defaults` to 8.0**
 
 In `config/application.rb`, replace:
 
@@ -833,7 +833,7 @@ config.load_defaults 8.0
 
 Remove `config/initializers/new_framework_defaults_8_0.rb` after the full gate passes.
 
-- [ ] **Step 8: Commit Rails 8.0**
+- [x] **Step 8: Commit Rails 8.0**
 
 Run:
 
