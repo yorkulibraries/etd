@@ -22,7 +22,7 @@ Bundler.require(*Rails.groups)
 module Etd
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 8.0
+    config.load_defaults 8.1
 
     config.active_record.belongs_to_required_by_default = false
 

@@ -858,7 +858,7 @@ Expected: one commit for Rails 8.0 runtime and defaults.
 - Create/modify: `config/initializers/new_framework_defaults_8_1.rb`
 - Possibly modify: `db/schema.rb`
 
-- [ ] **Step 1: Change Rails constraints to 8.1**
+- [x] **Step 1: Change Rails constraints to 8.1**
 
 In `Gemfile`, replace:
 
@@ -869,10 +869,10 @@ gem 'rails', '~> 8.0.0'
 with:
 
 ```ruby
-gem 'rails', '~> 8.1.3'
+gem 'rails', '~> 8.1.0'
 ```
 
-- [ ] **Step 2: Update Rails 8.1**
+- [x] **Step 2: Update Rails 8.1**
 
 Run:
 
@@ -882,7 +882,7 @@ docker compose run --rm web bundle update rails actiontext
 
 Expected: `Gemfile.lock` resolves `rails (8.1.3)` and Rails-managed gems at `8.1.3`.
 
-- [ ] **Step 3: Run Rails app update**
+- [x] **Step 3: Run Rails app update**
 
 Run:
 
@@ -892,7 +892,7 @@ docker compose run --rm web bin/rails app:update
 
 Expected: Rails 8.1 config is merged without removing ETD-specific settings.
 
-- [ ] **Step 4: Account for Rails 8.1 schema ordering**
+- [x] **Step 4: Account for Rails 8.1 schema ordering**
 
 Run:
 
@@ -903,7 +903,7 @@ git diff -- db/schema.rb
 
 Expected: if `db/schema.rb` changes only by alphabetical table column sorting, keep the generated file and mention the Rails 8.1 schema-ordering change in the commit body. If there are structural database changes, stop and inspect the migrations before committing.
 
-- [ ] **Step 5: Keep defaults pinned during validation**
+- [x] **Step 5: Keep defaults pinned during validation**
 
 Verify `config/application.rb` still contains:
 
@@ -911,20 +911,20 @@ Verify `config/application.rb` still contains:
 config.load_defaults 8.0
 ```
 
-- [ ] **Step 6: Run Rails 8.1 tests**
+- [x] **Step 6: Run Rails 8.1 tests**
 
 Run:
 
 ```bash
 docker compose run --rm web bundle exec rails db:prepare
 docker compose run --rm web bundle exec rails test -v
-docker compose run --rm web bundle exec rails test:system TESTOPTS="-v"
+docker compose run --rm web bundle exec rails test:system -- -v
 docker compose run --rm web bundle exec rails assets:precompile
 ```
 
 Expected: all commands pass.
 
-- [ ] **Step 7: Enable Rails 8.1 defaults**
+- [x] **Step 7: Enable Rails 8.1 defaults**
 
 Uncomment one setting at a time in `config/initializers/new_framework_defaults_8_1.rb`, running:
 
@@ -934,7 +934,7 @@ docker compose run --rm web bundle exec rails test -v
 
 Expected: tests pass after each setting.
 
-- [ ] **Step 8: Advance `load_defaults` to 8.1**
+- [x] **Step 8: Advance `load_defaults` to 8.1**
 
 In `config/application.rb`, replace:
 
@@ -950,7 +950,7 @@ config.load_defaults 8.1
 
 Remove `config/initializers/new_framework_defaults_8_1.rb` after the full gate passes.
 
-- [ ] **Step 9: Commit Rails 8.1.3**
+- [x] **Step 9: Commit Rails 8.1.3**
 
 Run:
 

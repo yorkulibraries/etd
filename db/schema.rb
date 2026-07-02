@@ -10,36 +10,36 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_07_17_225736) do
+ActiveRecord::Schema[8.1].define(version: 2024_07_17_225736) do
   create_table "action_text_rich_texts", charset: "utf8mb3", force: :cascade do |t|
-    t.string "name", null: false
-    t.text "body", size: :long
-    t.string "record_type", null: false
-    t.bigint "record_id", null: false
+    t.text "body", limit: 4294967295
     t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
     t.datetime "updated_at", null: false
     t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
   end
 
   create_table "active_storage_attachments", charset: "utf8mb3", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "record_type", null: false
-    t.bigint "record_id", null: false
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", charset: "utf8mb3", force: :cascade do |t|
-    t.string "key", null: false
-    t.string "filename", null: false
-    t.string "content_type"
-    t.text "metadata"
-    t.string "service_name", null: false
     t.bigint "byte_size", null: false
     t.string "checksum"
+    t.string "content_type"
     t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -50,20 +50,20 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_17_225736) do
   end
 
   create_table "audits", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.integer "auditable_id"
-    t.string "auditable_type"
+    t.string "action"
     t.integer "associated_id"
     t.string "associated_type"
+    t.integer "auditable_id"
+    t.string "auditable_type"
+    t.text "audited_changes"
+    t.string "comment"
+    t.datetime "created_at", precision: nil
+    t.string "remote_address"
+    t.string "request_uuid"
     t.integer "user_id"
     t.string "user_type"
     t.string "username"
-    t.string "action"
-    t.text "audited_changes"
     t.integer "version", default: 0
-    t.string "comment"
-    t.string "remote_address"
-    t.datetime "created_at", precision: nil
-    t.string "request_uuid"
     t.index ["associated_type", "associated_id"], name: "associated_index"
     t.index ["auditable_type", "auditable_id"], name: "auditable_index"
     t.index ["created_at"], name: "index_audits_on_created_at"
@@ -72,165 +72,165 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_17_225736) do
   end
 
   create_table "committee_members", id: :integer, charset: "utf8mb3", force: :cascade do |t|
+    t.datetime "created_at", precision: nil, null: false
+    t.string "first_name"
     t.string "full_name"
+    t.integer "gem_record_id"
+    t.string "last_name"
     t.string "role"
     t.integer "thesis_id"
-    t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.string "first_name"
-    t.string "last_name"
-    t.integer "gem_record_id"
   end
 
   create_table "delayed_jobs", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
+    t.datetime "created_at", precision: nil
+    t.datetime "failed_at", precision: nil
     t.text "handler", null: false
     t.text "last_error"
-    t.datetime "run_at", precision: nil
     t.datetime "locked_at", precision: nil
-    t.datetime "failed_at", precision: nil
     t.string "locked_by"
+    t.integer "priority", default: 0, null: false
     t.string "queue"
-    t.datetime "created_at", precision: nil
+    t.datetime "run_at", precision: nil
     t.datetime "updated_at", precision: nil
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
   create_table "documents", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.integer "thesis_id"
-    t.integer "user_id"
-    t.boolean "supplemental"
-    t.string "name"
     t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.string "file"
     t.boolean "deleted", default: false
+    t.string "file"
+    t.string "name"
+    t.boolean "supplemental"
+    t.integer "thesis_id"
+    t.datetime "updated_at", precision: nil, null: false
     t.integer "usage"
+    t.integer "user_id"
     t.index ["thesis_id"], name: "index_documents_on_thesis_id"
     t.index ["user_id"], name: "index_documents_on_user_id"
   end
 
   create_table "export_logs", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.integer "user_id"
-    t.date "published_date"
-    t.boolean "production_export", default: false
     t.boolean "complete_thesis", default: true
-    t.boolean "publish_thesis", default: true
-    t.text "theses_ids"
-    t.integer "theses_count"
+    t.datetime "created_at", precision: nil, null: false
     t.integer "failed_count"
-    t.integer "successful_count"
     t.text "failed_ids"
-    t.text "successful_ids"
-    t.text "output_full"
-    t.text "output_error"
-    t.string "job_id"
-    t.string "job_status"
-    t.date "job_started_at"
-    t.date "job_completed_at"
     t.date "job_cancelled_at"
     t.integer "job_cancelled_by_id"
-    t.datetime "created_at", precision: nil, null: false
+    t.date "job_completed_at"
+    t.string "job_id"
+    t.date "job_started_at"
+    t.string "job_status"
+    t.text "output_error"
+    t.text "output_full"
+    t.boolean "production_export", default: false
+    t.boolean "publish_thesis", default: true
+    t.date "published_date"
+    t.integer "successful_count"
+    t.text "successful_ids"
+    t.integer "theses_count"
+    t.text "theses_ids"
     t.datetime "updated_at", precision: nil, null: false
+    t.integer "user_id"
   end
 
   create_table "gem_records", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.string "studentname"
-    t.integer "sisid"
-    t.string "emailaddress"
-    t.string "eventtype"
-    t.date "eventdate"
-    t.string "examresult"
-    t.text "title"
-    t.string "program"
-    t.string "superv"
     t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.integer "seqgradevent"
+    t.string "emailaddress"
+    t.date "eventdate"
+    t.string "eventtype"
     t.date "examdate"
+    t.string "examresult"
+    t.string "program"
+    t.integer "seqgradevent"
+    t.integer "sisid"
+    t.string "studentname"
+    t.string "superv"
+    t.text "title"
+    t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "loc_subjects", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.string "name"
+    t.string "callnumber"
     t.string "category"
     t.integer "code"
-    t.string "callnumber"
     t.datetime "created_at", precision: nil, null: false
+    t.string "name"
     t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "settings", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.string "var", null: false
-    t.text "value"
+    t.datetime "created_at", precision: nil, null: false
     t.integer "thing_id"
     t.string "thing_type", limit: 30
-    t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.text "value"
+    t.string "var", null: false
     t.index ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true
   end
 
   create_table "theses", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.text "title"
-    t.string "author"
-    t.string "supervisor"
-    t.text "committee"
-    t.integer "student_id"
-    t.text "keywords"
     t.text "abstract"
-    t.text "embargo"
-    t.string "language"
-    t.string "degree_name"
-    t.string "degree_level"
-    t.string "program"
-    t.date "exam_date"
-    t.date "published_date"
-    t.string "status"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.integer "gem_record_event_id"
-    t.integer "assigned_to_id"
-    t.date "student_accepted_terms_at"
-    t.date "under_review_at"
     t.date "accepted_at"
-    t.date "published_at"
-    t.date "returned_at"
+    t.integer "assigned_to_id"
+    t.string "author"
+    t.boolean "certify_content_correct", default: false
+    t.text "committee"
+    t.datetime "created_at", precision: nil, null: false
+    t.string "degree_level"
+    t.string "degree_name"
+    t.text "embargo"
     t.boolean "embargoed", default: false
     t.datetime "embargoed_at", precision: nil
     t.integer "embargoed_by_id"
-    t.text "returned_message"
-    t.boolean "certify_content_correct", default: false
-    t.boolean "lac_licence_agreement", default: false
-    t.boolean "yorkspace_licence_agreement", default: false
     t.boolean "etd_licence_agreement", default: false
+    t.date "exam_date"
+    t.integer "gem_record_event_id"
+    t.text "keywords"
+    t.boolean "lac_licence_agreement", default: false
+    t.string "language"
     t.text "notes"
+    t.string "program"
+    t.date "published_at"
+    t.date "published_date"
+    t.date "returned_at"
+    t.text "returned_message"
+    t.string "status"
+    t.date "student_accepted_terms_at"
+    t.integer "student_id"
+    t.string "supervisor"
+    t.text "title"
+    t.date "under_review_at"
+    t.datetime "updated_at", precision: nil, null: false
+    t.boolean "yorkspace_licence_agreement", default: false
     t.index ["student_id"], name: "index_theses_on_student_id"
   end
 
   create_table "thesis_subjectships", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.integer "thesis_id"
+    t.datetime "created_at", precision: nil, null: false
     t.integer "loc_subject_id"
     t.integer "rank"
-    t.datetime "created_at", precision: nil, null: false
+    t.integer "thesis_id"
     t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "users", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.string "username"
-    t.string "name"
-    t.string "type"
-    t.string "email"
-    t.integer "created_by_id"
     t.boolean "blocked", default: false
-    t.string "role"
-    t.string "sisid"
     t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.date "invitation_sent_at"
+    t.integer "created_by_id"
+    t.string "email"
     t.string "email_external"
     t.string "first_name"
-    t.string "middle_name"
+    t.date "invitation_sent_at"
     t.string "last_name"
+    t.string "middle_name"
+    t.string "name"
+    t.string "role"
+    t.string "sisid"
+    t.string "type"
+    t.datetime "updated_at", precision: nil, null: false
+    t.string "username"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

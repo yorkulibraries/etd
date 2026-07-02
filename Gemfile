@@ -4,7 +4,7 @@ source 'http://rubygems.org'
 ruby File.read('.ruby-version').strip
 
 gem 'puma', '~> 6.4', '>= 6.4.2'
-gem 'rails', '~> 8.0.0'
+gem 'rails', '~> 8.1.0'
 
 ## DATABASES ##
 gem 'mysql2'
@@ -17,7 +17,6 @@ gem 'jquery-tablesorter', '~> 1.27', '>= 1.27.2'
 gem 'jquery-ui-rails', '6.0.1'
 gem 'sass-rails', '~> 6.0'
 gem 'terser', '~> 1.1', '>= 1.1.20'
-gem 'trix-rails', require: 'trix'
 source 'https://rails-assets.org' do
   gem 'rails-assets-chosen-bootstrap-theme'
 end
