@@ -12,7 +12,7 @@
 
 ActiveRecord::Schema[8.1].define(version: 2024_07_17_225736) do
   create_table "action_text_rich_texts", charset: "utf8mb3", force: :cascade do |t|
-    t.text "body", limit: 4294967295
+    t.text "body", size: :long
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.bigint "record_id", null: false

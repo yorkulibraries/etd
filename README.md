@@ -7,16 +7,21 @@ ETD is a collaboration between York University Libraries and Faculty of Graduate
 ```
 git clone https://github.com/yorkulibraries/etd.git
 cd etd
+```
+
+The app runs in Docker on Ruby 3.4.9 and Rails 8.1.3. Start it with:
+
+```
 docker compose up --build
 ```
 
-There are 3 containers created: **web**, **db** and **mailcatcher**
+There are 4 containers created: **web**, **db**, **mail** and **chrome**.
 
 # Access the front end web app in DEVELOPMENT 
 
-http://localhost:3004/
+http://localhost:4004/
 
-By default, the application will listen on port 3004 and runs with RAILS_ENV=development.
+By default, the application will listen on port 4004 and runs with RAILS_ENV=development.
 
 To access the application in Chrome browser, you will need to add the ModHeader extension to your Chrome browser.
 

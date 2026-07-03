@@ -42,6 +42,6 @@ services:
 
   chrome:
     image: selenium/standalone-chrome:nightly
+    platform: linux/amd64
     ports:
       - ${VNC_HTTP:-7904}:7900
-

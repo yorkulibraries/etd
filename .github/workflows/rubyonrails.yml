@@ -38,7 +38,7 @@ jobs:
           bundle exec rails db:reset
           bundle exec rails db:seed
           bundle exec rails test -v
-          bundle exec rails test:system TESTOPTS="-v"
+          bundle exec rails test:system -- -v
 
       - name: Run tests with mysql
         env:
@@ -48,7 +48,7 @@ jobs:
           bundle exec rails db:reset
           bundle exec rails db:seed
           bundle exec rails test -v
-          bundle exec rails test:system TESTOPTS="-v"
+          bundle exec rails test:system -- -v
 
       - name: Create tar archive of screenshots
         run: |
