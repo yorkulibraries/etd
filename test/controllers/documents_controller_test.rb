@@ -161,15 +161,41 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     should 'upload file and redirect to student thesis view' do
-      assert_difference 'Document.count' do
-        post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
-                                document: attributes_for(:document).except(:user, :thesis) }
+      assert_no_difference 'ThesisSubmissionVersion.count' do
+        assert_difference 'Document.count' do
+          post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
+                                  document: attributes_for(:document).except(:user, :thesis) }
+        end
       end
 
       document = assigns(:document)
 
       assert_equal @student.id, document.user.id, 'Current student is the one created the document'
       assert_equal @thesis.id, document.thesis.id, 'Current thesis should be set'
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
+                           'Should redirect to student view upload process path'
+    end
+
+    should 'not snapshot draft file replacements' do
+      d = create(:document, file: fixture_file_upload('document-microsoft.doc', 'application/text'),
+                            thesis: @thesis, user: @student)
+
+      assert_no_difference 'ThesisSubmissionVersion.count' do
+        post :update, params: { id: d.id, thesis_id: @thesis.id, student_id: @student.id,
+                                document: { file: fixture_file_upload('html-document.html', 'text/html') } }
+      end
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
+                           'Should redirect to student view upload process path'
+    end
+
+    should 'not snapshot draft file deletes' do
+      d = create(:document, thesis: @thesis, user: @student)
+
+      assert_no_difference 'ThesisSubmissionVersion.count' do
+        post :destroy, params: { id: d.id, thesis_id: @thesis.id, student_id: @student.id }
+      end
+
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
                            'Should redirect to student view upload process path'
     end

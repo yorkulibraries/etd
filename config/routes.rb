@@ -58,6 +58,10 @@ Rails.application.routes.draw do
 
       resource :embargo, only: %i[new create], controller: 'theses/embargo'
 
+      resources :submission_versions, only: [] do
+        resources :submission_documents, only: [:show], path: 'files', controller: 'thesis_submission_documents'
+      end
+
       resources :documents, path: 'files' do
         get 'deleted', on: :collection
       end

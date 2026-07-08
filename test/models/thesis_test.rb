@@ -13,6 +13,7 @@ class ThesisTest < ActiveSupport::TestCase
 
   should belong_to(:student)
   should have_many(:documents).dependent(:delete_all)
+  should have_many(:submission_versions).dependent(:delete_all)
   # should have_many(:documents)
   
   ## VALIDATIONS
@@ -122,6 +123,46 @@ class ThesisTest < ActiveSupport::TestCase
     assert_difference 'Document.count', -1 do
       @thesis.destroy
     end
+  end
+
+  should 'use working documents for export before a submitted version exists' do
+    thesis = create(:thesis)
+    document = create(:document, thesis: thesis, supplemental: false,
+                                 file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+    assert_equal [document], thesis.documents_for_export.to_a
+  end
+
+  should 'use latest submitted version documents for export after snapshot exists' do
+    student = create(:student)
+    thesis = create(:thesis, student: student)
+    create(:document, thesis: thesis, user: student, supplemental: false,
+                      file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+    thesis.create_submission_snapshot!(student)
+
+    assert_equal thesis.submission_versions.last.submission_documents.to_a, thesis.documents_for_export.to_a
+  end
+
+  should 'use latest submitted version documents for export after resubmission' do
+    student = create(:student)
+    thesis = create(:thesis, student: student)
+    document = create(:document, thesis: thesis, user: student, supplemental: false,
+                                 file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+    first_version = thesis.create_submission_snapshot!(student)
+    first_snapshot_path = first_version.submission_documents.first.file.path
+
+    document.file = fixture_file_upload('pdf-document.pdf')
+    document.name = File.basename(document.file.path)
+    document.save!
+
+    second_version = thesis.create_submission_snapshot!(student)
+
+    assert_equal [1, 2], thesis.submission_versions.order(:version_number).pluck(:version_number)
+    assert_equal second_version.submission_documents.to_a, thesis.documents_for_export.to_a
+    assert_not_equal first_snapshot_path, thesis.documents_for_export.first.file.path
+    assert File.exist?(first_snapshot_path), 'Earlier submitted version file should still exist'
   end
 
   should 'be able to update a thesis' do

@@ -1,0 +1,48 @@
+<div class="submission-versions fitted student-view mt-4">
+	<h4>Submitted Versions</h4>
+
+	<% if submission_versions.empty? %>
+		<p>There are no submitted versions.</p>
+	<% end %>
+
+	<% submission_versions.each do |submission_version| %>
+		<div class="bg-light-subtle mt-3 p-3">
+			<h5>
+				Version <%= submission_version.version_number %>
+				<span class="weak small">
+					submitted <%= format submission_version.submitted_at %>
+					by <%= submission_version.submitted_by.display_name %>
+				</span>
+			</h5>
+
+			<% if submission_version.submission_documents.empty? %>
+				<p>There are no files for this submitted version.</p>
+			<% else %>
+				<table class="table table-sm align-middle">
+					<thead>
+						<tr>
+							<th>File</th>
+							<th>Type</th>
+							<th>Size</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<% submission_version.submission_documents.each do |submission_document| %>
+							<tr>
+								<td class="text-wrap text-break"><%= submission_document.display_name %></td>
+								<td><%= submission_document.document_type.humanize %></td>
+								<td><%= number_to_human_size submission_document.file_size %></td>
+								<td class="text-end">
+									<%= link_to student_thesis_submission_version_submission_document_path(@student, @thesis, submission_version, submission_document), class: 'btn btn-secondary btn-sm', title: 'Download' do %>
+										<i class="fa fa-download"></i> Download
+									<% end %>
+								</td>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
+			<% end %>
+		</div>
+	<% end %>
+</div>

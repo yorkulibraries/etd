@@ -25,7 +25,9 @@ class ThesesController < ApplicationController
     @supplemental_documents = @thesis.documents.not_deleted.supplemental
     @licence_documents = @thesis.documents.not_deleted.licence
     @embargo_documents = @thesis.documents.not_deleted.embargo
-    authorize! :edit, @thesis
+    @submission_versions = @thesis.submission_versions.order(version_number: :desc) if current_user.role != User::STUDENT
+    permission = current_user.role == User::STUDENT ? :show : :read
+    authorize! permission, @thesis
   end
 
   def new
@@ -159,7 +161,7 @@ class ThesesController < ApplicationController
   end
 
   def validate_active_thesis(thesis_id)
-    Document.exists?(deleted: false, user_id: current_user.id, thesis_id:, supplemental: false)
+    Document.exists?(deleted: false, user_id: current_user.id, thesis_id: thesis_id, supplemental: false)
   end
 
   def submit_for_review
@@ -170,16 +172,21 @@ class ThesesController < ApplicationController
     @thesis.assign_attributes(thesis_params)
 
     if @thesis.valid?(:submit_for_review)
-      if @thesis.update(thesis_params)
-        if validate_active_thesis(@thesis.id)
-          @thesis.update(audit_comment: 'Submitting for review.', student_accepted_terms_at: Date.today, under_review_at: Date.today, status: Thesis::UNDER_REVIEW)
+      if validate_active_thesis(@thesis.id)
+        begin
+          ActiveRecord::Base.transaction do
+            @thesis.update!(thesis_params)
+            @thesis.create_submission_snapshot!(current_user)
+            @thesis.update!(audit_comment: 'Submitting for review.', student_accepted_terms_at: Date.today, under_review_at: Date.today, status: Thesis::UNDER_REVIEW)
+          end
+
           redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS)
-        else
-          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), alert: 'Please upload a Primary Thesis File.'
+        rescue ActiveRecord::RecordInvalid, CarrierWave::UploadError, CarrierWave::IntegrityError, CarrierWave::ProcessingError, SystemCallError => e
+          Rails.logger.error("Unable to snapshot thesis submission #{@thesis.id}: #{e.class} #{e.message}")
+          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: 'Unable to submit for review because the submitted files could not be preserved.'
         end
       else
-        error_messages = @thesis.errors.full_messages.join(', ')
-        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: "#{error_messages}."
+        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), alert: 'Please upload a Primary Thesis File.'
       end
     else
       error_messages = @thesis.errors.full_messages.join(', ')
@@ -188,7 +195,7 @@ class ThesesController < ApplicationController
   end
 
   def validate_licence_uplaod(thesis_id)
-    Document.exists?(deleted: false, user_id: current_user.id, thesis_id:, supplemental: true, usage: :licence)
+    Document.exists?(deleted: false, user_id: current_user.id, thesis_id: thesis_id, supplemental: true, usage: :licence)
   end
 
   def accept_licences

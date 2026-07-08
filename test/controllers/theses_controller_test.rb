@@ -423,9 +423,16 @@ class ThesesControllerTest < ActionController::TestCase
     end
 
     should 'submit for review, thesis status will change to under_review' do
-      create(:document, supplemental: false, thesis: @thesis, user: @student,
-                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
-      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+      primary_document = create(:document, supplemental: false, thesis: @thesis, user: @student,
+                                           file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+      supplemental_document = create(:document, supplemental: true, thesis: @thesis, user: @student,
+                                                file: fixture_file_upload('pdf-document.pdf'))
+
+      assert_difference 'ThesisSubmissionVersion.count', 1 do
+        assert_difference 'ThesisSubmissionDocument.count', 2 do
+          post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+        end
+      end
 
       thesis = assigns(:thesis)
       assert_response :redirect
@@ -444,19 +451,74 @@ class ThesesControllerTest < ActionController::TestCase
       get :edit, params: { id: thesis.id, student_id: @student.id }
 
       assert_redirected_to unauthorized_url, 'Should redirect to unauthorized.'
+
+      version = thesis.submission_versions.first
+      assert_equal 1, version.version_number
+      assert_equal @student.id, version.submitted_by_id
+      assert_equal Date.today, version.submitted_at.to_date
+      assert_equal [primary_document.id, supplemental_document.id].sort,
+                   version.submission_documents.pluck(:source_document_id).sort
     end
 
     should 'submit for review, thesis status will change to upload due to lack of document' do
-      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+      assert_no_difference 'ThesisSubmissionVersion.count' do
+        post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+      end
+
       assigns(:thesis)
       assert_response :redirect
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
     end
 
+    should 'not change status to under_review if submitted files cannot be snapshotted' do
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+      Thesis.any_instance.expects(:create_submission_snapshot!).raises(CarrierWave::UploadError.new('missing file'))
+
+      assert_no_difference 'ThesisSubmissionVersion.count' do
+        post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+      end
+
+      @thesis.reload
+      assert_equal Thesis::OPEN, @thesis.status
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
+    end
+
+    should 'create the next submitted version only after returned revisions are resubmitted' do
+      primary_document = create(:document, supplemental: false, thesis: @thesis, user: @student,
+                                           file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+      first_version = @thesis.submission_versions.first
+      first_snapshot = first_version.submission_documents.first
+      first_snapshot_path = first_snapshot.file.path
+      first_snapshot_size = File.size(first_snapshot_path)
+
+      @thesis.update(status: Thesis::RETURNED)
+      assert_no_difference 'ThesisSubmissionVersion.count' do
+        primary_document.update!(file: fixture_file_upload('pdf-document.pdf'))
+      end
+
+      assert File.exist?(first_snapshot_path)
+      assert_equal first_snapshot_size, File.size(first_snapshot_path)
+
+      assert_difference 'ThesisSubmissionVersion.count', 1 do
+        post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+      end
+
+      @thesis.reload
+      assert_equal [1, 2], @thesis.submission_versions.order(:version_number).pluck(:version_number)
+      assert_not_equal first_snapshot.file.path,
+                       @thesis.submission_versions.order(:version_number).last.submission_documents.first.file.path
+    end
+
     should 'should not submit for review without certifying content correct' do
       @thesis.update(certify_content_correct: false)
 
-      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: false } }
+      assert_no_difference 'ThesisSubmissionVersion.count' do
+        post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: false } }
+      end
 
       assigns(:thesis)
       assert_response :redirect

@@ -31,6 +31,7 @@ class Thesis < ApplicationRecord
 
   belongs_to :student
   has_many :documents, dependent: :delete_all
+  has_many :submission_versions, class_name: 'ThesisSubmissionVersion', dependent: :delete_all
   has_many :committee_members
 
   has_many :thesis_subjectships, dependent: :delete_all
@@ -204,6 +205,44 @@ class Thesis < ApplicationRecord
 
   def has_primary_file?
     return documents.primary.not_deleted.size > 0
+  end
+
+  def create_submission_snapshot!(submitted_by)
+    with_lock do
+      version = submission_versions.create!(
+        version_number: ThesisSubmissionVersion.next_version_number_for(self),
+        submitted_by: submitted_by,
+        submitted_at: Time.current
+      )
+
+      documents.not_deleted.order(:id).each do |document|
+        unless document.file.path.present? && File.exist?(document.file.path)
+          raise CarrierWave::UploadError, "Missing source file for document #{document.id}"
+        end
+
+        File.open(document.file.path, 'rb') do |file|
+          version.submission_documents.create!(
+            source_document: document,
+            supplemental: document.supplemental,
+            usage: document.usage,
+            name: document.name,
+            original_filename: File.basename(document.file.path),
+            content_type: document.file.file.try(:content_type),
+            file_size: File.size(document.file.path),
+            file: file
+          )
+        end
+      end
+
+      version
+    end
+  end
+
+  def documents_for_export
+    latest_submission_version = submission_versions.order(version_number: :desc).first
+    return documents.not_deleted unless latest_submission_version
+
+    latest_submission_version.submission_documents
   end
 
   def degree_name_full
