@@ -240,9 +240,9 @@ class Thesis < ApplicationRecord
 
   def documents_for_export
     latest_submission_version = submission_versions.order(version_number: :desc).first
-    return documents.not_deleted unless latest_submission_version
+    return documents.not_deleted.where(usage: :thesis) unless latest_submission_version
 
-    latest_submission_version.submission_documents
+    latest_submission_version.submission_documents.where(usage: :thesis)
   end
 
   def degree_name_full

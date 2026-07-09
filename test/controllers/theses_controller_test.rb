@@ -66,6 +66,8 @@ class ThesesControllerTest < ActionController::TestCase
       create_list(:document, 1, supplemental: false, thesis:, user: @student,
                                 file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
       create_list(:document, 3, supplemental: true, thesis:, user: @student)
+      create(:document, supplemental: true, usage: :modification_request, thesis:, user: @student,
+                        file: fixture_file_upload('pdf-document.pdf'))
       create(:document, supplemental: true, deleted: true, thesis:, user: @student)
       create(:document, supplemental: false, deleted: true, thesis:, user: @student,
                         file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
@@ -74,11 +76,14 @@ class ThesesControllerTest < ActionController::TestCase
 
       primary_documents = assigns(:primary_documents)
       supplemental_documents = assigns(:supplemental_documents)
+      modification_request_documents = assigns(:modification_request_documents)
       assert primary_documents, 'Primary documents must be not nil'
       assert supplemental_documents, 'Supllemental doucments'
+      assert modification_request_documents, 'Modification request documents must be not nil'
 
       assert_equal 1, primary_documents.size, '1 primary non-deleted document'
       assert_equal 3, supplemental_documents.size, '3 supplemental non-deleted documents'
+      assert_equal 1, modification_request_documents.size, '1 modification request non-deleted document'
     end
 
     should 'show new thesis form, make sure thesis author is assigned.' do

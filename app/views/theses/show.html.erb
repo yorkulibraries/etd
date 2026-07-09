@@ -163,6 +163,25 @@
 			<% end %>
 		<% end %>
 	</div>
+
+	<% if current_user.role != User::STUDENT %>
+		<div class="bg-light-subtle mt-3 p-3">
+			<h5>Modification Request Documents</h5>
+			<% if @modification_request_documents.count == 0 %>
+				<p>There are no modification request documents.</p>
+			<% end %>
+			<% @modification_request_documents.each do | document | %>
+				<div class='modification-request-file'>
+					<%= render partial: document %>
+				</div>
+			<% end %>
+			<%  unless block_thesis_changes?(@thesis) %>
+				<%= link_to new_student_thesis_document_path(@student, @thesis, usage: 'modification_request', supplemental: true), class: "btn btn-primary", remote: true do %>
+						Upload Modification Request Documents
+				<% end %>
+			<% end %>
+		</div>
+	<% end %>
 </div>
 
 <% if current_user.role != User::STUDENT %>

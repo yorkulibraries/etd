@@ -24,8 +24,9 @@ class Document < ApplicationRecord
   
   scope :licence, -> { where(usage: :licence).where('supplemental = ? ', true) }
   scope :embargo, -> { where(usage: [:embargo, :embargo_letter]).where('supplemental = ? ', true) }
+  scope :modification_request, -> { where(usage: :modification_request).where('supplemental = ? ', true) }
 
-  enum usage: %i[thesis embargo embargo_letter licence]
+  enum usage: %i[thesis embargo embargo_letter licence modification_request]
 
   attribute :usage, default: :thesis
   attribute :supplemental, default: true
@@ -48,6 +49,10 @@ class Document < ApplicationRecord
     AppSettings.embargo_file_extensions.split(',').map(&:strip)
   end
 
+  def self.modification_request_file_extensions
+    AppSettings.modification_request_file_extensions.split(',').map(&:strip)
+  end
+
   def allowed_extensions
     list = Document.primary_thesis_file_extensions
 
@@ -58,6 +63,8 @@ class Document < ApplicationRecord
       list = Document.licence_file_extensions
     when 'embargo'
       list = Document.embargo_file_extensions
+    when 'modification_request'
+      list = Document.modification_request_file_extensions
     else
       list = Document.primary_thesis_file_extensions
     end
@@ -119,6 +126,7 @@ class Document < ApplicationRecord
     return 'primary' if self.usage == "thesis" && self.primary?
     return 'embargo' if self.usage == "embargo" || self.usage == "embargo_letter"
     return 'licence' if self.usage == "licence"
+    return 'modification_request' if self.usage == "modification_request"
   end
 
   def uploaded_filename(original_filename)
@@ -144,6 +152,7 @@ class Document < ApplicationRecord
     docs = thesis.documents.not_deleted.supplemental.order('id') if type == 'supplemental'
     docs = thesis.documents.not_deleted.licence.order('id') if type == 'licence'
     docs = thesis.documents.not_deleted.embargo.order('id') if type == 'embargo'
+    docs = thesis.documents.not_deleted.modification_request.order('id') if type == 'modification_request'
 
     s = Hash.new
     docs.each_with_index do |d, i|
@@ -157,6 +166,7 @@ class Document < ApplicationRecord
     docs = thesis.documents.not_deleted.supplemental if document_type == 'supplemental'
     docs = thesis.documents.not_deleted.embargo if document_type == 'embargo'
     docs = thesis.documents.not_deleted.licence if document_type == 'licence'
+    docs = thesis.documents.not_deleted.modification_request if document_type == 'modification_request'
     docs.each do |d|
       d.file = File.open(d.file.path)
       d.save! validate: false

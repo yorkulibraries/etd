@@ -25,6 +25,7 @@ class ThesesController < ApplicationController
     @supplemental_documents = @thesis.documents.not_deleted.supplemental
     @licence_documents = @thesis.documents.not_deleted.licence
     @embargo_documents = @thesis.documents.not_deleted.embargo
+    @modification_request_documents = @thesis.documents.not_deleted.modification_request
     @submission_versions = @thesis.submission_versions.order(version_number: :desc) if current_user.role != User::STUDENT
     permission = current_user.role == User::STUDENT ? :show : :read
     authorize! permission, @thesis
