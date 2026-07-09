@@ -50,6 +50,14 @@ class DocumentTest < ActiveSupport::TestCase
     assert doc.primary?, "must be primary"
     assert_equal 'embargo', doc.usage, 'usage must be "embargo"'
     assert !doc.valid?, 'Should not be valid, usage can not be "embargo" AND not supplemental'
+
+    # should not be able to create a primary file with usage "modification_request"
+    doc = build(:document, usage: 'modification_request', supplemental: false, file: fixture_file_upload('pdf-document.pdf'))
+    assert '.pdf', doc.file_extension
+    assert doc.valid_extension?, 'extension should be valid'
+    assert doc.primary?, "must be primary"
+    assert_equal 'modification_request', doc.usage, 'usage must be "modification_request"'
+    assert !doc.valid?, 'Should not be valid, usage can not be "modification_request" AND not supplemental'
   end
 
   should 'only allow one primary file per thesis, and it should ignore deleted' do
@@ -464,5 +472,21 @@ class DocumentTest < ActiveSupport::TestCase
     d.usage = 'embargo'
     d.supplemental = true
     assert_equal Document.embargo_file_extensions, d.allowed_extensions
+
+    d.usage = 'modification_request'
+    d.supplemental = true
+    assert_equal Document.modification_request_file_extensions, d.allowed_extensions
+  end
+
+  should 'modification request files use their own document type and sequence' do
+    t = create(:thesis)
+    first = create(:document_for_file_naming, file: fixture_file_upload('pdf-document.pdf'), usage: :modification_request, supplemental: true, thesis: t)
+    second = create(:document_for_file_naming, file: fixture_file_upload('document-microsoft.doc'), usage: :modification_request, supplemental: true, thesis: t)
+
+    assert_equal 'modification_request', first.document_type
+    assert_equal 'modification_request', second.document_type
+    assert_match /_modification_request_1.pdf$/, first.uploaded_filename('pdf-document.pdf')
+    assert_match /_modification_request_2.doc$/, second.uploaded_filename('document-microsoft.doc')
+    assert_equal [first.id, second.id], t.documents.not_deleted.modification_request.order('id').pluck(:id)
   end
 end

@@ -94,7 +94,12 @@ class DspaceExportJob < ActiveJob::Base
     return [] if thesis.nil?
 
     files = []
-    thesis.documents.not_deleted.each do |document|
+    thesis.documents.primary.not_deleted.each do |document|
+      log "       #{document.file.path}"
+      files.push document.file.path
+    end
+
+    thesis.documents.supplemental.not_deleted.each do |document|
       log "       #{document.file.path}"
       files.push document.file.path
     end
