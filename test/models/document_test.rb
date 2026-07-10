@@ -476,6 +476,7 @@ class DocumentTest < ActiveSupport::TestCase
     d.usage = 'modification_request'
     d.supplemental = true
     assert_equal Document.modification_request_file_extensions, d.allowed_extensions
+    assert_includes d.allowed_extensions, '.txt'
   end
 
   should 'modification request files use their own document type and sequence' do
