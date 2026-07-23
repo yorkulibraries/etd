@@ -43,6 +43,19 @@ class StudentViewControllerTest < ActionController::TestCase
       assert_equal 2, theses.size, 'Just one for now'
     end
 
+    should 'show an expired unopened ETD as disabled in the thesis list' do
+      active_thesis = create(:thesis, student: @student, title: 'Active ETD')
+      expired_thesis = create(:thesis, student: @student, title: 'Expired ETD')
+      expired_thesis.invitations.create!(student: @student, sent_at: 15.days.ago, expires_at: 1.day.ago)
+
+      get :index
+
+      assert_response :success
+      assert_select 'a', text: active_thesis.title
+      assert_select 'a', text: expired_thesis.title, count: 0
+      assert_select '.invitation-expired', text: /Expired ETD.*Invitation expired—contact ETD staff\./m
+    end
+
     should 'avoid routing if files are not uploaded' do
       thesis = create(:thesis, student: @student)
 
