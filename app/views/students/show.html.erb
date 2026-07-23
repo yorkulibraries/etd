@@ -19,10 +19,9 @@
 			<h4>Invitation</h4>
 			<p>
 			<% if @student.invitation_sent_at.nil? %>
-				<%= link_to_if AppSettings.email_welcome_allow, "Send invitation email", send_invite_student_path(@student), id: "send_invitation_email" %>
+				No ETD invitation has been sent.
 			<% else %>
-				Sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>
-				<span class="soft weak">(<%= link_to_if AppSettings.email_welcome_allow, "Send Again", send_invite_student_path(@student), class: "soft weak"%>)</span>
+				Latest invitation sent on <%= @student.invitation_sent_at.strftime("%B %d, %Y")%>.
 			<% end %>
 			</p>
 		</div>
@@ -51,9 +50,19 @@
 			<h2 class='text-dark heading clear'>Available <%= "thesis".pluralize(@available_theses.count )%></h2>
 			<div class="row">
 			<% @available_theses.each do |record| %>
+				<% invitation = record.current_invitation_for(@student) %>
 				<div class="col-10">
 					<h5 class="fw-light"><%= record.program %></h5>
 					<h3><%= record.title %></h3>
+					<% if invitation&.accepted_at %>
+						<p>Invitation opened <%= invitation.accepted_at.in_time_zone('Eastern Time (US & Canada)').strftime("%B %-d, %Y") %>.</p>
+					<% elsif invitation %>
+						<p>Invitation <%= invitation.expires_at < Time.current ? 'expired' : 'expires' %> <%= invitation.expires_at.in_time_zone('Eastern Time (US & Canada)').strftime("%B %-d, %Y at %-I:%M %p %Z") %>.</p>
+					<% end %>
+					<%= link_to_if AppSettings.email_welcome_allow,
+									 invitation ? "Send invitation again" : "Send invitation email",
+									 send_invite_student_path(@student, gem_record_id: record.id),
+									 id: "send_invitation_email_#{record.id}" %>
 				</div>
 				<div class="col-2 col-sm-2">
 					<a href="<%= new_student_thesis_path(@student, gem_record: record.id) %>" class="btn btn-success btn-small float-end">

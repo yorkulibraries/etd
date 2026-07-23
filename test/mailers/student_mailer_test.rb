@@ -9,6 +9,7 @@ class StudentMailerTest < ActionMailer::TestCase
       @student = create(:student, email: 'stu1@me.ca', name: 'John Daily')
       AppSettings.email_welcome_allow = true
       AppSettings.email_welcome_subject = "email_welcome_subject"
+      AppSettings.email_welcome_body = '{{student_name}} | {{thesis_title}} | {{invitation_expiry_date}}'
       AppSettings.email_status_change_allow = true
       AppSettings.email_status_change_subject = "email_status_change_subject"
       AppSettings.email_from = "noreply@yorku.ca"
@@ -18,13 +19,29 @@ class StudentMailerTest < ActionMailer::TestCase
     end
 
     should 'send an invitation email' do
-      mail = StudentMailer.invitation_email(@student).deliver_now
+      thesis = create(:thesis, student: @student, title: 'A separate ETD')
+      invitation = ThesisInvitation.issue!(student: @student, thesis:, sent_at: Time.utc(2026, 7, 1, 14))
+      mail = nil
+
+      assert_nothing_raised do
+        mail = StudentMailer.invitation_email(invitation).deliver_now
+      end
       assert !ActionMailer::Base.deliveries.empty?, "Shouldn't be empty"
 
       assert_equal AppSettings.email_welcome_subject, mail.subject
       assert_equal ['stu1@me.ca'], mail.to
       assert_equal AppSettings.email_from, mail.from.first
-      # assert_match @student.name, mail.body.encoded ##FIXME
+      assert_match 'John Daily | A separate ETD | July 15, 2026 at 11:59 PM EDT', mail.body.encoded
+    end
+
+    should 'include the deadline even when the configured template omits the expiry tag' do
+      AppSettings.email_welcome_body = 'Welcome {{student_name}}.'
+      thesis = create(:thesis, student: @student, title: 'Deadline ETD')
+      invitation = ThesisInvitation.issue!(student: @student, thesis:, sent_at: Time.utc(2026, 7, 1, 14))
+
+      mail = StudentMailer.invitation_email(invitation).deliver_now
+
+      assert_match 'This invitation for Deadline ETD must be opened by July 15, 2026 at 11:59 PM EDT.', mail.body.encoded
     end
 
     should 'send out a status notification email' do
@@ -50,7 +67,9 @@ class StudentMailerTest < ActionMailer::TestCase
       StudentMailer.status_change_email(@student, Thesis.new, Thesis::OPEN, Thesis::UNDER_REVIEW).deliver_now
       assert ActionMailer::Base.deliveries.empty?, 'should not work'
 
-      StudentMailer.invitation_email(@student).deliver_now
+      thesis = create(:thesis, student: @student)
+      invitation = ThesisInvitation.issue!(student: @student, thesis:)
+      StudentMailer.invitation_email(invitation).deliver_now
       assert ActionMailer::Base.deliveries.empty?, 'should not work'
     end
   end

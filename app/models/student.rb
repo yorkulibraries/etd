@@ -24,6 +24,7 @@ class Student < User
                                published_date id gem_record_event_id status].freeze
 
   has_many :theses, dependent: :destroy
+  has_many :thesis_invitations, dependent: :delete_all
 
   audited
   has_associated_audits
@@ -42,6 +43,12 @@ class Student < User
 
   def display_name
     name
+  end
+
+  def accept_active_invitations!(at: Time.current)
+    thesis_invitations.where(accepted_at: nil)
+                      .where('sent_at <= ? AND expires_at >= ?', at, at)
+                      .update_all(accepted_at: at, updated_at: at)
   end
 
   ### Finders

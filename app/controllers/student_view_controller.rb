@@ -30,6 +30,13 @@ class StudentViewController < ApplicationController
     @thesis = @student.theses.find(params[:id])
     @thesis.current_user = current_user
 
+    unless @thesis.invitation_accessible?
+      render template: 'student_view/invitation_expired', status: :forbidden
+      return
+    end
+
+    @thesis.accept_invitation!
+
     if (@thesis.status != Thesis::OPEN && @thesis.status != Thesis::RETURNED) && @which != Thesis::PROCESS_REVIEW
       @which = Thesis::PROCESS_STATUS
     end

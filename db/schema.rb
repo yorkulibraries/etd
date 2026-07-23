@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_07_17_225736) do
+ActiveRecord::Schema[7.0].define(version: 2026_07_21_150000) do
   create_table "action_text_rich_texts", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
@@ -207,6 +207,20 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_17_225736) do
     t.index ["student_id"], name: "index_theses_on_student_id"
   end
 
+  create_table "thesis_invitations", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "student_id", null: false
+    t.integer "gem_record_id"
+    t.integer "thesis_id"
+    t.datetime "sent_at", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "accepted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["gem_record_id"], name: "index_thesis_invitations_on_gem_record_id"
+    t.index ["student_id"], name: "index_thesis_invitations_on_student_id"
+    t.index ["thesis_id"], name: "index_thesis_invitations_on_thesis_id"
+  end
+
   create_table "thesis_subjectships", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.integer "thesis_id"
     t.integer "loc_subject_id"
@@ -235,4 +249,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_17_225736) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "thesis_invitations", "gem_records"
+  add_foreign_key "thesis_invitations", "theses"
+  add_foreign_key "thesis_invitations", "users", column: "student_id"
 end

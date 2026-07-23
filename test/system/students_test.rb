@@ -24,7 +24,7 @@ class StudentsTest < ApplicationSystemTestCase
 
     save_screenshot
     
-    assert_selector '#send_invitation_email', text: 'Send invitation email'
+    assert_selector '[id^="send_invitation_email_"]', text: 'Send invitation email'
 
     assert has_link?('Send invitation email')
     

@@ -35,9 +35,16 @@ class StudentsController < ApplicationController
 
   def send_invite
     @student = Student.find(params[:id])
+    invitation = if params[:gem_record_id]
+                   gem_record = GemRecord.where(sisid: @student.sisid).find(params[:gem_record_id])
+                   ThesisInvitation.issue!(student: @student, gem_record:)
+                 else
+                   thesis = @student.theses.find(params[:thesis_id])
+                   ThesisInvitation.issue!(student: @student, thesis:)
+                 end
 
-    StudentMailer.invitation_email(@student).deliver_later
-    @student.invitation_sent_at = Time.now.beginning_of_day
+    StudentMailer.invitation_email(invitation).deliver_later
+    @student.invitation_sent_at = invitation.sent_at.to_date
     @student.audit_comment = "Sent an invitation email to #{@student.email}"
     @student.save(validate: false)
 

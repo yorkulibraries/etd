@@ -16,7 +16,7 @@ class Ability
 
     when User::STAFF
       can :read, GemRecord
-      can %i[create update read update_status audit_trail block unblock assign unassign],
+      can %i[create update read update_status audit_trail block unblock assign unassign send_invite],
           [Student, Thesis, CommitteeMember]
       can :manage, Document
 
@@ -26,15 +26,17 @@ class Ability
       can :read, [:student, Student]
 
       can :manage, Document do |document|
-        document.thesis.status == Thesis::OPEN || document.thesis.status == Thesis::RETURNED
+        (document.thesis.status == Thesis::OPEN || document.thesis.status == Thesis::RETURNED) &&
+          document.thesis.invitation_accessible?
       end
 
       can [:edit, :update, :read, :submit_for_review, :organize_student_information, :accept_licences], Thesis do |thesis|
-        (thesis.status == Thesis::OPEN || thesis.status == Thesis::RETURNED) && thesis.student_id == user.id
+        (thesis.status == Thesis::OPEN || thesis.status == Thesis::RETURNED) && thesis.student_id == user.id &&
+          thesis.invitation_accessible?
       end
 
       can :show, Thesis do |thesis|
-        thesis.student_id == user.id
+        thesis.student_id == user.id && thesis.invitation_accessible?
       end
 
       can :show, :home
