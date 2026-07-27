@@ -16,14 +16,12 @@ FactoryGirl.define do
     supervisor_email 'supervisor@example.com'
 
     factory :submitted_embargo_request do
-      status :submitted
-      submitted_at { Time.current }
-
       after(:create) do |request|
         create(:document, thesis: request.thesis, user: request.thesis.student,
                           embargo_request_id: request.id, usage: :embargo_letter,
                           supplemental: true,
                           file: Rack::Test::UploadedFile.new('test/fixtures/files/pdf-document.pdf'))
+        request.submit_request || raise(ActiveRecord::RecordInvalid, request)
       end
     end
   end

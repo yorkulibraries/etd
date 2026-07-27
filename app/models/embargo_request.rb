@@ -30,7 +30,7 @@ class EmbargoRequest < ApplicationRecord
   validates :request_type, :status, presence: true
   validate :one_open_request_per_thesis, if: -> { draft? || submitted? }
 
-  with_options on: :submission do
+  with_options if: :submission_requirements_apply? do
     validates :reason, :rationale, :requested_duration_months, :contact_phone, :contact_email,
               :graduate_program_director_name, :graduate_program_director_email,
               :supervisor_name, :supervisor_email, presence: true
@@ -66,12 +66,49 @@ class EmbargoRequest < ApplicationRecord
 
   def submit_request
     return false unless draft?
-    return false unless valid?(:submission)
 
-    update(status: :submitted, submitted_at: Time.current)
+    previous_status = status
+    previous_submitted_at = submitted_at
+    self.status = :submitted
+    self.submitted_at = Time.current
+
+    return true if save
+
+    self.status = previous_status
+    self.submitted_at = previous_submitted_at
+    false
+  end
+
+  def save(*args, **options, &block)
+    return super unless thesis_lock_required?
+
+    with_thesis_lock { super(*args, **options, &block) }
+  end
+
+  def save!(*args, **options, &block)
+    return super unless thesis_lock_required?
+
+    with_thesis_lock { super(*args, **options, &block) }
   end
 
   private
+
+  def submission_requirements_apply?
+    submitted? || validation_context == :submission
+  end
+
+  def thesis_lock_required?
+    thesis.present? && thesis.persisted? && !@thesis_lock_held
+  end
+
+  def with_thesis_lock
+    thesis.with_lock do
+      @thesis_lock_held = true
+      yield
+    ensure
+      @thesis_lock_held = false
+    end
+  end
 
   def one_open_request_per_thesis
     open_statuses = [self.class.statuses[:draft], self.class.statuses[:submitted]]
