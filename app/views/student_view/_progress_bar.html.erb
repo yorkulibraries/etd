@@ -1,4 +1,4 @@
- <div class="row pb-3 px-2">
+ <div class="submission-progress d-flex flex-nowrap gap-2 pb-3 px-2" aria-label="Submission progress" role="navigation">
 	<div class="col border p-2 m-1 rounded step <%= activate == Thesis::PROCESS_BEGIN ? "bg-info-subtle border-info border-2" :"bg-light border-secondary border-1" %> <%= "disable" if block_thesis_changes?(@thesis) %>">
 	  <div class="row">
 	   <div class="col-lg-2 d-none d-lg-block">
@@ -50,6 +50,19 @@
 					<strong class="">distribution licences</strong>
 				</span>
 			</div>
+	   </div>
+	  </div>
+	</div>
+	<div class="col border p-2 m-1 rounded step <%= activate == Thesis::PROCESS_EMBARGO ? "bg-info-subtle border-info border-2" :"bg-light border-secondary border-1" %> <%= "disable" if block_thesis_changes?(@thesis) %>">
+	  <div class="row">
+	   <div class="col-lg-2 d-none d-lg-block">
+		<i class="position-relative top-50 translate-middle ms-3 fa-2x <%= activate == Thesis::PROCESS_EMBARGO ? "fa fa-hand-o-right" : "fa fa-circle-o" %>"></i>
+	   </div>
+	   <div class="col-lg-10 col-sm-12">
+		<span class="text-black ms-2" title="Embargo request">
+			Embargo<br/>
+			<strong class="ms-2">request</strong>
+		</span>
 	   </div>
 	  </div>
 	</div>

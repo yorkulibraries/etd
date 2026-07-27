@@ -1,0 +1,103 @@
+<% title "#{@student.name}" %>
+
+<% title_html do %>
+	<h1><span class="text-secondary"><%= @student.name %></span></h1>
+	<h2><span class="fw-lighter text-secondary lead"><%= @thesis.title %></span></h2>
+<% end %>
+
+<%= progress_bar(Thesis::PROCESS_EMBARGO) %>
+
+<div class="student-view fitted embargo-request">
+	<h2>Embargo Request</h2>
+	<p>Choose whether you are requesting an embargo for this thesis before continuing to the distribution licences.</p>
+
+	<div class="row thesis data-grid bg-light-subtle p-3 mb-4">
+		<div class="col-md-6"><h4>Student</h4><p><%= @student.name %></p></div>
+		<div class="col-md-6"><h4>Supervisor</h4><p><%= @thesis.supervisor %></p></div>
+		<div class="col-md-6"><h4>Thesis</h4><p><%= @thesis.title %></p></div>
+		<div class="col-md-6"><h4>Program</h4><p><%= @thesis.program %></p></div>
+	</div>
+
+	<% if @thesis.embargo_undecided? || @thesis.embargo_not_requested? || (@thesis.embargo_requested? && @embargo_request&.draft?) %>
+		<%= form_tag select_student_thesis_embargo_requests_path(@student, @thesis), method: :post, class: 'mb-4', aria: { describedby: 'embargo-selection-help' } do %>
+			<fieldset>
+				<legend>Do you need an embargo?</legend>
+				<p id="embargo-selection-help" class="form-text">A request opens a draft form. Choosing no continues to the distribution licences.</p>
+				<div class="form-check">
+					<%= radio_button_tag :embargo_selection, 'not_requested', @thesis.embargo_not_requested?, class: 'form-check-input', id: 'embargo_not_requested' %>
+					<%= label_tag 'embargo_not_requested', 'No, do not request an embargo', class: 'form-check-label' %>
+				</div>
+				<div class="form-check">
+					<%= radio_button_tag :embargo_selection, 'requested', @thesis.embargo_requested?, class: 'form-check-input', id: 'embargo_requested' %>
+					<%= label_tag 'embargo_requested', 'Yes, request an embargo', class: 'form-check-label' %>
+				</div>
+				<%= submit_tag 'Save embargo choice', class: 'btn btn-primary mt-3' %>
+			</fieldset>
+		<% end %>
+	<% end %>
+
+	<% if @thesis.embargo_requested? && @embargo_request&.draft? %>
+		<% if @embargo_request.errors.any? %>
+			<div class="alert alert-danger" role="alert" aria-labelledby="embargo-errors-title">
+				<h3 id="embargo-errors-title"><%= pluralize(@embargo_request.errors.count, 'error') %> prevented submission</h3>
+				<ul>
+					<% @embargo_request.errors.full_messages.each do |message| %>
+						<li><a href="#request-form"><%= message %></a></li>
+					<% end %>
+				</ul>
+			</div>
+		<% end %>
+
+		<div id="request-form">
+			<h3>Embargo request draft</h3>
+			<p class="alert alert-info" role="status">Save your draft and upload its documents before the separate submission action. Submission makes this request non-editable.</p>
+			<%= simple_form_for [@student, @thesis, @embargo_request], url: student_thesis_embargo_request_path(@student, @thesis, @embargo_request), method: :patch do |f| %>
+				<%= f.input :request_type, collection: [['New request', 'new_request'], ['Extension request', 'extension']] %>
+				<%= f.input :reason, collection: EmbargoRequest.reason_options %>
+				<%= f.input :requested_duration_months, collection: (1..36).map { |month| ["#{month} #{'month'.pluralize(month)}", month] } %>
+				<%= f.input :rationale, as: :text, input_html: { rows: 6 } %>
+				<%= f.input :contact_phone %>
+				<%= f.input :contact_email %>
+				<%= f.input :graduate_program_director_name %>
+				<%= f.input :graduate_program_director_email %>
+				<%= f.input :supervisor_name %>
+				<%= f.input :supervisor_email %>
+				<%= f.button :submit, 'Save draft', class: 'btn btn-secondary' %>
+			<% end %>
+		</div>
+
+		<div id="request-documents" class="bg-light-subtle p-3 mt-4">
+			<h3>Request documents</h3>
+			<p>A supervisor support letter is required. Supporting documents are optional.</p>
+			<% letters = @embargo_documents.select(&:embargo_letter?) %>
+			<% supporting_documents = @embargo_documents.reject(&:embargo_letter?) %>
+			<h4>Required supervisor support letter</h4>
+			<% letters.each { |document| concat(render(partial: 'documents/document', locals: { document: document })) } %>
+			<%= link_to 'Upload supervisor support letter', new_student_thesis_document_path(@student, @thesis, usage: 'embargo_letter', supplemental: true, embargo_request_id: @embargo_request.id), class: 'btn btn-primary', remote: true %>
+			<h4 class="mt-3">Optional supporting documents</h4>
+			<% supporting_documents.each { |document| concat(render(partial: 'documents/document', locals: { document: document })) } %>
+			<%= link_to 'Upload supporting document', new_student_thesis_document_path(@student, @thesis, usage: 'embargo', supplemental: true, embargo_request_id: @embargo_request.id), class: 'btn btn-primary', remote: true %>
+		</div>
+
+		<%= button_to 'Submit saved embargo request and continue', submit_student_thesis_embargo_request_path(@student, @thesis, @embargo_request), method: :post, class: 'btn btn-success mt-3', data: { confirm: 'Submit this embargo request? You will not be able to edit it afterward.' } %>
+	<% elsif @embargo_request.present? %>
+		<div class="alert alert-info" role="status">
+			<h3>Embargo request <%= @embargo_request.status %></h3>
+			<% if @embargo_request.expired? %>
+				<p>This approved embargo has expired.</p>
+			<% elsif @embargo_request.submitted? %>
+				<p>Your request has been submitted for staff review and can no longer be edited or cancelled.</p>
+			<% elsif @embargo_request.approved? %>
+				<p>Your request has been approved and can no longer be edited or cancelled.</p>
+			<% else %>
+				<p>Your request has been declined and can no longer be edited or cancelled.</p>
+			<% end %>
+		</div>
+	<% elsif @thesis.embargo_not_requested? %>
+		<div class="alert alert-success" role="status">No embargo request has been selected. You may continue to the distribution licences.</div>
+	<% end %>
+
+	<div class="process-nav d-flex justify-content-end">
+		<%= link_to 'Continue to distribution licences', student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW), class: 'btn btn-success' unless @thesis.embargo_undecided? || (@thesis.embargo_requested? && @embargo_request&.draft?) %>
+	</div>
+</div>

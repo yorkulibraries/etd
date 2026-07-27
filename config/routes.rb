@@ -58,6 +58,11 @@ Rails.application.routes.draw do
 
       resource :embargo, only: %i[new create], controller: 'theses/embargo'
 
+      resources :embargo_requests, only: %i[create update], controller: 'theses/embargo_requests' do
+        post :select, on: :collection
+        post :submit, on: :member
+      end
+
       resources :documents, path: 'files' do
         get 'deleted', on: :collection
         get 'download', on: :member

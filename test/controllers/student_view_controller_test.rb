@@ -52,12 +52,27 @@ class StudentViewControllerTest < ActionController::TestCase
       assert_template 'upload'
       get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_REVIEW }
       assert_response :success
-      assert_template 'upload'
-      assert_match(/Please upload a Primary Thesis File./, flash[:error])
+      assert_template 'embargo'
+      assert_equal 'Choose whether you are requesting an embargo before continuing.', flash[:alert]
+    end
+
+    should 'render the embargo step and gate later steps until selection is made' do
+      thesis = create(:thesis, student: @student, embargo_selection: :undecided)
+      create(:document, thesis_id: thesis.id, user_id: @student.id, supplemental: false,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+      get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_EMBARGO }
+      assert_response :success
+      assert_template 'embargo'
+
+      get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_REVIEW }
+      assert_response :success
+      assert_template 'embargo'
+      assert_equal 'Choose whether you are requesting an embargo before continuing.', flash[:alert]
     end
 
     should 'load thesis object and display or redirect to proper process step' do
-      thesis = create(:thesis, student: @student)
+      thesis = create(:thesis, student: @student, embargo_selection: :not_requested)
       create(:document, thesis_id: thesis.id, user_id: @student.id, supplemental: false,
                         file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 

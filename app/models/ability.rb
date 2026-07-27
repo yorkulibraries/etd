@@ -43,6 +43,18 @@ class Ability
         request.thesis.student_id == user.id && request.draft?
       end
 
+      can :read, EmbargoRequest do |request|
+        request.thesis.student_id == user.id
+      end
+
+      can :submit, EmbargoRequest do |request|
+        request.thesis.student_id == user.id && request.draft?
+      end
+
+      can :create, EmbargoRequest do |request|
+        request.thesis.student_id == user.id
+      end
+
       can [:edit, :update, :read, :submit_for_review, :organize_student_information, :accept_licences], Thesis do |thesis|
         (thesis.status == Thesis::OPEN || thesis.status == Thesis::RETURNED) && thesis.student_id == user.id
       end

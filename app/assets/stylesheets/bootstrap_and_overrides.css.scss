@@ -40,6 +40,17 @@ $yorku_brand: #e31837;
 	margin-top: 10px;
 }
 
+.submission-progress {
+	overflow-x: auto;
+	scroll-snap-type: x proximity;
+
+	.step {
+		flex: 1 0 9rem;
+		min-width: 9rem;
+		scroll-snap-align: start;
+	}
+}
+
 //////////////////////////////////////////
 // Custom styles can go here, if needed //
 //////////////////////////////////////////
