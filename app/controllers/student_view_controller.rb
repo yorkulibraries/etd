@@ -34,7 +34,8 @@ class StudentViewController < ApplicationController
       @which = Thesis::PROCESS_STATUS
     end
 
-    if [Thesis::PROCESS_REVIEW, Thesis::PROCESS_SUBMIT].include?(@which) && @thesis.embargo_undecided?
+    if [Thesis::OPEN, Thesis::RETURNED].include?(@thesis.status) &&
+       [Thesis::PROCESS_REVIEW, Thesis::PROCESS_SUBMIT].include?(@which) && @thesis.embargo_undecided?
       @which = Thesis::PROCESS_EMBARGO
       flash.now[:alert] = 'Choose whether you are requesting an embargo before continuing.'
     end

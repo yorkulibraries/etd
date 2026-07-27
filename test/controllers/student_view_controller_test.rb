@@ -71,6 +71,31 @@ class StudentViewControllerTest < ActionController::TestCase
       assert_equal 'Choose whether you are requesting an embargo before continuing.', flash[:alert]
     end
 
+    should 'preserve review access for a closed thesis with an undecided embargo selection' do
+      thesis = create(:thesis, student: @student, status: Thesis::UNDER_REVIEW, embargo_selection: :undecided)
+      create(:document, thesis_id: thesis.id, user_id: @student.id, supplemental: false,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+      get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_REVIEW }
+
+      assert_response :success
+      assert_template 'review'
+    end
+
+    should 'show no-request state before a retained draft and mark the active progress step' do
+      thesis = create(:thesis, student: @student, embargo_selection: :not_requested)
+      create(:embargo_request, thesis: thesis, status: :draft)
+
+      get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_EMBARGO }
+
+      assert_response :success
+      assert_includes response.body, 'No embargo request has been selected.'
+      refute_includes response.body, 'Embargo request draft</h3>'
+      assert_includes response.body, 'aria-current="step"'
+      assert_operator response.body.index('title="Upload Files"'), :<, response.body.index('title="Embargo request"')
+      assert_operator response.body.index('title="Embargo request"'), :<, response.body.index('title="Review licences"')
+    end
+
     should 'load thesis object and display or redirect to proper process step' do
       thesis = create(:thesis, student: @student, embargo_selection: :not_requested)
       create(:document, thesis_id: thesis.id, user_id: @student.id, supplemental: false,

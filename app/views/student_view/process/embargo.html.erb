@@ -41,8 +41,10 @@
 			<div class="alert alert-danger" role="alert" aria-labelledby="embargo-errors-title">
 				<h3 id="embargo-errors-title"><%= pluralize(@embargo_request.errors.count, 'error') %> prevented submission</h3>
 				<ul>
-					<% @embargo_request.errors.full_messages.each do |message| %>
-						<li><a href="#request-form"><%= message %></a></li>
+					<% error_targets = { base: 'request-documents' } %>
+					<% @embargo_request.errors.each do |error| %>
+						<% target = error_targets.fetch(error.attribute, "embargo_request_#{error.attribute}") %>
+						<li><a href="#<%= target %>"><%= error.full_message %></a></li>
 					<% end %>
 				</ul>
 			</div>
@@ -80,6 +82,8 @@
 		</div>
 
 		<%= button_to 'Submit saved embargo request and continue', submit_student_thesis_embargo_request_path(@student, @thesis, @embargo_request), method: :post, class: 'btn btn-success mt-3', data: { confirm: 'Submit this embargo request? You will not be able to edit it afterward.' } %>
+	<% elsif @thesis.embargo_not_requested? %>
+		<div class="alert alert-success" role="status">No embargo request has been selected. You may continue to the distribution licences.</div>
 	<% elsif @embargo_request.present? %>
 		<div class="alert alert-info" role="status">
 			<h3>Embargo request <%= @embargo_request.status %></h3>
@@ -93,8 +97,6 @@
 				<p>Your request has been declined and can no longer be edited or cancelled.</p>
 			<% end %>
 		</div>
-	<% elsif @thesis.embargo_not_requested? %>
-		<div class="alert alert-success" role="status">No embargo request has been selected. You may continue to the distribution licences.</div>
 	<% end %>
 
 	<div class="process-nav d-flex justify-content-end">

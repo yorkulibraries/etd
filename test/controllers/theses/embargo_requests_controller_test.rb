@@ -36,6 +36,13 @@ class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
     assert_equal 'Choose whether you are requesting an embargo.', flash[:alert]
   end
 
+  test 'missing selection leaves thesis undecided with the selection prompt' do
+    post :select, params: { student_id: @student.id, thesis_id: @thesis.id }
+
+    assert @thesis.reload.embargo_undecided?
+    assert_equal 'Choose whether you are requesting an embargo.', flash[:alert]
+  end
+
   test 'student cannot access another thesis request' do
     other = create(:embargo_request)
 
@@ -63,6 +70,28 @@ class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
     assert_equal 'A submitted embargo request cannot be cancelled.', flash[:alert]
   end
 
+  test 'student cannot cancel an approved request by selecting no' do
+    request = create(:embargo_request, thesis: @thesis, status: :approved)
+    @thesis.update!(embargo_selection: :requested)
+
+    post :select, params: selection_params('not_requested')
+
+    assert @thesis.reload.embargo_requested?
+    assert request.reload.approved?
+    assert_equal 'An embargo request with a decision cannot be cancelled.', flash[:alert]
+  end
+
+  test 'student cannot cancel a declined request by selecting no' do
+    request = create(:embargo_request, thesis: @thesis, status: :declined)
+    @thesis.update!(embargo_selection: :requested)
+
+    post :select, params: selection_params('not_requested')
+
+    assert @thesis.reload.embargo_requested?
+    assert request.reload.declined?
+    assert_equal 'An embargo request with a decision cannot be cancelled.', flash[:alert]
+  end
+
   test 'draft save persists draft fields without submitting' do
     request = requested_draft
 
@@ -82,6 +111,7 @@ class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
     assert_template 'student_view/process/embargo'
     assert request.reload.draft?
     assert_includes assigns(:request).errors.full_messages, 'Upload a supervisor support letter before submitting the request.'
+    assert_includes response.body, 'href="#request-documents"'
   end
 
   test 'submit transitions a saved valid draft to immutable submitted request' do
@@ -113,6 +143,18 @@ class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
       post :create, params: { student_id: @student.id, thesis_id: @thesis.id }
     end
     assert_equal 'An extension requires a previously approved embargo.', flash[:alert]
+  end
+
+  test 'student may create an extension draft for a closed thesis with an approval' do
+    @thesis.update!(status: Thesis::UNDER_REVIEW, embargo_selection: :requested)
+    create(:embargo_request, thesis: @thesis, status: :approved)
+
+    assert_difference 'EmbargoRequest.count', 1 do
+      post :create, params: { student_id: @student.id, thesis_id: @thesis.id }
+    end
+
+    assert @thesis.embargo_requests.order(:created_at).last.extension?
+    assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO, anchor: 'request-form')
   end
 
   test 'embargo request payload is filtered from logs' do

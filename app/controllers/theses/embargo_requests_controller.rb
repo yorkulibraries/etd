@@ -3,41 +3,47 @@
 module Theses
   class EmbargoRequestsController < ApplicationController
     before_action :load_student_and_thesis
-    before_action :load_request, only: %i[update submit]
 
     def select
       authorize! :update, @thesis
-      selection = params.require(:embargo_selection)
+      selection = params[:embargo_selection]
       unless %w[not_requested requested].include?(selection)
         return redirect_to embargo_step_path, alert: 'Choose whether you are requesting an embargo.'
       end
-      if selection == 'not_requested' && @thesis.embargo_requests.submitted.exists?
-        return redirect_to embargo_step_path, alert: 'A submitted embargo request cannot be cancelled.'
-      end
 
+      cancellation_alert = nil
       @thesis.with_lock do
+        authorize! :update, @thesis
+        cancellation_alert = cancellation_alert_for(selection)
+        next if cancellation_alert
+
         @thesis.update!(embargo_selection: selection)
         create_draft_request! if selection == 'requested'
       end
+
+      return redirect_to embargo_step_path, alert: cancellation_alert if cancellation_alert
 
       redirect_to selection == 'requested' ? embargo_step_path :
                     student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW)
     end
 
     def create
-      authorize! :update, @thesis
-      previous = @thesis.embargo_requests.approved.order(decided_at: :desc).first
+      authorize! :create, @thesis.embargo_requests.build
+      previous = nil
+      request = nil
+      saved = @thesis.with_lock do
+        previous = @thesis.embargo_requests.approved.order(decided_at: :desc).first
+        next false unless previous
+
+        request = @thesis.embargo_requests.build(extension_attributes_from(previous))
+        authorize! :create, request
+        request.save
+      end
       unless previous
         return redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS),
                            alert: 'An extension requires a previously approved embargo.'
       end
 
-      request = nil
-      saved = @thesis.with_lock do
-        request = @thesis.embargo_requests.build(extension_attributes_from(previous))
-        authorize! :create, request
-        request.save
-      end
       if saved
         redirect_to embargo_step_path(anchor: 'request-form')
       else
@@ -47,8 +53,12 @@ module Theses
     end
 
     def update
-      authorize! :update, @request
-      if @request.update(request_params)
+      saved = @thesis.with_lock do
+        @request = @thesis.embargo_requests.find(params[:id])
+        authorize! :update, @request
+        @request.update(request_params)
+      end
+      if saved
         redirect_to embargo_step_path(anchor: 'request-documents'), notice: 'Embargo request draft saved.'
       else
         render_embargo_step
@@ -56,8 +66,12 @@ module Theses
     end
 
     def submit
-      authorize! :submit, @request
-      if @request.submit_request
+      submitted = @thesis.with_lock do
+        @request = @thesis.embargo_requests.find(params[:id])
+        authorize! :submit, @request
+        @request.submit_request
+      end
+      if submitted
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW),
                     notice: 'Embargo request submitted for staff review.'
       else
@@ -72,10 +86,6 @@ module Theses
       @thesis = @student.theses.find(params[:thesis_id])
     end
 
-    def load_request
-      @request = @thesis.embargo_requests.find(params[:id])
-    end
-
     def request_params
       params.require(:embargo_request).permit(
         :request_type, :reason, :rationale, :requested_duration_months,
@@ -85,7 +95,7 @@ module Theses
     end
 
     def create_draft_request!
-      return if @thesis.embargo_requests.where(status: %i[draft submitted]).exists?
+      return if @thesis.embargo_requests.exists?
 
       request = @thesis.embargo_requests.build(
         request_type: :new_request,
@@ -94,6 +104,16 @@ module Theses
       )
       authorize! :create, request
       request.save!
+    end
+
+    def cancellation_alert_for(selection)
+      return unless selection == 'not_requested'
+
+      if @thesis.embargo_requests.submitted.exists?
+        'A submitted embargo request cannot be cancelled.'
+      elsif @thesis.embargo_requests.where.not(status: EmbargoRequest.statuses[:draft]).exists?
+        'An embargo request with a decision cannot be cancelled.'
+      end
     end
 
     def extension_attributes_from(previous)
