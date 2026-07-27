@@ -15,7 +15,7 @@ class Document < ApplicationRecord
   validate :validate_extension
   validate :validate_usage
   validate :embargo_request_matches_thesis
-  validate :one_supervisor_letter_per_request, on: :create
+  validate :one_supervisor_letter_per_request
 
   #### SCOPES
   scope :newest, -> { order('created_at desc') }
@@ -82,6 +82,18 @@ class Document < ApplicationRecord
     embargo_request_id.present?
   end
 
+  def save(*args, **options, &block)
+    return super unless embargo_letter_lock_required?
+
+    with_embargo_request_lock { super }
+  end
+
+  def save!(*args, **options, &block)
+    return super unless embargo_letter_lock_required?
+
+    with_embargo_request_lock { super }
+  end
+
   def primary?
     return !supplemental?
   end
@@ -129,9 +141,23 @@ class Document < ApplicationRecord
 
   def one_supervisor_letter_per_request
     return unless usage == 'embargo_letter' && embargo_request.present?
-    return unless embargo_request.documents.not_deleted.where(usage: :embargo_letter).exists?
+    return unless embargo_request.documents.not_deleted.where(usage: :embargo_letter).where.not(id: id).exists?
 
     errors.add(:usage, 'already has a supervisor support letter')
+  end
+
+  def embargo_letter_lock_required?
+    embargo_request_id.present? && usage == 'embargo_letter' && !@embargo_request_lock_held
+  end
+
+  def with_embargo_request_lock
+    self.class.transaction do
+      self.embargo_request = EmbargoRequest.lock.find(embargo_request_id)
+      @embargo_request_lock_held = true
+      yield
+    ensure
+      @embargo_request_lock_held = false
+    end
   end
 
   def document_type

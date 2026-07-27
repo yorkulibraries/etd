@@ -28,11 +28,13 @@ module ApplicationHelper
   end
 
   def block_document_changes?(document)
-    return true if block_thesis_changes?(document.thesis)
-    return false unless document.embargo_request_document?
-    return false unless current_user.role == User::STUDENT
+    if document.embargo_request_document?
+      return false unless current_user.role == User::STUDENT
 
-    !document.embargo_request.draft?
+      return !document.embargo_request.draft?
+    end
+
+    block_thesis_changes?(document.thesis)
   end
 
   def auditable_link(auditable)

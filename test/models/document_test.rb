@@ -38,6 +38,26 @@ class DocumentTest < ActiveSupport::TestCase
     assert duplicate.valid?, 'a soft-deleted letter must not block its replacement'
   end
 
+  should 'prevent a second request document from changing into an active supervisor letter' do
+    request = create(:embargo_request)
+    create(:embargo_request_document, embargo_request: request, usage: :embargo_letter)
+    supporting_document = create(:embargo_request_document, embargo_request: request, usage: :embargo)
+
+    supporting_document.usage = :embargo_letter
+
+    assert_not supporting_document.save
+    assert_includes supporting_document.errors[:usage], 'already has a supervisor support letter'
+  end
+
+  should 'allow an active supervisor letter to update itself' do
+    request = create(:embargo_request)
+    letter = create(:embargo_request_document, embargo_request: request, usage: :embargo_letter)
+
+    letter.file = fixture_file_upload('pdf-document.pdf')
+
+    assert letter.save
+  end
+
   should 'require a request document to belong to the same thesis' do
     request = create(:embargo_request)
     document = build(:document, thesis: create(:thesis), user: request.thesis.student,

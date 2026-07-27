@@ -223,6 +223,23 @@ class DocumentsControllerTest < ActionController::TestCase
       end
     end
 
+    should 'not cache an upload when a non-owner cannot create a document' do
+      public_files = Dir.glob(Rails.root.join('public', 'uploads', '**', '*')).select { |path| File.file?(path) }
+      private_files = Dir.glob(Rails.root.join('storage', '**', '*')).select { |path| File.file?(path) }
+      log_user_in(create(:student))
+
+      assert_no_difference 'Document.count' do
+        post :create, params: {
+          student_id: @student.id, thesis_id: @thesis.id,
+          document: { usage: 'embargo', supplemental: true, file: fixture_file_upload('pdf-document.pdf') }
+        }
+      end
+
+      assert_redirected_to unauthorized_url
+      assert_empty Dir.glob(Rails.root.join('public', 'uploads', '**', '*')).select { |path| File.file?(path) } - public_files
+      assert_empty Dir.glob(Rails.root.join('storage', '**', '*')).select { |path| File.file?(path) } - private_files
+    end
+
     should 'allow an owner to download submitted request evidence without exposing its public URL' do
       request = create(:embargo_request, thesis: @thesis)
       post :create, params: {
@@ -270,6 +287,7 @@ class DocumentsControllerTest < ActionController::TestCase
                                    embargo_request: request, usage: :embargo_letter,
                                    file: fixture_file_upload('pdf-document.pdf'))
       request.update!(status: :submitted, submitted_at: Time.current)
+      document.reload
       ability = Ability.new(@student)
 
       assert ability.cannot?(:manage, document)
@@ -278,6 +296,32 @@ class DocumentsControllerTest < ActionController::TestCase
       post :destroy, params: { student_id: @student.id, thesis_id: @thesis.id, id: document.id }
       assert_redirected_to unauthorized_url
       assert_not document.reload.deleted?
+    end
+
+    should 'render a request document with only the authorized download route' do
+      request = create(:embargo_request, thesis: @thesis)
+      document = create(:embargo_request_document, embargo_request: request)
+      @controller.instance_variable_set(:@student, @student)
+      @controller.instance_variable_set(:@thesis, @thesis)
+      @controller.instance_variable_set(:@current_user, @student)
+
+      rendered = @controller.view_context.render(partial: 'documents/document',
+                                                  locals: { document: document, view_only: true })
+
+      assert_includes rendered, download_student_thesis_document_path(@student, @thesis, document)
+      assert_not_includes rendered, document.file_url.to_s
+    end
+
+    should 'render a legacy document with its public file link' do
+      document = create(:document, thesis: @thesis, user: @student)
+      @controller.instance_variable_set(:@student, @student)
+      @controller.instance_variable_set(:@thesis, @thesis)
+      @controller.instance_variable_set(:@current_user, @student)
+
+      rendered = @controller.view_context.render(partial: 'documents/document',
+                                                  locals: { document: document, view_only: true })
+
+      assert_includes rendered, document.file_url.to_s
     end
   end
 

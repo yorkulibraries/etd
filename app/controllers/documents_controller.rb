@@ -37,8 +37,8 @@ class DocumentsController < ApplicationController
     @document.thesis = @thesis
     @document.user = @thesis.student
     @document.embargo_request = request_from_parent(document_params[:embargo_request_id])
-    @document.file = uploaded_file
     authorize! :manage, @document
+    @document.file = uploaded_file
 
     if @document.save
       @document.name = File.basename(@document.file.path)
