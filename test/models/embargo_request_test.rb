@@ -56,6 +56,36 @@ class EmbargoRequestTest < ActiveSupport::TestCase
     assert_not_nil request.submitted_at
   end
 
+  test 'save persists a request without reloading a dirty associated thesis' do
+    thesis = create(:thesis)
+    thesis.embargo_selection = :requested
+    request = build(:embargo_request, thesis: thesis)
+
+    assert request.save
+    assert thesis.changed?
+    assert_equal 'requested', thesis.embargo_selection
+  end
+
+  test 'save! persists a request without reloading a dirty associated thesis' do
+    thesis = create(:thesis)
+    thesis.embargo_selection = :requested
+    request = build(:embargo_request, thesis: thesis)
+
+    assert request.save!
+    assert thesis.changed?
+    assert_equal 'requested', thesis.embargo_selection
+  end
+
+  test 'save! keeps record invalid semantics with a dirty associated thesis' do
+    thesis = create(:thesis)
+    thesis.embargo_selection = :requested
+    request = build(:embargo_request, thesis: thesis, status: :submitted, rationale: nil)
+
+    assert_raises(ActiveRecord::RecordInvalid) { request.save! }
+    assert thesis.changed?
+    assert_equal 'requested', thesis.embargo_selection
+  end
+
   test 'extension requires a previous approved request' do
     request = create(:embargo_request, request_type: :extension)
 

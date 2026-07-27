@@ -98,12 +98,13 @@ class EmbargoRequest < ApplicationRecord
   end
 
   def thesis_lock_required?
-    thesis.present? && thesis.persisted? && !@thesis_lock_held
+    thesis_id.present? && !@thesis_lock_held
   end
 
   def with_thesis_lock
-    thesis.with_lock do
-      @thesis_lock_held = true
+    self.class.transaction do
+      locked_thesis = Thesis.lock.find_by(id: thesis_id)
+      @thesis_lock_held = locked_thesis.present?
       yield
     ensure
       @thesis_lock_held = false
