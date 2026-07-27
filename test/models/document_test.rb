@@ -21,6 +21,49 @@ class DocumentTest < ActiveSupport::TestCase
     end
   end
 
+  should 'allow one active supervisor letter for an embargo request' do
+    request = create(:embargo_request)
+    letter = create(:document, thesis: request.thesis, user: request.thesis.student,
+                               embargo_request: request, usage: :embargo_letter,
+                               file: fixture_file_upload('pdf-document.pdf'))
+    duplicate = build(:document, thesis: request.thesis, user: request.thesis.student,
+                                 embargo_request: request, usage: :embargo_letter,
+                                 file: fixture_file_upload('pdf-document.pdf'))
+
+    assert letter.embargo_request_document?
+    assert_not duplicate.valid?
+    assert_includes duplicate.errors[:usage], 'already has a supervisor support letter'
+
+    letter.destroy
+    assert duplicate.valid?, 'a soft-deleted letter must not block its replacement'
+  end
+
+  should 'require a request document to belong to the same thesis' do
+    request = create(:embargo_request)
+    document = build(:document, thesis: create(:thesis), user: request.thesis.student,
+                                embargo_request: request, usage: :embargo,
+                                file: fixture_file_upload('pdf-document.pdf'))
+
+    assert_not document.valid?
+    assert_includes document.errors[:embargo_request], 'must belong to the same thesis'
+  end
+
+  should 'keep legacy embargo documents valid and public without a request' do
+    document = create(:document, usage: :embargo, embargo_request: nil,
+                                 file: fixture_file_upload('pdf-document.pdf'))
+
+    assert_not document.embargo_request_document?
+    assert document.file.path.start_with?(Rails.root.join('public').to_s)
+  end
+
+  should 'store request documents outside the public directory' do
+    request = create(:embargo_request)
+    document = create(:embargo_request_document, embargo_request: request, usage: :embargo_letter)
+
+    assert document.file.path.start_with?(Rails.root.join('storage').to_s)
+    assert File.exist?(document.file.path)
+  end
+
   should 'not create an invalid document' do
     assert !build(:document, file: nil).valid?, 'File is required'
     assert !build(:document, user: nil).valid?, 'User/owner is required'

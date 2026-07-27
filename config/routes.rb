@@ -60,6 +60,7 @@ Rails.application.routes.draw do
 
       resources :documents, path: 'files' do
         get 'deleted', on: :collection
+        get 'download', on: :member
       end
 
       resources :committee_members, only: %i[new create destroy]

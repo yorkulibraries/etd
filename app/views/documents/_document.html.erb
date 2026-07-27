@@ -2,13 +2,13 @@
 	<div class="col-12 col-md-6 p-3">
 		<i class="fa fa-file fa-2x me-2 text-warning"></i>
 		<span class="name text-wrap text-break <%= "supplemental" if document.supplemental? %>">
-			<%= document.name ? document.name : File.basename(document.file_url) %>
+			<%= document.name ? document.name : (document.embargo_request_document? ? document.file.filename : File.basename(document.file_url)) %>
 		</span>
 		<span class="weak small">[<%=number_to_human_size document.file.file.size rescue nil %>]</span>
 	</div>
 
 	<div class="col-12 col-md-5 d-flex flex-column flex-md-row justify-content-md-end align-items-start align-items-md-center">
-		<% unless block_thesis_changes?(@thesis) %>
+		<% unless block_document_changes?(document) %>
 		    <% if (defined? view_only).nil? || !view_only %>
 				<%= link_to edit_student_thesis_document_path(@student, @thesis, document), class: "btn btn-info mx-2 my-2", title: "Replace", remote: true do %>
 					<i class="fa fa-edit"></i> Replace
@@ -19,8 +19,14 @@
 				<% end %>
 		    <% end %>
 		<% end %>
-		<%= link_to document.file_url, class: 'btn btn-secondary mx-2 my-2', title: "Download", target: :_blank do %>
-			<i class="fa fa-download"></i> Download
+		<% if document.embargo_request_document? %>
+			<%= link_to download_student_thesis_document_path(@student, @thesis, document), class: 'btn btn-secondary mx-2 my-2', title: "Download", target: :_blank, rel: 'noopener' do %>
+				<i class="fa fa-download"></i> Download
+			<% end %>
+		<% else %>
+			<%= link_to document.file_url, class: 'btn btn-secondary mx-2 my-2', title: "Download", target: :_blank do %>
+				<i class="fa fa-download"></i> Download
+			<% end %>
 		<% end %>
 	</div>
 </div>

@@ -110,6 +110,7 @@ class Thesis < ApplicationRecord
   PROCESS_UPDATE = 'update'
   PROCESS_UPLOAD = 'upload'
   PROCESS_REVIEW = 'review'
+  PROCESS_EMBARGO = 'embargo'
   PROCESS_SUBMIT = 'submit'
   PROCESS_STATUS = 'status'
 

@@ -7,12 +7,15 @@ class Document < ApplicationRecord
   ### RELATIONS
   belongs_to :thesis
   belongs_to :user
+  belongs_to :embargo_request, optional: true
 
   #### VALIDATIONS
   validates_presence_of :file, :user, :thesis
   validate :one_primary_file_per_thesis, on: :create
   validate :validate_extension
   validate :validate_usage
+  validate :embargo_request_matches_thesis
+  validate :one_supervisor_letter_per_request, on: :create
 
   #### SCOPES
   scope :newest, -> { order('created_at desc') }
@@ -75,6 +78,10 @@ class Document < ApplicationRecord
     name
   end
 
+  def embargo_request_document?
+    embargo_request_id.present?
+  end
+
   def primary?
     return !supplemental?
   end
@@ -112,6 +119,19 @@ class Document < ApplicationRecord
       return false
     end
     return true
+  end
+
+  def embargo_request_matches_thesis
+    return if embargo_request.blank? || embargo_request.thesis_id == thesis_id
+
+    errors.add(:embargo_request, 'must belong to the same thesis')
+  end
+
+  def one_supervisor_letter_per_request
+    return unless usage == 'embargo_letter' && embargo_request.present?
+    return unless embargo_request.documents.not_deleted.where(usage: :embargo_letter).exists?
+
+    errors.add(:usage, 'already has a supervisor support letter')
   end
 
   def document_type

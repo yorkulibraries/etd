@@ -11,9 +11,15 @@ html: {  multipart: true, class: "file-upload" } do |f| %>
   	<% if @document.usage == 'licence' %>
   		Upload Licence File
   	<% end %>
-  	<% if @document.usage == 'embargo' %>
+	<% if @document.usage == 'embargo' && !@document.embargo_request_document? %>
   	  Upload Embargo Documents
   	<% end %>
+  <% if @document.usage == 'embargo' && @document.embargo_request_document? %>
+    Upload Supporting Embargo Document
+  <% end %>
+  <% if @document.usage == 'embargo_letter' %>
+    Upload Supervisor Support Letter
+  <% end %>
   </h2>
 
 	<div id="supplementary-help-info" class="alert alert-secondary" role="alert">
@@ -31,7 +37,7 @@ html: {  multipart: true, class: "file-upload" } do |f| %>
   	<% end %>
 	</div>
 
-  <% if @document.name || @document.file_url %>
+  <% if @document.name || (!@document.embargo_request_document? && @document.file_url) %>
     <div class="alert alert-warning" role="alert">
       Replacing: <%= @document.name ? @document.name : File.basename(@document.file_url) %>
     </div>
@@ -43,12 +49,15 @@ html: {  multipart: true, class: "file-upload" } do |f| %>
 
 	<%= f.hidden_field :usage, value: @document.usage %>
 	<%= f.hidden_field :supplemental, value: @document.supplemental %>
+  <%= f.hidden_field :embargo_request_id, value: @document.embargo_request_id %>
 
   <%= f.button :submit, "Upload", class: "btn btn-primary file-upload", id: "file_upload_button" %>
 
   <% if (defined? modal).nil? || !modal %>
     <% if current_user.role == User::STUDENT && @document.usage == 'licence' %>
       <a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW) %>" class="btn btn-secondary">Cancel</a>
+    <% elsif current_user.role == User::STUDENT && @document.embargo_request_document? %>
+      <a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO, anchor: 'request-documents') %>" class="btn btn-secondary">Cancel</a>
     <% elsif current_user.role == User::STUDENT && @document.usage != 'licence' %>
       <a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD) %>" class="btn btn-secondary">Cancel</a>
     <% elsif current_user.role != User::STUDENT %>

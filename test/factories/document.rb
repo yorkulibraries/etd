@@ -39,4 +39,17 @@ FactoryGirl.define do
     association :user, factory: :user
   end
 
+  factory :embargo_request_document, parent: :document do
+    association :embargo_request
+    usage :embargo
+    supplemental true
+    file nil
+
+    after(:build) do |document|
+      document.thesis = document.embargo_request.thesis
+      document.user = document.thesis.student
+      document.file = Rack::Test::UploadedFile.new('test/fixtures/files/pdf-document.pdf')
+    end
+  end
+
 end

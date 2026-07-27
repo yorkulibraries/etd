@@ -19,6 +19,7 @@ class Ability
       can %i[create update read update_status audit_trail block unblock assign unassign],
           [Student, Thesis, CommitteeMember]
       can :manage, Document
+      can :update, EmbargoRequest
 
       can :login_as, :student
       can :show, :home
@@ -26,7 +27,20 @@ class Ability
       can :read, [:student, Student]
 
       can :manage, Document do |document|
-        document.thesis.status == Thesis::OPEN || document.thesis.status == Thesis::RETURNED
+        if document.embargo_request.present?
+          document.embargo_request.thesis.student_id == user.id && document.embargo_request.draft?
+        else
+          document.thesis.student_id == user.id &&
+            [Thesis::OPEN, Thesis::RETURNED].include?(document.thesis.status)
+        end
+      end
+
+      can :read, Document do |document|
+        document.embargo_request.present? && document.embargo_request.thesis.student_id == user.id
+      end
+
+      can :update, EmbargoRequest do |request|
+        request.thesis.student_id == user.id && request.draft?
       end
 
       can [:edit, :update, :read, :submit_for_review, :organize_student_information, :accept_licences], Thesis do |thesis|
