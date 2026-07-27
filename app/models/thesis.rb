@@ -31,6 +31,7 @@ class Thesis < ApplicationRecord
 
   belongs_to :student
   has_many :documents, dependent: :delete_all
+  has_many :embargo_requests, dependent: :destroy
   has_many :committee_members
 
   has_many :thesis_subjectships, dependent: :delete_all
@@ -60,6 +61,12 @@ class Thesis < ApplicationRecord
   STATUSES = [OPEN, UNDER_REVIEW, ACCEPTED, PUBLISHED, RETURNED].freeze
   STATUS_ACTIONS = { OPEN => 'Open', UNDER_REVIEW => 'Under Review', REJECTED => 'Reject', ACCEPTED => 'Accept',
                      PUBLISHED => 'Publish', RETURNED => 'Return' }.freeze
+
+  enum embargo_selection: {
+    undecided: 0,
+    not_requested: 1,
+    requested: 2
+  }, _prefix: :embargo
 
   DEGREENAME = [
     'EMBA', 'IMBA', 'LLM', 'MA', 'MASc', 'MBA', 'Mdes', 'MEd', 'MES', 'MFA', 'MFAc', 'MHRM', 'MPA', 'MPIA', 'MPPAL', 'MSc', 'MScN', 'MSW',
@@ -121,6 +128,18 @@ class Thesis < ApplicationRecord
   def abstract=(text)
     text = '' if text.nil?
     self[:abstract] = text.encode('UTF-8', invalid: :replace, undef: :replace)
+  end
+
+  def current_embargo_request
+    embargo_requests.where(status: %i[draft submitted]).order(created_at: :desc).first ||
+      embargo_requests.order(created_at: :desc).first
+  end
+
+  def embargo_step_complete?
+    return true if embargo_not_requested?
+
+    completed_statuses = EmbargoRequest.statuses.values_at('submitted', 'approved', 'declined')
+    embargo_requested? && embargo_requests.where(status: completed_statuses).exists?
   end
 
   def assign_degree_name_and_level

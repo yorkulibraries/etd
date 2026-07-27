@@ -14,6 +14,24 @@ class ThesisTest < ActiveSupport::TestCase
   should belong_to(:student)
   should have_many(:documents).dependent(:delete_all)
   # should have_many(:documents)
+
+  should have_many(:embargo_requests).dependent(:destroy)
+
+  should 'complete the embargo step when no request is needed' do
+    thesis = build(:thesis, embargo_selection: :not_requested)
+
+    assert thesis.embargo_not_requested?
+    assert thesis.embargo_step_complete?
+  end
+
+  should 'complete the embargo step when an approved request exists' do
+    thesis = create(:thesis, embargo_selection: :requested)
+    approved_request = create(:embargo_request, thesis: thesis, status: :approved)
+
+    assert thesis.embargo_requested?
+    assert thesis.embargo_step_complete?
+    assert_equal approved_request, thesis.current_embargo_request
+  end
   
   ## VALIDATIONS
   # Licences are required fields
