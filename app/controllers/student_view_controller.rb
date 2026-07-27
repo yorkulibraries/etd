@@ -30,7 +30,8 @@ class StudentViewController < ApplicationController
     @thesis = @student.theses.find(params[:id])
     @thesis.current_user = current_user
 
-    if (@thesis.status != Thesis::OPEN && @thesis.status != Thesis::RETURNED) && @which != Thesis::PROCESS_REVIEW
+    if (@thesis.status != Thesis::OPEN && @thesis.status != Thesis::RETURNED) && @which != Thesis::PROCESS_REVIEW &&
+       !closed_extension_draft_embargo_step?
       @which = Thesis::PROCESS_STATUS
     end
 
@@ -113,5 +114,12 @@ class StudentViewController < ApplicationController
 
   def load_student
     @student = Student.find(current_user.id)
+  end
+
+  def closed_extension_draft_embargo_step?
+    return false unless @which == Thesis::PROCESS_EMBARGO
+
+    request = @thesis.current_embargo_request
+    request&.draft? && request.extension?
   end
 end

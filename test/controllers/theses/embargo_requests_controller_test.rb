@@ -128,6 +128,18 @@ class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
     assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW)
   end
 
+  test 'draft cannot submit after the student selects no embargo' do
+    request = requested_draft
+
+    post :select, params: selection_params('not_requested')
+    post :submit, params: request_params_for(request)
+
+    assert @thesis.reload.embargo_not_requested?
+    assert request.reload.draft?
+    assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO)
+    assert_equal 'Select an embargo request before submitting it.', flash[:alert]
+  end
+
   test 'submitted request cannot be updated' do
     request = create(:submitted_embargo_request, thesis: @thesis)
     @thesis.update!(embargo_selection: :requested)

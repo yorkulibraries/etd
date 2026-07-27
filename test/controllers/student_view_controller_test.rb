@@ -82,6 +82,19 @@ class StudentViewControllerTest < ActionController::TestCase
       assert_template 'review'
     end
 
+    should 'render embargo for a closed thesis draft extension' do
+      thesis = create(:thesis, student: @student, status: Thesis::UNDER_REVIEW, embargo_selection: :requested)
+      create(:embargo_request, thesis: thesis, status: :approved)
+      extension = create(:embargo_request, thesis: thesis, request_type: :extension, status: :draft)
+
+      get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_EMBARGO }
+
+      assert_response :success
+      assert_template 'embargo'
+      assert_equal extension, assigns(:embargo_request)
+      assert_includes response.body, 'Embargo request draft'
+    end
+
     should 'show no-request state before a retained draft and mark the active progress step' do
       thesis = create(:thesis, student: @student, embargo_selection: :not_requested)
       create(:embargo_request, thesis: thesis, status: :draft)

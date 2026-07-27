@@ -66,11 +66,20 @@ module Theses
     end
 
     def submit
+      selection_alert = nil
       submitted = @thesis.with_lock do
         @request = @thesis.embargo_requests.find(params[:id])
+        unless @thesis.embargo_requested?
+          authorize! :read, @request
+          selection_alert = 'Select an embargo request before submitting it.'
+          next false
+        end
+
         authorize! :submit, @request
         @request.submit_request
       end
+      return redirect_to embargo_step_path, alert: selection_alert if selection_alert
+
       if submitted
         redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_REVIEW),
                     notice: 'Embargo request submitted for staff review.'
