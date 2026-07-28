@@ -93,6 +93,7 @@ module Theses
       authorize! :approve, @request
 
       if @request.approve(decided_by: current_user, approved_until: decision_params[:approved_until])
+        queue_decision_email(@request)
         redirect_to student_thesis_path(@student, @thesis), notice: 'Embargo request approved.'
       else
         redirect_to student_thesis_path(@student, @thesis), alert: @request.errors.full_messages.to_sentence
@@ -104,6 +105,7 @@ module Theses
       authorize! :decline, @request
 
       if @request.decline(decided_by: current_user, decision_notes: decision_params[:decision_notes])
+        queue_decision_email(@request)
         redirect_to student_thesis_path(@student, @thesis), notice: 'Embargo request declined.'
       else
         redirect_to student_thesis_path(@student, @thesis), alert: @request.errors.full_messages.to_sentence
@@ -123,6 +125,10 @@ module Theses
         :contact_phone, :contact_email, :graduate_program_director_name,
         :graduate_program_director_email, :supervisor_name, :supervisor_email
       )
+    end
+
+    def queue_decision_email(request)
+      StudentMailer.embargo_decision_email(request).deliver_later
     end
 
     def decision_params

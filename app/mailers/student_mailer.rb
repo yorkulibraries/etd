@@ -45,6 +45,17 @@ class StudentMailer < ApplicationMailer
     mail to: map_recipients(recipients), subject: @message_subject.strip if AppSettings.email_status_change_allow
   end
 
+  def embargo_decision_email(request)
+    @request = request
+    @thesis = request.thesis
+    @student = @thesis.student
+    @status_url = student_view_thesis_process_url(@thesis, Thesis::PROCESS_STATUS)
+    outcome = request.approved? ? 'approved' : 'declined'
+
+    mail to: request.contact_email,
+         subject: "Your ETD embargo request was #{outcome}"
+  end
+
   def map_recipients(recipients)
     filtered = []
     recipients.each do |r|

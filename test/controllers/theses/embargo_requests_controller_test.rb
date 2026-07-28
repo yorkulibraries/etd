@@ -4,6 +4,8 @@ require 'test_helper'
 
 class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
   tests Theses::EmbargoRequestsController
+  include ActiveJob::TestHelper
+  include ActionMailer::TestHelper
 
   setup do
     @student = create(:student)
@@ -187,6 +189,26 @@ class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'successful approval queues exactly one decision email' do
+    request = create(:submitted_embargo_request)
+    log_user_in(create(:user, role: User::STAFF))
+
+    assert_enqueued_email_with StudentMailer, :embargo_decision_email, args: [request] do
+      post :approve, params: decision_params_for(request, { approved_until: EmbargoRequest.toronto_today + 1.year })
+    end
+    assert_equal 1, enqueued_jobs.size
+  end
+
+  test 'successful decline queues exactly one decision email' do
+    request = create(:submitted_embargo_request)
+    log_user_in(create(:user, role: User::STAFF))
+
+    assert_enqueued_email_with StudentMailer, :embargo_decision_email, args: [request] do
+      post :decline, params: decision_params_for(request, { decision_notes: 'The stated basis does not meet the embargo criteria.' })
+    end
+    assert_equal 1, enqueued_jobs.size
+  end
+
   test 'student cannot access staff decision actions' do
     request = create(:submitted_embargo_request, thesis: @thesis)
 
@@ -194,6 +216,7 @@ class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
 
     assert_redirected_to unauthorized_url
     assert request.reload.submitted?
+    assert_empty enqueued_jobs
   end
 
   test 'staff decision actions scope request ids to their parent thesis' do
@@ -218,6 +241,7 @@ class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
     assert_nil request.decided_at
     assert_nil request.approved_until
     assert_equal 'Approved until must be within 36 months of the decision date', flash[:alert]
+    assert_empty enqueued_jobs
   end
 
   test 'blank decline notes preserve the submitted request' do
@@ -231,6 +255,7 @@ class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
     assert_nil request.decided_at
     assert_nil request.decision_notes
     assert_equal "Decision notes can't be blank", flash[:alert]
+    assert_empty enqueued_jobs
   end
 
   test 'a second decision leaves the first decision fields unchanged' do
@@ -250,6 +275,7 @@ class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
     assert_equal first_decided_at, request.decided_at
     assert_equal EmbargoRequest.toronto_today + 1.year, request.approved_until
     assert_nil request.decision_notes
+    assert_equal 1, enqueued_jobs.size
   end
 
   private
