@@ -8,6 +8,19 @@ class HomeController < ApplicationController
     if current_user.is_a? Student
       redirect_to student_view_index_url
     else
+      @pending_embargo_requests_count = EmbargoRequest.submitted.count
+      if params[:which] == 'embargo_requests'
+        @which = 'embargo_requests'
+        @embargo_status = %w[submitted approved declined].include?(params[:status]) ? params[:status] : 'submitted'
+        relation = EmbargoRequest.public_send(@embargo_status).includes(thesis: :student)
+        @embargo_requests = if @embargo_status == 'submitted'
+                              relation.order(submitted_at: :asc)
+                            else
+                              relation.order(decided_at: :desc)
+                            end
+        return render :index
+      end
+
       case params[:which]
       when 'mine'
         @theses = Thesis.assigned_to_user(current_user).order('updated_at desc')

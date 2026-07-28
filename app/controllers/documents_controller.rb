@@ -104,7 +104,7 @@ class DocumentsController < ApplicationController
     return if request_id.blank?
 
     request = @thesis.embargo_requests.find(request_id)
-    authorize! :update, request
+    authorize! :read, request
     request
   end
 

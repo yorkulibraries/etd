@@ -61,6 +61,30 @@ class ThesesControllerTest < ActionController::TestCase
       end
     end
 
+    should 'render authorized embargo request history with escaped text and decision forms only for submitted requests' do
+      thesis = create(:thesis, student: @student)
+      submitted = create(:submitted_embargo_request, thesis: thesis, rationale: '<script>submitted</script>')
+      declined = create(:embargo_request, thesis: thesis, status: :declined,
+                                          rationale: '<script>declined</script>',
+                                          decision_notes: '<script>decision</script>',
+                                          decided_by: @user, decided_at: Time.current)
+      document = submitted.documents.not_deleted.where(usage: :embargo_letter).first
+      document.update_column(:name, 'private-letter.pdf')
+
+      get :show, params: { id: thesis.id, student_id: @student.id }
+
+      assert_select '#embargo-requests'
+      assert_includes response.body, '&lt;script&gt;submitted&lt;/script&gt;'
+      assert_includes response.body, '&lt;script&gt;decision&lt;/script&gt;'
+      assert_not_includes response.body, '<script>decision</script>'
+      assert_includes response.body, download_student_thesis_document_path(@student, thesis, document)
+      assert_not_includes response.body, document.file_url
+      assert_select "form[action='#{approve_student_thesis_embargo_request_path(@student, thesis, submitted)}']", 1
+      assert_select "form[action='#{decline_student_thesis_embargo_request_path(@student, thesis, submitted)}']", 1
+      assert_select "#embargo-request-#{declined.id} form", 0
+      assert_includes response.body, 'Permanent administrative embargo'
+    end
+
     should 'load documents separately, as primary and non primary. All must be not_deleted' do
       thesis = create(:thesis, student: @student)
       create_list(:document, 1, supplemental: false, thesis:, user: @student,

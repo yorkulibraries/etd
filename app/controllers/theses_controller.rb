@@ -25,6 +25,7 @@ class ThesesController < ApplicationController
     @supplemental_documents = @thesis.documents.not_deleted.supplemental
     @licence_documents = @thesis.documents.not_deleted.licence
     @embargo_documents = @thesis.documents.not_deleted.embargo
+    @embargo_requests = @thesis.embargo_requests.includes(:decided_by, :documents).order(created_at: :desc)
     authorize! :edit, @thesis
   end
 

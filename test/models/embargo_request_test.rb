@@ -133,4 +133,78 @@ class EmbargoRequestTest < ActiveSupport::TestCase
       assert_equal Date.new(2026, 7, 27), EmbargoRequest.toronto_today
     end
   end
+
+  test 'approval uses the Toronto decision date and accepts only the allowed 36 month window' do
+    request = create(:submitted_embargo_request)
+    staff = create(:user, role: User::STAFF)
+
+    assert_not request.approve(decided_by: staff, approved_until: EmbargoRequest.toronto_today - 1.day)
+    assert request.submitted?
+    assert_not request.approve(decided_by: staff,
+                               approved_until: EmbargoRequest.toronto_today + 3.years + 1.day)
+    assert request.submitted?
+    assert request.approve(decided_by: staff,
+                           approved_until: EmbargoRequest.toronto_today + 3.years)
+    assert request.approved?
+  end
+
+  test 'approval requires an approver and a date' do
+    request = create(:submitted_embargo_request)
+
+    assert_not request.approve(decided_by: nil, approved_until: EmbargoRequest.toronto_today + 1.year)
+    assert_includes request.errors[:decided_by], "can't be blank"
+    assert_not request.approve(decided_by: create(:user), approved_until: nil)
+    assert_includes request.errors[:approved_until], "can't be blank"
+    assert request.submitted?
+  end
+
+  test 'decline requires decision notes' do
+    request = create(:submitted_embargo_request)
+
+    assert_not request.decline(decided_by: create(:user), decision_notes: '  ')
+    assert_includes request.errors[:decision_notes], "can't be blank"
+    assert request.submitted?
+  end
+
+  test 'an invalid decision can be retried on the same record instance' do
+    request = create(:submitted_embargo_request)
+    staff = create(:user)
+
+    assert_not request.approve(decided_by: staff, approved_until: EmbargoRequest.toronto_today + 3.years + 1.day)
+    assert_not request.changed?
+    assert request.approve(decided_by: staff, approved_until: EmbargoRequest.toronto_today + 1.year)
+    assert request.reload.approved?
+  end
+
+  test 'a second decision cannot overwrite the first' do
+    request = create(:submitted_embargo_request)
+    first = create(:user, role: User::STAFF)
+    second = create(:user, role: User::STAFF)
+
+    assert request.approve(decided_by: first, approved_until: EmbargoRequest.toronto_today + 1.year)
+    assert_not request.decline(decided_by: second, decision_notes: 'Late second decision')
+    assert_equal first, request.reload.decided_by
+    assert request.approved?
+  end
+
+  test 'a stale record cannot overwrite a concurrent first decision' do
+    first_request = create(:submitted_embargo_request)
+    stale_request = EmbargoRequest.find(first_request.id)
+    first = create(:user, role: User::STAFF)
+    second = create(:user, role: User::STAFF)
+
+    assert first_request.approve(decided_by: first, approved_until: EmbargoRequest.toronto_today + 1.year)
+    assert_not stale_request.decline(decided_by: second, decision_notes: 'Stale second decision')
+    assert_equal first, first_request.reload.decided_by
+    assert first_request.approved?
+  end
+
+  test 'an approved or declined request cannot be edited after its decision' do
+    request = create(:embargo_request, status: :approved, decided_by: create(:user),
+                                       decided_at: Time.current,
+                                       approved_until: EmbargoRequest.toronto_today + 1.year)
+
+    assert_not request.update(rationale: 'Changed after a decision')
+    assert_includes request.errors[:base], 'A decided embargo request cannot be changed.'
+  end
 end

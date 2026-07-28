@@ -29,6 +29,7 @@ class EmbargoRequest < ApplicationRecord
 
   validates :request_type, :status, presence: true
   validate :one_open_request_per_thesis, if: -> { draft? || submitted? }
+  validate :decided_request_is_immutable, on: :update
 
   with_options if: :submission_requirements_apply? do
     validates :reason, :rationale, :requested_duration_months, :contact_phone, :contact_email,
@@ -79,6 +80,14 @@ class EmbargoRequest < ApplicationRecord
     false
   end
 
+  def approve(decided_by:, approved_until:)
+    decide(:approved, decided_by:, approved_until:)
+  end
+
+  def decline(decided_by:, decision_notes:)
+    decide(:declined, decided_by:, decision_notes:)
+  end
+
   def save(*args, **options, &block)
     return super unless thesis_lock_required?
 
@@ -92,6 +101,55 @@ class EmbargoRequest < ApplicationRecord
   end
 
   private
+
+  def decide(outcome, decided_by:, approved_until: nil, decision_notes: nil)
+    success = false
+
+    with_lock do
+      errors.clear
+      unless submitted?
+        errors.add(:base, 'This request has already been decided.')
+        next
+      end
+
+      self.decided_by = decided_by
+      self.decided_at = Time.current
+      self.approved_until = approved_until
+      self.decision_notes = decision_notes
+
+      if decision_valid?(outcome)
+        self.status = outcome
+        success = save(validate: false)
+      else
+        restore_attributes(%w[decided_by_id decided_at approved_until decision_notes])
+      end
+    end
+
+    success
+  end
+
+  def decision_valid?(outcome)
+    errors.add(:decided_by, "can't be blank") if decided_by.blank?
+
+    if outcome == :approved
+      errors.add(:approved_until, "can't be blank") if approved_until.blank?
+      if approved_until.present? &&
+         !(self.class.toronto_today..(self.class.toronto_today + 3.years)).cover?(approved_until)
+        errors.add(:approved_until, 'must be within 36 months of the decision date')
+      end
+    elsif decision_notes.blank?
+      errors.add(:decision_notes, "can't be blank")
+    end
+
+    errors.empty?
+  end
+
+  def decided_request_is_immutable
+    return unless persisted? && (approved? || declined?)
+    return unless changed_attribute_names_to_save.any? { |attribute| attribute != 'updated_at' }
+
+    errors.add(:base, 'A decided embargo request cannot be changed.')
+  end
 
   def submission_requirements_apply?
     submitted? || validation_context == :submission

@@ -19,7 +19,7 @@ class Ability
       can %i[create update read update_status audit_trail block unblock assign unassign],
           [Student, Thesis, CommitteeMember]
       can :manage, Document
-      can :update, EmbargoRequest
+      can %i[read approve decline], EmbargoRequest
 
       can :login_as, :student
       can :show, :home

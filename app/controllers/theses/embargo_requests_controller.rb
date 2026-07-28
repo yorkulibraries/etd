@@ -88,6 +88,28 @@ module Theses
       end
     end
 
+    def approve
+      @request = @thesis.embargo_requests.find(params[:id])
+      authorize! :approve, @request
+
+      if @request.approve(decided_by: current_user, approved_until: decision_params[:approved_until])
+        redirect_to student_thesis_path(@student, @thesis), notice: 'Embargo request approved.'
+      else
+        redirect_to student_thesis_path(@student, @thesis), alert: @request.errors.full_messages.to_sentence
+      end
+    end
+
+    def decline
+      @request = @thesis.embargo_requests.find(params[:id])
+      authorize! :decline, @request
+
+      if @request.decline(decided_by: current_user, decision_notes: decision_params[:decision_notes])
+        redirect_to student_thesis_path(@student, @thesis), notice: 'Embargo request declined.'
+      else
+        redirect_to student_thesis_path(@student, @thesis), alert: @request.errors.full_messages.to_sentence
+      end
+    end
+
     private
 
     def load_student_and_thesis
@@ -101,6 +123,10 @@ module Theses
         :contact_phone, :contact_email, :graduate_program_director_name,
         :graduate_program_director_email, :supervisor_name, :supervisor_email
       )
+    end
+
+    def decision_params
+      params.require(:embargo_request).permit(:approved_until, :decision_notes)
     end
 
     def create_draft_request!

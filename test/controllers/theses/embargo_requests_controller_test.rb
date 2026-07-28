@@ -173,6 +173,85 @@ class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
     assert_includes Rails.application.config.filter_parameters, :embargo_request
   end
 
+  [User::STAFF, User::MANAGER, User::ADMIN].each do |role|
+    test "#{role} can approve a submitted request" do
+      staff = create(:user, role: role)
+      request = create(:submitted_embargo_request)
+      log_user_in(staff)
+
+      post :approve, params: decision_params_for(request, { approved_until: EmbargoRequest.toronto_today + 1.year })
+
+      assert request.reload.approved?
+      assert_equal staff, request.decided_by
+      assert_redirected_to student_thesis_path(request.thesis.student, request.thesis)
+    end
+  end
+
+  test 'student cannot access staff decision actions' do
+    request = create(:submitted_embargo_request, thesis: @thesis)
+
+    post :approve, params: decision_params_for(request, { approved_until: EmbargoRequest.toronto_today + 1.year })
+
+    assert_redirected_to unauthorized_url
+    assert request.reload.submitted?
+  end
+
+  test 'staff decision actions scope request ids to their parent thesis' do
+    request = create(:submitted_embargo_request)
+    log_user_in(create(:user, role: User::STAFF))
+
+    assert_raises ActiveRecord::RecordNotFound do
+      post :approve, params: decision_params_for(request, { approved_until: EmbargoRequest.toronto_today + 1.year },
+                                                           thesis: @thesis, student: @student)
+    end
+    assert request.reload.submitted?
+  end
+
+  test 'invalid approval preserves the submitted request' do
+    request = create(:submitted_embargo_request)
+    log_user_in(create(:user, role: User::STAFF))
+
+    post :approve, params: decision_params_for(request, { approved_until: EmbargoRequest.toronto_today + 3.years + 1.day })
+
+    assert request.reload.submitted?
+    assert_nil request.decided_by
+    assert_nil request.decided_at
+    assert_nil request.approved_until
+    assert_equal 'Approved until must be within 36 months of the decision date', flash[:alert]
+  end
+
+  test 'blank decline notes preserve the submitted request' do
+    request = create(:submitted_embargo_request)
+    log_user_in(create(:user, role: User::STAFF))
+
+    post :decline, params: decision_params_for(request, { decision_notes: ' ' })
+
+    assert request.reload.submitted?
+    assert_nil request.decided_by
+    assert_nil request.decided_at
+    assert_nil request.decision_notes
+    assert_equal "Decision notes can't be blank", flash[:alert]
+  end
+
+  test 'a second decision leaves the first decision fields unchanged' do
+    request = create(:submitted_embargo_request)
+    first = create(:user, role: User::STAFF)
+    second = create(:user, role: User::STAFF)
+    log_user_in(first)
+    post :approve, params: decision_params_for(request, { approved_until: EmbargoRequest.toronto_today + 1.year })
+    first_decided_at = request.reload.decided_at
+
+    log_user_in(second)
+    post :decline, params: decision_params_for(request, { decision_notes: 'Too late' })
+
+    request.reload
+    assert request.approved?
+    assert_equal first, request.decided_by
+    assert_equal first_decided_at, request.decided_at
+    assert_equal EmbargoRequest.toronto_today + 1.year, request.approved_until
+    assert_nil request.decision_notes
+  end
+
   private
 
   def selection_params(selection)
@@ -181,6 +260,10 @@ class Theses::EmbargoRequestsControllerTest < ActionController::TestCase
 
   def request_params_for(request, attributes = {})
     { student_id: @student.id, thesis_id: @thesis.id, id: request.id, embargo_request: attributes }
+  end
+
+  def decision_params_for(request, attributes, thesis: request.thesis, student: request.thesis.student)
+    { student_id: student.id, thesis_id: thesis.id, id: request.id, embargo_request: attributes }
   end
 
   def requested_draft

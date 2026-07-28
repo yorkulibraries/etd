@@ -103,6 +103,11 @@ $yorku_brand: #e31837;
 }
 
 /* Simple Form basic styles */
+
+.embargo-request-history .card-header,
+.embargo-request-queue th {
+  white-space: nowrap;
+}
 .simple_form {
 	padding: 0.875rem;
 }
