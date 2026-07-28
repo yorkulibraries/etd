@@ -63,9 +63,12 @@ class StudentViewController < ApplicationController
       @primary_documents = @thesis.documents.not_deleted.primary
       @supplemental_documents = @thesis.documents.not_deleted.supplemental
       @licence_documents = @thesis.documents.not_deleted.licence
-      @embargo_documents = @thesis.documents.not_deleted.embargo
+      @embargo_request = @thesis.current_embargo_request
+      @embargo_documents = @embargo_request&.documents&.not_deleted || Document.none
       render_according_to_validation('student_view/process/submit')
     when Thesis::PROCESS_STATUS
+      @embargo_request = @thesis.current_embargo_request
+      @embargo_has_open_request = @thesis.embargo_requests.where(status: %i[draft submitted]).exists?
       render_according_to_validation('student_view/process/status')
     else
       render template: 'student_view/process/status'

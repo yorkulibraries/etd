@@ -32,6 +32,28 @@ class ThesisTest < ActiveSupport::TestCase
     assert thesis.embargo_step_complete?
     assert_equal approved_request, thesis.current_embargo_request
   end
+
+  should 'require a completed embargo step before a student submits for review' do
+    student = create(:student)
+    thesis = build(:thesis, student: student, current_user: student, embargo_selection: :undecided,
+                            loc_subjects: create_list(:loc_subject, 1))
+
+    assert_not thesis.valid?(:submit_for_review)
+    assert_includes thesis.errors[:base], 'Complete the embargo step before submitting for review.'
+
+    thesis.embargo_selection = :not_requested
+    assert thesis.valid?(:submit_for_review)
+  end
+
+  should 'require a requested embargo to leave draft before a student submits for review' do
+    student = create(:student)
+    thesis = create(:thesis, student: student, embargo_selection: :requested, loc_subjects: create_list(:loc_subject, 1))
+    create(:embargo_request, thesis: thesis, status: :draft)
+    thesis.current_user = student
+
+    assert_not thesis.valid?(:submit_for_review)
+    assert_includes thesis.errors[:base], 'Complete the embargo step before submitting for review.'
+  end
   
   ## VALIDATIONS
   # Licences are required fields

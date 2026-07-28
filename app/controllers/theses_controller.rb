@@ -179,11 +179,11 @@ class ThesesController < ApplicationController
         end
       else
         error_messages = @thesis.errors.full_messages.join(', ')
-        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: "#{error_messages}."
+        redirect_for_submission_error(error_messages)
       end
     else
       error_messages = @thesis.errors.full_messages.join(', ')
-      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: "#{error_messages}."
+      redirect_for_submission_error(error_messages)
     end
   end
 
@@ -243,6 +243,15 @@ class ThesesController < ApplicationController
   end
 
   private
+
+  def redirect_for_submission_error(error_messages)
+    if @thesis.errors[:base].include?('Complete the embargo step before submitting for review.')
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO),
+                  alert: 'Complete the embargo step before submitting for review.'
+    else
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: "#{error_messages}."
+    end
+  end
 
   def student_params
     params.require(:student).permit(:name, :first_name, :middle_name, :last_name, :email_external)

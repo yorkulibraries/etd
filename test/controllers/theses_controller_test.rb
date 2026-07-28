@@ -423,6 +423,7 @@ class ThesesControllerTest < ActionController::TestCase
     end
 
     should 'submit for review, thesis status will change to under_review' do
+      @thesis.update!(embargo_selection: :not_requested)
       create(:document, supplemental: false, thesis: @thesis, user: @student,
                         file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
       post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
@@ -447,6 +448,7 @@ class ThesesControllerTest < ActionController::TestCase
     end
 
     should 'submit for review, thesis status will change to upload due to lack of document' do
+      @thesis.update!(embargo_selection: :not_requested)
       post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
       assigns(:thesis)
       assert_response :redirect
@@ -454,6 +456,7 @@ class ThesesControllerTest < ActionController::TestCase
     end
 
     should 'should not submit for review without certifying content correct' do
+      @thesis.update!(embargo_selection: :not_requested)
       @thesis.update(certify_content_correct: false)
 
       post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: false } }
@@ -463,6 +466,47 @@ class ThesesControllerTest < ActionController::TestCase
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
       assert_equal "Please check the ‘I certify that the content is correct’ button to proceed.", flash[:alert]
 
+    end
+
+    should 'redirect an undecided embargo selection to the embargo step without submitting' do
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO)
+      assert_equal 'Complete the embargo step before submitting for review.', flash[:alert]
+      assert_equal Thesis::OPEN, @thesis.reload.status
+    end
+
+    should 'redirect a requested embargo with only a draft to the embargo step without submitting' do
+      @thesis.update!(embargo_selection: :requested)
+      create(:embargo_request, thesis: @thesis, status: :draft)
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO)
+      assert_equal Thesis::OPEN, @thesis.reload.status
+    end
+
+    %i[submitted approved declined].each do |request_status|
+      should "submit for review after a #{request_status} embargo request" do
+        @thesis.update!(embargo_selection: :requested)
+        if request_status == :submitted
+          create(:submitted_embargo_request, thesis: @thesis)
+        else
+          create(:embargo_request, thesis: @thesis, status: request_status)
+        end
+        create(:document, supplemental: false, thesis: @thesis, user: @student,
+                          file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+        post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+
+        assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS)
+        assert_equal Thesis::UNDER_REVIEW, @thesis.reload.status
+      end
     end
 
     ## LICENCE UPLOAD CHECK
