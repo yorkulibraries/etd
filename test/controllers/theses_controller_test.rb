@@ -462,6 +462,19 @@ class ThesesControllerTest < ActionController::TestCase
       assert_equal Thesis::OPEN, @thesis.status
     end
 
+    should 'prioritize the embargo error over a missing primary file without persisting submitted fields' do
+      original_title = @thesis.title
+
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: true, title: 'Must not persist when embargo precedes primary file' } }
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO)
+      assert_equal 'Complete the embargo step before submitting for review.', flash[:alert]
+      assert_equal original_title, @thesis.reload.title
+      assert_equal Thesis::OPEN, @thesis.status
+    end
+
     should 'should not submit for review without certifying content correct' do
       @thesis.update!(embargo_selection: :not_requested)
       original_title = @thesis.title
@@ -479,6 +492,20 @@ class ThesesControllerTest < ActionController::TestCase
       assert_equal original_title, @thesis.reload.title
       assert_equal Thesis::OPEN, @thesis.status
 
+    end
+
+    should 'prioritize the certification error over a missing primary file without persisting submitted fields' do
+      @thesis.update!(embargo_selection: :not_requested)
+      original_title = @thesis.title
+
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: false, title: 'Must not persist when certification precedes primary file' } }
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
+      assert_equal "Please check the ‘I certify that the content is correct’ button to proceed.", flash[:alert]
+      assert_equal original_title, @thesis.reload.title
+      assert_equal Thesis::OPEN, @thesis.status
     end
 
     should 'redirect an undecided embargo selection to the embargo step without submitting' do

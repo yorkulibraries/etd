@@ -173,13 +173,13 @@ class ThesesController < ApplicationController
       @thesis.current_user = current_user
       @thesis.assign_attributes(thesis_params)
 
-      unless validate_active_thesis(@thesis.id)
-        primary_file_missing = true
+      unless @thesis.valid?(:submit_for_review)
+        error_messages = @thesis.errors.full_messages.join(', ')
         next
       end
 
-      unless @thesis.valid?(:submit_for_review)
-        error_messages = @thesis.errors.full_messages.join(', ')
+      unless validate_active_thesis(@thesis.id)
+        primary_file_missing = true
         next
       end
 
