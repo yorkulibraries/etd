@@ -207,4 +207,29 @@ class EmbargoRequestTest < ActiveSupport::TestCase
     assert_not request.update(rationale: 'Changed after a decision')
     assert_includes request.errors[:base], 'A decided embargo request cannot be changed.'
   end
+
+  %i[approved declined].each do |terminal_status|
+    %i[draft submitted].each do |open_status|
+      test "a #{terminal_status} request cannot be reopened as #{open_status}" do
+        decider = create(:user)
+        decided_at = Time.current
+        approved_until = EmbargoRequest.toronto_today + 1.year
+        decision_notes = 'Original decision notes'
+        request = create(:embargo_request, status: terminal_status, decided_by: decider,
+                                           decided_at: decided_at, approved_until: approved_until,
+                                           decision_notes: decision_notes)
+
+        assert_not request.update(status: open_status, decided_by: create(:user), decided_at: nil,
+                                  approved_until: nil, decision_notes: 'Overwritten decision notes')
+        assert_includes request.errors[:base], 'A decided embargo request cannot be changed.'
+
+        request.reload
+        assert_equal terminal_status.to_s, request.status
+        assert_equal decider, request.decided_by
+        assert_equal decided_at.to_i, request.decided_at.to_i
+        assert_equal approved_until, request.approved_until
+        assert_equal decision_notes, request.decision_notes
+      end
+    end
+  end
 end

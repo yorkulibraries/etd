@@ -8,8 +8,9 @@ class HomeController < ApplicationController
     if current_user.is_a? Student
       redirect_to student_view_index_url
     else
-      @pending_embargo_requests_count = EmbargoRequest.submitted.count
       if params[:which] == 'embargo_requests'
+        authorize! :view_embargo_request_queue, EmbargoRequest
+        @pending_embargo_requests_count = EmbargoRequest.submitted.count
         @which = 'embargo_requests'
         @embargo_status = %w[submitted approved declined].include?(params[:status]) ? params[:status] : 'submitted'
         relation = EmbargoRequest.public_send(@embargo_status).includes(thesis: :student)
@@ -20,6 +21,8 @@ class HomeController < ApplicationController
                             end
         return render :index
       end
+
+      @pending_embargo_requests_count = EmbargoRequest.submitted.count if can?(:view_embargo_request_queue, EmbargoRequest)
 
       case params[:which]
       when 'mine'

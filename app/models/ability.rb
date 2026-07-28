@@ -9,6 +9,7 @@ class Ability
     case user.role
     when User::ADMIN, User::MANAGER
       can :manage, :all
+      can :view_embargo_request_queue, EmbargoRequest
 
       can :login_as, :student
       can :show, :home
@@ -19,7 +20,7 @@ class Ability
       can %i[create update read update_status audit_trail block unblock assign unassign],
           [Student, Thesis, CommitteeMember]
       can :manage, Document
-      can %i[read approve decline], EmbargoRequest
+      can %i[read approve decline view_embargo_request_queue], EmbargoRequest
 
       can :login_as, :student
       can :show, :home

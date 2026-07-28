@@ -145,7 +145,7 @@ class EmbargoRequest < ApplicationRecord
   end
 
   def decided_request_is_immutable
-    return unless persisted? && (approved? || declined?)
+    return unless %w[approved declined].include?(status_in_database)
     return unless changed_attribute_names_to_save.any? { |attribute| attribute != 'updated_at' }
 
     errors.add(:base, 'A decided embargo request cannot be changed.')

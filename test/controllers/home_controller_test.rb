@@ -97,6 +97,30 @@ class HomeControllerTest < ActionController::TestCase
     end
   end
 
+  test 'a base user with the student role cannot view the embargo request queue' do
+    student_role_user = create(:user, role: User::STUDENT)
+    log_user_in(student_role_user)
+    create(:submitted_embargo_request)
+
+    get :index, params: { which: 'embargo_requests' }
+
+    assert_redirected_to unauthorized_url
+    assert_nil assigns(:embargo_requests)
+    assert_nil assigns(:pending_embargo_requests_count)
+  end
+
+  test 'a nonstaff user cannot view the embargo request queue' do
+    nonstaff = create(:user, role: 'reviewer')
+    log_user_in(nonstaff)
+    create(:submitted_embargo_request)
+
+    get :index, params: { which: 'embargo_requests' }
+
+    assert_redirected_to unauthorized_url
+    assert_nil assigns(:embargo_requests)
+    assert_nil assigns(:pending_embargo_requests_count)
+  end
+
   context 'as student' do
     setup do
       @student = create(:student)
