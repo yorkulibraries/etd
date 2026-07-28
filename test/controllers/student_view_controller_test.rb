@@ -251,6 +251,29 @@ class StudentViewControllerTest < ActionController::TestCase
       refute_includes response.body, 'Request an extension'
     end
 
+    should 'allow another extension after a later declined request when an approval remains in history' do
+      thesis = create(:thesis, student: @student, status: Thesis::UNDER_REVIEW, embargo_selection: :requested)
+      create(:embargo_request, thesis: thesis, status: :approved)
+      create(:embargo_request, thesis: thesis, request_type: :extension, status: :declined)
+      create_primary_document(thesis)
+
+      get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_STATUS }
+
+      assert_includes response.body, 'Declined'
+      assert_includes response.body, 'Request an extension'
+    end
+
+    should 'suppress an extension action when an approved thesis has a submitted request open' do
+      thesis = create(:thesis, student: @student, status: Thesis::UNDER_REVIEW, embargo_selection: :requested)
+      create(:embargo_request, thesis: thesis, status: :approved)
+      create(:submitted_embargo_request, thesis: thesis)
+      create_primary_document(thesis)
+
+      get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_STATUS }
+
+      refute_includes response.body, 'Request an extension'
+    end
+
     should 'not load a thesis belonging to another student' do
       thesis = create(:thesis)
 

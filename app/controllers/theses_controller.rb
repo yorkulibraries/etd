@@ -164,25 +164,40 @@ class ThesesController < ApplicationController
 
   def submit_for_review
     @thesis = @student.theses.find(params[:id])
-    @thesis.current_user = current_user
+    submitted = false
+    primary_file_missing = false
+    error_messages = nil
 
-    # Temporarily assign the attributes for validation
-    @thesis.assign_attributes(thesis_params)
+    @thesis.with_lock do
+      @thesis = @thesis.reload
+      @thesis.current_user = current_user
+      @thesis.assign_attributes(thesis_params)
 
-    if @thesis.valid?(:submit_for_review)
-      if @thesis.update(thesis_params)
-        if validate_active_thesis(@thesis.id)
-          @thesis.update(audit_comment: 'Submitting for review.', student_accepted_terms_at: Date.today, under_review_at: Date.today, status: Thesis::UNDER_REVIEW)
-          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS)
-        else
-          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), alert: 'Please upload a Primary Thesis File.'
-        end
-      else
-        error_messages = @thesis.errors.full_messages.join(', ')
-        redirect_for_submission_error(error_messages)
+      unless validate_active_thesis(@thesis.id)
+        primary_file_missing = true
+        next
       end
+
+      unless @thesis.valid?(:submit_for_review)
+        error_messages = @thesis.errors.full_messages.join(', ')
+        next
+      end
+
+      @thesis.assign_attributes(
+        audit_comment: 'Submitting for review.',
+        student_accepted_terms_at: Date.today,
+        under_review_at: Date.today,
+        status: Thesis::UNDER_REVIEW
+      )
+      submitted = @thesis.save
+      error_messages = @thesis.errors.full_messages.join(', ') unless submitted
+    end
+
+    if submitted
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS)
+    elsif primary_file_missing
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), alert: 'Please upload a Primary Thesis File.'
     else
-      error_messages = @thesis.errors.full_messages.join(', ')
       redirect_for_submission_error(error_messages)
     end
   end

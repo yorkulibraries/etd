@@ -426,13 +426,16 @@ class ThesesControllerTest < ActionController::TestCase
       @thesis.update!(embargo_selection: :not_requested)
       create(:document, supplemental: false, thesis: @thesis, user: @student,
                         file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
-      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: true, title: 'Accepted atomically' } }
 
       thesis = assigns(:thesis)
       assert_response :redirect
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS),
                            'Should redirect to student thesis process Status page'
       assert_equal Thesis::UNDER_REVIEW, thesis.status, 'Status should change'
+      assert_equal 'Accepted atomically', thesis.title
 
       assert !thesis.student_accepted_terms_at.nil?, 'Ensure terms accepted date was assigned'
       assert_equal thesis.student_accepted_terms_at.beginning_of_day, Date.today.beginning_of_day,
@@ -449,46 +452,92 @@ class ThesesControllerTest < ActionController::TestCase
 
     should 'submit for review, thesis status will change to upload due to lack of document' do
       @thesis.update!(embargo_selection: :not_requested)
-      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
-      assigns(:thesis)
+      original_title = @thesis.title
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: true, title: 'Must not persist without a primary file' } }
       assert_response :redirect
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
+      assert_equal original_title, @thesis.reload.title
+      assert_equal Thesis::OPEN, @thesis.status
     end
 
     should 'should not submit for review without certifying content correct' do
       @thesis.update!(embargo_selection: :not_requested)
-      @thesis.update(certify_content_correct: false)
+      original_title = @thesis.title
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 
-      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: false } }
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: false, title: 'Must not persist without certification' } }
 
       assigns(:thesis)
       assert_response :redirect
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
       assert_equal "Please check the ‘I certify that the content is correct’ button to proceed.", flash[:alert]
+      assert_equal original_title, @thesis.reload.title
+      assert_equal Thesis::OPEN, @thesis.status
 
     end
 
     should 'redirect an undecided embargo selection to the embargo step without submitting' do
+      original_title = @thesis.title
       create(:document, supplemental: false, thesis: @thesis, user: @student,
                         file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 
-      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: true, title: 'Must not persist with an undecided embargo' } }
 
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO)
       assert_equal 'Complete the embargo step before submitting for review.', flash[:alert]
       assert_equal Thesis::OPEN, @thesis.reload.status
+      assert_equal original_title, @thesis.title
     end
 
     should 'redirect a requested embargo with only a draft to the embargo step without submitting' do
       @thesis.update!(embargo_selection: :requested)
+      original_title = @thesis.title
       create(:embargo_request, thesis: @thesis, status: :draft)
       create(:document, supplemental: false, thesis: @thesis, user: @student,
                         file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 
-      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: true, title: 'Must not persist with a draft embargo' } }
 
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO)
       assert_equal Thesis::OPEN, @thesis.reload.status
+      assert_equal original_title, @thesis.title
+    end
+
+    should 'reload the thesis inside its lock before atomically submitting for review' do
+      @thesis.update!(embargo_selection: :not_requested)
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+      Thesis.any_instance.expects(:with_lock).once.yields
+      Thesis.any_instance.expects(:reload).once.returns(@thesis)
+
+      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS)
+    end
+
+    should 'not persist submitted thesis attributes when the final save fails' do
+      @thesis.update!(embargo_selection: :not_requested)
+      original_title = @thesis.title
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+      Thesis.any_instance.stubs(:save).returns(false)
+
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: true, title: 'Must not persist after a save failure' } }
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
+      assert_equal original_title, @thesis.reload.title
+      assert_equal Thesis::OPEN, @thesis.status
     end
 
     %i[submitted approved declined].each do |request_status|
