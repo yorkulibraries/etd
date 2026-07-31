@@ -33,6 +33,7 @@ module Etd
     #
     config.time_zone = 'Central Time (US & Canada)'
     config.active_record.yaml_column_permitted_classes = [Date, ActiveSupport::TimeWithZone, Time,
-                                                          ActiveSupport::TimeZone]
+                                                          ActiveSupport::TimeZone,
+                                                          ActiveSupport::HashWithIndifferentAccess]
   end
 end
