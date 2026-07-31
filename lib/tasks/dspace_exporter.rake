@@ -41,8 +41,9 @@ namespace :dspace do
     # three things to do
 
     # THESIS_ANY bypasses status for diagnostics, but never publication eligibility.
-    theses = DspaceExporter.theses_for(thesis_id: ENV['THESIS'], thesis_any_id: ENV['THESIS_ANY'],
-                                        publish_date: publish_date)
+    selector = DspaceExporter.theses_for(thesis_id: ENV['THESIS'], thesis_any_id: ENV['THESIS_ANY'],
+                                         publish_date: publish_date)
+    theses = selector
 
     log "FOUND: #{theses.size} theses"
 
@@ -56,7 +57,7 @@ namespace :dspace do
         entry = thesis_to_atom_entry(thesis)
         files = extract_thesis_filepaths(thesis)
 
-        unless Thesis.publication_eligible.where(id: thesis.id).exists?
+        unless selector.where(id: thesis.id).exists?
           log "Skipping Thesis ID #{thesis.id}: no longer publication eligible."
           next
         end

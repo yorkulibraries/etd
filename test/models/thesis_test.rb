@@ -331,6 +331,16 @@ class ThesisTest < ActiveSupport::TestCase
     assert_equal Thesis::ACCEPTED, t.status, 'Thesis should not have its status changed'
   end
 
+  should 'treat a nil permanent embargo as publication blocked everywhere' do
+    thesis = create(:thesis, status: Thesis::ACCEPTED, embargoed: nil, published_date: 1.day.ago)
+
+    assert_not_includes Thesis.publication_eligible, thesis
+    assert thesis.publication_blocked?
+    assert_equal 'permanent_administrative_embargo', thesis.publication_block_reason
+    assert_not thesis.publish
+    assert_equal Thesis::ACCEPTED, thesis.reload.status
+  end
+
   should 'block pending requests from readiness and manual publication' do
     thesis = create(:thesis, status: Thesis::ACCEPTED, published_date: 1.day.ago)
     create(:submitted_embargo_request, thesis: thesis)
@@ -388,11 +398,44 @@ class ThesisTest < ActiveSupport::TestCase
 
   should 'not enqueue publication email when the publish save fails' do
     thesis = create(:thesis, status: Thesis::ACCEPTED)
-    thesis.stubs(:save).returns(false)
+    Thesis.any_instance.stubs(:save).returns(false)
 
     assert_not thesis.publish
     assert_empty enqueued_jobs
     assert_equal Thesis::ACCEPTED, thesis.reload.status
+  end
+
+  should 'leave a dirty receiver unchanged when publication is blocked' do
+    thesis = create(:thesis, status: Thesis::ACCEPTED, title: 'Persisted title')
+    create(:submitted_embargo_request, thesis: thesis)
+    thesis.title = 'Unsaved title'
+
+    assert_not thesis.publish
+    assert_equal 'Unsaved title', thesis.title
+    assert_equal Thesis::ACCEPTED, thesis.status
+    assert_equal 'Persisted title', thesis.reload.title
+  end
+
+  should 'reload a dirty receiver to the published database state after a successful publication' do
+    thesis = create(:thesis, status: Thesis::ACCEPTED, title: 'Persisted title')
+    thesis.title = 'Unsaved title'
+
+    assert thesis.publish
+    assert_equal Thesis::PUBLISHED, thesis.status
+    assert_equal 'Persisted title', thesis.title
+    assert_equal Thesis::PUBLISHED, Thesis.find(thesis.id).status
+  end
+
+  should 'leave a dirty receiver unchanged when the locked publication save fails' do
+    thesis = create(:thesis, status: Thesis::ACCEPTED, title: 'Persisted title')
+    thesis.title = 'Unsaved title'
+    Thesis.any_instance.stubs(:save).returns(false)
+
+    assert_not thesis.publish
+    assert_equal 'Unsaved title', thesis.title
+    assert_equal Thesis::ACCEPTED, thesis.status
+    assert_equal Thesis::ACCEPTED, Thesis.find(thesis.id).status
+    assert_empty enqueued_jobs
   end
 
   should 'not show up in accepted if embargoed' do

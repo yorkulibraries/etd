@@ -131,25 +131,10 @@ class ThesesController < ApplicationController
     @thesis = @student.theses.find(params[:id])
 
     if params[:status] && Thesis::STATUSES.include?(params[:status])
-      @thesis.audit_comment = "Updating status from #{@thesis.status} to #{params[:status]}."
-      old_status = @thesis.status
-      @thesis.update_attribute(:status, params[:status])
-      @message = "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}."
-      @thesis.update_attribute(:under_review_at, Date.today) if params[:status] == Thesis::UNDER_REVIEW
-      @thesis.update_attribute(:accepted_at, Date.today) if params[:status] == Thesis::ACCEPTED
-      if params[:status] == Thesis::RETURNED
-        @thesis.update(returned_at: Date.today,
-                       returned_message: params[:custom_message])
-      end
-      @thesis.update_attribute(:published_at, Date.today) if params[:status] == Thesis::PUBLISHED
-
-      if params[:notify_student].blank? == false
-        additional_recipients = params[:notify_current_user] ? [current_user.email] : []
-        custom_message ||= params[:custom_message]
-        StudentMailer.status_change_email(@student, @thesis, old_status, @thesis.status, additional_recipients,
-                                          custom_message).deliver_later
-        additional_recipients << @student.email
-        @email_sent = "Sent to #{additional_recipients.join(', ')}."
+      if params[:status] == Thesis::PUBLISHED
+        update_published_status
+      else
+        update_nonpublished_status
       end
 
     else
@@ -259,6 +244,42 @@ class ThesesController < ApplicationController
   end
 
   private
+
+  def update_published_status
+    notify_student = params[:notify_student].present?
+    additional_recipients = params[:notify_current_user] ? [current_user.email] : []
+
+    if @thesis.publish(notify: notify_student, additional_recipients: additional_recipients,
+                       custom_message: params[:custom_message])
+      @message = "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}."
+      if notify_student
+        @email_sent = "Sent to #{(additional_recipients + [@student.email]).join(', ')}."
+      end
+    else
+      @message = 'Status was not updated.'
+    end
+  end
+
+  def update_nonpublished_status
+    @thesis.audit_comment = "Updating status from #{@thesis.status} to #{params[:status]}."
+    old_status = @thesis.status
+    @thesis.update_attribute(:status, params[:status])
+    @message = "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}."
+    @thesis.update_attribute(:under_review_at, Date.today) if params[:status] == Thesis::UNDER_REVIEW
+    @thesis.update_attribute(:accepted_at, Date.today) if params[:status] == Thesis::ACCEPTED
+    if params[:status] == Thesis::RETURNED
+      @thesis.update(returned_at: Date.today,
+                     returned_message: params[:custom_message])
+    end
+
+    return if params[:notify_student].blank?
+
+    additional_recipients = params[:notify_current_user] ? [current_user.email] : []
+    StudentMailer.status_change_email(@student, @thesis, old_status, @thesis.status, additional_recipients,
+                                      params[:custom_message]).deliver_later
+    additional_recipients << @student.email
+    @email_sent = "Sent to #{additional_recipients.join(', ')}."
+  end
 
   def redirect_for_submission_error(error_messages)
     if @thesis.errors[:base].include?('Complete the embargo step before submitting for review.')

@@ -216,33 +216,47 @@ class Thesis < ApplicationRecord
   end
 
   def publication_blocked?(on: EmbargoRequest.toronto_today)
-    embargoed? || embargo_requests.publication_blocking(on: on).exists?
+    embargoed != false || embargo_requests.publication_blocking(on: on).exists?
   end
 
   def publication_block_reason(on: EmbargoRequest.toronto_today)
-    return 'permanent_administrative_embargo' if embargoed?
+    return 'permanent_administrative_embargo' if embargoed != false
     return 'pending_embargo_request' if embargo_requests.submitted.exists?
     return 'approved_embargo_request' if embargo_requests.approved.where('approved_until >= ?', on).exists?
 
     nil
   end
 
-  def publish
-    old_status = nil
-    published = false
+  def publish(notify: true, additional_recipients: [], custom_message: nil)
+    publication = nil
 
-    with_lock do
-      next if publication_blocked?
+    self.class.transaction do
+      locked_thesis = self.class.lock.find_by(id: id)
+      next if locked_thesis.nil? || locked_thesis.publication_blocked?
 
-      old_status = status
-      self.status = PUBLISHED
-      self.audit_comment = 'Publishing this thesis. Status changed to published'
-      self.published_at = published_date
-      published = save(validate: false)
+      old_status = locked_thesis.status
+      locked_thesis.assign_attributes(
+        status: PUBLISHED,
+        audit_comment: 'Publishing this thesis. Status changed to published',
+        published_at: locked_thesis.published_date
+      )
+      next unless locked_thesis.save(validate: false)
+
+      publication = { student: locked_thesis.student, old_status: old_status, new_status: locked_thesis.status }
     end
 
-    StudentMailer.status_change_email(student, self, old_status, status).deliver_later if published
-    published
+    return false if publication.nil?
+
+    reload
+    if notify
+      mailer_arguments = [publication[:student], self, publication[:old_status], publication[:new_status]]
+      if additional_recipients.present? || custom_message.present?
+        mailer_arguments << additional_recipients.dup
+        mailer_arguments << custom_message
+      end
+      StudentMailer.status_change_email(*mailer_arguments).deliver_later
+    end
+    true
   end
 
   def self.assigned_to_user(user)

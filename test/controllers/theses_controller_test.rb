@@ -3,6 +3,9 @@
 require 'test_helper'
 
 class ThesesControllerTest < ActionController::TestCase
+  include ActiveJob::TestHelper
+  include ActionMailer::TestHelper
+
   should 'not be visible unless logged in' do
     get :index, params: { student_id: 123 }
     assert_redirected_to login_path
@@ -302,7 +305,56 @@ class ThesesControllerTest < ActionController::TestCase
 
       post :update_status, params: { id: thesis.id, student_id: @student.id, status: Thesis::PUBLISHED }
       thesis = assigns(:thesis)
-      assert_equal thesis.published_at, Date.today
+      assert_equal thesis.published_at, thesis.published_date
+    end
+
+    should 'block a permanent administrative embargo from direct published status posts' do
+      thesis = create(:thesis, status: Thesis::ACCEPTED, student: @student, embargoed: true)
+
+      post :update_status,
+           params: { id: thesis.id, student_id: @student.id, status: Thesis::PUBLISHED, notify_student: true }
+
+      assert_equal Thesis::ACCEPTED, thesis.reload.status
+      assert_empty enqueued_jobs
+    end
+
+    should 'block a pending embargo request from direct published status posts' do
+      thesis = create(:thesis, status: Thesis::ACCEPTED, student: @student)
+      create(:submitted_embargo_request, thesis: thesis)
+
+      post :update_status,
+           params: { id: thesis.id, student_id: @student.id, status: Thesis::PUBLISHED, notify_student: true }
+
+      assert_equal Thesis::ACCEPTED, thesis.reload.status
+      assert_empty enqueued_jobs
+    end
+
+    should 'block an active approved embargo request from direct published status posts' do
+      thesis = create(:thesis, status: Thesis::ACCEPTED, student: @student)
+      create(:embargo_request, thesis: thesis, status: :approved,
+                               approved_until: EmbargoRequest.toronto_today,
+                               decided_at: Time.current, decided_by: create(:user))
+
+      post :update_status,
+           params: { id: thesis.id, student_id: @student.id, status: Thesis::PUBLISHED, notify_student: true }
+
+      assert_equal Thesis::ACCEPTED, thesis.reload.status
+      assert_empty enqueued_jobs
+    end
+
+    should 'publish an eligible thesis once through the direct status route' do
+      thesis = create(:thesis, status: Thesis::ACCEPTED, student: @student)
+
+      assert_difference -> { thesis.audits.count }, 1 do
+        post :update_status,
+             params: { id: thesis.id, student_id: @student.id, status: Thesis::PUBLISHED,
+                       notify_student: true, notify_current_user: true, custom_message: 'Published now' }
+      end
+
+      assert_equal Thesis::PUBLISHED, thesis.reload.status
+      assert_equal thesis.published_date, thesis.published_at
+      assert_equal 'Publishing this thesis. Status changed to published', thesis.audits.last.comment
+      assert_equal 1, enqueued_jobs.size
     end
 
     should 'send an email if notification[student] or notifcation[current_user] are present' do
