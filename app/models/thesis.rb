@@ -126,11 +126,15 @@ class Thesis < ApplicationRecord
   scope :open, -> { where('status = ? ', OPEN) }
   scope :under_review, -> { where('status = ? ', UNDER_REVIEW) }
   scope :rejected, -> { where('status = ? ', REJECTED) }
-  scope :accepted, -> { where('status = ? ', ACCEPTED).where('embargoed = ? ', false) }
-  scope :published, -> { where('status = ? ', PUBLISHED).where('embargoed = ? ', false) }
+  scope :publication_eligible, lambda { |on: EmbargoRequest.toronto_today|
+    blocked_ids = EmbargoRequest.publication_blocking(on: on).select(:thesis_id)
+    where(embargoed: false).where.not(id: blocked_ids)
+  }
+  scope :accepted, -> { where(status: ACCEPTED).publication_eligible }
+  scope :published, -> { where(status: PUBLISHED).publication_eligible }
   scope :returned, -> { where('status = ? ', RETURNED) }
   scope :with_embargo, -> { where('embargoed = ? ', true) }
-  scope :without_embargo, -> { where('embargoed = ? ', false) }
+  scope :without_embargo, -> { publication_eligible }
   scope :open_or_returned, -> { where('status = ? OR status = ?', OPEN, RETURNED) }
 
   def abstract=(text)
@@ -207,22 +211,38 @@ class Thesis < ApplicationRecord
   end
 
   # Return theses that are ready to publish. Status: ACCEPTED + PublisheDate: Today or before
-  def self.ready_to_publish
-    Thesis.accepted.where('published_date <= ?', Date.today)
+  def self.ready_to_publish(on: EmbargoRequest.toronto_today)
+    where(status: ACCEPTED).publication_eligible(on: on).where('published_date <= ?', on)
+  end
+
+  def publication_blocked?(on: EmbargoRequest.toronto_today)
+    embargoed? || embargo_requests.publication_blocking(on: on).exists?
+  end
+
+  def publication_block_reason(on: EmbargoRequest.toronto_today)
+    return 'permanent_administrative_embargo' if embargoed?
+    return 'pending_embargo_request' if embargo_requests.submitted.exists?
+    return 'approved_embargo_request' if embargo_requests.approved.where('approved_until >= ?', on).exists?
+
+    nil
   end
 
   def publish
-    return unless embargoed == false
+    old_status = nil
+    published = false
 
-    thesis = self
-    old_status = self.status
+    with_lock do
+      next if publication_blocked?
 
-    self.status = Thesis::PUBLISHED
-    self.audit_comment = 'Publishing this thesis. Status changed to published'
-    self.published_at = published_date
-    
-    StudentMailer.status_change_email(student, thesis, old_status, thesis.status).deliver_later
-    save(validate: false)
+      old_status = status
+      self.status = PUBLISHED
+      self.audit_comment = 'Publishing this thesis. Status changed to published'
+      self.published_at = published_date
+      published = save(validate: false)
+    end
+
+    StudentMailer.status_change_email(student, self, old_status, status).deliver_later if published
+    published
   end
 
   def self.assigned_to_user(user)

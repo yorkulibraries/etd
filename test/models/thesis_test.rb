@@ -3,6 +3,9 @@
 require 'test_helper'
 
 class ThesisTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+  include ActionMailer::TestHelper
+
   should 'create a valid thesis' do
     thesis = build(:thesis, title: 'some thesis')
 
@@ -326,6 +329,70 @@ class ThesisTest < ActiveSupport::TestCase
 
     t = Thesis.find(t.id)
     assert_equal Thesis::ACCEPTED, t.status, 'Thesis should not have its status changed'
+  end
+
+  should 'block pending requests from readiness and manual publication' do
+    thesis = create(:thesis, status: Thesis::ACCEPTED, published_date: 1.day.ago)
+    create(:submitted_embargo_request, thesis: thesis)
+
+    assert_not_includes Thesis.ready_to_publish, thesis
+    assert thesis.publication_blocked?
+    assert_equal 'pending_embargo_request', thesis.publication_block_reason
+    assert_not thesis.publish
+    assert_equal Thesis::ACCEPTED, thesis.reload.status
+  end
+
+  should 'block approved requests through their Toronto approval date' do
+    today = EmbargoRequest.toronto_today
+    thesis = create(:thesis, status: Thesis::ACCEPTED, published_date: 1.day.ago)
+    create(:embargo_request, thesis: thesis, status: :approved, approved_until: today,
+                             decided_at: Time.current, decided_by: create(:user))
+
+    assert thesis.publication_blocked?(on: today)
+    assert_not thesis.publication_blocked?(on: today + 1.day)
+  end
+
+  should 'release declined and expired requests for publication' do
+    thesis = create(:thesis, status: Thesis::ACCEPTED, published_date: 1.day.ago)
+    create(:embargo_request, thesis: thesis, status: :declined,
+                             decision_notes: 'Not approved', decided_at: Time.current,
+                             decided_by: create(:user))
+    create(:embargo_request, thesis: thesis, status: :approved,
+                             approved_until: EmbargoRequest.toronto_today - 1.day,
+                             decided_at: 2.years.ago, decided_by: create(:user))
+
+    assert_not thesis.publication_blocked?
+    assert_includes Thesis.ready_to_publish, thesis
+  end
+
+  should 'block a pending extension after a previous approval expires' do
+    thesis = create(:thesis, status: Thesis::ACCEPTED, published_date: 1.day.ago)
+    create(:embargo_request, thesis: thesis, status: :approved,
+                             approved_until: EmbargoRequest.toronto_today - 1.day,
+                             decided_at: 2.years.ago, decided_by: create(:user))
+    create(:submitted_embargo_request, thesis: thesis, request_type: :extension)
+
+    assert thesis.publication_blocked?
+    assert_equal 'pending_embargo_request', thesis.publication_block_reason
+  end
+
+  should 'only enqueue publication email after a successful eligible publish' do
+    thesis = create(:thesis, status: Thesis::ACCEPTED)
+
+    assert_enqueued_email_with StudentMailer, :status_change_email,
+                               args: [thesis.student, thesis, Thesis::ACCEPTED, Thesis::PUBLISHED] do
+      assert thesis.publish
+    end
+    assert_equal Thesis::PUBLISHED, thesis.reload.status
+  end
+
+  should 'not enqueue publication email when the publish save fails' do
+    thesis = create(:thesis, status: Thesis::ACCEPTED)
+    thesis.stubs(:save).returns(false)
+
+    assert_not thesis.publish
+    assert_empty enqueued_jobs
+    assert_equal Thesis::ACCEPTED, thesis.reload.status
   end
 
   should 'not show up in accepted if embargoed' do
