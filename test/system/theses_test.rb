@@ -206,7 +206,6 @@ class ThesesTest < ApplicationSystemTestCase
     [letter, supporting_document].each do |document|
       FileUtils.mkdir_p(File.dirname(document.file.path))
       FileUtils.cp(Rails.root.join('test/fixtures/files/pdf-document.pdf'), document.file.path)
-      FileUtils.rm_f(Rails.root.join('tmp', document.name))
     end
     approved_until = EmbargoRequest.toronto_today + 1.year
 
@@ -229,13 +228,37 @@ class ThesesTest < ApplicationSystemTestCase
       assert_match(%r{/files/#{letter.id}/download\z}, letter_download_href)
       assert_match(%r{/files/#{supporting_document.id}/download\z}, supporting_download_href)
 
-      click_link('Download supervisor support letter')
-      wait_for_download('tmp/supervisor-letter.pdf')
-      assert File.exist?('tmp/supervisor-letter.pdf')
+      verify_download = lambda do |href, expected_filename|
+        result = page.evaluate_async_script(<<~JAVASCRIPT, href)
+          const requestedUrl = arguments[0];
+          const done = arguments[arguments.length - 1];
 
-      click_link('Download supporting document')
-      wait_for_download('tmp/supporting-evidence.pdf')
-      assert File.exist?('tmp/supporting-evidence.pdf')
+          fetch(requestedUrl, { credentials: 'same-origin', redirect: 'manual' })
+            .then(async (response) => {
+              const blob = await response.blob();
+              done({
+                status: response.status,
+                redirected: response.redirected,
+                requestedPath: new URL(requestedUrl, window.location.href).pathname,
+                finalPath: new URL(response.url).pathname,
+                contentDisposition: response.headers.get('content-disposition'),
+                blobSize: blob.size
+              });
+            })
+            .catch((error) => done({ error: error.message }));
+        JAVASCRIPT
+
+        assert_nil result['error']
+        assert_equal 200, result['status']
+        assert_equal false, result['redirected']
+        assert_equal result['requestedPath'], result['finalPath']
+        assert_includes result['contentDisposition'], 'attachment'
+        assert_includes result['contentDisposition'], expected_filename
+        assert_operator result['blobSize'], :>, 0
+      end
+
+      verify_download.call(letter_download_href, 'supervisor-letter.pdf')
+      verify_download.call(supporting_download_href, 'supporting-evidence.pdf')
 
       fill_in('Approve until', with: approved_until.strftime('%m/%d/%Y'))
       accept_confirm do

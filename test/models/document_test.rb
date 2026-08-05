@@ -68,6 +68,24 @@ class DocumentTest < ActiveSupport::TestCase
     assert_includes document.errors[:embargo_request], 'must belong to the same thesis'
   end
 
+  should 'only allow embargo evidence usages on request-bound documents' do
+    request = create(:embargo_request)
+    malformed_document = build(:document, thesis: request.thesis, user: request.thesis.student,
+                                           embargo_request: request, usage: :licence,
+                                           file: fixture_file_upload('pdf-document.pdf'))
+
+    assert_not malformed_document.valid?
+    assert_includes malformed_document.errors[:usage],
+                    'must be embargo evidence when attached to an embargo request'
+
+    licence = build(:document, embargo_request: nil, usage: :licence,
+                               file: fixture_file_upload('pdf-document.pdf'))
+    thesis_file = build(:document, embargo_request: nil, usage: :thesis,
+                                   supplemental: true, file: fixture_file_upload('pdf-document.pdf'))
+    assert licence.valid?, 'a licence document without an embargo request remains valid'
+    assert thesis_file.valid?, 'a thesis document without an embargo request remains valid'
+  end
+
   should 'keep legacy embargo documents valid and public without a request' do
     document = create(:document, usage: :embargo, embargo_request: nil,
                                  file: fixture_file_upload('pdf-document.pdf'))

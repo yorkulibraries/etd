@@ -36,7 +36,7 @@
           <% end %>
         </dl>
 
-        <% evidence_documents = embargo_request.documents.not_deleted %>
+        <% evidence_documents = embargo_request.documents.not_deleted.where(usage: %i[embargo embargo_letter]) %>
         <% if evidence_documents.any? %>
           <h5 class="mt-3">Request evidence</h5>
           <ul class="list-unstyled mb-0">

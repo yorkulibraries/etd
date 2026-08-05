@@ -15,6 +15,7 @@ class Document < ApplicationRecord
   validate :validate_extension
   validate :validate_usage
   validate :embargo_request_matches_thesis
+  validate :embargo_request_evidence_usage
   validate :one_supervisor_letter_per_request
 
   #### SCOPES
@@ -137,6 +138,12 @@ class Document < ApplicationRecord
     return if embargo_request.blank? || embargo_request.thesis_id == thesis_id
 
     errors.add(:embargo_request, 'must belong to the same thesis')
+  end
+
+  def embargo_request_evidence_usage
+    return if embargo_request.blank? || embargo? || embargo_letter?
+
+    errors.add(:usage, 'must be embargo evidence when attached to an embargo request')
   end
 
   def one_supervisor_letter_per_request

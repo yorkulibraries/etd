@@ -88,6 +88,31 @@ class ThesesControllerTest < ActionController::TestCase
       assert_includes response.body, 'Permanent administrative embargo'
     end
 
+    should 'separate legacy embargo documents from request evidence and omit malformed request usages' do
+      thesis = create(:thesis, student: @student)
+      request = create(:embargo_request, thesis: thesis)
+      legacy_document = create(:document, thesis: thesis, user: @student, usage: :embargo,
+                                          name: 'legacy-embargo.pdf',
+                                          file: fixture_file_upload('pdf-document.pdf'))
+      request_document = create(:embargo_request_document, embargo_request: request, usage: :embargo,
+                                                           name: 'request-supporting.pdf')
+      malformed_document = build(:document, thesis: thesis, user: @student,
+                                             embargo_request: request, usage: :licence,
+                                             name: 'malformed-request-licence.pdf',
+                                             file: fixture_file_upload('pdf-document.pdf'))
+      malformed_document.save!(validate: false)
+
+      get :show, params: { id: thesis.id, student_id: @student.id }
+
+      assert_equal [legacy_document.id], assigns(:embargo_documents).pluck(:id)
+      assert_select ".embargo-file #document_#{legacy_document.id}", 1
+      assert_select ".embargo-file #document_#{request_document.id}", 0
+      assert_select "#embargo-request-#{request.id}" do
+        assert_select 'li', text: /request-supporting\.pdf/, count: 1
+        assert_select 'li', text: /malformed-request-licence\.pdf/, count: 0
+      end
+    end
+
     should 'load documents separately, as primary and non primary. All must be not_deleted' do
       thesis = create(:thesis, student: @student)
       create_list(:document, 1, supplemental: false, thesis:, user: @student,
