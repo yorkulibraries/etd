@@ -57,6 +57,19 @@ class ThesisTest < ActiveSupport::TestCase
     assert_not thesis.valid?(:submit_for_review)
     assert_includes thesis.errors[:base], 'Complete the embargo step before submitting for review.'
   end
+
+  should 'reject submission when a newer extension draft follows an approved request' do
+    student = create(:student)
+    thesis = create(:thesis, student: student, embargo_selection: :requested,
+                            loc_subjects: create_list(:loc_subject, 1))
+    create(:embargo_request, thesis: thesis, status: :approved)
+    extension_draft = create(:embargo_request, thesis: thesis, request_type: :extension, status: :draft)
+    thesis.current_user = student
+
+    assert_equal extension_draft, thesis.current_embargo_request
+    assert_not thesis.valid?(:submit_for_review)
+    assert_includes thesis.errors[:base], 'Complete the embargo step before submitting for review.'
+  end
   
   ## VALIDATIONS
   # Licences are required fields

@@ -150,8 +150,10 @@ class Thesis < ApplicationRecord
   def embargo_step_complete?
     return true if embargo_not_requested?
 
-    completed_statuses = EmbargoRequest.statuses.values_at('submitted', 'approved', 'declined')
-    embargo_requested? && embargo_requests.where(status: completed_statuses).exists?
+    completed_statuses = %w[submitted approved declined]
+    current_request = current_embargo_request
+
+    embargo_requested? && current_request.present? && completed_statuses.include?(current_request.status)
   end
 
   def assign_degree_name_and_level
