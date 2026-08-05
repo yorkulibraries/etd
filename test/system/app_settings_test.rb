@@ -157,6 +157,8 @@ class AppSettingsTest < ApplicationSystemTestCase
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
     click_link('Continue')
+    choose('No, do not request an embargo')
+    click_button('Save embargo choice')
     assert_selector 'div.student-view.fitted.submit > div', text: 'Review Licence Info Text Test'
 
     click_button('Accept and Continue')
@@ -197,6 +199,8 @@ class AppSettingsTest < ApplicationSystemTestCase
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
     click_link('Continue')
+    choose('No, do not request an embargo')
+    click_button('Save embargo choice')
     click_link_or_button('Upload Licence File')
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
@@ -210,4 +214,3 @@ class AppSettingsTest < ApplicationSystemTestCase
     assert_text 'Submit for Review Text Test'
   end
 end
-

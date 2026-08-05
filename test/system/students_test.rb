@@ -411,6 +411,51 @@ class StudentsTest < ApplicationSystemTestCase
     assert_selector '.text-bg-warning', text: 'Pending staff review'
   end
 
+  test 'student completes submission without requesting an embargo' do
+    thesis = FactoryGirl.create(:thesis)
+    thesis.loc_subjects << LocSubject.first
+    FactoryGirl.create(
+      :document,
+      thesis: thesis,
+      user: thesis.student,
+      usage: :thesis,
+      supplemental: false,
+      file: Rack::Test::UploadedFile.new('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf')
+    )
+
+    login_as(thesis.student)
+    visit root_url
+    visit student_view_thesis_process_path(thesis, Thesis::PROCESS_EMBARGO)
+
+    assert_selector '.submission-progress [aria-current="step"]', text: /Embargo\s+request/i
+    choose('No, do not request an embargo')
+    click_button('Save embargo choice')
+
+    assert_selector 'h2', text: 'Sign Copyright and Distribution Licences'
+    assert_selector '.submission-progress [aria-current="step"]', text: /Review\s+distribution licences/i
+    click_link('Upload Licence File')
+    within('#file_upload_modal') do
+      attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
+      click_button('Upload')
+    end
+    check('I agree to and I have signed LAC Form', allow_label_click: true)
+    check('I agree to YorkSpace Non-Exclusive Distribution Licence', allow_label_click: true)
+    check('I agree to ETD Licence', allow_label_click: true)
+    click_button('Accept and Continue')
+
+    assert_selector 'h2', text: 'Review Details for Submission'
+    assert_selector '.submission-progress [aria-current="step"]', text: /Submit\s+for review/i
+    check('I certify that the content is correct')
+    accept_confirm do
+      click_button('I accept and submit for review')
+    end
+
+    assert_selector 'h2', text: 'Thesis Submission Status'
+    assert_selector 'p.bg-light', text: 'Under review'
+    assert thesis.reload.embargo_not_requested?
+    assert_equal Thesis::UNDER_REVIEW, thesis.status
+  end
+
   ## Supplementary Info displays on edit/error
   should "Supplementary Info displays on edit/error" do
     @thesis = FactoryGirl.create(:thesis)

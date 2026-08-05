@@ -172,6 +172,9 @@ class ThesesTest < ApplicationSystemTestCase
   end
 
   test 'Add a permanent administrative embargo' do
+    @thesis_01.update!(embargo_selection: :requested)
+    request = FactoryGirl.create(:submitted_embargo_request, thesis: @thesis_01)
+
     visit root_url
     click_link(@thesis_01.title)
     assert_selector 'h4', text: 'Permanent administrative embargo'
@@ -185,12 +188,26 @@ class ThesesTest < ApplicationSystemTestCase
     page.accept_alert
     assert_selector 'p', text: 'This thesis has been placed under permanent embargo. It will not be published.'
     assert_selector '#embargo-requests h4', text: 'Embargo request history'
+    assert_equal 'submitted', request.reload.status
   end
 
   test 'staff opens and approves a pending embargo request' do
     @thesis_01.update!(embargo_selection: :requested)
     create_primary_document(@thesis_01)
     request = FactoryGirl.create(:submitted_embargo_request, thesis: @thesis_01)
+    letter = request.documents.embargo_letter.first
+    letter.update_column(:name, 'supervisor-letter.pdf')
+    supporting_document = FactoryGirl.create(
+      :embargo_request_document,
+      embargo_request: request,
+      usage: :embargo,
+      name: 'supporting-evidence.pdf'
+    )
+    [letter, supporting_document].each do |document|
+      FileUtils.mkdir_p(File.dirname(document.file.path))
+      FileUtils.cp(Rails.root.join('test/fixtures/files/pdf-document.pdf'), document.file.path)
+      FileUtils.rm_f(Rails.root.join('tmp', document.name))
+    end
     approved_until = EmbargoRequest.toronto_today + 1.year
 
     visit root_url
@@ -204,8 +221,22 @@ class ThesesTest < ApplicationSystemTestCase
     within("#embargo-request-#{request.id}") do
       assert_selector '.badge', text: 'Submitted'
       assert_link 'Download supervisor support letter'
-      download_href = find_link('Download supervisor support letter')['href']
-      assert_match(%r{/files/\d+/download\z}, download_href)
+      assert_link 'Download supporting document'
+      assert_text 'supervisor-letter.pdf'
+      assert_text 'supporting-evidence.pdf'
+      letter_download_href = find_link('Download supervisor support letter')['href']
+      supporting_download_href = find_link('Download supporting document')['href']
+      assert_match(%r{/files/#{letter.id}/download\z}, letter_download_href)
+      assert_match(%r{/files/#{supporting_document.id}/download\z}, supporting_download_href)
+
+      click_link('Download supervisor support letter')
+      wait_for_download('tmp/supervisor-letter.pdf')
+      assert File.exist?('tmp/supervisor-letter.pdf')
+
+      click_link('Download supporting document')
+      wait_for_download('tmp/supporting-evidence.pdf')
+      assert File.exist?('tmp/supporting-evidence.pdf')
+
       fill_in('Approve until', with: approved_until.strftime('%m/%d/%Y'))
       accept_confirm do
         click_button('Approve request')
@@ -218,6 +249,7 @@ class ThesesTest < ApplicationSystemTestCase
 
     visit root_url
     click_link('Embargo Requests')
+    assert_no_selector '#embargo-requests-queue', text: @thesis_01.title
     click_link('Approved')
     assert_selector '#embargo-requests-queue', text: @thesis_01.title
 
@@ -241,6 +273,13 @@ class ThesesTest < ApplicationSystemTestCase
 
     within("#embargo-request-#{request.id}") do
       assert_selector 'textarea[required][name="embargo_request[decision_notes]"]'
+      assert_selector 'textarea[name="embargo_request[decision_notes]"]:invalid'
+      accept_confirm do
+        click_button('Decline request')
+      end
+      assert_selector '.badge', text: 'Submitted'
+      assert_equal 'submitted', request.reload.status
+
       fill_in('Decline notes', with: decision_notes)
       accept_confirm do
         click_button('Decline request')
