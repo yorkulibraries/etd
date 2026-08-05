@@ -72,8 +72,9 @@ class DspaceExportJobTest < ActiveJob::TestCase
     primary = create(:document, thesis: thesis, usage: :thesis, supplemental: false,
                                 file: Rack::Test::UploadedFile.new('test/fixtures/files/pdf-document.pdf'))
     request = create(:embargo_request, thesis: thesis)
-    request_bound = create(:document, thesis: thesis, embargo_request: request,
-                                       usage: :thesis, supplemental: true)
+    request_bound = build(:document, thesis: thesis, embargo_request: request,
+                                      usage: :thesis, supplemental: true)
+    request_bound.save!(validate: false) # Simulate a malformed historical row predating the validation.
 
     files = DspaceExportJob.new.extract_thesis_filepaths(thesis)
 
@@ -151,8 +152,9 @@ class DspaceExportJobTest < ActiveJob::TestCase
     primary = create(:document, thesis: thesis, usage: :thesis, supplemental: false,
                                 file: Rack::Test::UploadedFile.new('test/fixtures/files/pdf-document.pdf'))
     request = create(:embargo_request, thesis: thesis)
-    request_bound = create(:document, thesis: thesis, embargo_request: request,
-                                       usage: :thesis, supplemental: true)
+    request_bound = build(:document, thesis: thesis, embargo_request: request,
+                                      usage: :thesis, supplemental: true)
+    request_bound.save!(validate: false) # Simulate a malformed historical row predating the validation.
 
     files = send(:extract_thesis_filepaths, thesis)
 
