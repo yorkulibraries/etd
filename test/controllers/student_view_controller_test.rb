@@ -43,6 +43,19 @@ class StudentViewControllerTest < ActionController::TestCase
       assert_equal 2, theses.size, 'Just one for now'
     end
 
+    should 'show an expired unopened ETD as disabled in the thesis list' do
+      active_thesis = create(:thesis, student: @student, title: 'Active ETD')
+      expired_thesis = create(:thesis, student: @student, title: 'Expired ETD')
+      expired_thesis.invitations.create!(student: @student, sent_at: 15.days.ago, expires_at: 1.day.ago)
+
+      get :index
+
+      assert_response :success
+      assert_select 'a', text: active_thesis.title
+      assert_select 'a', text: expired_thesis.title, count: 0
+      assert_select '.invitation-expired', text: /Expired ETD.*Invitation expired—contact ETD staff\./m
+    end
+
     should 'avoid routing if files are not uploaded' do
       thesis = create(:thesis, student: @student)
 
@@ -280,6 +293,27 @@ class StudentViewControllerTest < ActionController::TestCase
       assert_raises ActiveRecord::RecordNotFound do
         get :thesis_process_router, params: { id: thesis.id, process_step: 'whatever' }
       end
+    end
+
+    should 'show an expiry message instead of opening an ETD with an expired invitation' do
+      thesis = create(:thesis, student: @student)
+      thesis.invitations.create!(student: @student, sent_at: 15.days.ago, expires_at: 1.day.ago)
+
+      get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_BEGIN }
+
+      assert_response :forbidden
+      assert_template 'student_view/invitation_expired'
+      assert_match 'Invitation expired—contact ETD staff.', response.body
+    end
+
+    should 'accept an active invitation when the student first opens that ETD' do
+      thesis = create(:thesis, student: @student)
+      invitation = thesis.invitations.create!(student: @student, sent_at: Time.current, expires_at: 1.day.from_now)
+
+      get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_BEGIN }
+
+      assert_response :success
+      assert_not_nil invitation.reload.accepted_at
     end
   end
 

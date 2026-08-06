@@ -1,21 +1,23 @@
 # frozen_string_literal: true
 
 class StudentMailer < ApplicationMailer
-  def invitation_email(student)
+  def invitation_email(invitation)
     @template = Liquid::Template.parse(AppSettings.email_welcome_body) # Parses and compiles the template
 
     ## setup variables
     @date = Date.today.strftime('%b %e, %Y')
     @date_short = Date.today.strftime('%m-%d-%Y')
-    @student = student
+    @student = invitation.student
+    @thesis_title = invitation.thesis&.title || invitation.gem_record&.title
+    @invitation_expiry_date = invitation.expires_at.in_time_zone('Eastern Time (US & Canada)').strftime('%B %-d, %Y at %-I:%M %p %Z')
     @application_url = root_url
 
     @message_subject = AppSettings.email_welcome_subject
 
     recipients = []
-    recipients << student.email
-    if student.email_external.present?
-      student.email_external.split(/[\s,]+/).each do |address|
+    recipients << @student.email
+    if @student.email_external.present?
+      @student.email_external.split(/[\s,]+/).each do |address|
         recipients << address
       end
     end

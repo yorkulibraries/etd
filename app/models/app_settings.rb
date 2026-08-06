@@ -13,6 +13,8 @@ class AppSettings < RailsSettings::Base
   field :email_welcome_subject
   field :email_welcome_allow
   field :email_welcome_body
+  field :invitation_validity_days, type: :integer, default: 14,
+                                   validates: { numericality: { only_integer: true, greater_than: 0 } }
   field :email_status_change_allow
   field :email_status_change_subject
   field :email_status_change_body

@@ -71,6 +71,43 @@ class ThesisTest < ActiveSupport::TestCase
     assert_not thesis.valid?(:submit_for_review)
     assert_includes thesis.errors[:base], 'Complete the embargo step before submitting for review.'
   end
+
+  should 'create an invitation for this ETD with the configured Toronto-local deadline' do
+    assert_respond_to AppSettings, :invitation_validity_days=
+    AppSettings.invitation_validity_days = 14
+    thesis = create(:thesis)
+
+    travel_to Time.utc(2026, 7, 1, 14, 0, 0) do
+      invitation = thesis.send_invitation!
+
+      assert_equal thesis.student, invitation.student
+      assert_equal thesis, invitation.thesis
+      assert_equal Time.current, invitation.sent_at
+      assert_equal Time.utc(2026, 7, 16, 3, 59, 59), invitation.expires_at.change(usec: 0)
+    end
+  end
+
+  should 'deny an unopened ETD after its latest invitation expires' do
+    thesis = create(:thesis)
+    thesis.invitations.create!(student: thesis.student, sent_at: 15.days.ago, expires_at: 1.day.ago)
+
+    assert_respond_to thesis, :invitation_accessible?
+    assert_not thesis.invitation_accessible?
+  end
+
+  should 'keep an ETD accessible after the student opens it before the deadline' do
+    thesis = create(:thesis)
+    invitation = thesis.invitations.create!(student: thesis.student, sent_at: Time.current,
+                                            expires_at: 1.day.from_now)
+
+    assert_respond_to thesis, :accept_invitation!
+    assert thesis.accept_invitation!
+    assert_not_nil invitation.reload.accepted_at
+
+    travel_to 2.days.from_now do
+      assert thesis.invitation_accessible?
+    end
+  end
   
   ## VALIDATIONS
   # Licences are required fields

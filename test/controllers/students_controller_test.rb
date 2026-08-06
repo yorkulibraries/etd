@@ -99,7 +99,8 @@ class StudentsControllerTest < ActionController::TestCase
 
     should 'show details page with student info' do
       s = create(:student)
-      create(:gem_record, sisid: s.sisid, seqgradevent: 1)
+      record = create(:gem_record, sisid: s.sisid, seqgradevent: 1)
+      AppSettings.email_welcome_allow = true
 
       get :show, params: { id: s.id }
 
@@ -109,6 +110,7 @@ class StudentsControllerTest < ActionController::TestCase
       assert student, 'Student must be an object'
       assert_equal s.id, student.id, 'Ids should match'
       assert_equal 1, available_theses.count, 'Must have one available thesis'
+      assert_select "a#send_invitation_email_#{record.id}", text: 'Send invitation email'
     end
 
     should 'load current, available, and completed theses and display them' do
@@ -118,8 +120,10 @@ class StudentsControllerTest < ActionController::TestCase
       create(:gem_record, sisid: s.sisid, examresult: GemRecord::ACCEPTED, seqgradevent: 2)
       create(:gem_record, sisid: s.sisid, examresult: GemRecord::ACCEPTED, seqgradevent: 3)
 
-      create(:thesis, student: s, status: Thesis::OPEN, gem_record_event_id: 1)
+      open_thesis = create(:thesis, student: s, status: Thesis::OPEN, gem_record_event_id: 1)
       create(:thesis, student: s, status: Thesis::ACCEPTED, gem_record_event_id: 2)
+      open_thesis.invitations.create!(student: s, sent_at: Time.current, expires_at: 1.day.from_now)
+      AppSettings.email_welcome_allow = true
 
       get :show, params: { id: s.id }
 
@@ -131,6 +135,8 @@ class StudentsControllerTest < ActionController::TestCase
 
       assert_equal 2, current_theses.size, 'There are two current theses'
       assert_equal 1, available_theses.size, 'There is one gem record'
+      assert_select "a#send_thesis_invitation_email_#{open_thesis.id}", text: 'Send invitation again'
+      assert_select '.invitation-deadline', text: /Invitation expires/
     end
 
     should 'show edit page' do
@@ -274,11 +280,16 @@ class StudentsControllerTest < ActionController::TestCase
 
     should 'send an invitation email' do
       student = create(:student)
-      create(:thesis, student:)
+      gem_record = create(:gem_record, sisid: student.sisid)
 
-      get :send_invite, params: { id: student.id }
+      assert_difference 'ThesisInvitation.count', 1 do
+        get :send_invite, params: { id: student.id, gem_record_id: gem_record.id }
+      end
 
       s = assigns(:student)
+      invitation = ThesisInvitation.last
+      assert_equal gem_record, invitation.gem_record
+      assert_nil invitation.thesis
       assert_equal "Sent an invitation email to #{student.name}.", flash[:notice]
       assert_not_nil s.invitation_sent_at, 'Should set the inviation sent at date'
       assert_redirected_to student_path(student)
@@ -307,6 +318,24 @@ class StudentsControllerTest < ActionController::TestCase
       assert_difference ['Student.count', 'Thesis.count', 'Document.count'], -1 do
         post :destroy, params: { id: student.id }
       end
+    end
+  end
+
+  context 'as staff' do
+    setup do
+      log_user_in(create(:user, role: User::STAFF))
+    end
+
+    should 'resend an invitation for a student ETD' do
+      student = create(:student)
+      thesis = create(:thesis, student:)
+      thesis.invitations.create!(student:, sent_at: 15.days.ago, expires_at: 1.day.ago)
+
+      assert_difference 'ThesisInvitation.count', 1 do
+        get :send_invite, params: { id: student.id, thesis_id: thesis.id }
+      end
+
+      assert thesis.reload.invitation_accessible?
     end
   end
 

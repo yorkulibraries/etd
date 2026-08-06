@@ -2,6 +2,7 @@
 
 class Thesis < ApplicationRecord
   attr_accessor :current_user
+  after_create :attach_pending_invitations
 
   ##### VALIDATIONS ######
 
@@ -41,6 +42,7 @@ class Thesis < ApplicationRecord
   has_many :submission_versions, class_name: 'ThesisSubmissionVersion', dependent: :delete_all
   has_many :embargo_requests, dependent: :destroy
   has_many :committee_members
+  has_many :invitations, class_name: 'ThesisInvitation', dependent: :delete_all
 
   has_many :thesis_subjectships, dependent: :delete_all
   has_many :loc_subjects, through: :thesis_subjectships
@@ -138,6 +140,32 @@ class Thesis < ApplicationRecord
   scope :without_embargo, -> { publication_eligible }
   scope :open_or_returned, -> { where('status = ? OR status = ?', OPEN, RETURNED) }
 
+  def send_invitation!(sent_at: Time.current)
+    ThesisInvitation.issue!(student:, thesis: self, sent_at:)
+  end
+
+  def current_invitation
+    invitations.where.not(accepted_at: nil).order(accepted_at: :desc).first ||
+      invitations.order(sent_at: :desc, id: :desc).first
+  end
+
+  def invitation_accessible?(at: Time.current)
+    return true if invitations.where.not(accepted_at: nil).exists?
+
+    invitation = invitations.order(sent_at: :desc, id: :desc).first
+    invitation.nil? || invitation.expires_at >= at
+  end
+
+  def accept_invitation!(at: Time.current)
+    return true if invitations.where.not(accepted_at: nil).exists?
+
+    invitation = invitations.order(sent_at: :desc, id: :desc).first
+    return true unless invitation
+    return false if invitation.expires_at < at
+
+    invitation.update!(accepted_at: at)
+  end
+
   def abstract=(text)
     text = '' if text.nil?
     self[:abstract] = text.encode('UTF-8', invalid: :replace, undef: :replace)
@@ -183,6 +211,14 @@ class Thesis < ApplicationRecord
       false
     end
   end
+
+  def attach_pending_invitations
+    gem_record = GemRecord.find_by(seqgradevent: gem_record_event_id, sisid: student.sisid)
+    return unless gem_record
+
+    ThesisInvitation.where(student:, gem_record:, thesis_id: nil).update_all(thesis_id: id, updated_at: Time.current)
+  end
+  private :attach_pending_invitations
   
   def update_from_gem_record
     record = GemRecord.find_by_seqgradevent(gem_record_event_id)
