@@ -306,40 +306,56 @@ class Thesis < ApplicationRecord
     return documents.primary.not_deleted.size > 0
   end
 
-  def create_submission_snapshot!(submitted_by)
-    with_lock do
-      version = submission_versions.create!(
-        version_number: ThesisSubmissionVersion.next_version_number_for(self),
-        submitted_by: submitted_by,
-        submitted_at: Time.current
-      )
+  # Callers that already hold a row lock on this thesis (see
+  # ThesesController#submit_for_review) must pass lock: false. Taking a second
+  # lock here re-reloads the record inside the caller's transaction, which
+  # discards any unsaved changes the caller is mid-way through applying.
+  def create_submission_snapshot!(submitted_by, lock: true)
+    return build_submission_snapshot!(submitted_by) unless lock
 
-      documents.not_deleted.order(:id).each do |document|
-        unless document.file.path.present? && File.exist?(document.file.path)
-          raise CarrierWave::UploadError, "Missing source file for document #{document.id}"
-        end
+    with_lock { build_submission_snapshot!(submitted_by) }
+  end
 
-        File.open(document.file.path, 'rb') do |file|
-          version.submission_documents.create!(
-            source_document: document,
-            supplemental: document.supplemental,
-            usage: document.usage,
-            name: document.name,
-            original_filename: File.basename(document.file.path),
-            content_type: document.file.file.try(:content_type),
-            file_size: File.size(document.file.path),
-            file: file
-          )
-        end
+  private def build_submission_snapshot!(submitted_by)
+    version = submission_versions.create!(
+      version_number: ThesisSubmissionVersion.next_version_number_for(self),
+      submitted_by: submitted_by,
+      submitted_at: Time.current
+    )
+
+    submittable_documents.order(:id).each do |document|
+      unless document.file.path.present? && File.exist?(document.file.path)
+        raise CarrierWave::UploadError, "Missing source file for document #{document.id}"
       end
 
-      version
+      File.open(document.file.path, 'rb') do |file|
+        version.submission_documents.create!(
+          source_document: document,
+          supplemental: document.supplemental,
+          usage: document.usage,
+          name: document.name,
+          original_filename: File.basename(document.file.path),
+          content_type: document.file.file.try(:content_type),
+          file_size: File.size(document.file.path),
+          file: file
+        )
+      end
     end
+
+    version
+  end
+
+  # Documents attached to an embargo request are supporting evidence for staff
+  # review, not part of the thesis the student is submitting. They must stay out
+  # of submission snapshots and out of the DSpace export: snapshotting them made
+  # a missing or unreadable embargo letter block thesis submission outright.
+  def submittable_documents
+    documents.not_deleted.where(embargo_request_id: nil)
   end
 
   def documents_for_export
     latest_submission_version = submission_versions.order(version_number: :desc).first
-    return documents.not_deleted.where(usage: :thesis) unless latest_submission_version
+    return submittable_documents.where(usage: :thesis) unless latest_submission_version
 
     latest_submission_version.submission_documents.where(usage: :thesis)
   end

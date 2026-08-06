@@ -598,6 +598,7 @@ class ThesesControllerTest < ActionController::TestCase
     end
 
     should 'not change status to under_review if submitted files cannot be snapshotted' do
+      @thesis.update!(embargo_selection: :not_requested)
       create(:document, supplemental: false, thesis: @thesis, user: @student,
                         file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 
@@ -613,6 +614,7 @@ class ThesesControllerTest < ActionController::TestCase
     end
 
     should 'create the next submitted version only after returned revisions are resubmitted' do
+      @thesis.update!(embargo_selection: :not_requested)
       primary_document = create(:document, supplemental: false, thesis: @thesis, user: @student,
                                            file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 
@@ -723,7 +725,10 @@ class ThesesControllerTest < ActionController::TestCase
       original_title = @thesis.title
       create(:document, supplemental: false, thesis: @thesis, user: @student,
                         file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
-      Thesis.any_instance.stubs(:save).returns(false)
+      # submit_for_review persists via update!, which routes through save! and
+      # never calls save. Stubbing save left the failure unsimulated and the
+      # submission succeeded, so the assertions below were never exercised.
+      Thesis.any_instance.stubs(:save!).raises(ActiveRecord::RecordInvalid.new(Thesis.new))
 
       post :submit_for_review,
            params: { id: @thesis.id, student_id: @student.id,

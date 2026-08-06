@@ -51,9 +51,13 @@ class DspaceExportJobTest < ActiveJob::TestCase
     embargo = create(:document, thesis:, supplemental: true, usage: :embargo,
                               file: fixture_file_upload('pdf-document.pdf'))
     request = create(:embargo_request, thesis: thesis)
-    request_bound = create(:document, thesis: thesis, usage: :thesis, supplemental: true,
-                                    embargo_request: request,
-                                    file: fixture_file_upload('document-microsoft.doc'))
+    # Document#embargo_request_evidence_usage now rejects this combination, so a
+    # record like this can only reach the database as legacy or corrupted data.
+    # The export must still exclude it, which is what this regression guards.
+    request_bound = build(:document, thesis: thesis, usage: :thesis, supplemental: true,
+                                   embargo_request: request,
+                                   file: fixture_file_upload('document-microsoft.doc'))
+    request_bound.save!(validate: false)
     modification_request = create(:document, thesis:, supplemental: true, usage: :modification_request,
                                            file: fixture_file_upload('document-microsoft.doc'))
 
