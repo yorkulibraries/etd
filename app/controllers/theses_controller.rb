@@ -175,7 +175,7 @@ class ThesesController < ApplicationController
       begin
         ActiveRecord::Base.transaction do
           @thesis.update!(thesis_params)
-          @thesis.create_submission_snapshot!(current_user)
+          @thesis.create_submission_snapshot!(current_user, lock: false)
           @thesis.update!(audit_comment: 'Submitting for review.', student_accepted_terms_at: Date.today,
                           under_review_at: Date.today, status: Thesis::UNDER_REVIEW)
         end
