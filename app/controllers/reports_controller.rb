@@ -2,6 +2,7 @@
 
 class ReportsController < ApplicationController
   skip_authorization_check
+  before_action :require_staff_report_access, only: :review_thesis
 
   def dashboard
     @theses_count = Thesis.count
@@ -74,6 +75,12 @@ class ReportsController < ApplicationController
   end
 
   private
+
+  def require_staff_report_access
+    return if [User::STAFF, User::MANAGER, User::ADMIN].include?(current_user&.role)
+
+    redirect_to unauthorized_url
+  end
 
   def sort_column
     params[:sort].nil? ? params[:sort] : 'published_date'

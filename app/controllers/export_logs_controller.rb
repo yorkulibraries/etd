@@ -35,7 +35,10 @@ class ExportLogsController < ApplicationController
     @export_log.creator = current_user
     @export_log.audit_comment = 'Adding a new Export Job'
     @export_log.job_status = ExportLog::JOB_OPEN
-    ids = Thesis.accepted.where(published_date: @export_log.published_date).ids
+    ids = Thesis.where(status: Thesis::ACCEPTED)
+                .publication_eligible
+                .where(published_date: @export_log.published_date)
+                .ids
     @export_log.theses_count = ids.size
     @export_log.theses_ids = ids.join(',')
 

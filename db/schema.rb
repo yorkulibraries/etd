@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_07_07_120100) do
+ActiveRecord::Schema[7.0].define(version: 2026_07_27_170100) do
   create_table "action_text_rich_texts", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
@@ -107,8 +107,36 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_07_120100) do
     t.string "file"
     t.boolean "deleted", default: false
     t.integer "usage"
+    t.integer "embargo_request_id"
+    t.index ["embargo_request_id"], name: "index_documents_on_embargo_request_id"
     t.index ["thesis_id"], name: "index_documents_on_thesis_id"
     t.index ["user_id"], name: "index_documents_on_user_id"
+  end
+
+  create_table "embargo_requests", id: :integer, charset: "utf8mb3", force: :cascade do |t|
+    t.integer "thesis_id", null: false
+    t.integer "request_type", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.integer "reason"
+    t.text "rationale"
+    t.integer "requested_duration_months"
+    t.string "contact_phone"
+    t.string "contact_email"
+    t.string "graduate_program_director_name"
+    t.string "graduate_program_director_email"
+    t.string "supervisor_name"
+    t.string "supervisor_email"
+    t.datetime "submitted_at"
+    t.date "approved_until"
+    t.datetime "decided_at"
+    t.integer "decided_by_id"
+    t.text "decision_notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["decided_by_id"], name: "index_embargo_requests_on_decided_by_id"
+    t.index ["submitted_at"], name: "index_embargo_requests_on_submitted_at"
+    t.index ["thesis_id", "status"], name: "index_embargo_requests_on_thesis_id_and_status"
+    t.index ["thesis_id"], name: "index_embargo_requests_on_thesis_id"
   end
 
   create_table "export_logs", id: :integer, charset: "utf8mb3", force: :cascade do |t|
@@ -204,6 +232,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_07_120100) do
     t.boolean "yorkspace_licence_agreement", default: false
     t.boolean "etd_licence_agreement", default: false
     t.text "notes"
+    t.integer "embargo_selection", default: 0, null: false
     t.index ["student_id"], name: "index_theses_on_student_id"
   end
 
@@ -263,4 +292,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_07_120100) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "documents", "embargo_requests"
+  add_foreign_key "embargo_requests", "theses"
+  add_foreign_key "embargo_requests", "users", column: "decided_by_id"
 end

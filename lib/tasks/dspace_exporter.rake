@@ -8,6 +8,20 @@ OPTIONS = {
   collection_title: "#{ENV['COLLECTION']}"
 }
 
+module DspaceExporter
+  def self.theses_for(thesis_id: nil, thesis_any_id: nil, publish_date: EmbargoRequest.toronto_today)
+    base = Thesis.publication_eligible
+
+    if thesis_id.present?
+      base.where(status: Thesis::ACCEPTED, id: thesis_id)
+    elsif thesis_any_id.present?
+      base.where(id: thesis_any_id)
+    else
+      base.where(status: Thesis::ACCEPTED).where('published_date <= ?', publish_date)
+    end
+  end
+end
+
 namespace :dspace do
   desc "Deposit to YorkSpace"
 
@@ -26,14 +40,10 @@ namespace :dspace do
 
     # three things to do
 
-    # 1) get unpublished theses, that don't have embargo placed on them.
-    if ENV["THESIS"] != nil
-      theses = Thesis.accepted.without_embargo.where(id: ENV["THESIS"])
-    elsif ENV["THESIS_ANY"] != nil
-      theses = Thesis.where(id: ENV["THESIS_ANY"])
-    else
-      theses = Thesis.accepted.without_embargo.where("published_date <= ?", publish_date)
-    end
+    # THESIS_ANY bypasses status for diagnostics, but never publication eligibility.
+    selector = DspaceExporter.theses_for(thesis_id: ENV['THESIS'], thesis_any_id: ENV['THESIS_ANY'],
+                                         publish_date: publish_date)
+    theses = selector
 
     log "FOUND: #{theses.size} theses"
 
@@ -46,6 +56,11 @@ namespace :dspace do
 
         entry = thesis_to_atom_entry(thesis)
         files = extract_thesis_filepaths(thesis)
+
+        unless selector.where(id: thesis.id).exists?
+          log "Skipping Thesis ID #{thesis.id}: no longer publication eligible."
+          next
+        end
 
         receipt = exporter.deposit(entry: entry, files: files, zipped: zipped, complete: complete_thesis?)
 
@@ -147,13 +162,13 @@ namespace :dspace do
     return [] if thesis == nil
 
     files = []
-    thesis.documents_for_export.primary.each do |document|
+    thesis.documents.not_deleted.where(usage: Document.usages[:thesis], embargo_request_id: nil).where(supplemental: false).each do |document|
       log "       #{document.file.path}"
       files.push document.file.path
     end
 
     unless ENV["PRIMARY_FILES_ONLY"] == "true"
-      thesis.documents_for_export.supplemental.where(usage: :thesis).each do |document|
+    thesis.documents.not_deleted.where(usage: Document.usages[:thesis], embargo_request_id: nil, supplemental: true).each do |document|
         log "       #{document.file.path}"
         files.push document.file.path
       end
@@ -187,7 +202,7 @@ namespace :dspace do
 
   def publish_date
     if ENV['PUBLISH_DATE'] == nil
-      Time.now.strftime("%Y-%m-%d")
+      EmbargoRequest.toronto_today
     else
       ENV["PUBLISH_DATE"]
     end

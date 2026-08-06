@@ -110,7 +110,8 @@ class StudentsTest < ApplicationSystemTestCase
     first('#select_subjects_11_chosen .active-result').click
     click_link('Continue') #update
     click_link('Continue') #upload
-    click_link('Continue') #review
+    choose('No, do not request an embargo')
+    click_button('Save embargo choice')
     assert_selector '.alert-warning', text: 'Error: Please upload a Primary Thesis File.'
     # page.accept_alert
   end
@@ -270,6 +271,8 @@ class StudentsTest < ApplicationSystemTestCase
     assert_selector(".name", text: /\.pdf/)
 
     click_on("Continue")
+    choose('No, do not request an embargo')
+    click_button('Save embargo choice')
 
     ## Page 4: Licence Review
 
@@ -330,6 +333,127 @@ class StudentsTest < ApplicationSystemTestCase
     assert_no_link('Replace')
     assert_no_link('Delete')
 
+  end
+
+  test 'student submits an embargo request and sees pending review' do
+    @thesis = FactoryGirl.create(:thesis)
+    @thesis.loc_subjects << LocSubject.first
+    FactoryGirl.create(
+      :document,
+      thesis: @thesis,
+      user: @thesis.student,
+      usage: :thesis,
+      supplemental: false,
+      file: Rack::Test::UploadedFile.new('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf')
+    )
+
+    login_as(@thesis.student)
+    visit root_url
+    click_link('My ETD Submission')
+    fill_in('Non-YorkU Email Address', with: "#{@thesis.student.username}@mailinator.com")
+    click_on('Continue')
+    click_on('Continue')
+    find('a.next-btn[title="Continue to embargo request"]').click
+
+    assert_selector 'h2', text: 'Embargo Request'
+    choose('Yes, request an embargo')
+    click_button('Save embargo choice')
+
+    select('New request', from: 'Request type')
+    select('Approved intellectual-property confidentiality contract', from: 'Reason')
+    select('12 months', from: 'Requested duration months')
+    fill_in('Rationale', with: 'The sponsor agreement requires delayed publication.')
+    fill_in('Contact phone', with: '416-555-0123')
+    fill_in('Contact email', with: 'student@example.com')
+    fill_in('Graduate program director name', with: 'Graduate Program Director')
+    fill_in('Graduate program director email', with: 'gpd@example.com')
+    fill_in('Supervisor name', with: 'Supervisor Name')
+    fill_in('Supervisor email', with: 'supervisor@example.com')
+    click_button('Save draft')
+
+    click_link('Upload supervisor support letter')
+    within('#file_upload_modal') do
+      attach_file('document_file', Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
+      click_button('Upload')
+    end
+
+    click_link('Upload supporting document')
+    within('#file_upload_modal') do
+      attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
+      click_button('Upload')
+    end
+
+    assert_selector '#request-documents .name', count: 2
+    assert_selector '#request-documents .name', text: /\.pdf/
+
+    accept_confirm do
+      click_button('Submit saved embargo request and continue')
+    end
+
+    assert_selector 'h2', text: 'Sign Copyright and Distribution Licences'
+    click_link('Upload Licence File')
+    within('#file_upload_modal') do
+      attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
+      click_button('Upload')
+    end
+    check('I agree to and I have signed LAC Form', allow_label_click: true)
+    check('I agree to YorkSpace Non-Exclusive Distribution Licence', allow_label_click: true)
+    check('I agree to ETD Licence', allow_label_click: true)
+    click_button('Accept and Continue')
+
+    check('I certify that the content is correct')
+    accept_confirm do
+      click_button('I accept and submit for review')
+    end
+
+    assert_selector 'h2', text: 'Thesis Submission Status'
+    assert_selector 'p.bg-light', text: 'Under review'
+    assert_selector '.text-bg-warning', text: 'Pending staff review'
+  end
+
+  test 'student completes submission without requesting an embargo' do
+    thesis = FactoryGirl.create(:thesis)
+    thesis.loc_subjects << LocSubject.first
+    FactoryGirl.create(
+      :document,
+      thesis: thesis,
+      user: thesis.student,
+      usage: :thesis,
+      supplemental: false,
+      file: Rack::Test::UploadedFile.new('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf')
+    )
+
+    login_as(thesis.student)
+    visit root_url
+    visit student_view_thesis_process_path(thesis, Thesis::PROCESS_EMBARGO)
+
+    assert_selector '.submission-progress [aria-current="step"]', text: /Embargo\s+request/i
+    choose('No, do not request an embargo')
+    click_button('Save embargo choice')
+
+    assert_selector 'h2', text: 'Sign Copyright and Distribution Licences'
+    assert_selector '.submission-progress [aria-current="step"]', text: /Review\s+distribution licences/i
+    click_link('Upload Licence File')
+    within('#file_upload_modal') do
+      attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
+      click_button('Upload')
+    end
+    check('I agree to and I have signed LAC Form', allow_label_click: true)
+    check('I agree to YorkSpace Non-Exclusive Distribution Licence', allow_label_click: true)
+    check('I agree to ETD Licence', allow_label_click: true)
+    click_button('Accept and Continue')
+
+    assert_selector 'h2', text: 'Review Details for Submission'
+    assert_selector '.submission-progress [aria-current="step"]', text: /Submit\s+for review/i
+    check('I certify that the content is correct')
+    accept_confirm do
+      click_button('I accept and submit for review')
+    end
+
+    assert_selector 'h2', text: 'Thesis Submission Status'
+    assert_selector 'p.bg-light', text: 'Under review'
+    assert thesis.reload.embargo_not_requested?
+    assert_equal Thesis::UNDER_REVIEW, thesis.status
   end
 
   ## Supplementary Info displays on edit/error

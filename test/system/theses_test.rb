@@ -171,18 +171,153 @@ class ThesesTest < ApplicationSystemTestCase
     assert_selector 'span.badge.bg-primary', text: 'Accepted'
   end
 
-  test 'Add an embargo' do
+  test 'Add a permanent administrative embargo' do
+    @thesis_01.update!(embargo_selection: :requested)
+    request = FactoryGirl.create(:submitted_embargo_request, thesis: @thesis_01)
+
     visit root_url
     click_link(@thesis_01.title)
-    click_on('Place under permanent embargo?')
+    assert_selector 'h4', text: 'Permanent administrative embargo'
+    click_on('Place under permanent administrative embargo?')
     click_on('Close')
-    click_on('Place under permanent embargo?')
+    click_on('Place under permanent administrative embargo?')
     within('#embargo_modal_textfield') do
       fill_in('Embargo Explanation', with: 'Private corporate copyright on thesis')
     end
-    click_on('Place Embargo')
+    click_on('Place administrative embargo')
     page.accept_alert
     assert_selector 'p', text: 'This thesis has been placed under permanent embargo. It will not be published.'
+    assert_selector '#embargo-requests h4', text: 'Embargo request history'
+    assert_equal 'submitted', request.reload.status
+  end
+
+  test 'staff opens and approves a pending embargo request' do
+    @thesis_01.update!(embargo_selection: :requested)
+    create_primary_document(@thesis_01)
+    request = FactoryGirl.create(:submitted_embargo_request, thesis: @thesis_01)
+    letter = request.documents.embargo_letter.first
+    letter.update_column(:name, 'supervisor-letter.pdf')
+    supporting_document = FactoryGirl.create(
+      :embargo_request_document,
+      embargo_request: request,
+      usage: :embargo,
+      name: 'supporting-evidence.pdf'
+    )
+    [letter, supporting_document].each do |document|
+      FileUtils.mkdir_p(File.dirname(document.file.path))
+      FileUtils.cp(Rails.root.join('test/fixtures/files/pdf-document.pdf'), document.file.path)
+    end
+    approved_until = EmbargoRequest.toronto_today + 1.year
+
+    visit root_url
+    assert_selector 'a.nav-link', text: /Embargo Requests/
+    assert_selector 'a.nav-link .badge', text: '1'
+    click_link('Embargo Requests')
+
+    assert_selector '#embargo-requests-queue h2', text: 'Embargo Requests'
+    click_link(@thesis_01.title)
+
+    within("#embargo-request-#{request.id}") do
+      assert_selector '.badge', text: 'Submitted'
+      assert_link 'Download supervisor support letter'
+      assert_link 'Download supporting document'
+      assert_text 'supervisor-letter.pdf'
+      assert_text 'supporting-evidence.pdf'
+      letter_download_href = find_link('Download supervisor support letter')['href']
+      supporting_download_href = find_link('Download supporting document')['href']
+      assert_match(%r{/files/#{letter.id}/download\z}, letter_download_href)
+      assert_match(%r{/files/#{supporting_document.id}/download\z}, supporting_download_href)
+
+      verify_download = lambda do |href, expected_filename|
+        result = page.evaluate_async_script(<<~JAVASCRIPT, href)
+          const requestedUrl = arguments[0];
+          const done = arguments[arguments.length - 1];
+
+          fetch(requestedUrl, { credentials: 'same-origin', redirect: 'manual' })
+            .then(async (response) => {
+              const blob = await response.blob();
+              done({
+                status: response.status,
+                redirected: response.redirected,
+                requestedPath: new URL(requestedUrl, window.location.href).pathname,
+                finalPath: new URL(response.url).pathname,
+                contentDisposition: response.headers.get('content-disposition'),
+                blobSize: blob.size
+              });
+            })
+            .catch((error) => done({ error: error.message }));
+        JAVASCRIPT
+
+        assert_nil result['error']
+        assert_equal 200, result['status']
+        assert_equal false, result['redirected']
+        assert_equal result['requestedPath'], result['finalPath']
+        assert_includes result['contentDisposition'], 'attachment'
+        assert_includes result['contentDisposition'], expected_filename
+        assert_operator result['blobSize'], :>, 0
+      end
+
+      verify_download.call(letter_download_href, 'supervisor-letter.pdf')
+      verify_download.call(supporting_download_href, 'supporting-evidence.pdf')
+
+      fill_in('Approve until', with: approved_until.strftime('%m/%d/%Y'))
+      accept_confirm do
+        click_button('Approve request')
+      end
+    end
+
+    assert_selector "#embargo-request-#{request.id} .badge", text: 'Approved'
+    assert_selector "#embargo-request-#{request.id} dt", text: 'Approved until'
+    assert_text approved_until.strftime('%B %d, %Y')
+
+    visit root_url
+    click_link('Embargo Requests')
+    assert_no_selector '#embargo-requests-queue', text: @thesis_01.title
+    click_link('Approved')
+    assert_selector '#embargo-requests-queue', text: @thesis_01.title
+
+    visit logout_path
+    login_as(@thesis_01.student)
+    visit root_url
+    visit student_view_thesis_process_path(@thesis_01, Thesis::PROCESS_STATUS)
+    assert_selector '.text-bg-success', text: 'Approved'
+    assert_text "Approved until #{approved_until.strftime('%B %d, %Y')}"
+  end
+
+  test 'staff declines a pending embargo request with an explanation visible to the student' do
+    thesis = FactoryGirl.create(:thesis, embargo_selection: :requested)
+    create_primary_document(thesis)
+    request = FactoryGirl.create(:submitted_embargo_request, thesis: thesis)
+    decision_notes = 'The stated basis does not meet the embargo criteria.'
+
+    visit root_url
+    click_link('Embargo Requests')
+    click_link(thesis.title)
+
+    within("#embargo-request-#{request.id}") do
+      assert_selector 'textarea[required][name="embargo_request[decision_notes]"]'
+      assert_selector 'textarea[name="embargo_request[decision_notes]"]:invalid'
+      accept_confirm do
+        click_button('Decline request')
+      end
+      assert_selector '.badge', text: 'Submitted'
+      assert_equal 'submitted', request.reload.status
+
+      fill_in('Decline notes', with: decision_notes)
+      accept_confirm do
+        click_button('Decline request')
+      end
+    end
+
+    assert_selector "#embargo-request-#{request.id} .badge", text: 'Declined'
+    assert_selector "#embargo-request-#{request.id}", text: decision_notes
+
+    visit logout_path
+    login_as(thesis.student)
+    visit root_url
+    visit student_view_thesis_process_path(thesis, Thesis::PROCESS_STATUS)
+    assert_selector '.text-bg-danger', text: 'Declined'
+    assert_text decision_notes
   end
 
   #### FILE UPLOADS FROM BACKEND #####
@@ -321,6 +456,19 @@ class ThesesTest < ApplicationSystemTestCase
     page.accept_alert
 
     assert_selector "p", text: "There are no supplementary thesis files."
+  end
+
+  private
+
+  def create_primary_document(thesis)
+    FactoryGirl.create(
+      :document,
+      thesis: thesis,
+      user: thesis.student,
+      usage: :thesis,
+      supplemental: false,
+      file: Rack::Test::UploadedFile.new('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf')
+    )
   end
 
   ###########################################################

@@ -1,0 +1,32 @@
+<% if @thesis.embargo_not_requested? %>
+	<div class="alert alert-secondary" role="status">
+		<span class="badge text-bg-secondary">No embargo requested</span>
+	</div>
+<% elsif embargo_request.present? %>
+	<div class="alert alert-info" role="status">
+		<% if embargo_request.draft? %>
+			<span class="badge text-bg-secondary">Embargo request draft</span>
+			<p class="mb-0">Your embargo request draft is not yet submitted for staff review.</p>
+		<% elsif embargo_request.submitted? %>
+			<span class="badge text-bg-warning">Pending staff review</span>
+			<% if embargo_request.submitted_at.present? %>
+				<p class="mb-0">Submitted on <%= embargo_request.submitted_at.strftime('%B %d, %Y') %>.</p>
+			<% end %>
+		<% elsif embargo_request.approved? && embargo_request.expired? %>
+			<span class="badge text-bg-secondary">Expired</span>
+			<p class="mb-0">Embargo expired on <%= embargo_request.approved_until.strftime('%B %d, %Y') %>.</p>
+		<% elsif embargo_request.approved? %>
+			<span class="badge text-bg-success">Approved</span>
+			<% if embargo_request.approved_until.present? %>
+				<p class="mb-0">Approved until <%= embargo_request.approved_until.strftime('%B %d, %Y') %>.</p>
+			<% end %>
+		<% elsif embargo_request.declined? %>
+			<span class="badge text-bg-danger">Declined</span>
+			<% if embargo_request.decision_notes.present? %>
+				<p class="mb-0"><strong>Decision notes:</strong> <%= embargo_request.decision_notes %></p>
+			<% end %>
+		<% end %>
+	</div>
+<% else %>
+	<div class="alert alert-secondary" role="status">No embargo request found.</div>
+<% end %>

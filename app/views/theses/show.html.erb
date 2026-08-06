@@ -68,16 +68,16 @@
 			<% end %>
 		</div>
 		<div class="col-md-4">
-			<h4>Permanent Embargo</h4>
-			<% if @thesis.embargoed == true %>
-				<div class="alert alert-warning" role="alert">This thesis has been placed under permanent embargo. It will not be published.
+				<h4>Permanent administrative embargo</h4>
+				<% if @thesis.embargoed == true %>
+					<div class="alert alert-warning" role="alert">This thesis has been placed under permanent administrative embargo. It will not be published.
 					<hr />
 					<%= format @thesis.embargo, true, "Embargo explanation was not filled in..." %>
 				</div>
 			<% else  %>
 				<div id="place_under_embargo_button">
 					<%= link_to new_student_thesis_embargo_path(@student, @thesis), class: "btn btn-warning", data: { remote: true } do %>
-						Place under permanent embargo?
+							Place under permanent administrative embargo?
 					<% end %>
 				</div>
 			<% end %>
@@ -187,6 +187,10 @@
 <% if current_user.role != User::STUDENT %>
 	<%= render partial: "submission_versions", locals: { submission_versions: @submission_versions } %>
 <% end %>
+
+<hr />
+
+<%= render 'embargo_requests' %>
 
 <hr />
 

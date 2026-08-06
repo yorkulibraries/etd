@@ -47,6 +47,23 @@ class ExportLogsControllerTest < ActionController::TestCase
     end
   end
 
+  should 'capture only publication eligible thesis ids' do
+    eligible = create(:thesis, status: Thesis::ACCEPTED, published_date: Date.new(2026, 7, 27))
+    blocked = create(:thesis, status: Thesis::ACCEPTED, published_date: Date.new(2026, 7, 27))
+    create(:submitted_embargo_request, thesis: blocked)
+
+    post :create, params: {
+      export_log: {
+        published_date: '2026-07-27', complete_thesis: true,
+        publish_thesis: true, production_export: false
+      }
+    }
+
+    export_log = assigns(:export_log)
+    assert_includes export_log.theses_ids.split(','), eligible.id.to_s
+    assert_not_includes export_log.theses_ids.split(','), blocked.id.to_s
+  end
+
   should 'not update an an existing export log' do
     export_log = create(:export_log)
 

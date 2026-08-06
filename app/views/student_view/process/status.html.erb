@@ -23,6 +23,13 @@
 	
 	<p class="bg-light p-2">Your Current Thesis/Dissertation Status: <span class="badge text-bg-success" style="font-size: 16px;"><%= @thesis.status.humanize %></span></p>
 
+	<div class="mb-3">
+		<%= render 'student_view/process/embargo_request_outcome', embargo_request: @embargo_request %>
+		<% if @embargo_extension_eligible %>
+			<%= button_to 'Request an extension', student_thesis_embargo_requests_path(@student, @thesis), method: :post, class: 'btn btn-outline-primary' %>
+		<% end %>
+	</div>
+
 	<div class="accordion" id="accordionThesis">
 		<div class="accordion-item">
 			<h2 class="accordion-header">

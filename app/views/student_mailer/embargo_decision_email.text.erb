@@ -1,0 +1,11 @@
+Your embargo request for "<%= @thesis.title %>" was <%= @request.status %>.
+
+<% if @request.approved? %>
+The thesis will remain withheld through <%= @request.approved_until.strftime('%B %-d, %Y') %>.
+<% else %>
+Decision explanation:
+<%= @request.decision_notes %>
+<% end %>
+
+View your ETD status:
+<%= @status_url %>

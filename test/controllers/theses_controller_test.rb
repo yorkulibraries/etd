@@ -3,6 +3,9 @@
 require 'test_helper'
 
 class ThesesControllerTest < ActionController::TestCase
+  include ActiveJob::TestHelper
+  include ActionMailer::TestHelper
+
   should 'not be visible unless logged in' do
     get :index, params: { student_id: 123 }
     assert_redirected_to login_path
@@ -58,6 +61,55 @@ class ThesesControllerTest < ActionController::TestCase
 
       assert_raises ActiveRecord::RecordNotFound, 'Should throw a RecordNotFound' do
         get :show, params: { id: 29_292_929, student_id: @student.id }
+      end
+    end
+
+    should 'render authorized embargo request history with escaped text and decision forms only for submitted requests' do
+      thesis = create(:thesis, student: @student)
+      submitted = create(:submitted_embargo_request, thesis: thesis, rationale: '<script>submitted</script>')
+      declined = create(:embargo_request, thesis: thesis, status: :declined,
+                                          rationale: '<script>declined</script>',
+                                          decision_notes: '<script>decision</script>',
+                                          decided_by: @user, decided_at: Time.current)
+      document = submitted.documents.not_deleted.where(usage: :embargo_letter).first
+      document.update_column(:name, 'private-letter.pdf')
+
+      get :show, params: { id: thesis.id, student_id: @student.id }
+
+      assert_select '#embargo-requests'
+      assert_includes response.body, '&lt;script&gt;submitted&lt;/script&gt;'
+      assert_includes response.body, '&lt;script&gt;decision&lt;/script&gt;'
+      assert_not_includes response.body, '<script>decision</script>'
+      assert_includes response.body, download_student_thesis_document_path(@student, thesis, document)
+      assert_not_includes response.body, document.file_url
+      assert_select "form[action='#{approve_student_thesis_embargo_request_path(@student, thesis, submitted)}']", 1
+      assert_select "form[action='#{decline_student_thesis_embargo_request_path(@student, thesis, submitted)}']", 1
+      assert_select "#embargo-request-#{declined.id} form", 0
+      assert_includes response.body, 'Permanent administrative embargo'
+    end
+
+    should 'separate legacy embargo documents from request evidence and omit malformed request usages' do
+      thesis = create(:thesis, student: @student)
+      request = create(:embargo_request, thesis: thesis)
+      legacy_document = create(:document, thesis: thesis, user: @student, usage: :embargo,
+                                          name: 'legacy-embargo.pdf',
+                                          file: fixture_file_upload('pdf-document.pdf'))
+      request_document = create(:embargo_request_document, embargo_request: request, usage: :embargo,
+                                                           name: 'request-supporting.pdf')
+      malformed_document = build(:document, thesis: thesis, user: @student,
+                                             embargo_request: request, usage: :licence,
+                                             name: 'malformed-request-licence.pdf',
+                                             file: fixture_file_upload('pdf-document.pdf'))
+      malformed_document.save!(validate: false)
+
+      get :show, params: { id: thesis.id, student_id: @student.id }
+
+      assert_equal [legacy_document.id], assigns(:embargo_documents).pluck(:id)
+      assert_select ".embargo-file #document_#{legacy_document.id}", 1
+      assert_select ".embargo-file #document_#{request_document.id}", 0
+      assert_select "#embargo-request-#{request.id}" do
+        assert_select 'li', text: /request-supporting\.pdf/, count: 1
+        assert_select 'li', text: /malformed-request-licence\.pdf/, count: 0
       end
     end
 
@@ -283,7 +335,56 @@ class ThesesControllerTest < ActionController::TestCase
 
       post :update_status, params: { id: thesis.id, student_id: @student.id, status: Thesis::PUBLISHED }
       thesis = assigns(:thesis)
-      assert_equal thesis.published_at, Date.today
+      assert_equal thesis.published_at, thesis.published_date
+    end
+
+    should 'block a permanent administrative embargo from direct published status posts' do
+      thesis = create(:thesis, status: Thesis::ACCEPTED, student: @student, embargoed: true)
+
+      post :update_status,
+           params: { id: thesis.id, student_id: @student.id, status: Thesis::PUBLISHED, notify_student: true }
+
+      assert_equal Thesis::ACCEPTED, thesis.reload.status
+      assert_empty enqueued_jobs
+    end
+
+    should 'block a pending embargo request from direct published status posts' do
+      thesis = create(:thesis, status: Thesis::ACCEPTED, student: @student)
+      create(:submitted_embargo_request, thesis: thesis)
+
+      post :update_status,
+           params: { id: thesis.id, student_id: @student.id, status: Thesis::PUBLISHED, notify_student: true }
+
+      assert_equal Thesis::ACCEPTED, thesis.reload.status
+      assert_empty enqueued_jobs
+    end
+
+    should 'block an active approved embargo request from direct published status posts' do
+      thesis = create(:thesis, status: Thesis::ACCEPTED, student: @student)
+      create(:embargo_request, thesis: thesis, status: :approved,
+                               approved_until: EmbargoRequest.toronto_today,
+                               decided_at: Time.current, decided_by: create(:user))
+
+      post :update_status,
+           params: { id: thesis.id, student_id: @student.id, status: Thesis::PUBLISHED, notify_student: true }
+
+      assert_equal Thesis::ACCEPTED, thesis.reload.status
+      assert_empty enqueued_jobs
+    end
+
+    should 'publish an eligible thesis once through the direct status route' do
+      thesis = create(:thesis, status: Thesis::ACCEPTED, student: @student)
+
+      assert_difference -> { thesis.audits.count }, 1 do
+        post :update_status,
+             params: { id: thesis.id, student_id: @student.id, status: Thesis::PUBLISHED,
+                       notify_student: true, notify_current_user: true, custom_message: 'Published now' }
+      end
+
+      assert_equal Thesis::PUBLISHED, thesis.reload.status
+      assert_equal thesis.published_date, thesis.published_at
+      assert_equal 'Publishing this thesis. Status changed to published', thesis.audits.last.comment
+      assert_equal 1, enqueued_jobs.size
     end
 
     should 'send an email if notification[student] or notifcation[current_user] are present' do
@@ -427,15 +528,17 @@ class ThesesControllerTest < ActionController::TestCase
       assert_redirected_to unauthorized_url
     end
 
-    should 'submit for review, thesis status will change to under_review' do
-      primary_document = create(:document, supplemental: false, thesis: @thesis, user: @student,
-                                           file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
-      supplemental_document = create(:document, supplemental: true, thesis: @thesis, user: @student,
+  should 'submit for review, thesis status will change to under_review' do
+    @thesis.update!(embargo_selection: :not_requested)
+    primary_document = create(:document, supplemental: false, thesis: @thesis, user: @student,
+                                 file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+    supplemental_document = create(:document, supplemental: true, thesis: @thesis, user: @student,
                                                 file: fixture_file_upload('pdf-document.pdf'))
 
       assert_difference 'ThesisSubmissionVersion.count', 1 do
         assert_difference 'ThesisSubmissionDocument.count', 2 do
-          post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+          post :submit_for_review, params: { id: @thesis.id, student_id: @student.id,
+                                            thesis: { certify_content_correct: true, title: 'Accepted atomically' } }
         end
       end
 
@@ -444,6 +547,7 @@ class ThesesControllerTest < ActionController::TestCase
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS),
                            'Should redirect to student thesis process Status page'
       assert_equal Thesis::UNDER_REVIEW, thesis.status, 'Status should change'
+      assert_equal 'Accepted atomically', thesis.title
 
       assert !thesis.student_accepted_terms_at.nil?, 'Ensure terms accepted date was assigned'
       assert_equal thesis.student_accepted_terms_at.beginning_of_day, Date.today.beginning_of_day,
@@ -465,14 +569,32 @@ class ThesesControllerTest < ActionController::TestCase
                    version.submission_documents.pluck(:source_document_id).sort
     end
 
-    should 'submit for review, thesis status will change to upload due to lack of document' do
+  should 'submit for review, thesis status will change to upload due to lack of document' do
+      @thesis.update!(embargo_selection: :not_requested)
+      original_title = @thesis.title
       assert_no_difference 'ThesisSubmissionVersion.count' do
-        post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+        post :submit_for_review,
+             params: { id: @thesis.id, student_id: @student.id,
+                       thesis: { certify_content_correct: true, title: 'Must not persist without a primary file' } }
       end
-
       assigns(:thesis)
       assert_response :redirect
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD)
+      assert_equal original_title, @thesis.reload.title
+      assert_equal Thesis::OPEN, @thesis.status
+    end
+
+    should 'prioritize the embargo error over a missing primary file without persisting submitted fields' do
+      original_title = @thesis.title
+
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: true, title: 'Must not persist when embargo precedes primary file' } }
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO)
+      assert_equal 'Complete the embargo step before submitting for review.', flash[:alert]
+      assert_equal original_title, @thesis.reload.title
+      assert_equal Thesis::OPEN, @thesis.status
     end
 
     should 'not change status to under_review if submitted files cannot be snapshotted' do
@@ -518,18 +640,116 @@ class ThesesControllerTest < ActionController::TestCase
                        @thesis.submission_versions.order(:version_number).last.submission_documents.first.file.path
     end
 
-    should 'should not submit for review without certifying content correct' do
-      @thesis.update(certify_content_correct: false)
+  should 'should not submit for review without certifying content correct' do
+      @thesis.update!(embargo_selection: :not_requested)
+      original_title = @thesis.title
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
 
       assert_no_difference 'ThesisSubmissionVersion.count' do
-        post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: false } }
+        post :submit_for_review,
+             params: { id: @thesis.id, student_id: @student.id,
+                       thesis: { certify_content_correct: false, title: 'Must not persist without certification' } }
       end
 
       assigns(:thesis)
       assert_response :redirect
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
       assert_equal "Please check the ‘I certify that the content is correct’ button to proceed.", flash[:alert]
+      assert_equal original_title, @thesis.reload.title
+      assert_equal Thesis::OPEN, @thesis.status
 
+    end
+
+    should 'prioritize the certification error over a missing primary file without persisting submitted fields' do
+      @thesis.update!(embargo_selection: :not_requested)
+      original_title = @thesis.title
+
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: false, title: 'Must not persist when certification precedes primary file' } }
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
+      assert_equal "Please check the ‘I certify that the content is correct’ button to proceed.", flash[:alert]
+      assert_equal original_title, @thesis.reload.title
+      assert_equal Thesis::OPEN, @thesis.status
+    end
+
+    should 'redirect an undecided embargo selection to the embargo step without submitting' do
+      original_title = @thesis.title
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: true, title: 'Must not persist with an undecided embargo' } }
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO)
+      assert_equal 'Complete the embargo step before submitting for review.', flash[:alert]
+      assert_equal Thesis::OPEN, @thesis.reload.status
+      assert_equal original_title, @thesis.title
+    end
+
+    should 'redirect a requested embargo with only a draft to the embargo step without submitting' do
+      @thesis.update!(embargo_selection: :requested)
+      original_title = @thesis.title
+      create(:embargo_request, thesis: @thesis, status: :draft)
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: true, title: 'Must not persist with a draft embargo' } }
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO)
+      assert_equal Thesis::OPEN, @thesis.reload.status
+      assert_equal original_title, @thesis.title
+    end
+
+    should 'reload the thesis inside its lock before atomically submitting for review' do
+      @thesis.update!(embargo_selection: :not_requested)
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+      Thesis.any_instance.expects(:with_lock).once.yields
+      Thesis.any_instance.expects(:reload).once.returns(@thesis)
+
+      post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS)
+    end
+
+    should 'not persist submitted thesis attributes when the final save fails' do
+      @thesis.update!(embargo_selection: :not_requested)
+      original_title = @thesis.title
+      create(:document, supplemental: false, thesis: @thesis, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+      Thesis.any_instance.stubs(:save).returns(false)
+
+      post :submit_for_review,
+           params: { id: @thesis.id, student_id: @student.id,
+                     thesis: { certify_content_correct: true, title: 'Must not persist after a save failure' } }
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT)
+      assert_equal original_title, @thesis.reload.title
+      assert_equal Thesis::OPEN, @thesis.status
+    end
+
+    %i[submitted approved declined].each do |request_status|
+      should "submit for review after a #{request_status} embargo request" do
+        @thesis.update!(embargo_selection: :requested)
+        if request_status == :submitted
+          create(:submitted_embargo_request, thesis: @thesis)
+        else
+          create(:embargo_request, thesis: @thesis, status: request_status)
+        end
+        create(:document, supplemental: false, thesis: @thesis, user: @student,
+                          file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+
+        post :submit_for_review, params: { id: @thesis.id, student_id: @student.id, thesis: { certify_content_correct: true } }
+
+        assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS)
+        assert_equal Thesis::UNDER_REVIEW, @thesis.reload.status
+      end
     end
 
     ## LICENCE UPLOAD CHECK

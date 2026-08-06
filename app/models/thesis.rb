@@ -10,11 +10,18 @@ class Thesis < ApplicationRecord
   validates_presence_of :student_id, message: 'A student must be selected before thesis can be created.'
   validates_presence_of :abstract, if: :updating_by_student?
   validate :certify_content_correct_present, if: :updating_by_student?, on: :submit_for_review
+  validate :embargo_step_completed, if: :updating_by_student?, on: :submit_for_review
 
   def certify_content_correct_present
     if certify_content_correct.blank?
       errors.add(:base, "Please check the ‘I certify that the content is correct’ button to proceed")
     end
+  end
+
+  def embargo_step_completed
+    return if embargo_step_complete?
+
+    errors.add(:base, 'Complete the embargo step before submitting for review.')
   end
 
   validates_presence_of :lac_licence_agreement, :yorkspace_licence_agreement, :etd_licence_agreement, if: :updating_by_student?, on: :accept_licences
@@ -32,6 +39,7 @@ class Thesis < ApplicationRecord
   belongs_to :student
   has_many :documents, dependent: :delete_all
   has_many :submission_versions, class_name: 'ThesisSubmissionVersion', dependent: :delete_all
+  has_many :embargo_requests, dependent: :destroy
   has_many :committee_members
 
   has_many :thesis_subjectships, dependent: :delete_all
@@ -61,6 +69,12 @@ class Thesis < ApplicationRecord
   STATUSES = [OPEN, UNDER_REVIEW, ACCEPTED, PUBLISHED, RETURNED].freeze
   STATUS_ACTIONS = { OPEN => 'Open', UNDER_REVIEW => 'Under Review', REJECTED => 'Reject', ACCEPTED => 'Accept',
                      PUBLISHED => 'Publish', RETURNED => 'Return' }.freeze
+
+  enum embargo_selection: {
+    undecided: 0,
+    not_requested: 1,
+    requested: 2
+  }, _prefix: :embargo
 
   DEGREENAME = [
     'EMBA', 'IMBA', 'LLM', 'MA', 'MASc', 'MBA', 'Mdes', 'MEd', 'MES', 'MFA', 'MFAc', 'MHRM', 'MPA', 'MPIA', 'MPPAL', 'MSc', 'MScN', 'MSW',
@@ -104,6 +118,7 @@ class Thesis < ApplicationRecord
   PROCESS_UPDATE = 'update'
   PROCESS_UPLOAD = 'upload'
   PROCESS_REVIEW = 'review'
+  PROCESS_EMBARGO = 'embargo'
   PROCESS_SUBMIT = 'submit'
   PROCESS_STATUS = 'status'
 
@@ -112,16 +127,34 @@ class Thesis < ApplicationRecord
   scope :open, -> { where('status = ? ', OPEN) }
   scope :under_review, -> { where('status = ? ', UNDER_REVIEW) }
   scope :rejected, -> { where('status = ? ', REJECTED) }
-  scope :accepted, -> { where('status = ? ', ACCEPTED).where('embargoed = ? ', false) }
-  scope :published, -> { where('status = ? ', PUBLISHED).where('embargoed = ? ', false) }
+  scope :publication_eligible, lambda { |on: EmbargoRequest.toronto_today|
+    blocked_ids = EmbargoRequest.publication_blocking(on: on).select(:thesis_id)
+    where(embargoed: false).where.not(id: blocked_ids)
+  }
+  scope :accepted, -> { where(status: ACCEPTED).publication_eligible }
+  scope :published, -> { where(status: PUBLISHED).publication_eligible }
   scope :returned, -> { where('status = ? ', RETURNED) }
   scope :with_embargo, -> { where('embargoed = ? ', true) }
-  scope :without_embargo, -> { where('embargoed = ? ', false) }
+  scope :without_embargo, -> { publication_eligible }
   scope :open_or_returned, -> { where('status = ? OR status = ?', OPEN, RETURNED) }
 
   def abstract=(text)
     text = '' if text.nil?
     self[:abstract] = text.encode('UTF-8', invalid: :replace, undef: :replace)
+  end
+
+  def current_embargo_request
+    embargo_requests.where(status: %i[draft submitted]).order(created_at: :desc).first ||
+      embargo_requests.order(created_at: :desc).first
+  end
+
+  def embargo_step_complete?
+    return true if embargo_not_requested?
+
+    completed_statuses = %w[submitted approved declined]
+    current_request = current_embargo_request
+
+    embargo_requested? && current_request.present? && completed_statuses.include?(current_request.status)
   end
 
   def assign_degree_name_and_level
@@ -181,22 +214,52 @@ class Thesis < ApplicationRecord
   end
 
   # Return theses that are ready to publish. Status: ACCEPTED + PublisheDate: Today or before
-  def self.ready_to_publish
-    Thesis.accepted.where('published_date <= ?', Date.today)
+  def self.ready_to_publish(on: EmbargoRequest.toronto_today)
+    where(status: ACCEPTED).publication_eligible(on: on).where('published_date <= ?', on)
   end
 
-  def publish
-    return unless embargoed == false
+  def publication_blocked?(on: EmbargoRequest.toronto_today)
+    embargoed != false || embargo_requests.publication_blocking(on: on).exists?
+  end
 
-    thesis = self
-    old_status = self.status
+  def publication_block_reason(on: EmbargoRequest.toronto_today)
+    return 'permanent_administrative_embargo' if embargoed != false
+    return 'pending_embargo_request' if embargo_requests.submitted.exists?
+    return 'approved_embargo_request' if embargo_requests.approved.where('approved_until >= ?', on).exists?
 
-    self.status = Thesis::PUBLISHED
-    self.audit_comment = 'Publishing this thesis. Status changed to published'
-    self.published_at = published_date
-    
-    StudentMailer.status_change_email(student, thesis, old_status, thesis.status).deliver_later
-    save(validate: false)
+    nil
+  end
+
+  def publish(notify: true, additional_recipients: [], custom_message: nil)
+    publication = nil
+
+    self.class.transaction do
+      locked_thesis = self.class.lock.find_by(id: id)
+      next if locked_thesis.nil? || locked_thesis.publication_blocked?
+
+      old_status = locked_thesis.status
+      locked_thesis.assign_attributes(
+        status: PUBLISHED,
+        audit_comment: 'Publishing this thesis. Status changed to published',
+        published_at: locked_thesis.published_date
+      )
+      next unless locked_thesis.save(validate: false)
+
+      publication = { student: locked_thesis.student, old_status: old_status, new_status: locked_thesis.status }
+    end
+
+    return false if publication.nil?
+
+    reload
+    if notify
+      mailer_arguments = [publication[:student], self, publication[:old_status], publication[:new_status]]
+      if additional_recipients.present? || custom_message.present?
+        mailer_arguments << additional_recipients.dup
+        mailer_arguments << custom_message
+      end
+      StudentMailer.status_change_email(*mailer_arguments).deliver_later
+    end
+    true
   end
 
   def self.assigned_to_user(user)

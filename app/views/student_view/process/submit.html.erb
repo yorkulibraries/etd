@@ -13,10 +13,25 @@
 
 <div class="student-view fitted review">
 	<h2>Review Details for Submission</h2>
-	<div class="settings-content">
-		<%= raw(AppSettings.student_submit_for_review) %>
-	</div>
-	<h3><%= @thesis.title %></h3>
+		<div class="settings-content">
+			<%= raw(AppSettings.student_submit_for_review) %>
+		</div>
+		<div class="mt-3">
+			<%= render 'student_view/process/embargo_request_outcome', embargo_request: @embargo_request %>
+			<% if @thesis.embargo_requested? && @embargo_request.present? %>
+				<p><strong>Reason:</strong> <%= @embargo_request.reason_label %></p>
+				<p><strong>Requested:</strong> <%= pluralize(@embargo_request.requested_duration_months, 'month') %></p>
+				<% if @embargo_documents.any? %>
+					<ul>
+						<% @embargo_documents.each do |document| %>
+							<li><%= document.name %></li>
+						<% end %>
+					</ul>
+				<% end %>
+				<%= link_to 'Review embargo request', student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO), class: 'btn btn-link' %>
+			<% end %>
+		</div>
+		<h3><%= @thesis.title %></h3>
 	<div class="thesis data-grid">
 		<hr/>
 		<div class="row">
@@ -132,15 +147,6 @@
 		<% end %>
 	</div>
 	
-	<% if @embargo_documents.count > 0 %>
-		<div class="bg-light-subtle mt-3 p-3">
-			<h4>Embargo Documents</h4>
-			<% @embargo_documents.each do | document | %>
-					<%= render partial: 'documents/document', locals: {document: document, view_only: true} %>
-			<% end %>
-		</div>
-	<% end %>
-
 	<div class="my-4">
 		<h4><%= Date.today.strftime("%B %d, %Y")%></h4>
 		<hr />

@@ -21,6 +21,87 @@ class DocumentTest < ActiveSupport::TestCase
     end
   end
 
+  should 'allow one active supervisor letter for an embargo request' do
+    request = create(:embargo_request)
+    letter = create(:document, thesis: request.thesis, user: request.thesis.student,
+                               embargo_request: request, usage: :embargo_letter,
+                               file: fixture_file_upload('pdf-document.pdf'))
+    duplicate = build(:document, thesis: request.thesis, user: request.thesis.student,
+                                 embargo_request: request, usage: :embargo_letter,
+                                 file: fixture_file_upload('pdf-document.pdf'))
+
+    assert letter.embargo_request_document?
+    assert_not duplicate.valid?
+    assert_includes duplicate.errors[:usage], 'already has a supervisor support letter'
+
+    letter.destroy
+    assert duplicate.valid?, 'a soft-deleted letter must not block its replacement'
+  end
+
+  should 'prevent a second request document from changing into an active supervisor letter' do
+    request = create(:embargo_request)
+    create(:embargo_request_document, embargo_request: request, usage: :embargo_letter)
+    supporting_document = create(:embargo_request_document, embargo_request: request, usage: :embargo)
+
+    supporting_document.usage = :embargo_letter
+
+    assert_not supporting_document.save
+    assert_includes supporting_document.errors[:usage], 'already has a supervisor support letter'
+  end
+
+  should 'allow an active supervisor letter to update itself' do
+    request = create(:embargo_request)
+    letter = create(:embargo_request_document, embargo_request: request, usage: :embargo_letter)
+
+    letter.file = fixture_file_upload('pdf-document.pdf')
+
+    assert letter.save
+  end
+
+  should 'require a request document to belong to the same thesis' do
+    request = create(:embargo_request)
+    document = build(:document, thesis: create(:thesis), user: request.thesis.student,
+                                embargo_request: request, usage: :embargo,
+                                file: fixture_file_upload('pdf-document.pdf'))
+
+    assert_not document.valid?
+    assert_includes document.errors[:embargo_request], 'must belong to the same thesis'
+  end
+
+  should 'only allow embargo evidence usages on request-bound documents' do
+    request = create(:embargo_request)
+    malformed_document = build(:document, thesis: request.thesis, user: request.thesis.student,
+                                           embargo_request: request, usage: :licence,
+                                           file: fixture_file_upload('pdf-document.pdf'))
+
+    assert_not malformed_document.valid?
+    assert_includes malformed_document.errors[:usage],
+                    'must be embargo evidence when attached to an embargo request'
+
+    licence = build(:document, embargo_request: nil, usage: :licence,
+                               file: fixture_file_upload('pdf-document.pdf'))
+    thesis_file = build(:document, embargo_request: nil, usage: :thesis,
+                                   supplemental: true, file: fixture_file_upload('pdf-document.pdf'))
+    assert licence.valid?, 'a licence document without an embargo request remains valid'
+    assert thesis_file.valid?, 'a thesis document without an embargo request remains valid'
+  end
+
+  should 'keep legacy embargo documents valid and public without a request' do
+    document = create(:document, usage: :embargo, embargo_request: nil,
+                                 file: fixture_file_upload('pdf-document.pdf'))
+
+    assert_not document.embargo_request_document?
+    assert document.file.path.start_with?(Rails.root.join('public').to_s)
+  end
+
+  should 'store request documents outside the public directory' do
+    request = create(:embargo_request)
+    document = create(:embargo_request_document, embargo_request: request, usage: :embargo_letter)
+
+    assert document.file.path.start_with?(Rails.root.join('storage').to_s)
+    assert File.exist?(document.file.path)
+  end
+
   should 'not create an invalid document' do
     assert !build(:document, file: nil).valid?, 'File is required'
     assert !build(:document, user: nil).valid?, 'User/owner is required'

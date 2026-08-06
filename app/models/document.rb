@@ -7,12 +7,16 @@ class Document < ApplicationRecord
   ### RELATIONS
   belongs_to :thesis
   belongs_to :user
+  belongs_to :embargo_request, optional: true
 
   #### VALIDATIONS
   validates_presence_of :file, :user, :thesis
   validate :one_primary_file_per_thesis, on: :create
   validate :validate_extension
   validate :validate_usage
+  validate :embargo_request_matches_thesis
+  validate :embargo_request_evidence_usage
+  validate :one_supervisor_letter_per_request
 
   #### SCOPES
   scope :newest, -> { order('created_at desc') }
@@ -82,6 +86,22 @@ class Document < ApplicationRecord
     name
   end
 
+  def embargo_request_document?
+    embargo_request_id.present?
+  end
+
+  def save(*args, **options, &block)
+    return super unless embargo_letter_lock_required?
+
+    with_embargo_request_lock { super }
+  end
+
+  def save!(*args, **options, &block)
+    return super unless embargo_letter_lock_required?
+
+    with_embargo_request_lock { super }
+  end
+
   def primary?
     return !supplemental?
   end
@@ -119,6 +139,39 @@ class Document < ApplicationRecord
       return false
     end
     return true
+  end
+
+  def embargo_request_matches_thesis
+    return if embargo_request.blank? || embargo_request.thesis_id == thesis_id
+
+    errors.add(:embargo_request, 'must belong to the same thesis')
+  end
+
+  def embargo_request_evidence_usage
+    return if embargo_request.blank? || embargo? || embargo_letter?
+
+    errors.add(:usage, 'must be embargo evidence when attached to an embargo request')
+  end
+
+  def one_supervisor_letter_per_request
+    return unless usage == 'embargo_letter' && embargo_request.present?
+    return unless embargo_request.documents.not_deleted.where(usage: :embargo_letter).where.not(id: id).exists?
+
+    errors.add(:usage, 'already has a supervisor support letter')
+  end
+
+  def embargo_letter_lock_required?
+    embargo_request_id.present? && usage == 'embargo_letter' && !@embargo_request_lock_held
+  end
+
+  def with_embargo_request_lock
+    self.class.transaction do
+      self.embargo_request = EmbargoRequest.lock.find(embargo_request_id)
+      @embargo_request_lock_held = true
+      yield
+    ensure
+      @embargo_request_lock_held = false
+    end
   end
 
   def document_type

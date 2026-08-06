@@ -24,8 +24,9 @@ class ThesesController < ApplicationController
     @primary_documents = @thesis.documents.not_deleted.primary
     @supplemental_documents = @thesis.documents.not_deleted.supplemental
     @licence_documents = @thesis.documents.not_deleted.licence
-    @embargo_documents = @thesis.documents.not_deleted.embargo
+    @embargo_documents = @thesis.documents.not_deleted.embargo.where(embargo_request_id: nil)
     @modification_request_documents = @thesis.documents.not_deleted.modification_request
+    @embargo_requests = @thesis.embargo_requests.includes(:decided_by, :documents).order(created_at: :desc)
     @submission_versions = @thesis.submission_versions.order(version_number: :desc) if current_user.role != User::STUDENT
     permission = current_user.role == User::STUDENT ? :show : :read
     authorize! permission, @thesis
@@ -133,25 +134,10 @@ class ThesesController < ApplicationController
     @thesis = @student.theses.find(params[:id])
 
     if params[:status] && Thesis::STATUSES.include?(params[:status])
-      @thesis.audit_comment = "Updating status from #{@thesis.status} to #{params[:status]}."
-      old_status = @thesis.status
-      @thesis.update_attribute(:status, params[:status])
-      @message = "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}."
-      @thesis.update_attribute(:under_review_at, Date.today) if params[:status] == Thesis::UNDER_REVIEW
-      @thesis.update_attribute(:accepted_at, Date.today) if params[:status] == Thesis::ACCEPTED
-      if params[:status] == Thesis::RETURNED
-        @thesis.update(returned_at: Date.today,
-                       returned_message: params[:custom_message])
-      end
-      @thesis.update_attribute(:published_at, Date.today) if params[:status] == Thesis::PUBLISHED
-
-      if params[:notify_student].blank? == false
-        additional_recipients = params[:notify_current_user] ? [current_user.email] : []
-        custom_message ||= params[:custom_message]
-        StudentMailer.status_change_email(@student, @thesis, old_status, @thesis.status, additional_recipients,
-                                          custom_message).deliver_later
-        additional_recipients << @student.email
-        @email_sent = "Sent to #{additional_recipients.join(', ')}."
+      if params[:status] == Thesis::PUBLISHED
+        update_published_status
+      else
+        update_nonpublished_status
       end
 
     else
@@ -167,31 +153,47 @@ class ThesesController < ApplicationController
 
   def submit_for_review
     @thesis = @student.theses.find(params[:id])
-    @thesis.current_user = current_user
+    submitted = false
+    primary_file_missing = false
+    error_messages = nil
 
-    # Temporarily assign the attributes for validation
-    @thesis.assign_attributes(thesis_params)
+    @thesis.with_lock do
+      @thesis = @thesis.reload
+      @thesis.current_user = current_user
+      @thesis.assign_attributes(thesis_params)
 
-    if @thesis.valid?(:submit_for_review)
-      if validate_active_thesis(@thesis.id)
-        begin
-          ActiveRecord::Base.transaction do
-            @thesis.update!(thesis_params)
-            @thesis.create_submission_snapshot!(current_user)
-            @thesis.update!(audit_comment: 'Submitting for review.', student_accepted_terms_at: Date.today, under_review_at: Date.today, status: Thesis::UNDER_REVIEW)
-          end
-
-          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS)
-        rescue ActiveRecord::RecordInvalid, CarrierWave::UploadError, CarrierWave::IntegrityError, CarrierWave::ProcessingError, SystemCallError => e
-          Rails.logger.error("Unable to snapshot thesis submission #{@thesis.id}: #{e.class} #{e.message}")
-          redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: 'Unable to submit for review because the submitted files could not be preserved.'
-        end
-      else
-        redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), alert: 'Please upload a Primary Thesis File.'
+      unless @thesis.valid?(:submit_for_review)
+        error_messages = @thesis.errors.full_messages.join(', ')
+        next
       end
+
+      unless validate_active_thesis(@thesis.id)
+        primary_file_missing = true
+        next
+      end
+
+      begin
+        ActiveRecord::Base.transaction do
+          @thesis.update!(thesis_params)
+          @thesis.create_submission_snapshot!(current_user)
+          @thesis.update!(audit_comment: 'Submitting for review.', student_accepted_terms_at: Date.today,
+                          under_review_at: Date.today, status: Thesis::UNDER_REVIEW)
+        end
+        submitted = true
+      rescue ActiveRecord::RecordInvalid, CarrierWave::UploadError, CarrierWave::IntegrityError, CarrierWave::ProcessingError,
+             SystemCallError => e
+        Rails.logger.error("Unable to snapshot thesis submission #{@thesis.id}: #{e.class} #{e.message}")
+        error_messages = 'Unable to submit for review because the submitted files could not be preserved.'
+      end
+    end
+
+    if submitted
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_STATUS)
+    elsif primary_file_missing
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), alert: 'Please upload a Primary Thesis File.'
     else
-      error_messages = @thesis.errors.full_messages.join(', ')
-      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: "#{error_messages}."
+      error_messages = 'Unable to submit thesis for review. Please try again.' if error_messages.blank?
+      redirect_for_submission_error(error_messages)
     end
   end
 
@@ -251,6 +253,55 @@ class ThesesController < ApplicationController
   end
 
   private
+
+  def update_published_status
+    notify_student = params[:notify_student].present?
+    additional_recipients = params[:notify_current_user] ? [current_user.email] : []
+
+    if @thesis.publish(notify: notify_student, additional_recipients: additional_recipients,
+                       custom_message: params[:custom_message])
+      @message = "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}."
+      if notify_student
+        @email_sent = "Sent to #{(additional_recipients + [@student.email]).join(', ')}."
+      end
+    else
+      @message = 'Status was not updated.'
+    end
+  end
+
+  def update_nonpublished_status
+    @thesis.audit_comment = "Updating status from #{@thesis.status} to #{params[:status]}."
+    old_status = @thesis.status
+    @thesis.update_attribute(:status, params[:status])
+    @message = "Updated status to #{Thesis::STATUS_ACTIONS[@thesis.status]}."
+    @thesis.update_attribute(:under_review_at, Date.today) if params[:status] == Thesis::UNDER_REVIEW
+    @thesis.update_attribute(:accepted_at, Date.today) if params[:status] == Thesis::ACCEPTED
+    if params[:status] == Thesis::RETURNED
+      @thesis.update(returned_at: Date.today,
+                     returned_message: params[:custom_message])
+    end
+
+    return if params[:notify_student].blank?
+
+    additional_recipients = params[:notify_current_user] ? [current_user.email] : []
+    StudentMailer.status_change_email(@student, @thesis, old_status, @thesis.status, additional_recipients,
+                                      params[:custom_message]).deliver_later
+    additional_recipients << @student.email
+    @email_sent = "Sent to #{additional_recipients.join(', ')}."
+  end
+
+  def redirect_for_submission_error(error_messages)
+    message = error_messages.to_s.strip
+    message = 'Unable to submit thesis for review. Please try again.' if message.empty?
+    message = "#{message}." unless message.end_with?('.', '?', '!')
+
+    if @thesis.errors[:base].include?('Complete the embargo step before submitting for review.')
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO),
+                  alert: 'Complete the embargo step before submitting for review.'
+    else
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: message
+    end
+  end
 
   def student_params
     params.require(:student).permit(:name, :first_name, :middle_name, :last_name, :email_external)

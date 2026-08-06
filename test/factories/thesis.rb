@@ -32,6 +32,7 @@ FactoryGirl.define do
     status Thesis::OPEN
 
     embargoed false
+    embargo_selection :undecided
   end
 
 end

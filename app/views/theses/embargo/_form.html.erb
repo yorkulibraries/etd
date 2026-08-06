@@ -3,15 +3,15 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Place Permanent Embargo</h5>
+				<h5 class="modal-title">Place Permanent administrative embargo</h5>
 				<% if request.xhr? %>
 	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				<% end %>
       </div>
 			<%= simple_form_for [@student, @thesis], url: student_thesis_embargo_path(@student, @thesis), method: :post, remote: remote do |f| %>
 				<div class="modal-body">
-					<p>Placing permanent embargo will disallow this thesis to be published to YorkSpace forever.</p>
-					<p>Permanent embargo can not be removed, and an explanation is required.</p>
+					<p>Placing a permanent administrative embargo will disallow this thesis to be published to YorkSpace forever.</p>
+					<p>A permanent administrative embargo cannot be removed, and an explanation is required.</p>
 					<div id="embargo_modal_textfield">
 						<%= f.input :embargo, input_html: { class: "form-control", rows: "4" },
 							label: "Embargo Explanation", readonly: read_only_if_student("embargo")   %>
@@ -23,7 +23,7 @@
 					<% else %>
 						<%= link_to "Cancel", :back, class: "btn btn-secondary" %>
 					<% end %>
-					<%= f.button :submit, "Place Embargo", class: "btn btn-primary", data: { confirm: "Are you sure? This action is permanent."} %>
+					<%= f.button :submit, "Place administrative embargo", class: "btn btn-primary", data: { confirm: "Are you sure? This action is permanent."} %>
 				</div>
 			<% end %>
     </div>
