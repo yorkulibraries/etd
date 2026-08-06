@@ -25,8 +25,11 @@ class ThesesController < ApplicationController
     @supplemental_documents = @thesis.documents.not_deleted.supplemental
     @licence_documents = @thesis.documents.not_deleted.licence
     @embargo_documents = @thesis.documents.not_deleted.embargo.where(embargo_request_id: nil)
+    @modification_request_documents = @thesis.documents.not_deleted.modification_request
     @embargo_requests = @thesis.embargo_requests.includes(:decided_by, :documents).order(created_at: :desc)
-    authorize! :edit, @thesis
+    @submission_versions = @thesis.submission_versions.order(version_number: :desc) if current_user.role != User::STUDENT
+    permission = current_user.role == User::STUDENT ? :show : :read
+    authorize! permission, @thesis
   end
 
   def new
@@ -145,7 +148,7 @@ class ThesesController < ApplicationController
   end
 
   def validate_active_thesis(thesis_id)
-    Document.exists?(deleted: false, user_id: current_user.id, thesis_id:, supplemental: false)
+    Document.exists?(deleted: false, user_id: current_user.id, thesis_id: thesis_id, supplemental: false)
   end
 
   def submit_for_review
@@ -169,14 +172,19 @@ class ThesesController < ApplicationController
         next
       end
 
-      @thesis.assign_attributes(
-        audit_comment: 'Submitting for review.',
-        student_accepted_terms_at: Date.today,
-        under_review_at: Date.today,
-        status: Thesis::UNDER_REVIEW
-      )
-      submitted = @thesis.save
-      error_messages = @thesis.errors.full_messages.join(', ') unless submitted
+      begin
+        ActiveRecord::Base.transaction do
+          @thesis.update!(thesis_params)
+          @thesis.create_submission_snapshot!(current_user)
+          @thesis.update!(audit_comment: 'Submitting for review.', student_accepted_terms_at: Date.today,
+                          under_review_at: Date.today, status: Thesis::UNDER_REVIEW)
+        end
+        submitted = true
+      rescue ActiveRecord::RecordInvalid, CarrierWave::UploadError, CarrierWave::IntegrityError, CarrierWave::ProcessingError,
+             SystemCallError => e
+        Rails.logger.error("Unable to snapshot thesis submission #{@thesis.id}: #{e.class} #{e.message}")
+        error_messages = 'Unable to submit for review because the submitted files could not be preserved.'
+      end
     end
 
     if submitted
@@ -184,12 +192,13 @@ class ThesesController < ApplicationController
     elsif primary_file_missing
       redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD), alert: 'Please upload a Primary Thesis File.'
     else
+      error_messages = 'Unable to submit thesis for review. Please try again.' if error_messages.blank?
       redirect_for_submission_error(error_messages)
     end
   end
 
   def validate_licence_uplaod(thesis_id)
-    Document.exists?(deleted: false, user_id: current_user.id, thesis_id:, supplemental: true, usage: :licence)
+    Document.exists?(deleted: false, user_id: current_user.id, thesis_id: thesis_id, supplemental: true, usage: :licence)
   end
 
   def accept_licences
@@ -282,11 +291,15 @@ class ThesesController < ApplicationController
   end
 
   def redirect_for_submission_error(error_messages)
+    message = error_messages.to_s.strip
+    message = 'Unable to submit thesis for review. Please try again.' if message.empty?
+    message = "#{message}." unless message.end_with?('.', '?', '!')
+
     if @thesis.errors[:base].include?('Complete the embargo step before submitting for review.')
       redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO),
                   alert: 'Complete the embargo step before submitting for review.'
     else
-      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: "#{error_messages}."
+      redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_SUBMIT), alert: message
     end
   end
 

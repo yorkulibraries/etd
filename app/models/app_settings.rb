@@ -53,4 +53,5 @@ class AppSettings < RailsSettings::Base
   field :supplemental_thesis_file_extensions, default: ".pdf, .doc, .docx, .txt, .html, .htm, .odt, .odp, .ods, .png, .tif, .jpg, .csv, .xml, .avi, .flac, .wav, .mp3, .mp4, .mov"
   field :licence_file_extensions, default: ".pdf"
   field :embargo_file_extensions, default: ".pdf, .txt, .html, .htm, .odt, .odp, .ods"
+  field :modification_request_file_extensions, default: ".pdf, .doc, .docx"
 end

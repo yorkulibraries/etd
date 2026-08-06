@@ -168,7 +168,7 @@ namespace :dspace do
     end
 
     unless ENV["PRIMARY_FILES_ONLY"] == "true"
-      thesis.documents.not_deleted.where(usage: Document.usages[:thesis], embargo_request_id: nil, supplemental: true).each do |document|
+    thesis.documents.not_deleted.where(usage: Document.usages[:thesis], embargo_request_id: nil, supplemental: true).each do |document|
         log "       #{document.file.path}"
         files.push document.file.path
       end

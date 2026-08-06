@@ -67,6 +67,10 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :submission_versions, only: [] do
+        resources :submission_documents, only: [:show], path: 'files', controller: 'thesis_submission_documents'
+      end
+
       resources :documents, path: 'files' do
         get 'deleted', on: :collection
         get 'download', on: :member

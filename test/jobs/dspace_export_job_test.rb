@@ -41,6 +41,32 @@ class DspaceExportJobTest < ActiveJob::TestCase
     end
   end
 
+  should 'export only primary and thesis supplemental file paths' do
+    thesis = create(:thesis)
+    primary = create(:document, thesis:, supplemental: false, usage: :thesis,
+                                file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+    supplemental = create(:document, thesis:, supplemental: true, usage: :thesis,
+                                    file: fixture_file_upload('pdf-document.pdf'))
+    licence = create(:document_licence, thesis:)
+    embargo = create(:document, thesis:, supplemental: true, usage: :embargo,
+                              file: fixture_file_upload('pdf-document.pdf'))
+    request = create(:embargo_request, thesis: thesis)
+    request_bound = create(:document, thesis: thesis, usage: :thesis, supplemental: true,
+                                    embargo_request: request,
+                                    file: fixture_file_upload('document-microsoft.doc'))
+    modification_request = create(:document, thesis:, supplemental: true, usage: :modification_request,
+                                           file: fixture_file_upload('document-microsoft.doc'))
+
+    paths = DspaceExportJob.new.extract_thesis_filepaths(thesis)
+
+    assert_includes paths, primary.file.path
+    assert_includes paths, supplemental.file.path
+    assert_not_includes paths, licence.file.path
+    assert_not_includes paths, embargo.file.path
+    assert_not_includes paths, request_bound.file.path
+    assert_not_includes paths, modification_request.file.path
+  end
+
   should 'recheck embargo eligibility after an export log captured ids' do
     eligible = create(:thesis, status: Thesis::ACCEPTED)
     newly_blocked = create(:thesis, status: Thesis::ACCEPTED)
@@ -72,8 +98,7 @@ class DspaceExportJobTest < ActiveJob::TestCase
     primary = create(:document, thesis: thesis, usage: :thesis, supplemental: false,
                                 file: Rack::Test::UploadedFile.new('test/fixtures/files/pdf-document.pdf'))
     request = create(:embargo_request, thesis: thesis)
-    request_bound = build(:document, thesis: thesis, embargo_request: request,
-                                      usage: :thesis, supplemental: true)
+    request_bound = build(:document, thesis: thesis, embargo_request: request, usage: :thesis, supplemental: true)
     request_bound.save!(validate: false) # Simulate a malformed historical row predating the validation.
 
     files = DspaceExportJob.new.extract_thesis_filepaths(thesis)

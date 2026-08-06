@@ -14,13 +14,16 @@ html: {  multipart: true, class: "file-upload" } do |f| %>
 	<% if @document.usage == 'embargo' && !@document.embargo_request_document? %>
   	  Upload Embargo Documents
   	<% end %>
-  <% if @document.usage == 'embargo' && @document.embargo_request_document? %>
-    Upload Supporting Embargo Document
-  <% end %>
-  <% if @document.usage == 'embargo_letter' %>
-    Upload Supervisor Support Letter
-  <% end %>
-  </h2>
+	  <% if @document.usage == 'embargo' && @document.embargo_request_document? %>
+	    Upload Supporting Embargo Document
+	  <% end %>
+	  <% if @document.usage == 'embargo_letter' %>
+	    Upload Supervisor Support Letter
+	  <% end %>
+			<% if @document.usage == 'modification_request' %>
+			  Upload Modification Request Documents
+			<% end %>
+	  </h2>
 
 	<div id="supplementary-help-info" class="alert alert-secondary" role="alert">
 		<% if @document.usage == 'thesis' && !@document.supplemental %>
@@ -35,6 +38,9 @@ html: {  multipart: true, class: "file-upload" } do |f| %>
   	<% if @document.usage == 'embargo' %>
   	  <%= raw(AppSettings.student_supplementary_embargo_upload_files) %>
   	<% end %>
+		<% if @document.usage == 'modification_request' %>
+		  Upload approval emails, supervisor letters, or other documentation for a modification request.
+		<% end %>
 	</div>
 
   <% if @document.name || (!@document.embargo_request_document? && @document.file_url) %>

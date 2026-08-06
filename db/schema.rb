@@ -244,6 +244,34 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_27_170100) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
+  create_table "thesis_submission_documents", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "thesis_submission_version_id", null: false
+    t.integer "source_document_id"
+    t.boolean "supplemental", default: true, null: false
+    t.integer "usage", null: false
+    t.string "name"
+    t.string "original_filename"
+    t.string "content_type"
+    t.bigint "file_size"
+    t.string "file"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_document_id"], name: "index_thesis_submission_documents_on_source_document_id"
+    t.index ["thesis_submission_version_id"], name: "index_submission_documents_on_version_id"
+  end
+
+  create_table "thesis_submission_versions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "thesis_id", null: false
+    t.integer "version_number", null: false
+    t.integer "submitted_by_id", null: false
+    t.datetime "submitted_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["submitted_by_id"], name: "index_thesis_submission_versions_on_submitted_by_id"
+    t.index ["thesis_id", "version_number"], name: "index_submission_versions_on_thesis_and_version", unique: true
+    t.index ["thesis_id"], name: "index_thesis_submission_versions_on_thesis_id"
+  end
+
   create_table "users", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.string "username"
     t.string "name"
