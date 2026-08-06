@@ -44,3 +44,4 @@ services:
     image: seleniarm/standalone-chromium:latest
     ports:
       - ${VNC_HTTP:-7904}:7900
+ 
