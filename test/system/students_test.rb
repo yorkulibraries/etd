@@ -67,6 +67,8 @@ class StudentsTest < ApplicationSystemTestCase
     fill_in('Name *', with: "#{@gem_record.studentname} (test)")
     click_button('Update Student')
 
+    # Wait for the redirect to finish before querying nodes from the new document.
+    assert_current_path %r{\A/students/\d+\z}
     assert_selector 'p', text: "test@test.com", visible: true
     assert_selector 'h1', text: "#{@gem_record.studentname} (test)", visible: true
   end
