@@ -268,14 +268,63 @@ class StudentsControllerTest < ActionController::TestCase
       assert_equal 15, students.count, 'second page, 15'
     end
 
-    should 'display audit trail for this student, including theses and documents' do
+    should 'display audit trail for this student, including associated record changes' do
       student = create(:student)
-      create(:thesis, student:)
+      thesis = create(:thesis, student:, title: 'Original Thesis')
+      document = create(:document, thesis:, user: @user, name: 'Original Document')
+      committee_member = create(:committee_member, thesis:, role: CommitteeMember::CHAIR)
+
+      thesis.update!(title: 'Updated Thesis')
+      document.update!(name: 'Updated Document')
+      committee_member.update!(role: CommitteeMember::OUTSIDE_MEMBER)
 
       get :audit_trail, params: { id: student.id }
 
-      assert assigns(:audits)
-      assert assigns(:audits_grouped)
+      assert_select '#audit_trail .audit-change[data-field="title"]' do |changes|
+        assert changes.any? { |change| change.text.include?('Original Thesis') && change.text.include?('Updated Thesis') },
+               'The audit trail should include thesis field changes'
+      end
+      assert_select '#audit_trail .audit-change[data-field="name"]' do |changes|
+        assert changes.any? { |change| change.text.include?('Original Document') && change.text.include?('Updated Document') },
+               'The audit trail should include document field changes'
+      end
+      assert_select '#audit_trail .audit-change[data-field="role"]' do |changes|
+        assert changes.any? { |change| change.text.include?(CommitteeMember::CHAIR) && change.text.include?(CommitteeMember::OUTSIDE_MEMBER) },
+               'The audit trail should include committee member field changes'
+      end
+    end
+
+    should 'display create, update, and destroy details for changed fields in the audit trail' do
+      student = create(:student, name: 'Original Student')
+      student.audit_comment = 'Updating student details.'
+      student.update!(name: 'Updated Student', blocked: true)
+      Audited::Audit.create!(
+        auditable_type: 'User',
+        auditable_id: student.id,
+        action: 'destroy',
+        audited_changes: { 'name' => 'Removed Student', 'tags' => %w[one two] },
+        user_id: @user.id,
+        user_type: 'User',
+        comment: 'Removing the student.',
+        created_at: Time.current
+      )
+
+      get :audit_trail, params: { id: student.id }
+
+      assert_select '#audit_trail .audit-action', text: /Create/
+      assert_select '#audit_trail .audit-action', text: /Update/
+      assert_select '#audit_trail .audit-action', text: /Destroy/
+      assert_select '#audit_trail tr[data-action="update"] .audit-action', text: /Updating student details/
+      assert_select '#audit_trail tr[data-action="destroy"] .audit-action', text: /Removing the student/
+      assert_select '#audit_trail tr[data-action="destroy"] .who', text: @user.name
+      assert_select '#audit_trail tr[data-action="create"] .audit-change[data-field="name"] .value', text: /set to\s+Original Student/
+      assert_select '#audit_trail .audit-change[data-field="name"]' do |changes|
+        assert changes.any? { |change| change.text.include?('Original Student') && change.text.include?('Updated Student') },
+               'The audit trail should show both values for the changed field'
+      end
+      assert_select '#audit_trail .audit-change[data-field="blocked"] .old-value', text: /No/
+      assert_select '#audit_trail .audit-change[data-field="blocked"] .new-value', text: /Yes/
+      assert_select '#audit_trail tr[data-action="destroy"] .audit-change[data-field="tags"] .value', text: /removed\s+one, two/
     end
 
     should 'send an invitation email' do
