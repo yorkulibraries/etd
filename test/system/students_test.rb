@@ -263,8 +263,7 @@ class StudentsTest < ApplicationSystemTestCase
 
     click_on("Upload Primary Thesis File")
 
-    # assert_no_selector("p", text: "Smith_Jane_E_2014_PhD.pdf", visible: :all)
-    assert_not(page.has_css?("p", text: "Smith_Jane_E_2014_PhD.pdf"), "Should not show 'example text' as per Spring 2024 requirements")
+    assert_no_selector "p", text: "Smith_Jane_E_2014_PhD.pdf"
 
     attach_file("document_file", Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf'))
     click_button('Upload')
