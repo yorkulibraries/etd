@@ -26,7 +26,8 @@ class Ability
       can :read, [:student, Student]
 
       can :manage, Document do |document|
-        document.thesis.status == Thesis::OPEN || document.thesis.status == Thesis::RETURNED
+        document.thesis && document.thesis.student_id == user.id &&
+          (document.thesis.status == Thesis::OPEN || document.thesis.status == Thesis::RETURNED)
       end
 
       can [:edit, :update, :read, :submit_for_review, :organize_student_information, :accept_licences], Thesis do |thesis|

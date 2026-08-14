@@ -17,11 +17,11 @@ class WordCountValidator < ActiveModel::EachValidator
     word_count = value.scan(/[\w-]+/).size
 
     if maximum.is_a?(Integer) && word_count.to_i > maximum.to_i
-      record.errors[attribute] << (options[:message] || " exceeds maxmimum count of #{maximum} words")
-    elsif minimum.is_a?(Integer) && word_count.to_i < minumum.to_i
-      record.errors[attribute] << (options[:message] || " has less than mimumum (#{maximum}) number of words")
-    elsif between.is_a?(Range) && (word_count.to_i < range.begin || word_count.to_i > range.end)
-      record.errors[attribute] << (options[:message] || " must have between #{range.begin} and #{range.end} words")
+      record.errors.add(attribute, options[:message] || " exceeds maximum count of #{maximum} words")
+    elsif minimum.is_a?(Integer) && word_count.to_i < minimum.to_i
+      record.errors.add(attribute, options[:message] || " has less than minimum (#{minimum}) number of words")
+    elsif between.is_a?(Range) && (word_count.to_i < between.begin || word_count.to_i > between.end)
+      record.errors.add(attribute, options[:message] || " must have between #{between.begin} and #{between.end} words")
     end
   end
 end

@@ -97,7 +97,7 @@ module ETD
       deposit_receipt = @collection.post!(entry: options.entry, in_progress: true, on_behalf_of: options.on_behalf_of)
 
       # 2) Deposit Media if any (zip first if required)
-      if options.files.size.positive? && deposit_receipt.status_code.to_i >= 200
+      if options.files.size.positive? && deposit_receipt.status_code.to_i.between?(200, 299)
           # if there are files to send and original entry has been successfully deposited
           options.files.each do |file_path|
             file_size = File.size(file_path)
@@ -111,7 +111,7 @@ module ETD
       end
 
       # 3) Send a completed signal if required
-      if options.complete && deposit_receipt.status_code.to_i >= 200
+      if options.complete && deposit_receipt.status_code.to_i.between?(200, 299)
         # send a completion flag
         headers = { 'In-Progress' => 'false' }
         @connection.post(deposit_receipt.location, nil, headers)
