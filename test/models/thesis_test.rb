@@ -133,6 +133,12 @@ class ThesisTest < ActiveSupport::TestCase
     assert_equal 'New Title', thesis.title, 'Title should have been updated'
   end
 
+  should 'split subject keywords on commas and semicolons and capitalize their first words' do
+    thesis = build(:thesis, keywords: 'aeronomy, already Capitalized; “design” ; ;')
+
+    assert_equal ['Aeronomy', 'Already Capitalized', '“Design”'], thesis.subject_keywords
+  end
+
   should 'display only OPEN status thesis records' do
     create_list(:thesis, 5, status: Thesis::OPEN)
     create_list(:thesis, 10, status: Thesis::ACCEPTED)
