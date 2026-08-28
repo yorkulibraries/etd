@@ -3,7 +3,22 @@
 <%= f.label :abstract, label: "Abstract", required: true, class: "d-block mb-1" %>
 
 <div class="form-text"><%= raw(AppSettings.student_update_details_abstract) %></div>
-<%= f.input :abstract, input_html: { class: "", rows: "8" }, label: false, readonly: read_only_if_student("abstract") %>
+<p id="abstract-formatting-help" class="form-text">
+  Compare your pasted abstract with the PDF. Use a blank line between paragraphs (press Enter twice).
+  Remove line breaks within a paragraph that were introduced when copying from the PDF.
+  Indentation alone does not mark a new paragraph.
+</p>
+<%= f.input :abstract, input_html: { rows: "8", aria: { describedby: "abstract-formatting-help" } }, label: false, readonly: read_only_if_student("abstract") %>
+<section id="abstract-preview" class="border rounded bg-white p-3 mb-3" aria-labelledby="abstract-preview-heading" hidden>
+  <h3 id="abstract-preview-heading" class="h6">Paragraph preview</h3>
+  <p class="form-text">
+    This checks paragraph spacing only, not all YorkSpace formatting. Single line breaks appear as spaces;
+    blank lines separate paragraphs. Edit the abstract above to correct the spacing. Your text is not changed automatically.
+  </p>
+  <div id="abstract-paragraph-preview" class="text-break"></div>
+  <span id="abstract-preview-empty" class="text-secondary">Enter an abstract to preview its paragraphs.</span>
+</section>
+<noscript><p class="form-text">Enable JavaScript to see the paragraph preview. You can still edit and save your abstract.</p></noscript>
 
 <%= f.label :loc_subject_ids, label: "Subjects", class: "d-block mb-1" %>
 <div class="form-text"><%= raw(AppSettings.student_update_details_subjects) %></div>

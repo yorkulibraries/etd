@@ -198,6 +198,23 @@ class Thesis < ApplicationRecord
     title
   end
 
+  # Return the keywords in the form expected by DSpace's
+  # dc.subject.keywords field. Students may separate keywords with either
+  # commas or semicolons. Only the first word is capitalized, preserving the
+  # rest of each keyword phrase as entered.
+  def subject_keywords
+    return [] if keywords.blank?
+
+    keywords.split(/[,;]/).each_with_object([]) do |keyword, normalized_keywords|
+      keyword = keyword.strip
+      next if keyword.blank?
+
+      normalized_keywords << keyword.sub(/\A([^\p{L}\p{N}]*)(\p{Ll})/) do
+        "#{Regexp.last_match(1)}#{Regexp.last_match(2).upcase}"
+      end
+    end
+  end
+
   def masters?
     degree_level == MASTERS
   end

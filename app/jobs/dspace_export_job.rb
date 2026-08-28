@@ -127,8 +127,8 @@ class DspaceExportJob < ActiveJob::Base
       entry.add_dublin_core_extension!('subject', subject.name)
     end
 
-    thesis.keywords&.split(',')&.each do |keyword|
-      entry.add_dublin_core_extension!('relationSubjectKeywords', keyword.strip)
+    thesis.subject_keywords.each do |keyword|
+      entry.add_dublin_core_extension!('relationSubjectKeywords', keyword)
     end
 
     entry.add_dublin_core_extension!('abstract', thesis.abstract)

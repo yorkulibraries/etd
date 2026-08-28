@@ -112,10 +112,8 @@ namespace :dspace do
       entry.add_dublin_core_extension!("subject", subject.name)
     end
 
-    if thesis.keywords != nil
-      thesis.keywords.split(",").each do |keyword|
-        entry.add_dublin_core_extension!("relationSubjectKeywords", keyword.strip)
-      end
+    thesis.subject_keywords.each do |keyword|
+      entry.add_dublin_core_extension!("relationSubjectKeywords", keyword)
     end
 
     entry.add_dublin_core_extension!("abstract", thesis.abstract.tr("\u0002\u000B\u000C\u000E\u000F",''))
