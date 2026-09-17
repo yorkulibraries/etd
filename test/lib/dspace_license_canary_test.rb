@@ -5,8 +5,11 @@ require 'tmpdir'
 require 'json'
 require 'etd/dspace_rest_client'
 require 'etd/license_files'
+require_relative '../support/sqlite_license_lock'
 
 class DspaceLicenseCanaryTest < ActiveSupport::TestCase
+  include SqliteLicenseLock
+
   class Client
     attr_reader :writes
 

@@ -3,8 +3,10 @@
 require 'test_helper'
 require 'etd/dspace_rest_client'
 require 'etd/license_files'
+require_relative '../support/sqlite_license_lock'
 
 class DspaceLicenseBundleJobTest < ActiveSupport::TestCase
+  include SqliteLicenseLock
   class CompleteBundleClient
     def bundles(_item_uuid)
       [{ 'uuid' => '11111111-1111-4111-8111-111111111111', 'name' => 'LICENSE' }]

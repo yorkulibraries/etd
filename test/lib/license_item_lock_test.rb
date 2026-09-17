@@ -7,6 +7,8 @@ class LicenseItemLockTest < ActiveSupport::TestCase
   self.use_transactional_tests = false
 
   should 'exclude a second database connection and release after exceptions' do
+    skip 'MySQL named-lock integration is exercised by the MySQL CI step' if ActiveRecord::Base.connection.adapter_name == 'SQLite'
+
     uuid = SecureRandom.uuid
     ETD::LicenseItemLock.synchronize(uuid) do
       thread = Thread.new do
