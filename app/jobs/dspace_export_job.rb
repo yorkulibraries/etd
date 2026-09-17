@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require Rails.root.join('lib/etd/exporter.rb')
+require Rails.root.join('lib/etd/dspace_receipt_identifier.rb')
 require 'ostruct'
 
 class DspaceExportJob < ActiveJob::Base
@@ -61,6 +62,8 @@ class DspaceExportJob < ActiveJob::Base
 
             log "Receipt Status: #{receipt.status_code}"
             log "Receipt Message: #{receipt.status_message}"
+
+            enqueue_license_bundle(receipt, thesis)
 
             # 3) set status of each thesis to publish after it has been published
             thesis.publish if !receipt.nil? && @export_log.publish_thesis?
@@ -169,6 +172,34 @@ class DspaceExportJob < ActiveJob::Base
   end
 
   ## UTIL FUNCTIONS
+  def enqueue_license_bundle(receipt, thesis)
+    return unless @export_log.production_export?
+    return unless @export_log.complete_thesis?
+    return if AppSettings.dspace_rest_api_url.blank?
+    return unless receipt&.status_code.to_i.between?(200, 299)
+
+    item_uuid = ETD::DspaceReceiptIdentifier.item_uuid(receipt)
+    unless item_uuid
+      log 'LICENSE POST-DEPOSIT SKIPPED: SWORD receipt did not expose a DSpace item UUID'
+      return
+    end
+
+    deposit = DspaceDeposit.find_or_initialize_by(export_log: @export_log, thesis:)
+    if deposit.persisted? && deposit.item_uuid != item_uuid
+      log "LICENSE POST-DEPOSIT SKIPPED: export already recorded item #{deposit.item_uuid}"
+      return
+    end
+
+    deposit.item_uuid = item_uuid
+    deposit.sword_location = receipt.location
+    deposit.save!
+    return if [DspaceDeposit::COMPLETE, DspaceDeposit::REVIEW_REQUIRED].include?(deposit.license_status)
+
+    DspaceLicenseBundleJob.perform_later(deposit.id)
+  rescue StandardError => e
+    log "LICENSE POST-DEPOSIT SETUP ERROR: #{e.message}"
+  end
+
   def settings(_production)
     {
       username: AppSettings.dspace_live_username, password: AppSettings.dspace_live_password,

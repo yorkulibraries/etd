@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_07_27_170100) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_16_120000) do
   create_table "action_text_rich_texts", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
@@ -137,6 +137,25 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_27_170100) do
     t.index ["submitted_at"], name: "index_embargo_requests_on_submitted_at"
     t.index ["thesis_id", "status"], name: "index_embargo_requests_on_thesis_id_and_status"
     t.index ["thesis_id"], name: "index_embargo_requests_on_thesis_id"
+  end
+
+  create_table "dspace_deposits", charset: "utf8mb3", force: :cascade do |t|
+    t.integer "thesis_id", null: false
+    t.integer "export_log_id", null: false
+    t.string "item_uuid", limit: 36, null: false
+    t.string "sword_location"
+    t.string "license_status", default: "pending", null: false
+    t.datetime "license_synced_at"
+    t.text "last_error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "license_attempts", default: 0, null: false
+    t.datetime "license_retry_at"
+    t.index ["export_log_id", "thesis_id"], name: "index_dspace_deposits_on_export_log_id_and_thesis_id", unique: true
+    t.index ["export_log_id"], name: "index_dspace_deposits_on_export_log_id"
+    t.index ["item_uuid"], name: "index_dspace_deposits_on_item_uuid", unique: true
+    t.index ["license_status", "license_retry_at"], name: "index_dspace_deposits_on_license_status_and_license_retry_at"
+    t.index ["thesis_id"], name: "index_dspace_deposits_on_thesis_id"
   end
 
   create_table "export_logs", id: :integer, charset: "utf8mb3", force: :cascade do |t|
@@ -312,4 +331,6 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_27_170100) do
   add_foreign_key "thesis_invitations", "gem_records"
   add_foreign_key "thesis_invitations", "theses"
   add_foreign_key "thesis_invitations", "users", column: "student_id"
+  add_foreign_key "dspace_deposits", "export_logs"
+  add_foreign_key "dspace_deposits", "theses"
 end

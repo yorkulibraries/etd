@@ -39,6 +39,7 @@ class Thesis < ApplicationRecord
 
   belongs_to :student
   has_many :documents, dependent: :delete_all
+  has_many :dspace_deposits, dependent: :restrict_with_exception
   has_many :submission_versions, class_name: 'ThesisSubmissionVersion', dependent: :delete_all
   has_many :embargo_requests, dependent: :destroy
   has_many :committee_members
