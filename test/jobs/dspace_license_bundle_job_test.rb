@@ -127,7 +127,9 @@ class DspaceLicenseBundleJobTest < ActiveSupport::TestCase
 
   should 'recover persisted work through the recovery rake task' do
     require 'rake'
-    Rails.application.load_tasks unless Rake::Task.task_defined?('dspace:licenses:recover')
+    # Loading all tasks here appends a second action to the already-loaded exporter.
+    load Rails.root.join('lib/tasks/dspace_licenses.rake') unless Rake::Task.task_defined?('dspace:licenses:recover')
+    Rake::Task.define_task(:environment) unless Rake::Task.task_defined?(:environment)
     ETD::DspaceRestClient.stubs(:new).returns(CompleteBundleClient.new)
     Rake::Task['dspace:licenses:recover'].reenable
     Rake::Task['dspace:licenses:recover'].invoke
