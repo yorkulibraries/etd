@@ -15,6 +15,7 @@ class ExportLog < ApplicationRecord
   ## RELATIONS
   belongs_to :creator, foreign_key: 'user_id', class_name: 'User'
   belongs_to :cancelled_by, foreign_key: 'job_cancelled_by_id', class_name: 'User'
+  has_many :dspace_deposits, dependent: :restrict_with_exception
 
   ## VALIDATIONS
   validates_presence_of :creator, :job_status, :published_date

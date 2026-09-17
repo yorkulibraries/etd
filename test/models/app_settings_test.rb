@@ -12,4 +12,10 @@ class AppSettingsTest < ActiveSupport::TestCase
       assert_equal "This is begin, first step", setting.value
    end
 
+   should 'store the DSpace REST API URL' do
+      AppSettings.dspace_rest_api_url = 'https://repository.example/server/api'
+
+      assert_equal 'https://repository.example/server/api', AppSettings.dspace_rest_api_url
+   end
+
 end
