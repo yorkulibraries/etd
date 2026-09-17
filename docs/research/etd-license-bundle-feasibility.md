@@ -53,6 +53,8 @@ The database is the durable work list. The worker recovers pending records, inte
 
 MySQL named locks serialize each item's job and backfill operations across processes sharing the database. They are released on connection termination, so a crashed worker can be recovered. All writers for this application must use the same MySQL server. Repository staff or other applications do not participate in this lock. Reruns always inspect current remote state before writing; a timeout after a successful upload is reconciled on the next run.
 
+Licence writes and the recovery worker require MySQL; SQLite does not implement `GET_LOCK`. CI retains both database passes: SQLite tests licence service/job behaviour with a test-only lock stub and skips the MySQL concurrency integration test. The MySQL pass uses real locks throughout, including cross-connection exclusion, nested acquisition and release after exceptions. No runtime no-op lock fallback is provided.
+
 Authenticated collection reads cover restricted records and follow pagination. Public reads remain possible when credentials are absent. Receipt identifiers are extracted from parsed Atom links and IDs, and conflicting identifiers are rejected. Exact licence bytes are protected against Git line-ending conversion.
 
 ### Single-record validation

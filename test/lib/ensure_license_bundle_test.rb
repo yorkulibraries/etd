@@ -4,8 +4,10 @@ require 'test_helper'
 require 'digest'
 require 'tmpdir'
 require 'etd/ensure_license_bundle'
+require_relative '../support/sqlite_license_lock'
 
 class EnsureLicenseBundleTest < ActiveSupport::TestCase
+  include SqliteLicenseLock
   class StatefulDspaceClient
     attr_reader :writes
 
