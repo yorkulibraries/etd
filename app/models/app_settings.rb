@@ -24,6 +24,7 @@ class AppSettings < RailsSettings::Base
   field :dspace_live_service_document_url
   field :dspace_live_collection_uri
   field :dspace_live_collection_title
+  field :dspace_rest_api_url
   field :student_begin_submission
   field :student_begin_external_non_yorku_email
   field :student_update_details_initial
