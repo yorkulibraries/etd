@@ -38,6 +38,9 @@ class AppSettings < RailsSettings::Base
   field :student_supplementary_upload_files
   field :student_supplementary_licence_upload_files
   field :student_supplementary_embargo_upload_files
+  field :modification_request_upload_files,
+        default: '<div>Upload approval emails, supervisor letters, or other documentation for a ' \
+                 'modification request. These files are internal and are not exported to DSpace.</div>'
   field :student_review_license_info
   field :student_review_license_lac
   field :student_review_lac_licence_instructions

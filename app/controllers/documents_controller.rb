@@ -64,7 +64,11 @@ class DocumentsController < ApplicationController
     verify_document_request_thesis!
     authorize! :manage, @document
     @document.audit_comment = "Document was updated. File: #{@document.name}"
-    if @document.update(document_params.except(:embargo_request_id))
+    @document.assign_attributes(document_params.except(:embargo_request_id))
+    # Keep the displayed name in sync with the replacement file so the
+    # extension matches what was actually uploaded (e.g. .docx -> .pdf).
+    @document.name = @document.file.filename if @document.file.present?
+    if @document.save
       redirect_to document_return_path(@document), notice: 'File uploaded.'
     else
       render action: 'edit'

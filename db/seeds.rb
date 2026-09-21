@@ -230,6 +230,10 @@ AppSettings.student_supplementary_embargo_upload_files = <<HEREDOC
 <div>Please Upload the following documents:<br><br></div><ul><li><strong>Supervisor Letter</strong></li><li><strong>Other Embargo Supporting Documents</strong></li><li><strong>Portable Document Format:</strong> (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).</li></ul>
 HEREDOC
 
+AppSettings.modification_request_upload_files = <<HEREDOC
+<div>Upload approval emails, supervisor letters, or other documentation for a modification request. These files are internal and are not exported to DSpace.</div>
+HEREDOC
+
 AppSettings.student_review_license_info = <<HEREDOC
 <div>By signing these non-exclusive distribution licences, you are confirming that:<br><br></div><ul><li>your dissertation is your original work;&nbsp;</li><li>that your dissertation does not infringe any rights of others;&nbsp;</li><li>and that as the copyright holder, you have the right to grant a non-exclusive distribution licence to York University, YorkSpace (the university’s institutional repository), and Library and Archives Canada (LAC).&nbsp;</li></ul><div>This allows York University and LAC to make copies, including electronically formatted copies, and/or distribute worldwide all or part of the dissertation, subject to the conditions outlined in the licences.<br><br></div><div>If applicable, you should submit copies of any required copyright permissions before the final dissertation submission to the Office of the Dean, Graduate Studies. You should also retain copies of all copyright permission requests and approvals.<br><br></div>
 HEREDOC
@@ -358,5 +362,9 @@ HEREDOC
 
 AppSettings.embargo_file_extensions = <<HEREDOC
 .pdf, .txt, .html, .htm, .odt, .odp, .ods
+HEREDOC
+
+AppSettings.modification_request_file_extensions = <<HEREDOC
+.pdf, .doc, .docx
 HEREDOC
 
