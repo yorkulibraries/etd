@@ -10,6 +10,8 @@ gem 'rails', '~> 7.0', '>= 7.0.3.1'
 gem 'mysql2'
 
 ## CSS AND JAVASCRIPT ##
+# chosen-bootstrap-theme CSS is vendored under vendor/assets/stylesheets
+# because rails-assets.org is no longer reachable.
 gem 'actiontext', '~> 7.0', '>= 7.0.3.1'
 gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails', '4.5.0'
@@ -18,9 +20,6 @@ gem 'jquery-ui-rails', '6.0.1'
 gem 'sass-rails', '~> 6.0'
 gem 'terser', '~> 1.1', '>= 1.1.20'
 gem 'trix-rails', require: 'trix'
-source 'https://rails-assets.org' do
-  gem 'rails-assets-chosen-bootstrap-theme'
-end
 
 ## BOOTSTRAP && SIMPLE_FORM && CHOSEN ##
 gem 'active_link_to', '~> 1.0', '>= 1.0.5'

@@ -103,6 +103,21 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_redirected_to student_thesis_path(@student, @thesis), 'Should redirect to thesis details'
     end
 
+    should 'keep the displayed name in sync with the file extension after a replace' do
+      post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
+                              document: { usage: 'modification_request', supplemental: true,
+                                          file: fixture_file_upload('document-microsoft.doc', 'application/msword') } }
+      d = assigns(:document).reload
+      assert_match(/_modification_request_1\.doc\z/, d.name)
+      assert_equal File.basename(d.file.path), d.name
+
+      post :update, params: { id: d.id, thesis_id: @thesis.id, student_id: @student.id,
+                              document: { file: fixture_file_upload('pdf-document.pdf', 'application/pdf') } }
+      d.reload
+      assert_match(/_modification_request_1\.pdf\z/, d.name, 'name should carry the replacement extension')
+      assert_equal File.basename(d.file.path), d.name
+    end
+
     should 'not delete files' do
       d = create(:document, thesis: @thesis)
 
