@@ -13,6 +13,24 @@ class SettingsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select 'input#app_settings_invitation_validity_days[value="14"]'
+    assert_select 'input#app_settings_upload_validity_days[value="14"]'
+  end
+
+  should 'allow an admin to change upload link validity' do
+    patch :update, params: { app_settings: { upload_validity_days: '30' } }
+
+    assert_equal 30, AppSettings.upload_validity_days
+    assert_redirected_to edit_settings_path
+  end
+
+  should 'reject an invalid upload link validity without changing the setting' do
+    AppSettings.upload_validity_days = 14
+
+    patch :update, params: { app_settings: { upload_validity_days: '0' } }
+
+    assert_equal 14, AppSettings.upload_validity_days
+    assert_equal 'Upload link validity must be a positive number of calendar days.', flash[:alert]
+    assert_redirected_to edit_settings_path
   end
 
   should 'allow an admin to change invitation validity' do

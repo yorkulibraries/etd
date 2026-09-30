@@ -57,7 +57,10 @@
 					<% if invitation&.accepted_at %>
 						<p>Invitation opened <%= invitation.accepted_at.in_time_zone('Eastern Time (US & Canada)').strftime("%B %-d, %Y") %>.</p>
 					<% elsif invitation %>
-						<p>Invitation <%= invitation.expires_at < Time.current ? 'expired' : 'expires' %> <%= invitation.expires_at.in_time_zone('Eastern Time (US & Canada)').strftime("%B %-d, %Y at %-I:%M %p %Z") %>.</p>
+						<p>Invitation <%= invitation.expires_at < Time.current ? 'expired' : 'expires' %> <%= invitation.expiry_label %>.</p>
+					<% end %>
+					<% if invitation %>
+						<p>Upload <%= invitation.upload_expires_at < Time.current ? 'deadline passed' : 'by' %> <%= invitation.upload_expiry_label %>.</p>
 					<% end %>
 					<%= link_to_if AppSettings.email_welcome_allow,
 									 invitation ? "Send invitation again" : "Send invitation email",

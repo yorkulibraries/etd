@@ -72,9 +72,11 @@ class ThesisTest < ActiveSupport::TestCase
     assert_includes thesis.errors[:base], 'Complete the embargo step before submitting for review.'
   end
 
-  should 'create an invitation for this ETD with the configured Toronto-local deadline' do
+  should 'create an invitation for this ETD with the configured Toronto-local deadlines' do
     assert_respond_to AppSettings, :invitation_validity_days=
+    assert_respond_to AppSettings, :upload_validity_days=
     AppSettings.invitation_validity_days = 14
+    AppSettings.upload_validity_days = 30
     thesis = create(:thesis)
 
     travel_to Time.utc(2026, 7, 1, 14, 0, 0) do
@@ -84,6 +86,7 @@ class ThesisTest < ActiveSupport::TestCase
       assert_equal thesis, invitation.thesis
       assert_equal Time.current, invitation.sent_at
       assert_equal Time.utc(2026, 7, 16, 3, 59, 59), invitation.expires_at.change(usec: 0)
+      assert_equal Time.utc(2026, 8, 1, 3, 59, 59), invitation.upload_expires_at.change(usec: 0)
     end
   end
 
@@ -95,16 +98,43 @@ class ThesisTest < ActiveSupport::TestCase
     assert_not thesis.invitation_accessible?
   end
 
-  should 'keep an ETD accessible after the student opens it before the deadline' do
+  should 'keep an ETD accessible after the student opens it before the invitation deadline' do
     thesis = create(:thesis)
     invitation = thesis.invitations.create!(student: thesis.student, sent_at: Time.current,
-                                            expires_at: 1.day.from_now)
+                                            expires_at: 1.day.from_now, upload_expires_at: 10.days.from_now)
 
     assert_respond_to thesis, :accept_invitation!
     assert thesis.accept_invitation!
     assert_not_nil invitation.reload.accepted_at
 
     travel_to 2.days.from_now do
+      assert thesis.invitation_accessible?
+    end
+  end
+
+  should 'deny an unopened invitation after its deadline even when the upload deadline is later' do
+    thesis = create(:thesis)
+    thesis.invitations.create!(student: thesis.student, sent_at: Time.current,
+                               expires_at: 1.day.ago, upload_expires_at: 10.days.from_now)
+
+    assert_not thesis.invitation_accessible?
+    assert_equal :invitation_expired, thesis.invitation_block_reason
+    assert_not thesis.accept_invitation!
+  end
+
+  should 'deny upload after the upload deadline even if the student already opened the invitation' do
+    thesis = create(:thesis)
+    invitation = thesis.invitations.create!(student: thesis.student, sent_at: Time.current,
+                                            expires_at: 1.day.from_now, upload_expires_at: 3.days.from_now)
+
+    assert thesis.accept_invitation!
+    assert_not_nil invitation.reload.accepted_at
+
+    travel_to 4.days.from_now do
+      assert_not thesis.invitation_accessible?
+      assert_equal :upload_expired, thesis.invitation_block_reason
+
+      thesis.send_invitation!
       assert thesis.invitation_accessible?
     end
   end
