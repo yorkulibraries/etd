@@ -13,9 +13,6 @@
 
 <div class="student-view fitted upload">
 	<h2>Files and Documents</h2>
-	<% if @thesis.current_invitation %>
-		<p class="upload-deadline">Upload by <%= @thesis.current_invitation.upload_expiry_label %>.</p>
-	<% end %>
 	<div class="settings-content">
 		<%= raw(AppSettings.student_upload_files) %>
 	</div>

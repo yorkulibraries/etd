@@ -150,43 +150,19 @@ class Thesis < ApplicationRecord
       invitations.order(sent_at: :desc, id: :desc).first
   end
 
-  def latest_invitation
-    invitations.order(sent_at: :desc, id: :desc).first
-  end
-
   def invitation_accessible?(at: Time.current)
-    invitation = latest_invitation
-    return true if invitation.nil?
-    return false if invitation.upload_expires_at < at
     return true if invitations.where.not(accepted_at: nil).exists?
 
-    invitation.expires_at >= at
-  end
-
-  def invitation_block_reason(at: Time.current)
-    invitation = latest_invitation
-    return nil if invitation.nil? || invitation_accessible?(at:)
-    return :upload_expired if invitations.where.not(accepted_at: nil).exists?
-    return :invitation_expired if invitation.expires_at < at
-
-    :upload_expired
-  end
-
-  def invitation_block_message(at: Time.current)
-    case invitation_block_reason(at:)
-    when :upload_expired
-      'Upload deadline passed—contact ETD staff.'
-    when :invitation_expired
-      'Invitation expired—contact ETD staff.'
-    end
+    invitation = invitations.order(sent_at: :desc, id: :desc).first
+    invitation.nil? || invitation.expires_at >= at
   end
 
   def accept_invitation!(at: Time.current)
     return true if invitations.where.not(accepted_at: nil).exists?
 
-    invitation = latest_invitation
+    invitation = invitations.order(sent_at: :desc, id: :desc).first
     return true unless invitation
-    return false if invitation.expires_at < at || invitation.upload_expires_at < at
+    return false if invitation.expires_at < at
 
     invitation.update!(accepted_at: at)
   end

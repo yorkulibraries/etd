@@ -20,10 +20,7 @@
 					<% if invitation&.accepted_at %>
 						<p class="invitation-deadline">Invitation opened <%= invitation.accepted_at.in_time_zone('Eastern Time (US & Canada)').strftime("%B %-d, %Y") %>.</p>
 					<% elsif invitation %>
-						<p class="invitation-deadline">Invitation <%= invitation.expires_at < Time.current ? 'expired' : 'expires' %> <%= invitation.expiry_label %>.</p>
-					<% end %>
-					<% if invitation %>
-						<p class="upload-deadline">Upload <%= invitation.upload_expires_at < Time.current ? 'deadline passed' : 'by' %> <%= invitation.upload_expiry_label %>.</p>
+						<p class="invitation-deadline">Invitation <%= invitation.expires_at < Time.current ? 'expired' : 'expires' %> <%= invitation.expires_at.in_time_zone('Eastern Time (US & Canada)').strftime("%B %-d, %Y at %-I:%M %p %Z") %>.</p>
 					<% end %>
 				<% end %>
 			</div>

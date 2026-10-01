@@ -9,8 +9,7 @@ class StudentMailer < ApplicationMailer
     @date_short = Date.today.strftime('%m-%d-%Y')
     @student = invitation.student
     @thesis_title = invitation.thesis&.title || invitation.gem_record&.title
-    @invitation_expiry_date = invitation.expiry_label
-    @upload_expiry_date = invitation.upload_expiry_label
+    @invitation_expiry_date = invitation.expires_at.in_time_zone('Eastern Time (US & Canada)').strftime('%B %-d, %Y at %-I:%M %p %Z')
     @application_url = root_url
 
     @message_subject = AppSettings.email_welcome_subject

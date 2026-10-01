@@ -10,15 +10,9 @@ class SettingsController < ApplicationController
   def update
     settings = params[:app_settings]
 
-    {
-      invitation_validity_days: 'Invitation validity',
-      upload_validity_days: 'Upload link validity'
-    }.each do |field, label|
-      value = settings[field]
-      next if value.blank?
-      next if value.match?(/\A[1-9]\d*\z/)
-
-      redirect_to edit_settings_path, alert: "#{label} must be a positive number of calendar days."
+    validity_days = settings[:invitation_validity_days]
+    if validity_days.present? && !validity_days.match?(/\A[1-9]\d*\z/)
+      redirect_to edit_settings_path, alert: 'Invitation validity must be a positive number of calendar days.'
       return
     end
 

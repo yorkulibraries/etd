@@ -1,7 +1,7 @@
-<% title(@thesis.invitation_block_reason == :upload_expired ? 'Upload deadline passed' : 'ETD Invitation Expired') %>
+<% title 'ETD Invitation Expired' %>
 
 <div class="alert alert-warning" role="alert">
-  <strong><%= @thesis.invitation_block_message %></strong>
+  <strong>Invitation expired—contact ETD staff.</strong>
   Staff can resend the invitation to provide a new deadline for this ETD.
 </div>
 

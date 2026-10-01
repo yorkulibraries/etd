@@ -98,21 +98,6 @@ class StudentMailerTest < ActionMailer::TestCase
       mail = StudentMailer.invitation_email(invitation).deliver_now
 
       assert_match 'This invitation for Deadline ETD must be opened by July 15, 2026 at 11:59 PM EDT.', mail.body.encoded
-      assert_match 'Upload must be completed by July 15, 2026 at 11:59 PM EDT.', mail.body.encoded
-    end
-
-    should 'include a separate upload deadline in the invitation email' do
-      AppSettings.email_welcome_body = 'Welcome {{student_name}}. Upload by {{upload_expiry_date}}.'
-      AppSettings.invitation_validity_days = 14
-      AppSettings.upload_validity_days = 30
-      thesis = create(:thesis, student: @student, title: 'Deadline ETD')
-      invitation = ThesisInvitation.issue!(student: @student, thesis:, sent_at: Time.utc(2026, 7, 1, 14))
-
-      mail = StudentMailer.invitation_email(invitation).deliver_now
-
-      assert_match 'Welcome John Daily. Upload by July 31, 2026 at 11:59 PM EDT.', mail.body.encoded
-      assert_match 'This invitation for Deadline ETD must be opened by July 15, 2026 at 11:59 PM EDT.', mail.body.encoded
-      assert_match 'Upload must be completed by July 31, 2026 at 11:59 PM EDT.', mail.body.encoded
     end
 
     should 'send out a status notification email' do

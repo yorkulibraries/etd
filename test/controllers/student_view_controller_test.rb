@@ -306,39 +306,6 @@ class StudentViewControllerTest < ActionController::TestCase
       assert_match 'Invitation expired—contact ETD staff.', response.body
     end
 
-    should 'block an opened ETD once its upload deadline has passed' do
-      thesis = create(:thesis, student: @student, title: 'Opened ETD')
-      thesis.invitations.create!(student: @student, sent_at: 15.days.ago, expires_at: 10.days.ago,
-                                 upload_expires_at: 1.day.ago, accepted_at: 14.days.ago)
-
-      create(:thesis, student: @student, title: 'Active ETD')
-      get :index
-
-      assert_select 'a', text: 'Active ETD'
-      assert_select 'a', text: 'Opened ETD', count: 0
-      assert_select '.invitation-expired', text: /Opened ETD.*Upload deadline passed—contact ETD staff\./m
-
-      get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_BEGIN }
-
-      assert_response :forbidden
-      assert_template 'student_view/invitation_expired'
-      assert_match 'Upload deadline passed—contact ETD staff.', response.body
-    end
-
-    should 'show the upload deadline while the upload link is still open' do
-      thesis = create(:thesis, student: @student)
-      thesis.invitations.create!(student: @student, sent_at: Time.utc(2026, 7, 1, 14),
-                                 expires_at: Time.utc(2026, 7, 16, 3, 59, 59),
-                                 upload_expires_at: Time.utc(2026, 8, 1, 3, 59, 59))
-
-      travel_to Time.utc(2026, 7, 2, 14) do
-        get :thesis_process_router, params: { id: thesis.id, process_step: Thesis::PROCESS_UPLOAD }
-      end
-
-      assert_response :success
-      assert_select '.upload-deadline', text: 'Upload by July 31, 2026 at 11:59 PM EDT.'
-    end
-
     should 'accept an active invitation when the student first opens that ETD' do
       thesis = create(:thesis, student: @student)
       invitation = thesis.invitations.create!(student: @student, sent_at: Time.current, expires_at: 1.day.from_now)

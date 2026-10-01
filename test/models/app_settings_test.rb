@@ -9,10 +9,6 @@ class AppSettingsTest < ActiveSupport::TestCase
       assert_equal 14, AppSettings.invitation_validity_days
    end
 
-   should 'default upload link validity to 14 calendar days' do
-      assert_equal 14, AppSettings.upload_validity_days
-   end
-
    should 'store invitation validity as a positive integer' do
       AppSettings.invitation_validity_days = '21'
 

@@ -14,18 +14,4 @@ class AbilityTest < ActiveSupport::TestCase
     assert ability.cannot?(:update, thesis)
     assert ability.cannot?(:manage, document)
   end
-
-  should 'deny thesis and document access after the upload deadline even if the student already opened it' do
-    student = create(:student)
-    thesis = create(:thesis, student:)
-    document = create(:document, thesis:, user_id: student.id)
-    thesis.invitations.create!(student:, sent_at: 15.days.ago, expires_at: 10.days.ago,
-                               upload_expires_at: 1.day.ago, accepted_at: 14.days.ago)
-    ability = Ability.new(student)
-
-    assert ability.cannot?(:edit, thesis)
-    assert ability.cannot?(:update, thesis)
-    assert ability.cannot?(:submit_for_review, thesis)
-    assert ability.cannot?(:manage, document)
-  end
 end

@@ -137,35 +137,6 @@ class StudentsControllerTest < ActionController::TestCase
       assert_equal 1, available_theses.size, 'There is one gem record'
       assert_select "a#send_thesis_invitation_email_#{open_thesis.id}", text: 'Send invitation again'
       assert_select '.invitation-deadline', text: /Invitation expires/
-      assert_select '.upload-deadline', text: /Upload by/
-    end
-
-    should 'show the upload deadline after an invitation has been opened' do
-      student = create(:student)
-      thesis = create(:thesis, student:, status: Thesis::OPEN)
-      thesis.invitations.create!(student:, sent_at: 15.days.ago, expires_at: 10.days.ago,
-                                 upload_expires_at: 1.day.from_now, accepted_at: 14.days.ago)
-      AppSettings.email_welcome_allow = true
-
-      get :show, params: { id: student.id }
-
-      assert_select '.invitation-deadline', text: /Invitation opened/
-      assert_select '.upload-deadline', text: /Upload by/
-      assert_select "a#send_thesis_invitation_email_#{thesis.id}", text: 'Send invitation again'
-    end
-
-    should 'show an upload deadline as passed after it expires' do
-      student = create(:student)
-      thesis = create(:thesis, student:, status: Thesis::OPEN)
-      thesis.invitations.create!(student:, sent_at: 15.days.ago, expires_at: 10.days.ago,
-                                 upload_expires_at: 1.day.ago, accepted_at: 14.days.ago)
-      AppSettings.email_welcome_allow = true
-
-      get :show, params: { id: student.id }
-
-      assert_select '.invitation-deadline', text: /Invitation opened/
-      assert_select '.upload-deadline', text: /Upload deadline passed/
-      assert_select "a#send_thesis_invitation_email_#{thesis.id}", text: 'Send invitation again'
     end
 
     should 'show edit page' do
