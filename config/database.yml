@@ -2,7 +2,7 @@ default: &default
   encoding: utf8mb4
   adapter: <%= ENV["DB_ADAPTER"] || "mysql2" %>
   url: <%= ENV["DATABASE_URL"] %>
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  pool: <%= ENV["DATABASE_URL"].to_s.start_with?("sqlite") ? 1 : ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 10000
   variables:
     sql_mode: "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"

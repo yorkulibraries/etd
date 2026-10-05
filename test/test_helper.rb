@@ -19,7 +19,10 @@ Rails::Controller::Testing.install
 DatabaseCleaner.url_allowlist = [
   %r{.*test.*}
 ]
-DatabaseCleaner.strategy = :truncation
+# SQLite allows one writer. Truncating every table from a second pooled
+# connection waits out the 10s timeout and raises BusyException. Rails already
+# wraps each test in a transaction, so roll that back instead.
+DatabaseCleaner.strategy = ENV['DATABASE_URL'].to_s.start_with?('sqlite') ? :transaction : :truncation
 
 include ActionDispatch::TestProcess
 
