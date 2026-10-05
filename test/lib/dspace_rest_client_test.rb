@@ -252,4 +252,218 @@ class DspaceRestClientTest < ActiveSupport::TestCase
     assert_equal 500, error.status
     refute_includes error.message, 'secret-token'
   end
+
+  should 'treat a whitespace-only login as anonymous' do
+    transport = RecordingTransport.new([
+      Response.new(code: 200, body: JSON.generate('uuid' => '9eb3679d-898f-4180-9335-bd3211dd87fb', 'type' => 'community'))
+    ])
+    client = ETD::DspaceRestClient.new(
+      base_url: 'https://repository.example/server/api',
+      username: "\n",
+      password: "\n",
+      transport:
+    )
+
+    refute client.credentials?
+    client.find_handle('10315/26310')
+    assert_equal ['GET'], transport.requests.map { |_uri, request| request.method }
+  end
+
+  should 'follow a same-host handle redirect and read the community' do
+    community = {
+      'uuid' => '9eb3679d-898f-4180-9335-bd3211dd87fb',
+      'handle' => '10315/26310',
+      'type' => 'community'
+    }
+    transport = RecordingTransport.new([
+      Response.new(
+        code: 302,
+        headers: {
+          'Location' => 'https://repository.example/server/api/core/communities/9eb3679d-898f-4180-9335-bd3211dd87fb'
+        }
+      ),
+      Response.new(code: 200, body: JSON.generate(community))
+    ])
+    client = ETD::DspaceRestClient.new(base_url: 'https://repository.example/server/api',
+                                     username: nil, password: nil, transport:)
+
+    assert_equal community, client.find_handle('10315/26310')
+    assert_equal [
+      '/server/api/pid/find',
+      '/server/api/core/communities/9eb3679d-898f-4180-9335-bd3211dd87fb'
+    ], transport.requests.map { |uri, _request| uri.path }
+  end
+
+  should 'resolve a handle without authenticating' do
+    community = {
+      'uuid' => '9eb3679d-898f-4180-9335-bd3211dd87fb',
+      'handle' => '10315/26310',
+      'type' => 'community'
+    }
+    transport = RecordingTransport.new([Response.new(code: 200, body: JSON.generate(community))])
+    client = ETD::DspaceRestClient.new(base_url: 'https://repository.example/server/api',
+                                     username: nil, password: nil, transport:)
+
+    assert_equal community, client.find_handle('10315/26310')
+    uri, request = transport.requests.first
+    assert_equal 'GET', request.method
+    assert_equal '/server/api/pid/find', uri.path
+    assert_equal({ 'id' => '10315/26310' }, URI.decode_www_form(uri.query).to_h)
+  end
+
+  should 'yield discovery pages and stop when the reported total changes' do
+    first_uuid = '22222222-2222-4222-8222-222222222222'
+    transport = RecordingTransport.new([
+      Response.new(code: 200, body: JSON.generate(discovery_page([first_uuid], total_elements: 2, total_pages: 2))),
+      Response.new(code: 200, body: JSON.generate(discovery_page(['33333333-3333-4333-8333-333333333333'],
+                                                                 total_elements: 3, total_pages: 2)))
+    ])
+    client = ETD::DspaceRestClient.new(base_url: 'https://repository.example/server/api',
+                                     username: nil, password: nil, transport:)
+    pages = []
+
+    error = assert_raises(ETD::DspaceRestClient::RequestError) do
+      client.search_item_uuids('9eb3679d-898f-4180-9335-bd3211dd87fb') { |page| pages << page }
+    end
+
+    assert_match(/total changed/, error.message)
+    assert_equal [[first_uuid]], pages.map { |page| page.fetch(:uuids) }
+    query = URI.decode_www_form(transport.requests.first.first.query).to_h
+    assert_equal '9eb3679d-898f-4180-9335-bd3211dd87fb', query.fetch('scope')
+    assert_equal 'item', query.fetch('dsoType')
+    assert_equal '100', query.fetch('size')
+    assert_equal '0', query.fetch('page')
+    assert_equal 'dc.date.accessioned,ASC', query.fetch('sort')
+  end
+
+  should 'retry a transient discovery page and then continue' do
+    uuid = '22222222-2222-4222-8222-222222222222'
+    transport = RecordingTransport.new([
+      Response.new(code: 503, body: 'busy'),
+      Response.new(code: 200, body: JSON.generate(discovery_page([uuid], total_elements: 1, total_pages: 1)))
+    ])
+    delays = []
+    client = ETD::DspaceRestClient.new(
+      base_url: 'https://repository.example/server/api',
+      username: nil,
+      password: nil,
+      transport:,
+      sleeper: ->(seconds) { delays << seconds }
+    )
+    pages = []
+
+    client.search_item_uuids('9eb3679d-898f-4180-9335-bd3211dd87fb') { |page| pages << page }
+
+    assert_equal [[uuid]], pages.map { |page| page.fetch(:uuids) }
+    assert_equal [1], delays
+    assert_equal 2, transport.requests.size
+  end
+
+  should 'retry a dropped connection and then read the discovery page' do
+    uuid = '22222222-2222-4222-8222-222222222222'
+    calls = 0
+    transport = lambda do |_uri, _request|
+      calls += 1
+      raise SocketError, 'getaddrinfo: Name or service not known' if calls == 1
+
+      Response.new(code: 200, body: JSON.generate(discovery_page([uuid], total_elements: 1, total_pages: 1)))
+    end
+    delays = []
+    client = ETD::DspaceRestClient.new(
+      base_url: 'https://repository.example/server/api',
+      username: nil,
+      password: nil,
+      transport:,
+      sleeper: ->(seconds) { delays << seconds }
+    )
+    pages = []
+
+    client.search_item_uuids('9eb3679d-898f-4180-9335-bd3211dd87fb') { |page| pages << page }
+
+    assert_equal [[uuid]], pages.map { |page| page.fetch(:uuids) }
+    assert_equal [1], delays
+    assert_equal 2, calls
+  end
+
+  should 'reject a discovery object that is not embedded' do
+    body = discovery_page(['22222222-2222-4222-8222-222222222222'], total_elements: 1, total_pages: 1, embed: false)
+    transport = RecordingTransport.new([Response.new(code: 200, body: JSON.generate(body))])
+    client = ETD::DspaceRestClient.new(base_url: 'https://repository.example/server/api',
+                                     username: nil, password: nil, transport:)
+
+    error = assert_raises(ETD::DspaceRestClient::RequestError) do
+      client.search_item_uuids('9eb3679d-898f-4180-9335-bd3211dd87fb') { |_page| nil }
+    end
+
+    assert_match(/embedded item UUID/, error.message)
+  end
+
+  should 'read every community collection uuid' do
+    first = '11111111-1111-4111-8111-111111111111'
+    second = '22222222-2222-4222-8222-222222222222'
+    transport = RecordingTransport.new([
+      Response.new(code: 200, body: JSON.generate(
+        '_embedded' => { 'collections' => [{ 'uuid' => first }] },
+        'page' => { 'totalPages' => 2, 'totalElements' => 2 }
+      )),
+      Response.new(code: 200, body: JSON.generate(
+        '_embedded' => { 'collections' => [{ 'uuid' => second }] },
+        'page' => { 'totalPages' => 2, 'totalElements' => 2 }
+      ))
+    ])
+    client = ETD::DspaceRestClient.new(base_url: 'https://repository.example/server/api',
+                                     username: nil, password: nil, transport:)
+
+    assert_equal [first, second], client.community_collection_uuids('9eb3679d-898f-4180-9335-bd3211dd87fb')
+    assert_equal 'size=100&page=1', transport.requests.last.first.query
+  end
+
+  should 'reject a community that has no collections' do
+    transport = RecordingTransport.new([
+      Response.new(code: 200, body: '{"page":{"totalElements":0,"totalPages":0}}')
+    ])
+    client = ETD::DspaceRestClient.new(base_url: 'https://repository.example/server/api',
+                                     username: nil, password: nil, transport:)
+
+    error = assert_raises(ETD::DspaceRestClient::RequestError) do
+      client.community_collection_uuids('9eb3679d-898f-4180-9335-bd3211dd87fb')
+    end
+    assert_match(/no collections/, error.message)
+  end
+
+  should 'read the owning collection and an empty mapped collection page' do
+    owning = '11111111-1111-4111-8111-111111111111'
+    item = '22222222-2222-4222-8222-222222222222'
+    transport = RecordingTransport.new([
+      Response.new(code: 200, body: JSON.generate('uuid' => owning, 'type' => 'collection')),
+      Response.new(code: 200, body: '{"page":{"totalElements":0,"totalPages":0}}')
+    ])
+    client = ETD::DspaceRestClient.new(base_url: 'https://repository.example/server/api',
+                                     username: nil, password: nil, transport:)
+
+    assert_equal owning, client.owning_collection_uuid(item)
+    assert_empty client.mapped_collection_uuids(item)
+    assert_equal "/server/api/core/items/#{item}/owningCollection", transport.requests.first.first.path
+    assert_equal "/server/api/core/items/#{item}/mappedCollections", transport.requests.last.first.path
+  end
+
+  private
+
+  def discovery_page(uuids, total_elements:, total_pages:, embed: true)
+    objects = uuids.map do |uuid|
+      if embed
+        { '_embedded' => { 'indexableObject' => { 'uuid' => uuid } } }
+      else
+        { '_links' => { 'indexableObject' => { 'href' => "https://repository.example/items/#{uuid}" } } }
+      end
+    end
+    {
+      '_embedded' => {
+        'searchResult' => {
+          '_embedded' => { 'objects' => objects },
+          'page' => { 'totalElements' => total_elements, 'totalPages' => total_pages, 'number' => 0, 'size' => 100 }
+        }
+      }
+    }
+  end
 end

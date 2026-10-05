@@ -16,7 +16,11 @@ module ETD
       end
     end
 
-    def initialize(base_url:, username:, password:, transport: nil)
+    TRANSIENT_STATUSES = [429, 502, 503, 504].freeze
+
+    attr_reader :base_url
+
+    def initialize(base_url:, username:, password:, transport: nil, sleeper: nil)
       @base_url = base_url.to_s.sub(%r{/+\z}, '')
       uri = URI.parse(@base_url)
       unless uri.scheme == 'https' && uri.host && !uri.userinfo && !uri.query && !uri.fragment
@@ -25,9 +29,14 @@ module ETD
       @username = username
       @password = password
       @transport = transport || method(:perform_request)
+      @sleeper = sleeper || ->(seconds) { sleep(seconds) }
       @authorization = nil
       @csrf_token = nil
       @csrf_cookie = nil
+    end
+
+    def credentials?
+      !@username.to_s.strip.empty? && !@password.to_s.strip.empty?
     end
 
     def create_bundle(item_uuid, name:)
@@ -75,7 +84,108 @@ module ETD
       parse_json(response)
     end
 
+    def find_handle(handle)
+      get_json("/pid/find?#{URI.encode_www_form(id: handle)}", follow_redirects: true)
+    end
+
+    def search_item_uuids(scope_uuid)
+      expected = nil
+      page = 0
+      loop do
+        parsed = with_transient_retry { fetch_search_page(scope_uuid, page) }
+        if expected.nil?
+          expected = parsed.fetch(:total_elements)
+        elsif parsed.fetch(:total_elements) != expected
+          raise RequestError, 'Discovery total changed during the scan'
+        end
+        yield parsed
+        page += 1
+        break if page >= parsed.fetch(:total_pages)
+      end
+    end
+
+    def community_collection_uuids(community_uuid)
+      uuids = collection("/core/communities/#{community_uuid}/collections", 'collections').map do |record|
+        record.fetch('uuid').to_s.downcase
+      end
+      raise RequestError, 'DSpace community has no collections' if uuids.empty?
+
+      uuids
+    end
+
+    def owning_collection_uuid(item_uuid)
+      uuid = get_json("/core/items/#{item_uuid}/owningCollection")['uuid'].to_s.downcase
+      raise RequestError, 'DSpace item has no owning collection' if uuid.empty?
+
+      uuid
+    end
+
+    def mapped_collection_uuids(item_uuid)
+      collection("/core/items/#{item_uuid}/mappedCollections", 'mappedCollections').map do |record|
+        record.fetch('uuid').to_s.downcase
+      end
+    end
+
+    def with_transient_retry
+      attempts = 0
+      begin
+        attempts += 1
+        yield
+      rescue RequestError => e
+        raise unless TRANSIENT_STATUSES.include?(e.status) && attempts <= 3
+
+        @sleeper.call(2**(attempts - 1))
+        retry
+      rescue SocketError, Errno::ECONNRESET, Errno::ECONNREFUSED, Errno::ETIMEDOUT,
+             Errno::EHOSTUNREACH, Net::OpenTimeout, Net::ReadTimeout, OpenSSL::SSL::SSLError
+        raise if attempts > 3
+
+        @sleeper.call(2**(attempts - 1))
+        retry
+      end
+    end
+
     private
+
+    def get_json(path, follow_redirects: false)
+      authenticate! if credentials?
+      parse_json(request(:get, path, authenticated: @authorization.present?, follow_redirects:))
+    end
+
+    def fetch_search_page(scope_uuid, page)
+      query = URI.encode_www_form(
+        scope: scope_uuid,
+        dsoType: 'item',
+        size: 100,
+        page:,
+        sort: 'dc.date.accessioned,ASC'
+      )
+      data = get_json("/discover/search/objects?#{query}")
+      search_result = data.fetch('_embedded').fetch('searchResult')
+      page_info = search_result.fetch('page')
+      total_pages = page_info['totalPages']
+      total_elements = page_info['totalElements']
+      unless total_pages.is_a?(Integer) && total_pages.between?(0, 1000) &&
+             total_elements.is_a?(Integer) && total_elements >= 0
+        raise RequestError, 'Invalid DSpace pagination'
+      end
+
+      objects = search_result.dig('_embedded', 'objects')
+      if objects.nil?
+        raise RequestError, 'Discovery page is missing embedded objects' unless total_elements.zero?
+
+        objects = []
+      end
+      raise RequestError, 'Discovery page is missing embedded objects' unless objects.is_a?(Array)
+
+      uuids = objects.map do |object|
+        uuid = object.dig('_embedded', 'indexableObject', 'uuid').to_s.downcase
+        raise RequestError, 'Discovery result is missing an embedded item UUID' if uuid.empty?
+
+        uuid
+      end
+      { uuids:, total_elements:, total_pages: }
+    end
 
     def collection(path, key)
       authenticate! if @username.present? && @password.present?
@@ -124,7 +234,7 @@ module ETD
       raise RequestError, 'DSpace login response did not include an Authorization token' if @authorization.blank?
     end
 
-    def request(method, path, body: nil, headers: {}, authenticated: false, csrf: false)
+    def request(method, path, body: nil, headers: {}, authenticated: false, csrf: false, follow_redirects: false)
       uri = URI.parse("#{@base_url}#{path}")
       request = request_class(method).new(uri.request_uri)
       headers.each { |name, value| request[name] = value }
@@ -138,10 +248,36 @@ module ETD
 
       response = @transport.call(uri, request)
       update_security_state(response)
-      return response if response.code.to_i.between?(200, 299)
+      code = response.code.to_i
+      if follow_redirects && method == :get && [301, 302, 303, 307, 308].include?(code)
+        return request(:get, redirect_path(response['Location']), headers:, authenticated:)
+      end
+      return response if code.between?(200, 299)
 
       raise RequestError.new("DSpace REST #{method.to_s.upcase} #{path} returned #{response.code}",
-                             status: response.code.to_i)
+                             status: code)
+    end
+
+    def redirect_path(location)
+      raise RequestError, 'DSpace redirect did not include a location' if location.to_s.empty?
+
+      target = URI.parse(location)
+      base = URI.parse(@base_url)
+      same_host = target.host.nil? || target.host.casecmp?(base.host)
+      unless same_host && (target.scheme.nil? || target.scheme == 'https') && target.userinfo.nil?
+        raise RequestError, 'DSpace redirect left the REST host'
+      end
+
+      prefix = base.path.sub(%r{/+\z}, '')
+      path = target.path.to_s
+      unless path == prefix || path.start_with?("#{prefix}/")
+        raise RequestError, 'DSpace redirect left the REST API'
+      end
+
+      relative = path.delete_prefix(prefix)
+      relative = '/' if relative.empty?
+      relative += "?#{target.query}" if target.query
+      relative
     end
 
     def request_class(method)
