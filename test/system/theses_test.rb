@@ -143,32 +143,16 @@ class ThesesTest < ApplicationSystemTestCase
     visit root_url
     click_link(@thesis_01.title)
 
-    find('a.btn.btn-secondary.btn-sm.dropdown-toggle').click
-    choose('status', option: 'under_review')
-    click_on('Change Status')
-
-
-    find('a.btn.btn-secondary.btn-sm.dropdown-toggle').click
-    choose('status', option: 'returned')
-    click_on('Change Status')
-
-    assert_selector 'span.badge.bg-primary', text: 'Returned'
+    change_thesis_status(to: 'under_review', badge: 'Under review')
+    change_thesis_status(to: 'returned', badge: 'Returned')
   end
 
   test 'Accepting a thesis' do
     visit root_url
     click_link(@thesis_01.title)
 
-    find('a.btn.btn-secondary.btn-sm.dropdown-toggle').click
-    choose('status', option: 'under_review')
-    click_on('Change Status')
-
-
-    find('a.btn.btn-secondary.btn-sm.dropdown-toggle').click
-    choose('status', option: 'accepted')
-    click_on('Change Status')
-
-    assert_selector 'span.badge.bg-primary', text: 'Accepted'
+    change_thesis_status(to: 'under_review', badge: 'Under review')
+    change_thesis_status(to: 'accepted', badge: 'Accepted')
   end
 
   test 'Add an embargo' do
@@ -183,6 +167,25 @@ class ThesesTest < ApplicationSystemTestCase
     click_on('Place Embargo')
     page.accept_alert
     assert_selector 'p', text: 'This thesis has been placed under permanent embargo. It will not be published.'
+  end
+
+  def change_thesis_status(to:, badge:)
+    open_status_menu
+    choose('status', option: to)
+    click_on('Change Status')
+    assert_selector '#status_menu .badge', text: badge
+  end
+
+  def open_status_menu
+    attempts = 0
+    begin
+      attempts += 1
+      find('#status_menu a.dropdown-toggle').click
+    rescue Selenium::WebDriver::Error::UnknownError => e
+      raise unless e.message.include?('does not belong to the document') && attempts < 3
+
+      retry
+    end
   end
 
   #### FILE UPLOADS FROM BACKEND #####
