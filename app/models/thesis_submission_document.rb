@@ -29,5 +29,6 @@ class ThesisSubmissionDocument < ApplicationRecord
     return 'primary' if usage == 'thesis' && !supplemental?
     return 'embargo' if usage == 'embargo' || usage == 'embargo_letter'
     return 'licence' if usage == 'licence'
+    return 'modification_request' if usage == 'modification_request'
   end
 end

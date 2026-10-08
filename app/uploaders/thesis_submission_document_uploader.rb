@@ -11,10 +11,6 @@ class ThesisSubmissionDocumentUploader < CarrierWave::Uploader::Base
     model.stored_filename || original_filename
   end
 
-  def move_to_cache
-    true
-  end
-
   def move_to_store
     true
   end
