@@ -109,7 +109,7 @@ class GoogleOnlyAuthenticationTest < ActionDispatch::IntegrationTest
     identity.update_columns(provider: 'facebook')
     cookies[Rails.application.config.session_options[:key]] = saved_cookie
     get student_view_details_path
-    assert_redirected_to login_path
+    assert_redirected_to graduate_login_path
     %i[user_id auth_source graduate_identity_id graduate_session_token].each { |key| assert_nil session[key] }
     assert record.reload.revoked_at
     assert_not_includes response.body, @student.name

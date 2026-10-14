@@ -5,13 +5,12 @@ require 'pathname'
 # Apache must enforce the same denial before serving files itself. This guard
 # covers Puma/Rails and runs before Static even when Static is not installed.
 class GraduateUploadsGuard
-  def initialize(app, enabled:)
+  def initialize(app)
     @app = app
-    @enabled = enabled
   end
 
   def call(env)
-    return unavailable if @enabled && protected_path?(env['PATH_INFO'])
+    return unavailable if protected_path?(env['PATH_INFO'])
 
     @app.call(env)
   end

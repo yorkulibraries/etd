@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
   def login_required
     return if current_user || controller_name == 'sessions'
 
-    redirect_to login_url
+    redirect_to GraduateAuthentication.enabled_providers.any? ? graduate_login_path : login_url
   end
 
   rescue_from CanCan::AccessDenied do |exception|

@@ -47,7 +47,7 @@ class GraduateOAuthLifecycleTest < ActionDispatch::IntegrationTest
     [first, second].each do |saved|
       cookies[Rails.application.config.session_options[:key]] = saved
       get student_view_details_path
-      assert_redirected_to login_path
+      assert_redirected_to graduate_login_path
       assert_nil session[:user_id]
     end
   end

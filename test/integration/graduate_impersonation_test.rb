@@ -132,7 +132,7 @@ class GraduateImpersonationTest < ActionDispatch::IntegrationTest
 
   def assert_session_revoked
     get student_view_details_path
-    assert_redirected_to login_path
+    assert_redirected_to graduate_login_path
     assert_nil session[:user_id]
     assert_nil session[:return_to_user_id]
     assert_nil session[:auth_source]

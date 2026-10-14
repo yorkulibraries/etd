@@ -23,7 +23,7 @@ module Etd
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
-    config.middleware.insert_before 0, GraduateUploadsGuard, enabled: ENV['GRADUATE_OAUTH_ENABLED'] == 'true'
+    config.middleware.insert_before 0, GraduateUploadsGuard
 
     config.active_record.belongs_to_required_by_default = false
     config.active_record.legacy_connection_handling = false

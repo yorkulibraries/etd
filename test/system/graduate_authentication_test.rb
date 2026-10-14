@@ -84,6 +84,16 @@ class GraduateAuthenticationSystemTest < ActionDispatch::SystemTestCase
     browser_artifact('login-mobile', mobile: true)
   end
 
+  test 'anonymous visitors reach the combined sign in from the home page' do
+    browser_fresh_session
+    visit root_path
+    assert_current_path graduate_login_path
+    assert_selector 'h1', text: 'Graduate sign in'
+    assert_button 'Continue with Google'
+    assert_link 'Sign in with Passport York', href: login_path
+    browser_artifact('anonymous-home-sign-in')
+  end
+
   test 'old Facebook records stay hidden in student settings and staff invitations' do
     student = create(:student, name: 'Synthetic Google Only Graduate')
     manager = create(:user, role: User::MANAGER)

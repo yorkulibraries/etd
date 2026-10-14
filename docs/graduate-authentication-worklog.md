@@ -4,7 +4,23 @@
 Provide an alternative to Passport York for graduates returning to ETD for embargo requests and future modifications.
 
 ## Current goal
-Fix the browser failures in staging CI, verify the final changes in GitHub's browser environment, and publish through graduate-authentication before updating staging. The user explicitly authorized the publication process on 2026-10-14 and then requested investigation and repair. Server deployment, real provider testing and Apache activation remain separate.
+Prepare the verified dual-sign-in entry and upload protection changes for GitHub CI on `graduate-authentication`. Commit the scoped changes locally; a branch push and staging Apache activation remain separate steps.
+
+## Sign-in and upload protection changes, 2026-10-14
+- `ApplicationController#login_required` redirects guests to `/graduate/login` whenever an external provider is configured. When none is configured, it preserves `/login` as the fallback. The Passport York login action remains unchanged.
+- `GraduateUploadsGuard` always blocks raw `/uploads` paths before Rails static file handling. The middleware no longer accepts an enable/disable option.
+- Added a browser test for the home-page redirect and updated existing integration expectations for unauthenticated sessions and private document downloads.
+- Verified that Docker mounts the current source. The focused Selenium redirect test passed (1 run, 6 assertions). The broader graduate integration suites passed (75 runs, 1,432 assertions) and Selenium browser suites passed (9 runs, 139 assertions), all with zero failures, errors, or skips. Together those suites contain 84 runs and 1,571 assertions.
+- Before commit, reran the 75 integration cases and 9 browser cases in two independent Rails processes, mirroring the CI suite separation; both passed again with the same assertions. An exploratory combined-process invocation had 64 errors because integration tests encountered responses without CSRF metadata after the browser suite shared the process; the single-suite checks recovered without source changes. CI runs application and browser tests as separate commands.
+- Confirmed with Google disabled that unauthenticated `/my/details` redirects to `/login`, while `/uploads/private.pdf`, `/%75ploads/private.pdf`, and `/assets/../uploads/private.pdf` return 404. Inspected the actual combined-sign-in browser screenshot at `tmp/graduate-authentication/screenshots/anonymous-home-sign-in.png`.
+- The branch's `.github/workflows/rubyonrails.yml` runs SQLite and MySQL tests on pushes to `graduate-authentication`. Next: commit these verified files, push only after explicit authorization, review GitHub CI, then coordinate the staging Apache change.
+
+## Live staging post-deployment verification, 2026-10-14
+- Confirmed over SSH that `/home/etdqa/etdqa` is on staging commit `879fa8e` and `etdqa.service` is active. Rails reports no pending migrations. Staging Google client ID, secret and base URL are configured; secret values were not read or exposed.
+- Public HTTPS `/graduate/login`, `/graduate/enroll`, `/graduate/auth/google_oauth2`, `/graduate/auth/google_oauth2/callback`, `/graduate/auth/failure`, and the compiled CSS asset all redirect to Passport York. The actual enabled Apache HTTPS vhost applies `AuthType PYork` and a valid-user plus university-IP restriction to `<Location />`; graduate paths cannot reach Rails unauthenticated.
+- The internal Rails upstream returns HTTP 200 for `/graduate/login`, but the live `GRADUATE_OAUTH_ENABLED` environment value is disabled and Google is absent from the rendered login page. The application requires the literal value `true` to enable providers.
+- Rails static-file serving is enabled and uploads reside under `public/uploads`; deny direct access to `/uploads/` (including any aliases) at Apache before opening the site to authenticated graduate sessions. Keep trusted Passport York header stripping and make Passport York authentication available at its dedicated `/login` route; graduates need access to their subsequent `/my` pages without a compulsory PPY challenge. Permit public `/assets/` access.
+- The live Apache vhost is not writable by `etdqa` and `sudo -n` requires a password. No Apache, environment, or service settings were changed. A privileged operator must make and validate the routing restrictions, enable `GRADUATE_OAUTH_ENABLED=true`, reload Apache, restart `etdqa.service`, and verify public login, uploads denial, Passport York, Google linking and the return flow.
 
 ## Staging browser CI repair, 2026-10-14
 - Feature CI passed for 2a7e7bc before staging was fast-forwarded to it. Staging run 38583296544 passed SQLite application tests but failed two browser interactions.

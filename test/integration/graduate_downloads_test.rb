@@ -62,7 +62,7 @@ class GraduateDownloadsTest < ActionDispatch::IntegrationTest
   test 'anonymous other student mismatched parents and blocked sessions cannot read file' do
     fresh_browser
     get download_student_thesis_document_path(@student, @thesis, @document)
-    assert_redirected_to login_path
+    assert_redirected_to graduate_login_path
     other = create(:student)
     ppy_login(other)
     get download_student_thesis_document_path(@student, @thesis, @document)
@@ -73,7 +73,7 @@ class GraduateDownloadsTest < ActionDispatch::IntegrationTest
     ppy_login(@student)
     @student.update!(blocked: true)
     get download_student_thesis_document_path(@student, @thesis, @document)
-    assert_redirected_to login_path
+    assert_redirected_to graduate_login_path
   end
 
   test 'deleted and missing files return controlled not found' do
