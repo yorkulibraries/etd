@@ -36,6 +36,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     select "EMBA", from: "thesis_degree_name"
     select "Master's", from: "thesis_degree_level"
     click_button('Create Thesis')
+    assert_current_path %r{\A/students/\d+/theses/\d+\z}
 
     assert_selector "a", text: @gem_record.studentname
 
@@ -68,6 +69,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     select "EMBA", from: "thesis_degree_name"
     select "Master's", from: "thesis_degree_level"
     click_button('Create Thesis')
+    assert_current_path %r{\A/students/\d+/theses/\d+\z}
     assert_selector "a", text: @gem_record.studentname
     click_link("Students")
     click_link(@gem_record.studentname)
@@ -98,6 +100,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     select "EMBA", from: "thesis_degree_name"
     select "Master's", from: "thesis_degree_level"
     click_button('Create Thesis')
+    assert_current_path %r{\A/students/\d+/theses/\d+\z}
     assert_selector "a", text: @gem_record.studentname
     click_link("Students")
     click_link(@gem_record.studentname)
@@ -139,6 +142,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     select "EMBA", from: "thesis_degree_name"
     select "Master's", from: "thesis_degree_level"
     click_button('Create Thesis')
+    assert_current_path %r{\A/students/\d+/theses/\d+\z}
     assert_selector "a", text: @gem_record.studentname
     click_link("Students")
     click_link(@gem_record.studentname)
@@ -181,6 +185,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     select "EMBA", from: "thesis_degree_name"
     select "Master's", from: "thesis_degree_level"
     click_button('Create Thesis')
+    assert_current_path %r{\A/students/\d+/theses/\d+\z}
     assert_selector "a", text: @gem_record.studentname
     click_link("Students")
     click_link(@gem_record.studentname)
