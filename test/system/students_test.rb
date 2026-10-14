@@ -444,6 +444,8 @@ class StudentsTest < ApplicationSystemTestCase
     check('I agree to ETD Licence', allow_label_click: true)
     click_button('Accept and Continue')
 
+    assert_current_path student_view_thesis_process_path(thesis, Thesis::PROCESS_SUBMIT)
+    assert_selector '#thesis_certify_content_correct'
     assert_selector 'h2', text: 'Review Details for Submission'
     assert_selector '.submission-progress [aria-current="step"]', text: /Submit\s+for review/i
     check('I certify that the content is correct')

@@ -70,6 +70,7 @@ class GraduateDownloadsSystemTest < ActionDispatch::SystemTestCase
     browser_fresh_session
     visit graduate_login_path
     click_button 'Continue with Google'
+    assert_current_path student_view_thesis_process_path(thesis, Thesis::PROCESS_BEGIN)
     visit student_view_thesis_process_path(thesis, Thesis::PROCESS_UPLOAD)
     assert_link 'Download', href: download_student_thesis_document_path(student, thesis, document)
     assert_no_link href: document.file_url
