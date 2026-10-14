@@ -5,7 +5,7 @@ require 'test_helper'
 class StudentsControllerTest < ActionController::TestCase
   should 'not be visible unless logged in' do
     get :index
-    assert_redirected_to login_path
+    assert_redirected_to graduate_login_path
   end
 
   context 'as admin' do

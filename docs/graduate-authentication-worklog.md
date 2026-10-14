@@ -4,7 +4,14 @@
 Provide an alternative to Passport York for graduates returning to ETD for embargo requests and future modifications.
 
 ## Current goal
-Prepare the verified dual-sign-in entry and upload protection changes for GitHub CI on `graduate-authentication`. Commit the scoped changes locally; a branch push and staging Apache activation remain separate steps.
+Resolve the full-suite CI regression for the new graduate sign-in redirect, commit the verified correction on `graduate-authentication`, and prepare for another GitHub CI run. Staging activation requires a separate Apache change.
+
+## CI redirect regression correction, 2026-10-14
+- GitHub Actions run 38603023767 for `3b49979` failed in the SQLite application step: 529 tests, 3,334 assertions, three failures, zero errors and one expected MySQL-only skip. MySQL and browser tests were skipped because the job stopped at the SQLite failure.
+- All three failures were older anonymous-controller checks that still expected `/login`. With the test environment's Google provider enabled, the intended destination is `/graduate/login`. Updated only those expectations in the theses, students, and student-view controller tests. The explicit fallback-to-Passport-York coverage remains in the graduate integration suite.
+- Full local SQLite CI application sequence passed: 529 tests, 3,334 assertions, zero failures, zero errors and one MySQL-only skip. Repeatable log: `tmp/graduate-authentication/current-ci-sqlite.log`.
+- The first full browser attempt collided with the running manual demo on port 3210. Replayed the complete browser suite using `ETD_SYSTEM_TEST_PORT=3220`, without stopping or resetting the demo: 63 tests, 496 assertions, zero failures, zero errors and zero skips. Repeatable log: `tmp/graduate-authentication/current-ci-browser-3220.log` (seed 33957).
+- The manual demo's `/demo` endpoint still returned HTTP 200 on port 3210. `origin/staging` remains an ancestor of the feature branch. Next: commit this correction, obtain separate approval before pushing the new commit, verify both SQLite and MySQL GitHub jobs, then coordinate staging integration and Apache activation.
 
 ## Sign-in and upload protection changes, 2026-10-14
 - `ApplicationController#login_required` redirects guests to `/graduate/login` whenever an external provider is configured. When none is configured, it preserves `/login` as the fallback. The Passport York login action remains unchanged.

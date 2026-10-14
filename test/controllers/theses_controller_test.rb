@@ -8,7 +8,7 @@ class ThesesControllerTest < ActionController::TestCase
 
   should 'not be visible unless logged in' do
     get :index, params: { student_id: 123 }
-    assert_redirected_to login_path
+    assert_redirected_to graduate_login_path
   end
 
   context 'as admin' do

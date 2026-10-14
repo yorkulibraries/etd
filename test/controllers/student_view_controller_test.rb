@@ -5,7 +5,7 @@ require 'test_helper'
 class StudentViewControllerTest < ActionController::TestCase
   should 'not be able to access without loging in' do
     get :index
-    assert_redirected_to login_url
+    assert_redirected_to graduate_login_path
   end
 
   context 'as student' do
