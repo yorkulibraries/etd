@@ -160,6 +160,7 @@ class AppSettingsTest < ApplicationSystemTestCase
     click_link_or_button('Upload Primary Thesis File')
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
+    assert_selector '.student-view.upload .name'
     click_link('Continue')
     choose('No, do not request an embargo')
     click_button('Save embargo choice')
@@ -203,12 +204,14 @@ class AppSettingsTest < ApplicationSystemTestCase
     click_link_or_button('Upload Primary Thesis File')
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
+    assert_selector '.student-view.upload .name'
     click_link('Continue')
     choose('No, do not request an embargo')
     click_button('Save embargo choice')
     click_link_or_button('Upload Licence File')
     attach_file('document_file', Rails.root.join('test/fixtures/files/pdf-document.pdf'))
     click_button('Upload')
+    assert_selector '.licence-box .name'
     check 'thesis_lac_licence_agreement'
     assert_selector "input[type=checkbox][id=thesis_lac_licence_agreement]:checked"
     check 'thesis_yorkspace_licence_agreement'
