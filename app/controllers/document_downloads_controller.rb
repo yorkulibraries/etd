@@ -20,7 +20,9 @@ class DocumentDownloadsController < ApplicationController
 
     response.set_header('Cache-Control', 'private, no-store')
     response.set_header('X-Content-Type-Options', 'nosniff')
-    send_file path, filename: File.basename(document.file.identifier),
+    filename = document.embargo_request_document? ? document.name.presence : nil
+    filename ||= document.file.identifier
+    send_file path, filename: File.basename(filename),
                    type: 'application/octet-stream', disposition: 'attachment'
   end
 
