@@ -185,3 +185,11 @@ Activate and verify on staging after university-managed provider credentials and
 - The user approved creation. Clicked Create and verified Google's "OAuth client created" confirmation, with enabled credential status. The client uses the staging callback prepared above.
 - Google warns that the client secret cannot be viewed or downloaded after closing the creation dialog. Left this dialog open for the user to securely save the credentials; did not download, copy, or record the secret. Proof screenshot excludes the credential area: tmp/google-cloud-setup/client-created.jpg.
 - Next step: securely capture the new credentials, configure the staging server, deploy and verify real Google linking/sign-in. Production credentials have not been created.
+
+## CI browser synchronization, 2026-10-14
+- Current goal: repair CI run 607's three MySQL browser errors, verify locally, and prepare a commit before requesting approval for another push.
+- The Google linking test checked the unchanged settings URL before callback completion; wait for the newly rendered connection before reading its database record.
+- The embargo and thesis status tests interacted with controls from the outgoing page; wait for the saved-draft notice or updated status before the next interaction. Applied the status check to both acceptance and return workflows.
+- Application behavior is unchanged. Both full browser suites passed on port 3220 with seed 20996: SQLite 63 tests/499 assertions and MySQL 63 tests/499 assertions, zero failures/errors/skips. MySQL used a separate temporary database. Local Chromium is version 120; GitHub's Chrome 154 remains to be verified by CI.
+- Repeat with `RAILS_ENV=test ETD_SYSTEM_TEST_PORT=3220 DATABASE_URL=<isolated test database URL> bundle exec rails test:system TESTOPTS="-v --seed=20996"` after loading the schema and seeds. Results: tmp/graduate-authentication/ci-browser-waits-sqlite.log and ci-browser-waits-mysql.log; screenshots and download checksum remain under tmp/graduate-authentication.
+- Reviewed the four-file diff and passed git diff --check. Next step: obtain approval for the new feature-branch push, monitor GitHub CI, and integrate staging only after it passes.

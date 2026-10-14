@@ -151,9 +151,9 @@ class GraduateAuthenticationSystemTest < ActionDispatch::SystemTestCase
     assert_current_path graduate_connections_path
     assert_text 'No graduate accounts are connected yet.'
     click_button 'Connect Google'
+    assert_text 'Linked on'
     assert_current_path graduate_connections_path
     identity = student.graduate_identities.find_by!(provider: 'google_oauth2')
-    assert_text 'Linked on'
     assert_no_text 'browser-google-subject'
     assert_required_checkbox "remove_identity_#{identity.id}"
     browser_artifact('settings-desktop')

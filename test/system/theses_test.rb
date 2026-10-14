@@ -147,7 +147,7 @@ class ThesesTest < ApplicationSystemTestCase
     choose('status', option: 'under_review')
     click_on('Change Status')
 
-
+    assert_selector '#status_menu .badge', text: 'Under review'
     find('a.btn.btn-secondary.btn-sm.dropdown-toggle').click
     choose('status', option: 'returned')
     click_on('Change Status')
@@ -163,7 +163,7 @@ class ThesesTest < ApplicationSystemTestCase
     choose('status', option: 'under_review')
     click_on('Change Status')
 
-
+    assert_selector '#status_menu .badge', text: 'Under review'
     find('a.btn.btn-secondary.btn-sm.dropdown-toggle').click
     choose('status', option: 'accepted')
     click_on('Change Status')

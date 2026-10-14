@@ -371,6 +371,7 @@ class StudentsTest < ApplicationSystemTestCase
     fill_in('Supervisor name', with: 'Supervisor Name')
     fill_in('Supervisor email', with: 'supervisor@example.com')
     click_button('Save draft')
+    assert_text 'Embargo request draft saved.'
 
     click_link('Upload supervisor support letter')
     within('#file_upload_modal') do
