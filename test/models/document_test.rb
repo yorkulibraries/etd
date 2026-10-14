@@ -86,12 +86,14 @@ class DocumentTest < ActiveSupport::TestCase
     assert thesis_file.valid?, 'a thesis document without an embargo request remains valid'
   end
 
-  should 'keep legacy embargo documents valid and public without a request' do
+  should 'keep legacy embargo documents valid in the default uploader storage without a request' do
     document = create(:document, usage: :embargo, embargo_request: nil,
                                  file: fixture_file_upload('pdf-document.pdf'))
 
     assert_not document.embargo_request_document?
-    assert document.file.path.start_with?(Rails.root.join('public').to_s)
+    assert_equal CarrierWave::Uploader::Base.root, document.file.root
+    assert document.file.path.start_with?(File.join(document.file.root, document.file.store_dir) + '/')
+    assert File.exist?(document.file.path)
   end
 
   should 'store request documents outside the public directory' do
