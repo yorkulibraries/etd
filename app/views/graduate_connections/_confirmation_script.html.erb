@@ -1,0 +1,9 @@
+<% content_for :scripts do %>
+  <script>
+    jQuery(function () {
+      document.querySelectorAll('[data-graduate-confirmation]').forEach(function (checkbox) {
+        checkbox.required = true;
+      });
+    });
+  </script>
+<% end %>

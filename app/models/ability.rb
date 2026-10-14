@@ -23,7 +23,8 @@ class Ability
       can :login_as, :student
       can :show, :home
     when User::STUDENT
-      can :read, [:student, Student]
+      can :read, :student
+      can :read, Student, id: user.id
 
       can :manage, Document do |document|
         document.thesis.status == Thesis::OPEN || document.thesis.status == Thesis::RETURNED

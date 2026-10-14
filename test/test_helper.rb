@@ -3,7 +3,11 @@
 
 # some of the comments are in UTF-8
 ENV['RAILS_ENV'] = 'test'
+require_relative 'support/graduate_oauth_environment'
 require File.expand_path('../config/environment', __dir__)
+CarrierWave.configure do |configuration|
+  configuration.root = Rails.root.join('tmp/graduate-authentication/test-uploads').to_s
+end
 require 'rails/test_help'
 require 'factory_girl_rails'
 require 'minitest/unit'

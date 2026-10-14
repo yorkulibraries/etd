@@ -1,0 +1,40 @@
+<% title "Graduate account connections" %>
+
+<p>Connected accounts let you sign in to your existing ETD student record after your Passport York access ends.</p>
+<% unless @can_connect %>
+  <div class="alert alert-info" role="status">To add or remove a connection, sign in with Passport York as yourself or contact the Faculty of Graduate Studies.</div>
+  <p><%= link_to "Sign in with Passport York", login_path %></p>
+<% end %>
+
+<section class="mb-4" aria-labelledby="linked-accounts-heading">
+  <h2 id="linked-accounts-heading" class="h4">Linked accounts</h2>
+  <% if @identities.any? %>
+    <ul class="list-group">
+      <% @identities.each do |identity| %>
+        <%= render "identity", identity: identity, removal_path: @can_connect ? graduate_connection_path(identity) : nil %>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>No graduate accounts are connected yet.</p>
+  <% end %>
+</section>
+
+<% if @can_connect %>
+  <section aria-labelledby="connect-account-heading">
+    <h2 id="connect-account-heading" class="h4">Connect an account</h2>
+    <p>Choose an account you control. You will use it to sign in to this student record.</p>
+    <% providers = GraduateAuthentication.enabled_providers - @identities.map(&:provider) %>
+    <% if providers.any? %>
+      <div class="d-flex flex-column flex-sm-row gap-3">
+        <% providers.each do |provider| %>
+          <%= button_to "Connect #{GraduateAuthentication.label(provider)}", graduate_auth_path(provider), method: :post, authenticity_token: form_authenticity_token, class: "btn btn-primary w-100", form: { data: { turbo: false } } %>
+        <% end %>
+      </div>
+    <% elsif GraduateAuthentication.enabled_providers.empty? %>
+      <p class="text-secondary">Account connections are currently unavailable. Contact the Faculty of Graduate Studies for help.</p>
+    <% else %>
+      <p class="text-secondary">All available providers are already connected. To change an account, remove its existing connection first.</p>
+    <% end %>
+  </section>
+<% end %>
+<%= render "confirmation_script" %>

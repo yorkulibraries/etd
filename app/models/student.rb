@@ -5,6 +5,7 @@ class Student < User
 
   validate :secondary_information, on: :update
   validate :auto_populate_first_name, on: :create
+  after_update :revoke_graduate_sessions_on_block
   belongs_to :created_by, foreign_key: 'created_by_id', class_name: 'User'
 
   validates_presence_of :sisid
@@ -24,6 +25,8 @@ class Student < User
                                published_date id gem_record_event_id status].freeze
 
   has_many :theses, dependent: :destroy
+  has_many :graduate_identities, dependent: :destroy
+  has_many :graduate_authentication_invitations, dependent: :destroy
 
   audited
   has_associated_audits
@@ -71,5 +74,11 @@ class Student < User
       end
     end
 
+  end
+
+  private
+
+  def revoke_graduate_sessions_on_block
+    GraduateSession.revoke_for_student(id) if saved_change_to_blocked? && blocked?
   end
 end

@@ -7,7 +7,10 @@
 			</h1>
 			<p class="trivial fw-light text-warning-emphasis mb-0">Created by <%= @student.created_by.name%>
 			<% if current_user.role != User::STUDENT && can?(:login_as, :student) %>
-			- <%= link_to "Login as this student", login_as_student_path(id: @student.id) %>
+			- <%= link_to "Login as this student", login_as_student_path(id: @student.id), class: "d-inline-block" %>
+			<% end %>
+			<% if controller_name == "students" && action_name == "show" && GraduateAuthentication.staff_authorized?(current_user) %>
+			- <%= link_to "Graduate account connections", staff_student_graduate_connections_path(@student), class: "d-inline-block" %>
 			<% end %>
 			</p>
 		</div>

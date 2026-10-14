@@ -1,0 +1,73 @@
+<% title "Graduate account connections for #{@student.name}" %>
+
+<p><%= link_to "Back to student record", student_path(@student) %></p>
+
+<% can_manage = GraduateAuthentication.staff_authorized?(current_user) && !@student.blocked? %>
+<% unless can_manage %>
+  <div class="alert alert-warning" role="alert">Connections cannot be changed for a blocked student or without an active administrator or manager account.</div>
+<% end %>
+
+<section class="mb-4" aria-labelledby="staff-linked-accounts-heading">
+  <h2 id="staff-linked-accounts-heading" class="h4">Linked accounts</h2>
+  <% if @identities.any? %>
+    <ul class="list-group">
+      <% @identities.each do |identity| %>
+        <%= render "identity", identity: identity, removal_path: can_manage ? student_graduate_connection_path(@student, identity) : nil %>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>No graduate accounts are connected yet.</p>
+  <% end %>
+</section>
+
+<% if can_manage %>
+  <section class="card mb-4" aria-labelledby="invitation-heading">
+    <div class="card-body">
+      <h2 id="invitation-heading" class="h4">Create a connection invitation</h2>
+      <p>First verify this student's identity through an approved Faculty of Graduate Studies process outside this app. Agree on the provider and a secure way to share the invitation.</p>
+      <p>Matching an email address is not identity verification. Each invitation expires after 48 hours, can be used once, and replaces any earlier unused invitation. No email is sent by this app.</p>
+      <% providers = GraduateAuthentication.enabled_providers %>
+      <% if providers.any? %>
+        <%= form_with url: student_graduate_invitations_path(@student), method: :post, local: true, data: { turbo: false } do %>
+          <div class="mb-3">
+            <%= label_tag :provider, "Account provider", class: "form-label" %>
+            <%= select_tag :provider, options_for_select(providers.map { |provider| [GraduateAuthentication.label(provider), provider] }), required: true, class: "form-select" %>
+          </div>
+          <div class="form-check mb-3">
+            <%= check_box_tag :identity_verified, "1", false, required: true, class: "form-check-input", data: { graduate_confirmation: true } %>
+            <%= label_tag :identity_verified, "I verified this student's identity outside this app and agreed on this provider.", class: "form-check-label" %>
+          </div>
+          <%= submit_tag "Create invitation", class: "btn btn-primary" %>
+        <% end %>
+      <% else %>
+        <p class="text-secondary mb-0">No account providers are enabled. Invitations are currently unavailable.</p>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+<%= render "confirmation_script" %>
+
+<% if @invitations.any? %>
+  <section aria-labelledby="recent-invitations-heading">
+    <h2 id="recent-invitations-heading" class="h4">Recent invitations</h2>
+    <ul class="list-group">
+      <% @invitations.each do |invitation| %>
+        <li class="list-group-item">
+          <strong><%= GraduateAuthentication.label(invitation.provider) %></strong>
+          <span class="d-block">
+            <% if invitation.consumed_at %>
+              Used
+            <% elsif invitation.revoked_at %>
+              Superseded
+            <% elsif invitation.expires_at <= Time.current %>
+              Expired
+            <% else %>
+              Active
+            <% end %>
+          </span>
+          <span class="d-block">Expires <%= time_tag invitation.expires_at, invitation.expires_at.strftime("%B %-d, %Y at %H:%M %Z") %></span>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

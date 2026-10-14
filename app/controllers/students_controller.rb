@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-class StudentsController < ApplicationController
+class StudentsController < AuthenticatedStaffController
+  skip_before_action :redirect_if_not_staff, only: :show
   authorize_resource
 
   def gem_search

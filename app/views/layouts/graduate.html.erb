@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= content_for?(:title) ? yield(:title) : "Graduate sign in" %> | York University ETD</title>
+    <%= stylesheet_link_tag "application", media: "all" %>
+    <%= javascript_include_tag "application" %>
+    <%= csrf_meta_tags %>
+  </head>
+  <body class="bg-light">
+    <a href="#graduate-main" class="visually-hidden-focusable">Skip to main content</a>
+    <div class="container py-4 py-md-5">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+          <header class="mb-4">
+            <%= image_tag "yorklogo.gif", alt: "York University", class: "img-fluid mb-3" %>
+            <p class="text-secondary mb-1">Faculty of Graduate Studies</p>
+            <p class="mb-0">Electronic Thesis and Dissertation</p>
+          </header>
+          <main id="graduate-main" class="card shadow-sm">
+            <div class="card-body p-4">
+              <% flash.each do |name, message| %>
+                <div class="alert alert-<%= name.to_s == 'notice' ? 'success' : 'warning' %>" role="alert"><%= message %></div>
+              <% end %>
+              <h1 class="h3 mb-3"><%= content_for?(:title) ? yield(:title) : "Graduate sign in" %></h1>
+              <%= yield %>
+            </div>
+          </main>
+          <footer class="mt-4 small text-secondary">ETD | York University Libraries</footer>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -5,8 +5,8 @@ class ThesesController < ApplicationController
   authorize_resource :thesis, through: :student
 
   def organize_student_information
-    @thesis = Thesis.find(params[:id])
-    @student = @thesis.student
+    @thesis = @student.theses.find(params[:id])
+    authorize! :organize_student_information, @thesis
     @student.validate_secondary_info = true
     if @student.update(student_params)
       redirect_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPDATE)

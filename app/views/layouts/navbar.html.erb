@@ -42,6 +42,9 @@
 					<%= truncate(@current_user.name, length: 20) if @current_user%> <b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu dropdown-menu-end">
+				<% if @current_user.role == User::STUDENT %>
+					<li><%= link_to "Account connections", graduate_connections_path, class: "dropdown-item" %></li>
+				<% end %>
 				<% if session[:return_to_user_id] %>
 					<li><%= link_to "Logout As Student", logout_as_student_path, class: "dropdown-item" %></li>
 				<% else %>

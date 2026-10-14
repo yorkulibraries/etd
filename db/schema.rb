@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_07_17_225736) do
+ActiveRecord::Schema[7.0].define(version: 2026_10_06_130000) do
   create_table "action_text_rich_texts", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
@@ -151,6 +151,46 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_17_225736) do
     t.date "examdate"
   end
 
+  create_table "graduate_authentication_invitations", charset: "utf8mb4", force: :cascade do |t|
+    t.integer "student_id", null: false
+    t.integer "approved_by_id", null: false
+    t.string "provider", limit: 32, null: false
+    t.string "token_digest", limit: 64, null: false
+    t.datetime "expires_at", null: false
+    t.datetime "consumed_at"
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approved_by_id"], name: "index_graduate_invitations_on_approver"
+    t.index ["student_id"], name: "index_graduate_invitations_on_student"
+    t.index ["token_digest"], name: "index_graduate_invitations_on_digest", unique: true
+  end
+
+  create_table "graduate_identities", charset: "utf8mb4", force: :cascade do |t|
+    t.integer "student_id", null: false
+    t.integer "linked_by_id"
+    t.string "provider", limit: 32, null: false
+    t.string "uid", limit: 191, null: false, collation: (ActiveRecord::Base.connection.adapter_name == "Mysql2" ? "utf8mb4_bin" : nil)
+    t.string "link_method", limit: 32, default: "ppy", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["linked_by_id"], name: "index_graduate_identities_on_linked_by_id"
+    t.index ["provider", "uid"], name: "index_graduate_identities_on_provider_and_uid", unique: true
+    t.index ["student_id", "provider"], name: "index_graduate_identities_on_student_id_and_provider", unique: true
+    t.index ["student_id"], name: "index_graduate_identities_on_student_id"
+  end
+
+  create_table "graduate_sessions", charset: "utf8mb4", force: :cascade do |t|
+    t.bigint "graduate_identity_id", null: false
+    t.string "token_digest", limit: 64, null: false, collation: (ActiveRecord::Base.connection.adapter_name == "Mysql2" ? "utf8mb4_bin" : nil)
+    t.datetime "expires_at", null: false
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["graduate_identity_id"], name: "index_graduate_sessions_on_graduate_identity_id"
+    t.index ["token_digest"], name: "index_graduate_sessions_on_token_digest", unique: true
+  end
+
   create_table "loc_subjects", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.string "name"
     t.string "category"
@@ -235,4 +275,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_17_225736) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "graduate_authentication_invitations", "users", column: "approved_by_id"
+  add_foreign_key "graduate_authentication_invitations", "users", column: "student_id"
+  add_foreign_key "graduate_identities", "users", column: "linked_by_id"
+  add_foreign_key "graduate_identities", "users", column: "student_id"
+  add_foreign_key "graduate_sessions", "graduate_identities", on_delete: :cascade
 end

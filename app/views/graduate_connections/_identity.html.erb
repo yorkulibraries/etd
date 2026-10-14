@@ -1,0 +1,13 @@
+<li class="list-group-item p-3">
+  <h3 class="h5"><%= GraduateAuthentication.label(identity.provider) %></h3>
+  <p class="mb-<%= removal_path ? '3' : '0' %>">Linked on <%= time_tag identity.created_at, identity.created_at.strftime("%B %-d, %Y") %></p>
+  <% if removal_path %>
+    <%= form_with url: removal_path, method: :delete, local: true, data: { turbo: false } do %>
+      <div class="form-check mb-3">
+        <%= check_box_tag :confirmation, "1", false, required: true, id: "remove_identity_#{identity.id}", class: "form-check-input", data: { graduate_confirmation: true } %>
+        <%= label_tag "remove_identity_#{identity.id}", "I confirm removal of this #{GraduateAuthentication.label(identity.provider)} connection.", class: "form-check-label" %>
+      </div>
+      <%= submit_tag "Remove #{GraduateAuthentication.label(identity.provider)} connection", class: "btn btn-outline-danger" %>
+    <% end %>
+  <% end %>
+</li>

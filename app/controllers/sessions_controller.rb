@@ -1,18 +1,22 @@
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
-  before_action :authenticate_user!, except: :destroy
   skip_authorization_check
+  prepend_before_action :remember_graduate_logout, only: :destroy
 
   def new
-    current_user = request.env['warden'].authenticate!
-    session[:user_id] = current_user.id if current_user
-    if current_user.is_a?(Student)
-      if current_user.username == current_user.sisid && request.headers['HTTP_PYORK_USER']
-        current_user.update_attribute(:username, request.headers['HTTP_PYORK_USER'])
+    # Drop cached Warden authentication, then use only fresh PPY header proof.
+    clear_authentication_session
+    ppy_user = request.env['warden'].authenticate(:ppy_devise, scope: :user)
+    if ppy_user&.active?
+      start_authentication_session(ppy_user, source: 'ppy')
+    end
+    if ppy_user.is_a?(Student) && ppy_user.active?
+      if ppy_user.username == ppy_user.sisid && request.headers['HTTP_PYORK_USER']
+        ppy_user.update_attribute(:username, request.headers['HTTP_PYORK_USER'])
       end
       redirect_to student_view_index_url
-    elsif current_user
+    elsif ppy_user&.active?
       redirect_to root_url
     else
       redirect_to invalid_login_url, alert: 'Invalid username or password'
@@ -24,12 +28,23 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    session[:user_id] = nil
-    request.env['warden'] = nil if request.env['warden'].present?
+    external = @graduate_logout
+    clear_authentication_session
+
+    if external
+      redirect_to graduate_login_path
+      return
+    end
 
     cookies.delete('mayaauth', domain: 'yorku.ca')
     cookies.delete('pybpp', domain: 'yorku.ca')
 
     redirect_to 'https://passportyork.yorku.ca/ppylogin/ppylogout', allow_other_host: true
+  end
+
+  private
+
+  def remember_graduate_logout
+    @graduate_logout = GraduateSession.marked?(session)
   end
 end

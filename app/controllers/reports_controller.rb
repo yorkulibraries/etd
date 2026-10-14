@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ReportsController < ApplicationController
+class ReportsController < AuthenticatedStaffController
   skip_authorization_check
 
   def dashboard

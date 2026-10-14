@@ -1,0 +1,14 @@
+<% title "Graduate account invitation created" %>
+
+<p>Share this invitation with <strong><%= @student.name %></strong> through the secure channel agreed during identity verification. No email has been sent by this app.</p>
+<div class="alert alert-info" role="status">
+  This invitation connects a <%= GraduateAuthentication.label(@invitation.provider) %> account and can be used once. It expires after 48 hours, on <%= time_tag @invitation.expires_at, @invitation.expires_at.strftime("%B %-d, %Y at %H:%M %Z") %>.
+</div>
+
+<div class="mb-4">
+  <%= label_tag :graduate_invitation_url, "Invitation URL", class: "form-label fw-bold" %>
+  <%= text_field_tag :graduate_invitation_url, @invitation_url, readonly: true, class: "form-control", spellcheck: false, data: { invitation_url: true }, "aria-describedby": "invitation-copy-help" %>
+  <p id="invitation-copy-help" class="form-text">Select and copy the full URL. Keep it private and share it only with the verified student. The URL is shown here only when the invitation is created.</p>
+</div>
+
+<%= link_to "Back to graduate account connections", staff_student_graduate_connections_path(@student), class: "btn btn-outline-secondary" %>

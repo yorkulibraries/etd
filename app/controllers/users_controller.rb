@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UsersController < ApplicationController
+class UsersController < AuthenticatedStaffController
   authorize_resource
 
   def index

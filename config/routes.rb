@@ -20,6 +20,19 @@ Rails.application.routes.draw do
   get 'invalid_login' => 'sessions#invalid_login', as: 'invalid_login'
   get 'unauthorized' => 'home#unauthorized'
 
+  get 'graduate/login' => 'graduate_sessions#new', as: :graduate_login
+  match 'graduate/enroll' => 'graduate_sessions#enroll', via: %i[get post], as: :graduate_enroll
+  get 'graduate/auth/failure' => 'graduate_sessions#failure', as: :graduate_auth_failure
+  get 'graduate/auth/:provider/callback' => 'graduate_sessions#callback', as: :graduate_auth_callback
+  # Registered OmniAuth strategies handle POST first; all other requests fail closed.
+  match 'graduate/auth/:provider' => 'graduate_sessions#unavailable', via: %i[get post], as: :graduate_auth
+  get 'my/graduate-connections' => 'graduate_connections#index', as: :graduate_connections
+  delete 'my/graduate-connections/:id' => 'graduate_connections#destroy', as: :graduate_connection
+  get 'students/:student_id/graduate-connections' => 'graduate_connections#staff_index', as: :staff_student_graduate_connections
+  delete 'students/:student_id/graduate-connections/:id' => 'graduate_connections#destroy', as: :student_graduate_connection
+  post 'students/:student_id/graduate-invitations' => 'graduate_invitations#create', as: :student_graduate_invitations
+  get 'students/:student_id/theses/:thesis_id/files/:id/download' => 'document_downloads#show', as: :download_student_thesis_document
+
   resources :export_logs, path: 'exports'
 
   resource :settings, only: %i[edit update] do

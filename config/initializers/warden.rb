@@ -19,9 +19,16 @@ Warden::Strategies.add(:ppy_devise) do
 
   def authenticate!
     if valid?
-      resource = User.find_by('sisid = ? OR username = ?', request.headers[CAS_UID],
-                              request.headers[CAS_USERNAME])
-      if resource.present?
+      student = Student.find_by(sisid: request.headers[CAS_UID], role: User::STUDENT) if request.headers[CAS_UID].present?
+      named_user = User.find_by(username: request.headers[CAS_USERNAME]) if request.headers[CAS_USERNAME].present?
+      # PPY staff also receive CYIN. Preserve their trusted username fallback,
+      # but never switch between two inconsistent known identities.
+      if student && named_user && student.id != named_user.id
+        fail!('Inconsistent ppy headers')
+        return
+      end
+      resource = student || named_user
+      if resource&.active?
         success!(resource)
       else
         fail!('Missing ppy headers')

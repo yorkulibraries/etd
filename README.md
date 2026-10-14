@@ -2,6 +2,10 @@
 
 ETD is a collaboration between York University Libraries and Faculty of Graduate Studies to facilitate depositing of Electronic Thesis and Dissertations.
 
+# Graduate sign-in
+
+Google sign-in for existing students is disabled by default. See [graduate authentication setup](docs/graduate-authentication-setup.md) for account linking, FGS invitations, the staging callback URL, provider credentials, and required Apache/file-access changes.
+
 # Start developing
 
 ```

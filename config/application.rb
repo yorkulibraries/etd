@@ -17,11 +17,13 @@ require 'action_text/engine'
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
+require_relative '../app/middleware/graduate_uploads_guard'
 
 module Etd
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
+    config.middleware.insert_before 0, GraduateUploadsGuard, enabled: ENV['GRADUATE_OAUTH_ENABLED'] == 'true'
 
     config.active_record.belongs_to_required_by_default = false
     config.active_record.legacy_connection_handling = false

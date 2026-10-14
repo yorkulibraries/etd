@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Run inside the Ruby 3.1.4 application image, with an isolated SQLite test DB.
+# Example: docker exec etd-graduate-auth bash script/verify_graduate_authentication
+set -euo pipefail
+cd "$(dirname "$0")/.."
+export RAILS_ENV=test
+export DB_ADAPTER=sqlite3
+export DATABASE_URL=sqlite3:/app/tmp/graduate-auth-verification-test.sqlite3
+export TEST_DATABASE_URL="$DATABASE_URL"
+export RUBYOPT="${RUBYOPT:+$RUBYOPT }-r$(pwd)/test/support/graduate_oauth_environment"
+mkdir -p tmp/graduate-authentication
+export SCHEMA=/app/tmp/graduate-authentication/verification-schema.rb
+cp db/schema.rb "$SCHEMA"
+report=tmp/graduate-authentication-verification.txt
+exec > >(tee "$report") 2>&1
+printf 'Graduate authentication verification\n'
+printf 'UTC: %s\n' "$(date -u '+%Y-%m-%d %H:%M:%S')"
+printf 'Branch: %s; HEAD: %s\n' "$(git branch --show-current)" "$(git rev-parse HEAD)"
+printf 'Ruby: %s\n' "$(ruby --version)"
+printf 'Provider boundaries mocked. No external email or live provider calls.\n\n'
+run() {
+  printf '$'; printf ' %q' "$@"; printf '\n'
+  "$@"
+  printf 'Exit code: 0\n\n'
+}
+run bundle check
+run bundle exec rails db:schema:load
+run bundle exec rails test test/integration/google_only_authentication_test.rb test/integration/graduate_authentication_test.rb test/integration/graduate_downloads_test.rb test/integration/graduate_staff_boundaries_test.rb test/integration/graduate_impersonation_test.rb test/integration/graduate_thesis_ownership_test.rb test/integration/graduate_session_security_test.rb test/integration/graduate_oauth_transaction_test.rb test/integration/graduate_oauth_intent_test.rb test/integration/graduate_oauth_lifecycle_test.rb
+run bundle exec rails test test/system/graduate_authentication_test.rb test/system/graduate_downloads_test.rb
+printf 'Screenshots:\n'
+find tmp/graduate-authentication/screenshots -maxdepth 1 -name '*.png' ! -name 'failures_*' -print | sort
+printf '\nLimitations: real Google consent and callback registration, actual upstream Passport York header trust, Apache public-route exemptions and production HTTPS/cookie behavior need staging verification.\n'
+printf 'Additional MySQL up/down/up evidence: tmp/graduate-authentication/mysql-verification.txt\n'
+printf 'OAuth session migration and final MySQL session checks: tmp/oauth-correction/mysql-verification.log and mysql-final-session-lifecycle.log\n'

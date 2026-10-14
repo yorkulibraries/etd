@@ -1,0 +1,25 @@
+<% content_for :title, @enrollment ? "Connect your graduate account" : "Graduate sign in" %>
+
+<% if @enrollment %>
+  <p>Use the account agreed with the Faculty of Graduate Studies to connect it to your existing student record.</p>
+  <p class="text-secondary">This invitation does not create a new student record. Choose the provider named in your invitation.</p>
+<% else %>
+  <p>Sign in with an account you have already connected to your student record.</p>
+  <p class="text-secondary">To connect an account for the first time, sign in with Passport York or contact the Faculty of Graduate Studies.</p>
+<% end %>
+
+<% providers = @providers %>
+<% if providers.empty? %>
+  <div class="alert alert-info" role="status">Graduate account sign in is currently unavailable. Use Passport York or contact the Faculty of Graduate Studies for help.</div>
+<% end %>
+
+<div class="d-grid gap-3 my-4">
+  <% providers.each do |provider| %>
+    <%= button_to "Continue with #{GraduateAuthentication.label(provider)}", graduate_auth_path(provider), method: :post, authenticity_token: form_authenticity_token, class: "btn btn-primary w-100", form: { data: { turbo: false } } %>
+  <% end %>
+  <%= link_to "Sign in with Passport York", login_path, class: "btn btn-primary w-100" %>
+</div>
+
+<% if @enrollment %>
+  <p class="small mb-0"><%= link_to "Return to graduate sign in", graduate_login_path %></p>
+<% end %>
