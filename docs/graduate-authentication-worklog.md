@@ -4,7 +4,15 @@
 Provide an alternative to Passport York for graduates returning to ETD for embargo requests and future modifications.
 
 ## Current goal
-Set up the Google Cloud staging application and OAuth web client through the user's open browser. Keep credentials out of Git and chat. Server deployment, real provider testing and Apache activation remain separate.
+Commit and push graduate-authentication, wait for its GitHub CI to pass, then merge into staging and push. The user explicitly authorized both pushes on 2026-10-14. Server deployment, real provider testing and Apache activation remain separate.
+
+## Branch publication, 2026-10-14
+- Confirmed iota staging runs etdqa.service (Puma), loads /home/etdqa/.etdqa, and currently lacks the OAuth code.
+- Committed the OAuth implementation as a5d2319. Left unrelated embargo planning documents untracked.
+- The feature branch started at d3a69a2, older than origin/staging c8d1f05. Integrate current staging before CI so the tested branch retains staging fixes and submission snapshots.
+- Integrated staging in c2f3c94, preserving current schema, invitations, submission snapshots and dependency fixes. Unified protected document downloads with existing embargo authorization.
+- Local merged checks passed: 82 OAuth integration tests (1,568 assertions), 9 graduate/snapshot browser tests (206 assertions), and 41 document/session/snapshot checks (184 assertions). Both snapshot download checksums passed. Tests used port 3220 and an isolated database; existing manual demo was preserved.
+- Next: push graduate-authentication, wait for successful CI for its exact commit, then merge and push staging. Google secrets are excluded from the commit.
 
 ## Google Cloud setup, 2026-10-13
 - The user explicitly requested the first Google-provider setup step through Computer Use.
