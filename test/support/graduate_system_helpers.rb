@@ -3,6 +3,7 @@
 require 'fileutils'
 require 'uri'
 require 'base64'
+require_relative 'selenium_detached_visibility'
 
 # Test-only trusted-header boundary. Mapping is one-use and restricted to /login.
 # The real SessionsController and Warden PPY strategy establish the session.
