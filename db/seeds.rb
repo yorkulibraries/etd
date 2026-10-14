@@ -207,7 +207,7 @@ AppSettings.student_update_details_subjects = <<HEREDOC
 HEREDOC
 
 AppSettings.student_update_details_keywords = <<HEREDOC
-<div>Choose up to ten key words or phrases that describe what your work is about. The keywords should repeat core concepts in your abstract. Capitalize each keyword or the first word of a keyword phrase and separate words or terms with commas. Select terms that your target audience might use when searching for your work. Keep in mind that:<br><br></div><ul><li>Terms that are too broad (e.g. 'Anthropology') or too narrow (e.g. 'fM space') may not help people find your work.</li><li>There is no need to add your subject terms as keywords.&nbsp;</li><li>Use the plural form of nouns (e.g., 'magazines' instead of 'magazine').&nbsp;</li><li>Adding variations or synonyms for key words can be helpful for searchers but avoid common variations (e.g. employees or workers).&nbsp;</li></ul>
+<div>Choose up to ten key words or phrases that describe what your work is about. The keywords should repeat core concepts in your abstract. Capitalize the first word of each keyword or keyword phrase and separate words or terms with commas or semicolons. Select terms that your target audience might use when searching for your work. Keep in mind that:<br><br></div><ul><li>Terms that are too broad (e.g. 'Anthropology') or too narrow (e.g. 'fM space') may not help people find your work.</li><li>There is no need to add your subject terms as keywords.&nbsp;</li><li>Use the plural form of nouns (e.g., 'magazines' instead of 'magazine').&nbsp;</li><li>Adding variations or synonyms for key words can be helpful for searchers but avoid common variations (e.g. employees or workers).&nbsp;</li></ul>
 HEREDOC
 
 AppSettings.student_upload_files = <<HEREDOC
@@ -228,6 +228,10 @@ HEREDOC
 
 AppSettings.student_supplementary_embargo_upload_files = <<HEREDOC
 <div>Please Upload the following documents:<br><br></div><ul><li><strong>Supervisor Letter</strong></li><li><strong>Other Embargo Supporting Documents</strong></li><li><strong>Portable Document Format:</strong> (.pdf), Text (.txt), Hypertext Markup Language (.html, .htm), Open Document Format (.odt, .odp, .ods).</li></ul>
+HEREDOC
+
+AppSettings.modification_request_upload_files = <<HEREDOC
+<div>Upload approval emails, supervisor letters, or other documentation for a modification request. These files are internal and are not exported to DSpace.</div>
 HEREDOC
 
 AppSettings.student_review_license_info = <<HEREDOC
@@ -360,4 +364,7 @@ AppSettings.embargo_file_extensions = <<HEREDOC
 .pdf, .txt, .html, .htm, .odt, .odp, .ods
 HEREDOC
 
+AppSettings.modification_request_file_extensions = <<HEREDOC
+.pdf, .doc, .docx
+HEREDOC
 

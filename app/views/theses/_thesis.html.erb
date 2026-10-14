@@ -9,6 +9,20 @@
 					<% end %>
 					<%= link_to thesis.title, student_thesis_path(thesis.student, thesis), id: "thesis_link_#{thesis.id}", class: "thesis-link" %>
 				</h2>
+				<% if @student && current_user.role != User::STUDENT %>
+					<% invitation = thesis.current_invitation %>
+					<p>
+						<%= link_to_if AppSettings.email_welcome_allow,
+										 invitation ? "Send invitation again" : "Send invitation email",
+										 send_invite_student_path(thesis.student, thesis_id: thesis.id),
+										 id: "send_thesis_invitation_email_#{thesis.id}" %>
+					</p>
+					<% if invitation&.accepted_at %>
+						<p class="invitation-deadline">Invitation opened <%= invitation.accepted_at.in_time_zone('Eastern Time (US & Canada)').strftime("%B %-d, %Y") %>.</p>
+					<% elsif invitation %>
+						<p class="invitation-deadline">Invitation <%= invitation.expires_at < Time.current ? 'expired' : 'expires' %> <%= invitation.expires_at.in_time_zone('Eastern Time (US & Canada)').strftime("%B %-d, %Y at %-I:%M %p %Z") %>.</p>
+					<% end %>
+				<% end %>
 			</div>
 			<div class="col-md-3">
 				<div class="d-flex justify-content-md-evenly justify-content-between align-items-start mt-2">

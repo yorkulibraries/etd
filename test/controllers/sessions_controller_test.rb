@@ -38,6 +38,17 @@ class SessionsControllerTest < ActionController::TestCase
     assert_redirected_to student_view_index_url
   end
 
+  should 'accept active ETD invitations when a student follows the login flow' do
+    student = create(:student, sisid: '123123123')
+    gem_record = create(:gem_record, sisid: student.sisid)
+    invitation = ThesisInvitation.issue!(student:, gem_record:)
+    @request.env['HTTP_PYORK_CYIN'] = student.sisid
+
+    get :new
+
+    assert_not_nil invitation.reload.accepted_at
+  end
+
   should "save student username if it's a student and username is not set" do
     student = create(:student, username: '123123123', sisid: '123123123')
 

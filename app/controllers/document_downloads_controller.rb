@@ -7,6 +7,11 @@ class DocumentDownloadsController < ApplicationController
     # Reading an owned thesis is allowed after submission; edit rules are untouched.
     authorize! :show, thesis
     document = thesis.documents.not_deleted.find_by(id: params[:id])
+    if document&.embargo_request_document?
+      raise ActiveRecord::RecordNotFound unless document.embargo_request.thesis_id == thesis.id
+
+      authorize! :read, document
+    end
     path = safe_file_path(document)
     unless path
       render plain: 'This file is unavailable. Contact FGS for help.', status: :not_found

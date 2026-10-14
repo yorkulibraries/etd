@@ -112,7 +112,7 @@
 		<%  unless block_thesis_changes?(@thesis) %>
 			<hr/>
 			<div class="process-nav d-flex justify-content-end">
-				<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD) %>" class="btn btn-lg btn-primary me-2" title="Begin Submission">
+				<a href="<%= student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO) %>" class="btn btn-lg btn-primary me-2" title="Return to embargo request">
 					<i class="fa fa-angle-double-left"></i>
 				</a>
 				<%= button_tag(type: 'submit', class: "next-btn btn btn-lg btn-success") do %>

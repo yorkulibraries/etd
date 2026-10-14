@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require Rails.root.join('lib/etd/exporter.rb')
+require Rails.root.join('lib/etd/dspace_receipt_identifier.rb')
 require 'ostruct'
 
 class DspaceExportJob < ActiveJob::Base
@@ -30,55 +31,67 @@ class DspaceExportJob < ActiveJob::Base
       @exporter.prepare_collection
 
       log ">>>>>>>> #{@export_log.production_export? ? 'PRODUCTION' : 'TEST'} MODE <<<<<<<<<<"
-      log Thesis.accepted.without_embargo.where('id in (?)', @export_log.theses_ids).to_sql
-      theses = Thesis.accepted.without_embargo.where("id in (#{@export_log.theses_ids})")
+      theses = eligible_theses
+      log theses.to_sql
 
       log "FOUND: #{theses.size} theses"
 
-      failed_ids = []
-      successful_ids = []
+      if theses.empty?
+        log 'No captured theses remain publication eligible; skipping DSpace deposit.'
+        @export_log.update_attribute(:job_status, ExportLog::JOB_DONE)
+      else
 
-      theses.each_with_index do |thesis, index|
-        begin
-          log "\n==== Depositing #{index + 1} of #{theses.size} ========="
-          log "Thesis ID: #{thesis.id}"
-          log "Student ID: #{thesis.student.id}"
+        failed_ids = []
+        successful_ids = []
 
-          entry = thesis_to_atom_entry(thesis)
-          files = extract_thesis_filepaths(thesis)
+        theses.each_with_index do |thesis, index|
+          begin
+            log "\n==== Depositing #{index + 1} of #{theses.size} ========="
+            log "Thesis ID: #{thesis.id}"
+            log "Student ID: #{thesis.student.id}"
 
-          receipt = @exporter.deposit(entry:, files:, zipped: true, complete: @export_log.complete_thesis?)
+            entry = thesis_to_atom_entry(thesis)
+            files = extract_thesis_filepaths(thesis)
 
-          log "Receipt Status: #{receipt.status_code}"
-          log "Receipt Message: #{receipt.status_message}"
+            unless eligible_theses.where(id: thesis.id).exists?
+              log "SKIPPED: Thesis ID #{thesis.id} is no longer publication eligible."
+              next
+            end
 
-          # 3) set status of each thesis to publish after it has been published
-          thesis.publish if !receipt.nil? && @export_log.publish_thesis?
+            receipt = @exporter.deposit(entry:, files:, zipped: true, complete: @export_log.complete_thesis?)
 
-          successful_ids.push(thesis.id)
-          @export_log.update_attribute(:successful_count, successful_ids.size)
-          @export_log.update_attribute(:successful_ids, successful_ids.join(','))
+            log "Receipt Status: #{receipt.status_code}"
+            log "Receipt Message: #{receipt.status_message}"
 
-          log '======================'
-        rescue Exception => e
-          failed_ids.push(thesis.id)
-          error(thesis, e)
+            enqueue_license_bundle(receipt, thesis)
 
-          @export_log.update_attribute(:failed_count, failed_ids.size)
-          @export_log.update_attribute(:failed_ids, failed_ids.join(','))
+            # 3) set status of each thesis to publish after it has been published
+            thesis.publish if !receipt.nil? && @export_log.publish_thesis?
+
+            successful_ids.push(thesis.id)
+            @export_log.update_attribute(:successful_count, successful_ids.size)
+            @export_log.update_attribute(:successful_ids, successful_ids.join(','))
+
+            log '======================'
+          rescue Exception => e
+            failed_ids.push(thesis.id)
+            error(thesis, e)
+
+            @export_log.update_attribute(:failed_count, failed_ids.size)
+            @export_log.update_attribute(:failed_ids, failed_ids.join(','))
+          end
+
+          log "\rOf: #{theses.size}. Succeeded: #{successful_ids.size}. Failed: #{failed_ids.size}. "
+
+          sleep(@sleep_interval)
         end
 
-        log "\rOf: #{theses.size}. Succeeded: #{successful_ids.size}. Failed: #{failed_ids.size}. "
-
-        sleep(@sleep_interval)
+        if failed_ids.size == theses.size
+          @export_log.update_attribute(:job_status, ExportLog::JOB_FAILED)
+        else
+          @export_log.update_attribute(:job_status, ExportLog::JOB_DONE)
+        end
       end
-
-      if failed_ids.size == theses.size
-        @export_log.update_attribute(:job_status, ExportLog::JOB_FAILED)
-      else
-        @export_log.update_attribute(:job_status, ExportLog::JOB_DONE)
-      end
-
     else
       @export_log.update_attribute(:job_status, ExportLog::JOB_DONE)
     end
@@ -94,7 +107,8 @@ class DspaceExportJob < ActiveJob::Base
     return [] if thesis.nil?
 
     files = []
-    thesis.documents.not_deleted.each do |document|
+    thesis.documents.not_deleted
+          .where(usage: Document.usages[:thesis], embargo_request_id: nil).each do |document|
       log "       #{document.file.path}"
       files.push document.file.path
     end
@@ -116,8 +130,8 @@ class DspaceExportJob < ActiveJob::Base
       entry.add_dublin_core_extension!('subject', subject.name)
     end
 
-    thesis.keywords&.split(',')&.each do |keyword|
-      entry.add_dublin_core_extension!('relationSubjectKeywords', keyword.strip)
+    thesis.subject_keywords.each do |keyword|
+      entry.add_dublin_core_extension!('relationSubjectKeywords', keyword)
     end
 
     entry.add_dublin_core_extension!('abstract', thesis.abstract)
@@ -158,6 +172,34 @@ class DspaceExportJob < ActiveJob::Base
   end
 
   ## UTIL FUNCTIONS
+  def enqueue_license_bundle(receipt, thesis)
+    return unless @export_log.production_export?
+    return unless @export_log.complete_thesis?
+    return if AppSettings.dspace_rest_api_url.blank?
+    return unless receipt&.status_code.to_i.between?(200, 299)
+
+    item_uuid = ETD::DspaceReceiptIdentifier.item_uuid(receipt)
+    unless item_uuid
+      log 'LICENSE POST-DEPOSIT SKIPPED: SWORD receipt did not expose a DSpace item UUID'
+      return
+    end
+
+    deposit = DspaceDeposit.find_or_initialize_by(export_log: @export_log, thesis:)
+    if deposit.persisted? && deposit.item_uuid != item_uuid
+      log "LICENSE POST-DEPOSIT SKIPPED: export already recorded item #{deposit.item_uuid}"
+      return
+    end
+
+    deposit.item_uuid = item_uuid
+    deposit.sword_location = receipt.location
+    deposit.save!
+    return if [DspaceDeposit::COMPLETE, DspaceDeposit::REVIEW_REQUIRED].include?(deposit.license_status)
+
+    DspaceLicenseBundleJob.perform_later(deposit.id)
+  rescue StandardError => e
+    log "LICENSE POST-DEPOSIT SETUP ERROR: #{e.message}"
+  end
+
   def settings(_production)
     {
       username: AppSettings.dspace_live_username, password: AppSettings.dspace_live_password,
@@ -189,5 +231,13 @@ class DspaceExportJob < ActiveJob::Base
     o += "=============================\n\n"
 
     @export_log.update_attribute(:output_error, "#{@export_log.output_error} \n #{o}")
+  end
+
+  private
+
+  def eligible_theses
+    Thesis.where(status: Thesis::ACCEPTED)
+          .publication_eligible
+          .where(id: @export_log.theses_ids.to_s.split(',').map(&:to_i))
   end
 end

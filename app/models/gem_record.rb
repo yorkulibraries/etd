@@ -15,6 +15,7 @@ class GemRecord < ApplicationRecord
   ACCEPTED = 'Accepted'
 
   has_many :committee_members
+  has_many :thesis_invitations
 
   scope :completed, lambda {
                       where('eventtype = ? OR eventtype = ?', GemRecord::PHD_COMPLETED, GemRecord::MASTERS_COMPLETED)
@@ -33,6 +34,12 @@ class GemRecord < ApplicationRecord
 
   def display_name
     title
+  end
+
+  def current_invitation_for(student)
+    student_invitations = thesis_invitations.where(student:)
+    student_invitations.where.not(accepted_at: nil).order(accepted_at: :desc).first ||
+      student_invitations.order(sent_at: :desc, id: :desc).first
   end
 
   ### FINDERS ###

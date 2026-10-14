@@ -9,6 +9,7 @@ MissingDrawer.tmplugin
 .DS_Store
 .vagrant
 uploads/
+storage/
 REVISION
 assets_manifest_backup/
 config/secrets.yml

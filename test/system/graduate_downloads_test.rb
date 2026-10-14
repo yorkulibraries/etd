@@ -27,8 +27,8 @@ class GraduateDownloadsSystemTest < ActionDispatch::SystemTestCase
     self.class.ppy_boundary = GraduateSystemPpyBoundary.shared
     Capybara.app = self.class.ppy_boundary
     Capybara.server_host = '127.0.0.1'
-    Capybara.server_port = 3210
-    Capybara.app_host = 'http://127.0.0.1:3210'
+    Capybara.server_port = ENV.fetch("ETD_SYSTEM_TEST_PORT", "3210").to_i
+    Capybara.app_host = "http://127.0.0.1:#{Capybara.server_port}"
     Capybara.default_max_wait_time = 5
     Capybara.save_path = Rails.root.join('tmp/graduate-authentication/screenshots').to_s
     ActionDispatch::SystemTesting::Server.new.run

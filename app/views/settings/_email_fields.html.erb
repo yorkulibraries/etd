@@ -27,9 +27,11 @@
   <div class="tab-pane fade" id="welcome_email_settings" role="tabpanel" tabindex="0">
     <h4>Welcome Email</h4>
     <%= f.input :email_welcome_allow, as: :radio_buttons, label: "Allow Welcome Email?", item_wrapper_class: 'form-check form-check-inline'%>
+		<%= f.input :invitation_validity_days, as: :integer, label: "Invitation validity (calendar days)",
+					input_html: { min: 1, step: 1 }, hint: "Invitations expire at 11:59 PM Toronto time on the final day." %>
 		<%= f.input :email_welcome_subject, as: :text, label: "Subject" %>
 		<%= f.input :email_welcome_body, as: :text, label: "Body", input_html: { rows: 20, class: "span8" } %>
-		<p class="help-block">Available Tags: {{student_name}} | {{date}} | {{date-short}} | {{application_url}} </p>
+			<p class="help-block">Available Tags: {{student_name}} | {{thesis_title}} | {{invitation_expiry_date}} | {{date}} | {{date-short}} | {{application_url}} </p>
   </div>
 
   <div class="tab-pane fade" id="status_change_email_settings" role="tabpanel" tabindex="0">

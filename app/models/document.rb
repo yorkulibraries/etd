@@ -7,12 +7,16 @@ class Document < ApplicationRecord
   ### RELATIONS
   belongs_to :thesis
   belongs_to :user
+  belongs_to :embargo_request, optional: true
 
   #### VALIDATIONS
   validates_presence_of :file, :user, :thesis
   validate :one_primary_file_per_thesis, on: :create
   validate :validate_extension
   validate :validate_usage
+  validate :embargo_request_matches_thesis
+  validate :embargo_request_evidence_usage
+  validate :one_supervisor_letter_per_request
 
   #### SCOPES
   scope :newest, -> { order('created_at desc') }
@@ -24,8 +28,9 @@ class Document < ApplicationRecord
   
   scope :licence, -> { where(usage: :licence).where('supplemental = ? ', true) }
   scope :embargo, -> { where(usage: [:embargo, :embargo_letter]).where('supplemental = ? ', true) }
+  scope :modification_request, -> { where(usage: :modification_request).where('supplemental = ? ', true) }
 
-  enum usage: %i[thesis embargo embargo_letter licence]
+  enum usage: %i[thesis embargo embargo_letter licence modification_request]
 
   attribute :usage, default: :thesis
   attribute :supplemental, default: true
@@ -48,6 +53,10 @@ class Document < ApplicationRecord
     AppSettings.embargo_file_extensions.split(',').map(&:strip)
   end
 
+  def self.modification_request_file_extensions
+    AppSettings.modification_request_file_extensions.split(',').map(&:strip)
+  end
+
   def allowed_extensions
     list = Document.primary_thesis_file_extensions
 
@@ -58,6 +67,8 @@ class Document < ApplicationRecord
       list = Document.licence_file_extensions
     when 'embargo'
       list = Document.embargo_file_extensions
+    when 'modification_request'
+      list = Document.modification_request_file_extensions
     else
       list = Document.primary_thesis_file_extensions
     end
@@ -73,6 +84,22 @@ class Document < ApplicationRecord
 
   def display_name
     name
+  end
+
+  def embargo_request_document?
+    embargo_request_id.present?
+  end
+
+  def save(*args, **options, &block)
+    return super unless embargo_letter_lock_required?
+
+    with_embargo_request_lock { super }
+  end
+
+  def save!(*args, **options, &block)
+    return super unless embargo_letter_lock_required?
+
+    with_embargo_request_lock { super }
   end
 
   def primary?
@@ -114,11 +141,45 @@ class Document < ApplicationRecord
     return true
   end
 
+  def embargo_request_matches_thesis
+    return if embargo_request.blank? || embargo_request.thesis_id == thesis_id
+
+    errors.add(:embargo_request, 'must belong to the same thesis')
+  end
+
+  def embargo_request_evidence_usage
+    return if embargo_request.blank? || embargo? || embargo_letter?
+
+    errors.add(:usage, 'must be embargo evidence when attached to an embargo request')
+  end
+
+  def one_supervisor_letter_per_request
+    return unless usage == 'embargo_letter' && embargo_request.present?
+    return unless embargo_request.documents.not_deleted.where(usage: :embargo_letter).where.not(id: id).exists?
+
+    errors.add(:usage, 'already has a supervisor support letter')
+  end
+
+  def embargo_letter_lock_required?
+    embargo_request_id.present? && usage == 'embargo_letter' && !@embargo_request_lock_held
+  end
+
+  def with_embargo_request_lock
+    self.class.transaction do
+      self.embargo_request = EmbargoRequest.lock.find(embargo_request_id)
+      @embargo_request_lock_held = true
+      yield
+    ensure
+      @embargo_request_lock_held = false
+    end
+  end
+
   def document_type
     return 'supplemental' if self.usage == "thesis" && self.supplemental?
     return 'primary' if self.usage == "thesis" && self.primary?
     return 'embargo' if self.usage == "embargo" || self.usage == "embargo_letter"
     return 'licence' if self.usage == "licence"
+    return 'modification_request' if self.usage == "modification_request"
   end
 
   def uploaded_filename(original_filename)
@@ -144,6 +205,7 @@ class Document < ApplicationRecord
     docs = thesis.documents.not_deleted.supplemental.order('id') if type == 'supplemental'
     docs = thesis.documents.not_deleted.licence.order('id') if type == 'licence'
     docs = thesis.documents.not_deleted.embargo.order('id') if type == 'embargo'
+    docs = thesis.documents.not_deleted.modification_request.order('id') if type == 'modification_request'
 
     s = Hash.new
     docs.each_with_index do |d, i|
@@ -157,6 +219,7 @@ class Document < ApplicationRecord
     docs = thesis.documents.not_deleted.supplemental if document_type == 'supplemental'
     docs = thesis.documents.not_deleted.embargo if document_type == 'embargo'
     docs = thesis.documents.not_deleted.licence if document_type == 'licence'
+    docs = thesis.documents.not_deleted.modification_request if document_type == 'modification_request'
     docs.each do |d|
       d.file = File.open(d.file.path)
       d.save! validate: false

@@ -18,9 +18,16 @@
 			<% if @theses.size > 0 %>
 				<p>Select which thesis you want to work on:</p>
 				<% @theses.each do |thesis| %>
-					<h4 class="title clearfix mb-4" title="title">
-						<%= link_to thesis.title, student_view_thesis_process_path(thesis, Thesis::PROCESS_BEGIN) %>
-					</h4>
+					<% if thesis.invitation_accessible? %>
+						<h4 class="title clearfix mb-4" title="title">
+							<%= link_to thesis.title, student_view_thesis_process_path(thesis, Thesis::PROCESS_BEGIN) %>
+						</h4>
+					<% else %>
+						<div class="invitation-expired mb-4">
+							<h4 class="title clearfix" title="title"><%= thesis.title %></h4>
+							<p>Invitation expired—contact ETD staff.</p>
+						</div>
+					<% end %>
 				<% end %>
 			<% else %>
 				<p>Currently you do not have an open thesis or dissertation. Once you have successfully defended your oral exam, a Thesis Coordinator will open an ETD record for you and you will be notified by email, with instructions on how to submit.</p>

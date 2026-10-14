@@ -18,14 +18,28 @@
 		<li class="nav-item">
 			<%= active_link_to 'Assigned to me', root_path(which: :mine), active: /mine/, class:"nav-link" %>
 		</li>
-	</ul>	
-	<div id="theses">
-		<% if @theses.size == 0 %>
-			<p class="py-3">There are no <strong><%= @which.humanize.titleize %></strong> theses available right now.</p>
+		<% if can? :read, EmbargoRequest %>
+			<li class="nav-item">
+				<%= active_link_to root_path(which: 'embargo_requests'), active: /embargo_requests/, class: 'nav-link' do %>
+					Embargo Requests
+					<% if @pending_embargo_requests_count.to_i.positive? %>
+						<span class="badge rounded-pill text-bg-danger"><%= @pending_embargo_requests_count %></span>
+					<% end %>
+				<% end %>
+			</li>
 		<% end %>
-		<% @theses.each do |thesis| %>			
-			<%= render partial: thesis %>
-		<% end %>		
-	</div>
+	</ul>
+	<% if @which == 'embargo_requests' %>
+		<%= render 'embargo_requests/queue' %>
+	<% else %>
+		<div id="theses">
+			<% if @theses.size == 0 %>
+				<p class="py-3">There are no <strong><%= @which.humanize.titleize %></strong> theses available right now.</p>
+			<% end %>
+			<% @theses.each do |thesis| %>
+				<%= render partial: thesis %>
+			<% end %>
+		</div>
+	<% end %>
 	
 </div>

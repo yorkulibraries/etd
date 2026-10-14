@@ -74,7 +74,8 @@
 		<% @student = @thesis.student %>
 		<div class="bg-light-subtle mt-3 p-3">
 			<h4>Primary</h4>
-			<% @primary_documents = @thesis.documents.not_deleted.primary %>
+			<% report_documents = @thesis.documents.not_deleted.where(embargo_request_id: nil) %>
+			<% @primary_documents = report_documents.primary %>
 				<% @primary_documents.each do | document | %>
 					<%= render partial: document %>
 				<% end %>
@@ -86,15 +87,12 @@
 	
 		<div class="bg-light-subtle mt-3 p-3">
 			<h4>Supplementary Thesis Files</h4>
-			<!-- temp assignment as awaiting update from another dev -->
-			<% @supplemental_documents = @thesis.documents.not_deleted.supplemental %>
-			<% @supplemental_licence_documents = @thesis.documents.not_deleted.supplemental %>
-			<% @supplemental_embargo_documents = @thesis.documents.not_deleted.supplemental %>
+			<% @supplemental_documents = report_documents.supplemental %>
+			<% @supplemental_licence_documents = report_documents.licence %>
+			<% @supplemental_embargo_documents = report_documents.embargo %>
 			
 			<% @supplemental_documents.each do | document | %>
-				<% if document.usage == 'thesis'%>
-					<%= render partial: document %>
-				<% end %>
+				<%= render partial: document %>
 			<% end %>
 			<% if @supplemental_documents.count == 0 %>
 				<p>There are no <strong>supplementary</strong> files or documents attached to this thesis/dissertation.</p>

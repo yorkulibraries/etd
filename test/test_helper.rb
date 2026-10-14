@@ -50,10 +50,12 @@ module ActiveSupport
 
     setup do
       DatabaseCleaner.start
+      AppSettings.clear_cache
     end
 
     teardown do
       DatabaseCleaner.clean
+      AppSettings.clear_cache
     end
   end
 end

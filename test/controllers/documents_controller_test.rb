@@ -103,6 +103,21 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_redirected_to student_thesis_path(@student, @thesis), 'Should redirect to thesis details'
     end
 
+    should 'keep the displayed name in sync with the file extension after a replace' do
+      post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
+                              document: { usage: 'modification_request', supplemental: true,
+                                          file: fixture_file_upload('document-microsoft.doc', 'application/msword') } }
+      d = assigns(:document).reload
+      assert_match(/_modification_request_1\.doc\z/, d.name)
+      assert_equal File.basename(d.file.path), d.name
+
+      post :update, params: { id: d.id, thesis_id: @thesis.id, student_id: @student.id,
+                              document: { file: fixture_file_upload('pdf-document.pdf', 'application/pdf') } }
+      d.reload
+      assert_match(/_modification_request_1\.pdf\z/, d.name, 'name should carry the replacement extension')
+      assert_equal File.basename(d.file.path), d.name
+    end
+
     should 'not delete files' do
       d = create(:document, thesis: @thesis)
 
@@ -161,15 +176,41 @@ class DocumentsControllerTest < ActionController::TestCase
     end
 
     should 'upload file and redirect to student thesis view' do
-      assert_difference 'Document.count' do
-        post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
-                                document: attributes_for(:document).except(:user, :thesis) }
+      assert_no_difference 'ThesisSubmissionVersion.count' do
+        assert_difference 'Document.count' do
+          post :create, params: { thesis_id: @thesis.id, student_id: @student.id,
+                                  document: attributes_for(:document).except(:user, :thesis) }
+        end
       end
 
       document = assigns(:document)
 
       assert_equal @student.id, document.user.id, 'Current student is the one created the document'
       assert_equal @thesis.id, document.thesis.id, 'Current thesis should be set'
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
+                           'Should redirect to student view upload process path'
+    end
+
+    should 'not snapshot draft file replacements' do
+      d = create(:document, file: fixture_file_upload('document-microsoft.doc', 'application/text'),
+                            thesis: @thesis, user: @student)
+
+      assert_no_difference 'ThesisSubmissionVersion.count' do
+        post :update, params: { id: d.id, thesis_id: @thesis.id, student_id: @student.id,
+                                document: { file: fixture_file_upload('html-document.html', 'text/html') } }
+      end
+
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
+                           'Should redirect to student view upload process path'
+    end
+
+    should 'not snapshot draft file deletes' do
+      d = create(:document, thesis: @thesis, user: @student)
+
+      assert_no_difference 'ThesisSubmissionVersion.count' do
+        post :destroy, params: { id: d.id, thesis_id: @thesis.id, student_id: @student.id }
+      end
+
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
                            'Should redirect to student view upload process path'
     end
@@ -191,6 +232,166 @@ class DocumentsControllerTest < ActionController::TestCase
 
       assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_UPLOAD),
                            'Should redirect to student  view upload process path'
+    end
+
+    should 'associate an upload only with a request from the current thesis' do
+      request = create(:embargo_request, thesis: @thesis)
+      other_request = create(:embargo_request)
+
+      assert_difference 'Document.count', 1 do
+        post :create, params: {
+          student_id: @student.id, thesis_id: @thesis.id,
+          document: {
+            usage: 'embargo_letter', supplemental: true,
+            embargo_request_id: request.id,
+            file: fixture_file_upload('pdf-document.pdf')
+          }
+        }
+      end
+      assert_equal request, assigns(:document).embargo_request
+      assert_redirected_to student_view_thesis_process_path(@thesis, Thesis::PROCESS_EMBARGO,
+                                                             anchor: 'request-documents')
+
+      assert_raises ActiveRecord::RecordNotFound do
+        post :create, params: {
+          student_id: @student.id, thesis_id: @thesis.id,
+          document: {
+            usage: 'embargo', supplemental: true,
+            embargo_request_id: other_request.id,
+            file: fixture_file_upload('pdf-document.pdf')
+          }
+        }
+      end
+    end
+
+    should 'not cache an upload when a non-owner cannot create a document' do
+      public_files = Dir.glob(Rails.root.join('public', 'uploads', '**', '*')).select { |path| File.file?(path) }
+      private_files = Dir.glob(Rails.root.join('storage', '**', '*')).select { |path| File.file?(path) }
+      log_user_in(create(:student))
+
+      assert_no_difference 'Document.count' do
+        post :create, params: {
+          student_id: @student.id, thesis_id: @thesis.id,
+          document: { usage: 'embargo', supplemental: true, file: fixture_file_upload('pdf-document.pdf') }
+        }
+      end
+
+      assert_redirected_to unauthorized_url
+      assert_empty Dir.glob(Rails.root.join('public', 'uploads', '**', '*')).select { |path| File.file?(path) } - public_files
+      assert_empty Dir.glob(Rails.root.join('storage', '**', '*')).select { |path| File.file?(path) } - private_files
+    end
+
+    should 'allow an owner to download submitted request evidence without exposing its public URL' do
+      request = create(:embargo_request, thesis: @thesis)
+      post :create, params: {
+        student_id: @student.id, thesis_id: @thesis.id,
+        document: {
+          usage: 'embargo_letter', supplemental: true, embargo_request_id: request.id,
+          file: fixture_file_upload('pdf-document.pdf')
+        }
+      }
+      document = assigns(:document)
+      assert File.exist?(document.file.path)
+      request.update!(status: :submitted, submitted_at: Time.current)
+      assert File.exist?(document.file.path)
+
+      @controller = DocumentDownloadsController.new
+      get :show, params: { student_id: @student.id, thesis_id: @thesis.id, id: document.id }
+
+      assert_response :success
+      assert_equal 'attachment', response.headers['Content-Disposition'][/attachment/]
+      assert document.file.path.start_with?(Rails.root.join('storage').to_s)
+      assert_not_includes response.body, document.file.url.to_s
+    end
+
+    should 'deny a non-owner access to request evidence downloads' do
+      request = create(:embargo_request, thesis: @thesis)
+      post :create, params: {
+        student_id: @student.id, thesis_id: @thesis.id,
+        document: {
+          usage: 'embargo_letter', supplemental: true, embargo_request_id: request.id,
+          file: fixture_file_upload('pdf-document.pdf')
+        }
+      }
+      document = assigns(:document)
+      request.update!(status: :submitted, submitted_at: Time.current)
+      log_user_in(create(:student))
+
+      @controller = DocumentDownloadsController.new
+      get :show, params: { student_id: @student.id, thesis_id: @thesis.id, id: document.id }
+
+      assert_redirected_to unauthorized_url
+      assert_not document.reload.deleted?
+    end
+
+    should 'not manage a submitted request document but can read it' do
+      request = create(:embargo_request, thesis: @thesis)
+      document = create(:document, thesis: @thesis, user: @student,
+                                   embargo_request: request, usage: :embargo_letter,
+                                   file: fixture_file_upload('pdf-document.pdf'))
+      request.update!(status: :submitted, submitted_at: Time.current)
+      document.reload
+      ability = Ability.new(@student)
+
+      assert ability.cannot?(:manage, document)
+      assert ability.can?(:read, document)
+
+      post :destroy, params: { student_id: @student.id, thesis_id: @thesis.id, id: document.id }
+      assert_redirected_to unauthorized_url
+      assert_not document.reload.deleted?
+    end
+
+    should 'render a request document with only the authorized download route' do
+      request = create(:embargo_request, thesis: @thesis)
+      document = create(:embargo_request_document, embargo_request: request)
+      @controller.instance_variable_set(:@student, @student)
+      @controller.instance_variable_set(:@thesis, @thesis)
+      @controller.instance_variable_set(:@current_user, @student)
+
+      rendered = @controller.view_context.render(partial: 'documents/document',
+                                                  locals: { document: document, view_only: true })
+
+      assert_includes rendered, download_student_thesis_document_path(@student, @thesis, document)
+      assert_not_includes rendered, document.file_url.to_s
+    end
+
+    should 'render a legacy document with its authorized download link' do
+      document = create(:document, thesis: @thesis, user: @student)
+      @controller.instance_variable_set(:@student, @student)
+      @controller.instance_variable_set(:@thesis, @thesis)
+      @controller.instance_variable_set(:@current_user, @student)
+
+      rendered = @controller.view_context.render(partial: 'documents/document',
+                                                  locals: { document: document, view_only: true })
+
+      assert_includes rendered, download_student_thesis_document_path(@student, @thesis, document)
+      assert_not_includes rendered, document.file_url.to_s
+    end
+  end
+
+  context 'as staff' do
+    setup do
+      @user = create(:user, role: User::STAFF)
+      @student = create(:student)
+      @thesis = create(:thesis, student: @student)
+      log_user_in(@user)
+    end
+
+    should 'retain access to create a request document' do
+      request = create(:embargo_request, thesis: @thesis)
+
+      assert_difference 'Document.count', 1 do
+        post :create, params: {
+          student_id: @student.id, thesis_id: @thesis.id,
+          document: {
+            usage: 'embargo_letter', supplemental: true, embargo_request_id: request.id,
+            file: fixture_file_upload('pdf-document.pdf')
+          }
+        }
+      end
+
+      assert_equal request, assigns(:document).embargo_request
+      assert_redirected_to student_thesis_path(@student, @thesis)
     end
   end
 end

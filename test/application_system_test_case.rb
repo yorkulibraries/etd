@@ -23,10 +23,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     LocSubject.load_from_file('lib/loc_subjects.txt')
 
     Capybara.server_host = "0.0.0.0"
-    Capybara.server_port = 3210
+    Capybara.server_port = ENV.fetch("ETD_SYSTEM_TEST_PORT", "3210").to_i
     self.class.ppy_boundary = GraduateSystemPpyBoundary.shared
     Capybara.app = self.class.ppy_boundary
-    Capybara.app_host = ENV["SELENIUM_REMOTE_URL"].present? ? "http://#{IPSocket.getaddress(Socket.gethostname)}:3210" : "http://127.0.0.1:3210"
+    Capybara.app_host = ENV["SELENIUM_REMOTE_URL"].present? ? "http://#{IPSocket.getaddress(Socket.gethostname)}:#{Capybara.server_port}" : "http://127.0.0.1:#{Capybara.server_port}"
     Capybara.default_max_wait_time = 60
     Capybara.save_path = "tmp/test-screenshots"
     Capybara.default_driver = :selenium

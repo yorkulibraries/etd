@@ -1,0 +1,43 @@
+<div id="embargo-requests-queue" class="py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">Embargo Requests</h2>
+    <div class="btn-group" role="group" aria-label="Embargo request status">
+      <% %w[submitted approved declined].each do |status| %>
+        <%= link_to status.humanize,
+                    root_path(which: 'embargo_requests', status: status),
+                    class: "btn btn-outline-secondary #{'active' if @embargo_status == status}" %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @embargo_requests.empty? %>
+    <p class="text-muted">There are no <%= @embargo_status %> embargo requests.</p>
+  <% else %>
+    <div class="table-responsive">
+      <table class="table table-hover embargo-request-queue">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Thesis</th>
+            <th>Request type</th>
+            <th>Requested duration</th>
+            <th>Submitted</th>
+            <th>Thesis status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @embargo_requests.each do |embargo_request| %>
+            <tr>
+              <td><%= embargo_request.thesis.student.name %></td>
+              <td><%= link_to embargo_request.thesis.title, student_thesis_path(embargo_request.thesis.student, embargo_request.thesis) %></td>
+              <td><%= embargo_request.request_type.humanize %></td>
+              <td><%= pluralize(embargo_request.requested_duration_months, 'month') %></td>
+              <td><%= format(embargo_request.submitted_at) %></td>
+              <td><%= embargo_request.thesis.status.humanize %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

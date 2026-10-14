@@ -22,8 +22,8 @@ class GraduateAuthenticationSystemTest < ActionDispatch::SystemTestCase
     self.ppy_boundary ||= GraduateSystemPpyBoundary.shared
     Capybara.app = ppy_boundary
     Capybara.server_host = '127.0.0.1'
-    Capybara.server_port = 3210
-    Capybara.app_host = 'http://127.0.0.1:3210'
+    Capybara.server_port = ENV.fetch("ETD_SYSTEM_TEST_PORT", "3210").to_i
+    Capybara.app_host = "http://127.0.0.1:#{Capybara.server_port}"
     ActionDispatch::SystemTesting::Server.new.run
   end
 
@@ -197,7 +197,7 @@ class GraduateAuthenticationSystemTest < ActionDispatch::SystemTestCase
     field = find_field('Invitation URL')
     assert_equal 'true', field[:readonly]
     invitation_url = field.value
-    assert_match(%r{\Ahttp://127\.0\.0\.1:3210/}, invitation_url)
+    assert_match(%r{\A#{Regexp.escape(Capybara.app_host)}/}, invitation_url)
     assert_text '48 hours'
     assert_text 'No email has been sent'
     assert_empty ActionMailer::Base.deliveries

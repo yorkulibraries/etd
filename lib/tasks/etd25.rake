@@ -45,6 +45,8 @@ namespace :etd25 do
   end
 
   def correct_usage(d)
+    return if d.embargo_request_id.present?
+
     u = d.user_id
     t = d.thesis_id
     if d.file.path.match?(/embargo/i)
@@ -65,6 +67,8 @@ namespace :etd25 do
   end
 
   def rename(d)
+    return if d.embargo_request_id.present?
+
     puts d.file.path + "\n"
     d.file = File.open(d.file.path)
     d.save! validate: false

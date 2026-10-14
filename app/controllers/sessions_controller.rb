@@ -12,6 +12,7 @@ class SessionsController < ApplicationController
       start_authentication_session(ppy_user, source: 'ppy')
     end
     if ppy_user.is_a?(Student) && ppy_user.active?
+      ppy_user.accept_active_invitations!
       if ppy_user.username == ppy_user.sisid && request.headers['HTTP_PYORK_USER']
         ppy_user.update_attribute(:username, request.headers['HTTP_PYORK_USER'])
       end

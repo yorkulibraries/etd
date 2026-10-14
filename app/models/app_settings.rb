@@ -13,6 +13,8 @@ class AppSettings < RailsSettings::Base
   field :email_welcome_subject
   field :email_welcome_allow
   field :email_welcome_body
+  field :invitation_validity_days, type: :integer, default: 14,
+                                   validates: { numericality: { only_integer: true, greater_than: 0 } }
   field :email_status_change_allow
   field :email_status_change_subject
   field :email_status_change_body
@@ -24,6 +26,7 @@ class AppSettings < RailsSettings::Base
   field :dspace_live_service_document_url
   field :dspace_live_collection_uri
   field :dspace_live_collection_title
+  field :dspace_rest_api_url
   field :student_begin_submission
   field :student_begin_external_non_yorku_email
   field :student_update_details_initial
@@ -35,6 +38,9 @@ class AppSettings < RailsSettings::Base
   field :student_supplementary_upload_files
   field :student_supplementary_licence_upload_files
   field :student_supplementary_embargo_upload_files
+  field :modification_request_upload_files,
+        default: '<div>Upload approval emails, supervisor letters, or other documentation for a ' \
+                 'modification request. These files are internal and are not exported to DSpace.</div>'
   field :student_review_license_info
   field :student_review_license_lac
   field :student_review_lac_licence_instructions
@@ -53,4 +59,5 @@ class AppSettings < RailsSettings::Base
   field :supplemental_thesis_file_extensions, default: ".pdf, .doc, .docx, .txt, .html, .htm, .odt, .odp, .ods, .png, .tif, .jpg, .csv, .xml, .avi, .flac, .wav, .mp3, .mp4, .mov"
   field :licence_file_extensions, default: ".pdf"
   field :embargo_file_extensions, default: ".pdf, .txt, .html, .htm, .odt, .odp, .ods"
+  field :modification_request_file_extensions, default: ".pdf, .doc, .docx"
 end

@@ -9,26 +9,70 @@
 	<h3>Audit Trail</h3>
 	
 	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th scope="col">Time</th>
+				<th scope="col">Record</th>
+				<th scope="col">Action</th>
+				<th scope="col">Changes</th>
+				<th scope="col">By</th>
+			</tr>
+		</thead>
+		<tbody>
 
 		<% @audits_grouped.each do |date, events| %>
 			<tr class="date">
-				<td colspan="4">
+				<td colspan="5">
 					<span class="trivial"><%= date.strftime('%b %e, %Y')%></span>
 				</td>
 			</tr>
 			<% events.each do |event| %>
 				<% type = event.auditable_type %>
 
-			<tr>
+			<tr data-action="<%= event.action %>">
 				<td class="trivial time"><%= event.created_at.strftime("%R")%></td>
 				<td class="what">
 					<span class="badge bg-secondary <%= type.underscore.downcase %>"><%= defined?(audit_what) ? audit_what : type.tableize.singularize.humanize %></span>
 				</td>
-				<td class="distinct"><%= event.comment ? event.comment : event.action %></td>
+				<td class="distinct audit-action">
+					<%= event.action.humanize %>
+					<% if event.comment.present? %>
+						<div><%= event.comment %></div>
+					<% end %>
+				</td>
+				<td class="changes">
+					<% if event.audited_changes.present? %>
+						<ul class="list-unstyled mb-0">
+							<% event.audited_changes.each do |field, values| %>
+								<% update_change = event.action == 'update' && values.is_a?(Array) && values.length == 2 %>
+								<li class="audit-change" data-field="<%= field %>">
+									<strong><%= field.to_s.humanize %>:</strong>
+									<% if update_change %>
+										<span class="old-value"><span class="visually-hidden">from </span><%= audit_change_value(values.first) %></span>
+										<span aria-hidden="true"> &rarr; </span>
+										<span class="new-value"><span class="visually-hidden">to </span><%= audit_change_value(values.last) %></span>
+									<% else %>
+										<span class="value">
+											<% if event.action == 'create' %>
+												set to
+											<% elsif event.action == 'destroy' %>
+												removed
+											<% end %>
+											<%= audit_change_value(values) %>
+										</span>
+									<% end %>
+								</li>
+							<% end %>
+						</ul>
+					<% else %>
+						<span class="text-muted">No field changes recorded</span>
+					<% end %>
+				</td>
 				<td class="who"><code title="<%= event.action %> "><%= event.user.name if event.user %></code></td>		
-			</tr>	
+			</tr>
 			<% end %>
 		<% end %>
+		</tbody>
 	</table>
 	
 </section>

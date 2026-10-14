@@ -2,10 +2,19 @@ name: "Ruby on Rails CI"
 on:
   push:
     branches: [ "*" ]
+  # Allows re-running the suite from the Actions tab without pushing a commit,
+  # which is useful when a run fails for infrastructure reasons rather than
+  # code ones.
+  workflow_dispatch:
 jobs:
   build_and_run_tests:
     name: Build and run tests
     runs-on: ubuntu-latest
+    # The suite runs in roughly 5 minutes per database backend. Without a
+    # timeout a hung job sits on the default 6 hour limit and surfaces as
+    # "the hosted runner lost communication with the server" instead of a
+    # readable failure.
+    timeout-minutes: 30
     services:
       mysql:
         image: mysql
