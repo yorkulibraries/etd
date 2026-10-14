@@ -4,7 +4,14 @@
 Provide an alternative to Passport York for graduates returning to ETD for embargo requests and future modifications.
 
 ## Current goal
-Commit and push graduate-authentication, wait for its GitHub CI to pass, then merge into staging and push. The user explicitly authorized both pushes on 2026-10-14. Server deployment, real provider testing and Apache activation remain separate.
+Fix the browser failures in staging CI, verify the final changes in GitHub's browser environment, and publish through graduate-authentication before updating staging. The user explicitly authorized the publication process on 2026-10-14 and then requested investigation and repair. Server deployment, real provider testing and Apache activation remain separate.
+
+## Staging browser CI repair, 2026-10-14
+- Feature CI passed for 2a7e7bc before staging was fast-forwarded to it. Staging run 38583296544 passed SQLite application tests but failed two browser interactions.
+- An asynchronous navigation probe reproduced the exact missing graduate Download link. Waiting for the final student begin-page redirect made the same probe pass with the expected download checksum.
+- The no-embargo submission test now waits for the submit URL and its certification checkbox before reading the new document's text. CI used Chrome 155; local Chromium 120 did not reproduce the exact detached-node driver error. Matching-browser CI remains the verification gate.
+- Existing focused browser tests passed: 19 tests, 108 assertions. No application behavior, sleeps, broad retries, or assertions were removed. Full local replay stopped after 40 passing tests as disk space became low; Docker was recovered without resetting data.
+- CI will retain graduate failure screenshots/download checksums and supports an optional numeric browser seed for reproducible ordering. Detailed probes and logs are under tmp/staging-ci-fix.
 
 ## Branch publication, 2026-10-14
 - Confirmed iota staging runs etdqa.service (Puma), loads /home/etdqa/.etdqa, and currently lacks the OAuth code.

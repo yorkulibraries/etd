@@ -6,10 +6,17 @@ on:
   # which is useful when a run fails for infrastructure reasons rather than
   # code ones.
   workflow_dispatch:
+    inputs:
+      system_test_seed:
+        description: Optional numeric seed to reproduce a browser test order
+        required: false
+        type: string
 jobs:
   build_and_run_tests:
     name: Build and run tests
     runs-on: ubuntu-latest
+    env:
+      ETD_SYSTEM_TEST_SEED: ${{ inputs.system_test_seed }}
     # The suite runs in roughly 5 minutes per database backend. Without a
     # timeout a hung job sits on the default 6 hour limit and surfaces as
     # "the hosted runner lost communication with the server" instead of a
@@ -46,7 +53,12 @@ jobs:
           bundle exec rails db:reset
           bundle exec rails db:seed
           bundle exec rails test -v
-          bundle exec rails test:system TESTOPTS="-v"
+          options="-v"
+          if [ -n "$ETD_SYSTEM_TEST_SEED" ]; then
+            [[ "$ETD_SYSTEM_TEST_SEED" =~ ^[0-9]+$ ]] || exit 1
+            options="$options --seed=$ETD_SYSTEM_TEST_SEED"
+          fi
+          bundle exec rails test:system TESTOPTS="$options"
 
       - name: Run tests with mysql
         env:
@@ -56,7 +68,12 @@ jobs:
           bundle exec rails db:reset
           bundle exec rails db:seed
           bundle exec rails test -v
-          bundle exec rails test:system TESTOPTS="-v"
+          options="-v"
+          if [ -n "$ETD_SYSTEM_TEST_SEED" ]; then
+            [[ "$ETD_SYSTEM_TEST_SEED" =~ ^[0-9]+$ ]] || exit 1
+            options="$options --seed=$ETD_SYSTEM_TEST_SEED"
+          fi
+          bundle exec rails test:system TESTOPTS="$options"
 
       - name: Create tar archive of screenshots
         run: |
@@ -68,4 +85,7 @@ jobs:
         if: always()
         with:
           name: test-screenshots
-          path: /home/runner/work/etd/etd/tmp/test-screenshots.tar
+          path: |
+            tmp/test-screenshots.tar
+            tmp/graduate-authentication/screenshots/
+            tmp/graduate-authentication/download-artifacts/download-sha256.txt
