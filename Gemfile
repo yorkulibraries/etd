@@ -88,3 +88,7 @@ group :test do
   gem 'spring' # , "1.3.6"
   gem 'sqlite3'
 end
+
+# Durable graduate email jobs use the existing delayed_jobs table.
+gem 'delayed_job', '= 4.1.13'
+gem 'delayed_job_active_record', '= 4.1.11'

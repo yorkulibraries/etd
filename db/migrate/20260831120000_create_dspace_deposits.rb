@@ -2,7 +2,7 @@
 
 class CreateDspaceDeposits < ActiveRecord::Migration[7.0]
   def change
-    create_table :dspace_deposits, options: 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb3' do |t|
+    create_table :dspace_deposits, options: (connection.adapter_name == 'Mysql2' ? 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb3' : nil) do |t|
       t.references :thesis, type: :integer, null: false, foreign_key: true
       t.references :export_log, type: :integer, null: false, foreign_key: true
       t.string :item_uuid, limit: 36, null: false

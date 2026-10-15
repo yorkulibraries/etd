@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# Never use application DB defaults or shell tracing for this disposable gate.
+set +x
+set -euo pipefail
+project_root="$(cd "$(dirname "$0")/.." && pwd -P)"
+cd "$project_root"
+export GRADUATE_EMAIL_PROJECT_ROOT="$project_root"
+exec ruby - "$@" <<'RUBY'
+require 'uri'
+require 'fileutils'
+require 'open3'
+require 'digest'
+root = ENV.fetch('GRADUATE_EMAIL_PROJECT_ROOT')
+adapter, mode, *command = ARGV
+reject = -> { warn 'Storage guard rejected configuration'; exit 1 }
+reject.call unless %w[sqlite mysql].include?(adapter) && %w[fresh upgrade exec].include?(mode)
+reject.call if mode == 'exec' && command.empty?
+url = adapter == 'sqlite' ? "sqlite3:#{root}/tmp/graduate-email-storage_test.sqlite3" : ENV['GRADUATE_EMAIL_TEST_DATABASE_URL']
+begin
+  parsed = URI.parse(url.to_s)
+  if adapter == 'sqlite'
+    reject.call unless url == "sqlite3:#{root}/tmp/graduate-email-storage_test.sqlite3" && parsed.query.nil? && parsed.fragment.nil?
+  else
+    reject.call unless parsed.scheme == 'mysql2' && parsed.path == '/etd_graduate_email_test' && parsed.host &&
+      parsed.query.nil? && parsed.fragment.nil? && ENV['GRADUATE_EMAIL_TEST_DATABASE_CONFIRMED'] == 'dedicated_disposable_test'
+  end
+rescue URI::Error
+  reject.call
+end
+ENV['RAILS_ENV'] = 'test'
+ENV['DB_ADAPTER'] = adapter == 'sqlite' ? 'sqlite3' : 'mysql2'
+ENV['DATABASE_URL'] = ENV['TEST_DATABASE_URL'] = url
+ENV['SCHEMA'] = "#{root}/tmp/graduate-email/#{ENV['DB_ADAPTER']}-schema.rb"
+ENV['RUBYOPT'] = [ENV['RUBYOPT'], "-r#{root}/test/support/graduate_oauth_environment"].compact.join(' ')
+FileUtils.mkdir_p("#{root}/tmp/graduate-email")
+report = mode == 'exec' ? nil : File.open("#{root}/tmp/graduate-email/#{adapter}-storage-#{mode}.txt", 'w')
+emit = lambda do |line|
+  puts line
+  report&.puts(line)
+  report&.flush
+end
+# Raw subprocess output remains in memory. Only static stage labels and test
+# counts cross the reporting boundary, including on a connection/driver error.
+run = lambda do |label, args|
+  begin
+    output, status = Open3.capture2e(*args)
+  rescue SystemCallError
+    emit.call("#{adapter} #{label}: FAIL command_unavailable")
+    exit 1
+  end
+  if label == 'reset' && !status.success? && output.include?('ActiveRecord::NoEnvironmentInSchemaError')
+    _, repair = Open3.capture2e('bundle', 'exec', 'rails', 'db:environment:set')
+    output, status = Open3.capture2e(*args) if repair.success?
+  end
+  emit.call("#{adapter} #{label}: #{status.success? ? 'PASS' : 'FAIL'}")
+  output.lines.each do |line|
+    emit.call(line.strip) if line.match?(/\A\d+ runs, \d+ assertions, \d+ failures, \d+ errors, \d+ skips\s*\z/) ||
+      line.match?(/\ASTORAGE_PROBE (?:PASS|FAIL) [a-z_]+\s*\z/) ||
+      line.match?(/\AVERSIONS ruby=[0-9.]+ rails=[0-9.]+ delayed_job=[0-9.]+ backend=[0-9.]+ database=[0-9.]+\s*\z/)
+  end
+  unless status.success?
+    %w[Errno::EADDRINUSE SyntaxError LoadError NameError ArgumentError NoMethodError
+       ActiveRecord::PendingMigrationError ActiveRecord::StatementInvalid
+       ActiveRecord::RecordInvalid].each do |category|
+      emit.call("Failure category: #{category}") if output.include?(category)
+    end
+    exit(status.exitstatus || 1)
+  end
+end
+schema_before = Digest::SHA256.file("#{root}/db/schema.rb").hexdigest
+if mode == 'exec'
+  run.call('exec', command)
+else
+  FileUtils.rm_f("#{root}/tmp/graduate-email/#{adapter}-baseline.json")
+  run.call('reset', %w[bundle exec rails db:drop db:create])
+  run.call('baseline_migration', %w[bundle exec rails db:migrate VERSION=20261006130000])
+  probe = %w[bundle exec rails runner test/support/graduate_email_storage_probe.rb]
+  run.call('seed_baseline', probe + ['seed_baseline']) if mode == 'upgrade'
+  run.call('migrate_up', %w[bundle exec rails db:migrate])
+  run.call('check_after_up', probe + ['check_after_up'])
+  run.call('migrate_down', %w[bundle exec rails db:migrate VERSION=20261006130000])
+  run.call('check_after_down', probe + ['check_after_down'])
+  run.call('migrate_up_again', %w[bundle exec rails db:migrate])
+  run.call('check_after_up_again', probe + ['check_after_up'])
+  run.call('storage_and_artifacts', %w[bundle exec rails test test/integration/graduate_email_storage_test.rb test/integration/graduate_email_artifacts_test.rb -v])
+end
+unless schema_before == Digest::SHA256.file("#{root}/db/schema.rb").hexdigest
+  emit.call('Tracked schema changed unexpectedly')
+  exit 1
+end
+RUBY

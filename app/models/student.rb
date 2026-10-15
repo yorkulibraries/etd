@@ -26,6 +26,10 @@ class Student < User
 
   has_many :theses, dependent: :destroy
   has_many :graduate_identities, dependent: :destroy
+  has_many :graduate_email_approvals, dependent: :delete_all
+  has_many :graduate_email_connections, dependent: :delete_all
+  has_many :graduate_email_active_addresses, dependent: :delete_all
+  has_many :graduate_email_challenges, dependent: :delete_all
   has_many :graduate_authentication_invitations, dependent: :destroy
   has_many :thesis_invitations, dependent: :delete_all
 

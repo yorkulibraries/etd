@@ -213,8 +213,6 @@ class GraduateAuthenticationSystemTest < ActionDispatch::SystemTestCase
     assert_empty ActionMailer::Base.deliveries
     invitation = GraduateAuthenticationInvitation.order(:id).last
     assert_in_delta 48.hours, invitation.expires_at - invitation.created_at, 5
-    browser_artifact('generated-url')
-    browser_artifact('generated-url-mobile', mobile: true)
 
     browser_fresh_session
     visit invitation_url

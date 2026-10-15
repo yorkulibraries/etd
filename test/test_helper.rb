@@ -8,6 +8,12 @@ require File.expand_path('../config/environment', __dir__)
 CarrierWave.configure do |configuration|
   configuration.root = Rails.root.join('tmp/graduate-authentication/test-uploads').to_s
 end
+# The guarded storage gate verifies real migrations. Rails' automatic schema
+# reload would replace that database (and omit the control singleton seed).
+if ENV['GRADUATE_EMAIL_PROJECT_ROOT']
+  ActiveRecord::Migration.check_pending!
+  ActiveRecord.maintain_test_schema = false
+end
 require 'rails/test_help'
 require 'factory_girl_rails'
 require 'minitest/unit'
@@ -49,11 +55,20 @@ module ActiveSupport
     Warden.test_mode!
 
     setup do
+      if ENV['GRADUATE_EMAIL_PROJECT_ROOT']
+        configuration = ActiveRecord::Base.connection_db_config.configuration_hash
+        expected_database = ENV['DB_ADAPTER'] == 'sqlite3' ? Rails.root.join('tmp/graduate-email-storage_test.sqlite3').to_s : 'etd_graduate_email_test'
+        unless ENV['DATABASE_URL'] == ENV['TEST_DATABASE_URL'] && configuration[:adapter] == ENV['DB_ADAPTER'] && configuration[:database] == expected_database
+          raise 'Graduate email test database mismatch'
+        end
+      end
+      ActionMailer::Base.deliveries.clear
       DatabaseCleaner.start
       AppSettings.clear_cache
     end
 
     teardown do
+      ActionMailer::Base.deliveries.clear
       DatabaseCleaner.clean
       AppSettings.clear_cache
     end

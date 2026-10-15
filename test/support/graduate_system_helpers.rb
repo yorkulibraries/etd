@@ -4,6 +4,7 @@ require 'fileutils'
 require 'uri'
 require 'base64'
 require_relative 'selenium_detached_element_errors'
+require_relative 'graduate_email_safe_artifacts'
 
 # Test-only trusted-header boundary. Mapping is one-use and restricted to /login.
 # The real SessionsController and Warden PPY strategy establish the session.
@@ -29,6 +30,10 @@ class GraduateSystemPpyBoundary
 end
 
 module GraduateSystemHelpers
+  def self.included(base)
+    base.prepend GraduateEmailSafeArtifacts
+  end
+
   def browser_ppy_login(user)
     headers = { 'HTTP_PYORK_USER' => user.username }
     headers['HTTP_PYORK_CYIN'] = user.sisid if user.is_a?(Student)
