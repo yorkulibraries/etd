@@ -113,6 +113,25 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.index ["user_id"], name: "index_documents_on_user_id"
   end
 
+  create_table "dspace_deposits", charset: "utf8mb3", force: :cascade do |t|
+    t.integer "thesis_id", null: false
+    t.integer "export_log_id", null: false
+    t.string "item_uuid", limit: 36, null: false
+    t.string "sword_location"
+    t.string "license_status", default: "pending", null: false
+    t.datetime "license_synced_at"
+    t.text "last_error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "license_attempts", default: 0, null: false
+    t.datetime "license_retry_at"
+    t.index ["export_log_id", "thesis_id"], name: "index_dspace_deposits_on_export_log_id_and_thesis_id", unique: true
+    t.index ["export_log_id"], name: "index_dspace_deposits_on_export_log_id"
+    t.index ["item_uuid"], name: "index_dspace_deposits_on_item_uuid", unique: true
+    t.index ["license_status", "license_retry_at"], name: "index_dspace_deposits_on_license_status_and_license_retry_at"
+    t.index ["thesis_id"], name: "index_dspace_deposits_on_thesis_id"
+  end
+
   create_table "embargo_requests", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.integer "thesis_id", null: false
     t.integer "request_type", default: 0, null: false
@@ -137,25 +156,6 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.index ["submitted_at"], name: "index_embargo_requests_on_submitted_at"
     t.index ["thesis_id", "status"], name: "index_embargo_requests_on_thesis_id_and_status"
     t.index ["thesis_id"], name: "index_embargo_requests_on_thesis_id"
-  end
-
-  create_table "dspace_deposits", charset: "utf8mb3", force: :cascade do |t|
-    t.integer "thesis_id", null: false
-    t.integer "export_log_id", null: false
-    t.string "item_uuid", limit: 36, null: false
-    t.string "sword_location"
-    t.string "license_status", default: "pending", null: false
-    t.datetime "license_synced_at"
-    t.text "last_error"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "license_attempts", default: 0, null: false
-    t.datetime "license_retry_at"
-    t.index ["export_log_id", "thesis_id"], name: "index_dspace_deposits_on_export_log_id_and_thesis_id", unique: true
-    t.index ["export_log_id"], name: "index_dspace_deposits_on_export_log_id"
-    t.index ["item_uuid"], name: "index_dspace_deposits_on_item_uuid", unique: true
-    t.index ["license_status", "license_retry_at"], name: "index_dspace_deposits_on_license_status_and_license_retry_at"
-    t.index ["thesis_id"], name: "index_dspace_deposits_on_thesis_id"
   end
 
   create_table "export_logs", id: :integer, charset: "utf8mb3", force: :cascade do |t|
@@ -213,7 +213,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.index ["token_digest"], name: "index_graduate_invitations_on_digest", unique: true
   end
 
-  create_table "graduate_email_active_addresses", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "graduate_email_active_addresses", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "student_id", null: false
     t.bigint "connection_id", null: false
     t.string "normalized_address", limit: 254, null: false, collation: (ActiveRecord::Base.connection.adapter_name == "Mysql2" ? "utf8mb4_bin" : nil)
@@ -224,7 +224,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.index ["student_id"], name: "idx_ge_active_addresses_student", unique: true
   end
 
-  create_table "graduate_email_approvals", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "graduate_email_approvals", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "student_id", null: false
     t.integer "approved_by_id", null: false
     t.string "normalized_address", limit: 254, null: false, collation: (ActiveRecord::Base.connection.adapter_name == "Mysql2" ? "utf8mb4_bin" : nil)
@@ -240,10 +240,10 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.index ["replacement_of_connection_id"], name: "idx_ge_approval_replacement"
     t.index ["student_id"], name: "idx_ge_approvals_student"
     t.index ["token_digest"], name: "idx_ge_approval_token", unique: true
-    t.check_constraint "`generation` > 0", name: "graduate_email_approval_generation"
+    t.check_constraint "(`generation` > 0)", name: "graduate_email_approval_generation"
   end
 
-  create_table "graduate_email_audit_events", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "graduate_email_audit_events", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "student_id"
     t.integer "actor_id"
     t.bigint "connection_id"
@@ -259,10 +259,10 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.index ["challenge_id"], name: "idx_ge_audit_challenge"
     t.index ["connection_id"], name: "idx_ge_audit_connection"
     t.index ["student_id"], name: "idx_ge_audit_student"
-    t.check_constraint "`generation` > 0", name: "graduate_email_audit_generation"
+    t.check_constraint "(`generation` > 0)", name: "graduate_email_audit_generation"
   end
 
-  create_table "graduate_email_challenges", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "graduate_email_challenges", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "public_id", limit: 64, null: false
     t.bigint "approval_id"
     t.bigint "connection_id"
@@ -288,12 +288,12 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.index ["expires_at"], name: "idx_ge_challenge_expiry"
     t.index ["public_id"], name: "idx_ge_challenge_public", unique: true
     t.index ["student_id"], name: "idx_ge_challenges_student"
-    t.check_constraint "((`purpose` = 'enroll') and (`approval_id` is not null) and (`connection_id` is null) and (`student_id` is not null)) or ((`purpose` = 'login') and (`approval_id` is null) and (`connection_id` is not null) and (`student_id` is not null)) or ((`purpose` = 'noop') and (`approval_id` is null) and (`connection_id` is null) and (`student_id` is null) and (`address_key` is null))", name: "graduate_email_challenge_target"
-    t.check_constraint "(`generation` > 0) and (`failed_attempts` between 0 and 5)", name: "graduate_email_challenge_counts"
-    t.check_constraint "`state` in ('queued','noop','claimed','sending','sent','failed','superseded','revoked','consumed','expired')", name: "graduate_email_challenge_state"
+    t.check_constraint "(((`purpose` = 'enroll') and (`approval_id` is not null) and (`connection_id` is null) and (`student_id` is not null)) or ((`purpose` = 'login') and (`approval_id` is null) and (`connection_id` is not null) and (`student_id` is not null)) or ((`purpose` = 'noop') and (`approval_id` is null) and (`connection_id` is null) and (`student_id` is null) and (`address_key` is null)))", name: "graduate_email_challenge_target"
+    t.check_constraint "((`generation` > 0) and (`failed_attempts` between 0 and 5))", name: "graduate_email_challenge_counts"
+    t.check_constraint "(`state` in ('queued','noop','claimed','sending','sent','failed','superseded','revoked','consumed','expired'))", name: "graduate_email_challenge_state"
   end
 
-  create_table "graduate_email_connections", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "graduate_email_connections", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "student_id", null: false
     t.integer "approved_by_id", null: false
     t.string "normalized_address", limit: 254, null: false, collation: (ActiveRecord::Base.connection.adapter_name == "Mysql2" ? "utf8mb4_bin" : nil)
@@ -305,36 +305,36 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.index ["student_id"], name: "idx_ge_connections_student"
   end
 
-  create_table "graduate_email_controls", id: :bigint, default: nil, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "graduate_email_controls", id: :bigint, default: nil, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.boolean "enabled", default: false, null: false
     t.bigint "generation", default: 1, null: false
     t.integer "lock_version", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.check_constraint "(`id` = 1) and (`generation` > 0) and (`lock_version` >= 0)", name: "graduate_email_control_singleton"
+    t.check_constraint "((`id` = 1) and (`generation` > 0) and (`lock_version` >= 0))", name: "graduate_email_control_singleton"
   end
 
-  create_table "graduate_email_cooldowns", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "graduate_email_cooldowns", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "kind", limit: 32, null: false
     t.string "key_digest", limit: 64, null: false
     t.datetime "blocked_until", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["kind", "key_digest"], name: "idx_ge_cooldown_key", unique: true
-    t.check_constraint "`kind` in ('verify_address','verify_student','verify_ip')", name: "graduate_email_cooldown_kind"
+    t.check_constraint "(`kind` in ('verify_address','verify_student','verify_ip'))", name: "graduate_email_cooldown_kind"
   end
 
-  create_table "graduate_email_limit_events", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "graduate_email_limit_events", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "kind", limit: 32, null: false
     t.string "key_digest", limit: 64, null: false
     t.datetime "occurred_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["kind", "key_digest", "occurred_at"], name: "idx_ge_limit_window"
-    t.check_constraint "`kind` in ('send_address','request_ip','verify_address','verify_student','verify_ip','admission_send','admission_verify')", name: "graduate_email_limit_kind"
+    t.check_constraint "(`kind` in ('send_address','request_ip','verify_address','verify_student','verify_ip','admission_send','admission_verify'))", name: "graduate_email_limit_kind"
   end
 
-  create_table "graduate_email_notices", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "graduate_email_notices", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "old_connection_id", null: false
     t.bigint "replacement_connection_id", null: false
     t.string "state", limit: 16, default: "queued", null: false
@@ -344,7 +344,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.datetime "updated_at", null: false
     t.index ["old_connection_id"], name: "idx_ge_notice_old_connection"
     t.index ["replacement_connection_id"], name: "idx_ge_notice_replacement_connection", unique: true
-    t.check_constraint "`state` in ('queued','claimed','sent','failed')", name: "graduate_email_notice_state"
+    t.check_constraint "(`state` in ('queued','claimed','sent','failed'))", name: "graduate_email_notice_state"
   end
 
   create_table "graduate_identities", charset: "utf8mb4", force: :cascade do |t|
@@ -374,7 +374,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.index ["graduate_email_connection_id"], name: "idx_graduate_session_email"
     t.index ["graduate_identity_id"], name: "index_graduate_sessions_on_graduate_identity_id"
     t.index ["token_digest"], name: "index_graduate_sessions_on_token_digest", unique: true
-    t.check_constraint "((`authentication_method` = 'google') and (`graduate_identity_id` is not null) and (`graduate_email_connection_id` is null) and (`email_generation` is null)) or ((`authentication_method` = 'email') and (`graduate_identity_id` is null) and (`graduate_email_connection_id` is not null) and (`email_generation` is not null) and (`email_generation` > 0))", name: "graduate_session_exclusive_method"
+    t.check_constraint "(((`authentication_method` = 'google') and (`graduate_identity_id` is not null) and (`graduate_email_connection_id` is null) and (`email_generation` is null)) or ((`authentication_method` = 'email') and (`graduate_identity_id` is null) and (`graduate_email_connection_id` is not null) and (`email_generation` is not null) and (`email_generation` > 0)))", name: "graduate_session_exclusive_method"
   end
 
   create_table "loc_subjects", id: :integer, charset: "utf8mb3", force: :cascade do |t|
@@ -434,7 +434,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.index ["student_id"], name: "index_theses_on_student_id"
   end
 
-  create_table "thesis_invitations", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "thesis_invitations", charset: "utf8mb4", force: :cascade do |t|
     t.integer "student_id", null: false
     t.integer "gem_record_id"
     t.integer "thesis_id"
@@ -456,7 +456,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
-  create_table "thesis_submission_documents", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "thesis_submission_documents", id: :integer, charset: "utf8mb4", force: :cascade do |t|
     t.integer "thesis_submission_version_id", null: false
     t.integer "source_document_id"
     t.boolean "supplemental", default: true, null: false
@@ -472,7 +472,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.index ["thesis_submission_version_id"], name: "index_submission_documents_on_version_id"
   end
 
-  create_table "thesis_submission_versions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "thesis_submission_versions", id: :integer, charset: "utf8mb4", force: :cascade do |t|
     t.integer "thesis_id", null: false
     t.integer "version_number", null: false
     t.integer "submitted_by_id", null: false
@@ -502,6 +502,15 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.string "last_name"
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "documents", "embargo_requests"
+  add_foreign_key "dspace_deposits", "export_logs"
+  add_foreign_key "dspace_deposits", "theses"
+  add_foreign_key "embargo_requests", "theses"
+  add_foreign_key "embargo_requests", "users", column: "decided_by_id"
+  add_foreign_key "graduate_authentication_invitations", "users", column: "approved_by_id"
+  add_foreign_key "graduate_authentication_invitations", "users", column: "student_id"
   add_foreign_key "graduate_email_active_addresses", "graduate_email_connections", column: "connection_id", on_delete: :cascade
   add_foreign_key "graduate_email_active_addresses", "users", column: "student_id", on_delete: :cascade
   add_foreign_key "graduate_email_approvals", "graduate_email_connections", column: "replacement_of_connection_id", on_delete: :cascade
@@ -519,20 +528,11 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
   add_foreign_key "graduate_email_connections", "users", column: "student_id", on_delete: :cascade
   add_foreign_key "graduate_email_notices", "graduate_email_connections", column: "old_connection_id", on_delete: :cascade
   add_foreign_key "graduate_email_notices", "graduate_email_connections", column: "replacement_connection_id", on_delete: :cascade
-  add_foreign_key "graduate_sessions", "graduate_email_connections", on_delete: :cascade
-  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "graduate_authentication_invitations", "users", column: "approved_by_id"
-  add_foreign_key "graduate_authentication_invitations", "users", column: "student_id"
   add_foreign_key "graduate_identities", "users", column: "linked_by_id"
   add_foreign_key "graduate_identities", "users", column: "student_id"
+  add_foreign_key "graduate_sessions", "graduate_email_connections", on_delete: :cascade
   add_foreign_key "graduate_sessions", "graduate_identities", on_delete: :cascade
-  add_foreign_key "documents", "embargo_requests"
-  add_foreign_key "embargo_requests", "theses"
-  add_foreign_key "embargo_requests", "users", column: "decided_by_id"
   add_foreign_key "thesis_invitations", "gem_records"
   add_foreign_key "thesis_invitations", "theses"
   add_foreign_key "thesis_invitations", "users", column: "student_id"
-  add_foreign_key "dspace_deposits", "export_logs"
-  add_foreign_key "dspace_deposits", "theses"
 end

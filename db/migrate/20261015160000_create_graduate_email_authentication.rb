@@ -2,7 +2,7 @@
 
 class CreateGraduateEmailAuthentication < ActiveRecord::Migration[7.0]
   def change
-    create_table :graduate_email_controls, id: false do |t|
+    create_table :graduate_email_controls, id: false, **table_options do |t|
       t.bigint :id, null: false, primary_key: true, **(connection.adapter_name == 'Mysql2' ? { auto_increment: false } : {})
       t.boolean :enabled, null: false, default: false
       t.bigint :generation, null: false, default: 1
@@ -14,7 +14,7 @@ class CreateGraduateEmailAuthentication < ActiveRecord::Migration[7.0]
       direction.up { execute 'INSERT INTO graduate_email_controls (id, enabled, generation, lock_version, created_at, updated_at) VALUES (1, FALSE, 1, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)' }
     end
 
-    create_table :graduate_email_connections do |t|
+    create_table :graduate_email_connections, **table_options do |t|
       user_reference(t, :student, cascade: true)
       user_reference(t, :approved_by)
       address(t)
@@ -23,7 +23,7 @@ class CreateGraduateEmailAuthentication < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    create_table :graduate_email_approvals do |t|
+    create_table :graduate_email_approvals, **table_options do |t|
       user_reference(t, :student, cascade: true)
       user_reference(t, :approved_by)
       address(t)
@@ -38,7 +38,7 @@ class CreateGraduateEmailAuthentication < ActiveRecord::Migration[7.0]
     end
     add_index :graduate_email_approvals, :token_digest, unique: true, name: 'idx_ge_approval_token'
 
-    create_table :graduate_email_active_addresses do |t|
+    create_table :graduate_email_active_addresses, **table_options do |t|
       user_reference(t, :student, cascade: true, unique: true)
       t.references :connection, null: false, foreign_key: { to_table: :graduate_email_connections, on_delete: :cascade }, index: { unique: true, name: 'idx_ge_active_connection' }
       address(t)
@@ -46,7 +46,7 @@ class CreateGraduateEmailAuthentication < ActiveRecord::Migration[7.0]
     end
     add_index :graduate_email_active_addresses, :normalized_address, unique: true, name: 'idx_ge_active_address'
 
-    create_table :graduate_email_challenges do |t|
+    create_table :graduate_email_challenges, **table_options do |t|
       t.string :public_id, limit: 64, null: false
       t.references :approval, foreign_key: { to_table: :graduate_email_approvals, on_delete: :cascade }, index: { name: 'idx_ge_challenge_approval' }
       t.references :connection, foreign_key: { to_table: :graduate_email_connections, on_delete: :cascade }, index: { name: 'idx_ge_challenge_connection' }
@@ -69,7 +69,7 @@ class CreateGraduateEmailAuthentication < ActiveRecord::Migration[7.0]
     add_index :graduate_email_challenges, %i[browser_digest purpose], name: 'idx_ge_challenge_browser'
     add_index :graduate_email_challenges, :expires_at, name: 'idx_ge_challenge_expiry'
 
-    create_table :graduate_email_limit_events do |t|
+    create_table :graduate_email_limit_events, **table_options do |t|
       t.string :kind, limit: 32, null: false
       t.string :key_digest, limit: 64, null: false
       t.datetime :occurred_at, null: false
@@ -78,7 +78,7 @@ class CreateGraduateEmailAuthentication < ActiveRecord::Migration[7.0]
     end
     add_index :graduate_email_limit_events, %i[kind key_digest occurred_at], name: 'idx_ge_limit_window'
 
-    create_table :graduate_email_cooldowns do |t|
+    create_table :graduate_email_cooldowns, **table_options do |t|
       t.string :kind, limit: 32, null: false
       t.string :key_digest, limit: 64, null: false
       t.datetime :blocked_until, null: false
@@ -87,7 +87,7 @@ class CreateGraduateEmailAuthentication < ActiveRecord::Migration[7.0]
     end
     add_index :graduate_email_cooldowns, %i[kind key_digest], unique: true, name: 'idx_ge_cooldown_key'
 
-    create_table :graduate_email_audit_events do |t|
+    create_table :graduate_email_audit_events, **table_options do |t|
       { student: :users, actor: :users, connection: :graduate_email_connections,
         approval: :graduate_email_approvals, challenge: :graduate_email_challenges }.each do |name, table|
         t.references name, type: (table == :users ? :integer : :bigint),
@@ -100,7 +100,7 @@ class CreateGraduateEmailAuthentication < ActiveRecord::Migration[7.0]
       t.check_constraint 'generation > 0', name: 'graduate_email_audit_generation'
     end
 
-    create_table :graduate_email_notices do |t|
+    create_table :graduate_email_notices, **table_options do |t|
       %i[old_connection replacement_connection].each do |name|
         t.references name, null: false, foreign_key: { to_table: :graduate_email_connections, on_delete: :cascade }, index: { name: "idx_ge_notice_#{name}", unique: name == :replacement_connection }
       end
@@ -113,6 +113,12 @@ class CreateGraduateEmailAuthentication < ActiveRecord::Migration[7.0]
   end
 
   private
+
+  # Explicit common utf8mb4 collation, rather than a server-specific default.
+  # Canonical address keys retain the stricter per-column binary collation.
+  def table_options
+    connection.adapter_name == 'Mysql2' ? { charset: 'utf8mb4', collation: 'utf8mb4_unicode_ci' } : {}
+  end
 
   def user_reference(table, name, cascade: false, nullable: false, unique: false)
     table.references name, type: :integer, null: nullable,

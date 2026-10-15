@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require 'test_helper'
 require 'open3'
+require 'tmpdir'
 require_relative '../support/graduate_oauth_flow'
 
 # F03 F04 F11 F18 F20 F22: storage isolation is necessary to prove DB enforcement.
@@ -89,10 +90,16 @@ class GraduateEmailStorageTest < ActionDispatch::IntegrationTest
 
   test 'durable_job_survives_process_exit_and_transaction_rollback' do
     job = Delayed::Job.create!(handler: YAML.dump('harmless-storage-payload'), queue: 'storage_sentinel')
+    # Ordinary discovery verifies persistence on the same established connection.
+    # The dedicated gate additionally enforces its selected allowlist identity.
+    expected_config = ActiveRecord::Base.connection_db_config.configuration_hash.slice(:adapter, :database)
     child_check = <<~RUBY
       config = ActiveRecord::Base.connection_db_config.configuration_hash
-      expected = ENV['DB_ADAPTER'] == 'sqlite3' ? Rails.root.join('tmp/graduate-email-storage_test.sqlite3').to_s : 'etd_graduate_email_test'
-      valid = ENV['DATABASE_URL'] == ENV['TEST_DATABASE_URL'] && config[:adapter] == ENV['DB_ADAPTER'] && config[:database] == expected
+      valid = config.slice(:adapter, :database) == #{expected_config.inspect}
+      if ENV['GRADUATE_EMAIL_PROJECT_ROOT']
+        expected = ENV['DB_ADAPTER'] == 'sqlite3' ? Rails.root.join('tmp/graduate-email-storage_test.sqlite3').to_s : 'etd_graduate_email_test'
+        valid &&= ENV['DATABASE_URL'] == ENV['TEST_DATABASE_URL'] && config[:adapter] == ENV['DB_ADAPTER'] && config[:database] == expected
+      end
       exit(valid && Delayed::Job.where(id: #{job.id}, queue: 'storage_sentinel').exists? ? 0 : 1)
     RUBY
     _, status = Open3.capture2e(RbConfig.ruby, '-S', 'bundle', 'exec', 'rails', 'runner', child_check)
@@ -153,13 +160,32 @@ class GraduateEmailStorageTest < ActionDispatch::IntegrationTest
 
   test 'runner_rejects_unsafe_configuration_and_propagates_selected_environment' do
     script = Rails.root.join('script/verify_graduate_email_storage').to_s
-    [['mysql', {'GRADUATE_EMAIL_TEST_DATABASE_URL' => 'mysql2://invalid/etd_graduate_email_test'}], ['mysql', {'GRADUATE_EMAIL_TEST_DATABASE_URL' => 'mysql2://invalid/etd_graduate_email_test?database=other', 'GRADUATE_EMAIL_TEST_DATABASE_CONFIRMED' => 'dedicated_disposable_test'}], ['mysql', {'GRADUATE_EMAIL_TEST_DATABASE_URL' => 'mysql2://invalid/other_test', 'GRADUATE_EMAIL_TEST_DATABASE_CONFIRMED' => 'dedicated_disposable_test'}], ['invalid', {}]].each do |adapter, extra|
-      output, status = Open3.capture2e({'GRADUATE_EMAIL_TEST_DATABASE_URL' => nil}.merge(extra), 'bash', script, adapter, 'exec', 'false')
-      refute status.success?, 'unsafe configuration rejected'
-      refute output.include?('mysql2://'), 'errors contain no URL'
+    # A successful marker child proves rejection happened before command execution.
+    # Never boot Rails or connect for any unsafe case, including mutation checks.
+    Dir.mktmpdir('storage-guard') do |directory|
+      marker = File.join(directory, 'child-ran')
+      child = 'File.write(ARGV.fetch(0), "ran"); exit 0'
+      base = {'GRADUATE_EMAIL_TEST_DATABASE_URL' => nil,
+              'GRADUATE_EMAIL_TEST_DATABASE_CONFIRMED' => nil}
+      confirmed = {'GRADUATE_EMAIL_TEST_DATABASE_CONFIRMED' => 'dedicated_disposable_test'}
+      cases = [
+        ['mysql', {}],
+        ['mysql', confirmed.merge('GRADUATE_EMAIL_TEST_DATABASE_URL' => 'mysql2://[')],
+        ['mysql', confirmed.merge('GRADUATE_EMAIL_TEST_DATABASE_URL' => 'mysql2://invalid/other_test')],
+        ['mysql', confirmed.merge('GRADUATE_EMAIL_TEST_DATABASE_URL' => 'mysql2://invalid/etd_graduate_email_test?database=other')],
+        ['mysql', confirmed.merge('GRADUATE_EMAIL_TEST_DATABASE_URL' => 'mysql2://invalid/etd_graduate_email_test#other')],
+        ['mysql', {'GRADUATE_EMAIL_TEST_DATABASE_URL' => 'mysql2://invalid/etd_graduate_email_test'}],
+        ['invalid', {}]
+      ]
+      cases.each do |adapter, extra|
+        output, status = Open3.capture2e(base.merge(extra), 'bash', script, adapter, 'exec', RbConfig.ruby, '-e', child, marker)
+        assert_equal 1, status.exitstatus, 'static guard exit'
+        assert_equal "Storage guard rejected configuration\n", output, 'static guard rejection'
+        refute File.exist?(marker), 'unsafe child never invoked'
+      end
     end
-    code = 'exit(ENV["DATABASE_URL"] == ENV["TEST_DATABASE_URL"] && ENV["SCHEMA"].start_with?(Dir.pwd + "/tmp/") ? 0 : 1)'
-    _, status = Open3.capture2e({'DATABASE_URL' => 'sqlite3:/unsafe/application.sqlite3', 'TEST_DATABASE_URL' => 'stale'}, 'bash', script, 'sqlite', 'exec', RbConfig.ruby, '-e', code)
+    code = 'exit(ENV["DATABASE_URL"] == ENV["TEST_DATABASE_URL"] && ENV["SCHEMA"].start_with?(Dir.pwd + "/tmp/") && ENV["GRADUATE_EMAIL_MIGRATION_PRESERVATION"].nil? ? 0 : 1)'
+    _, status = Open3.capture2e({'DATABASE_URL' => 'sqlite3:/unsafe/application.sqlite3', 'TEST_DATABASE_URL' => 'stale', 'GRADUATE_EMAIL_MIGRATION_PRESERVATION' => '1'}, 'bash', script, 'sqlite', 'exec', RbConfig.ruby, '-e', code)
     assert status.success?, 'child environment overrides stale test URL'
   end
 end

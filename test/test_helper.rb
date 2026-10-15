@@ -10,7 +10,7 @@ CarrierWave.configure do |configuration|
 end
 # The guarded storage gate verifies real migrations. Rails' automatic schema
 # reload would replace that database (and omit the control singleton seed).
-if ENV['GRADUATE_EMAIL_PROJECT_ROOT']
+if ENV['GRADUATE_EMAIL_PROJECT_ROOT'] && ENV['GRADUATE_EMAIL_MIGRATION_PRESERVATION'] == '1'
   ActiveRecord::Migration.check_pending!
   ActiveRecord.maintain_test_schema = false
 end

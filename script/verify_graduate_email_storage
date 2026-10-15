@@ -27,6 +27,8 @@ begin
 rescue URI::Error
   reject.call
 end
+# Only this invocation's completed migration stages may request preservation.
+ENV.delete('GRADUATE_EMAIL_MIGRATION_PRESERVATION')
 ENV['RAILS_ENV'] = 'test'
 ENV['DB_ADAPTER'] = adapter == 'sqlite' ? 'sqlite3' : 'mysql2'
 ENV['DATABASE_URL'] = ENV['TEST_DATABASE_URL'] = url
@@ -82,6 +84,7 @@ else
   run.call('check_after_down', probe + ['check_after_down'])
   run.call('migrate_up_again', %w[bundle exec rails db:migrate])
   run.call('check_after_up_again', probe + ['check_after_up'])
+  ENV['GRADUATE_EMAIL_MIGRATION_PRESERVATION'] = '1'
   run.call('storage_and_artifacts', %w[bundle exec rails test test/integration/graduate_email_storage_test.rb test/integration/graduate_email_artifacts_test.rb -v])
 end
 unless schema_before == Digest::SHA256.file("#{root}/db/schema.rb").hexdigest
