@@ -82,6 +82,10 @@ module GraduateAuthentication
       provider_credentials.keys
     end
 
+    def available?
+      enabled_providers.any? || GraduateEmail::Control.enabled?
+    end
+
     def label(provider)
       { 'google_oauth2' => 'Google' }.fetch(provider)
     end
@@ -110,7 +114,7 @@ module GraduateAuthentication
 
     def ppy_student_session?(session, user)
       active_student?(user) && session[:auth_source] == 'ppy' &&
-        session[:user_id] == user.id && session[:return_to_user_id].blank?
+        session[:user_id] == user.id && session[:return_to_user_id].blank? && !GraduateSession.marked?(session)
     end
 
     # Runs after the Rails CSRF verifier, inside the strategy request phase.
@@ -124,10 +128,7 @@ module GraduateAuthentication
 
       user = User.find_by(id: session[:user_id]) if session[:user_id]
       if GraduateSession.marked?(session)
-        valid_session = session[:auth_source] == 'graduate_oauth' && session[:return_to_user_id].blank? &&
-                        active_student?(user) &&
-                        GraduateSession.valid_for?(session[:graduate_session_token],
-                                                   identity_id: session[:graduate_identity_id], student_id: user.id)
+        valid_session = GraduateSession.valid_markers_for?(session, user)
         unless valid_session
           GraduateSession.revoke(session[:graduate_session_token])
           env['warden']&.logout

@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
   def login_required
     return if current_user || controller_name == 'sessions'
 
-    redirect_to GraduateAuthentication.enabled_providers.any? ? graduate_login_path : login_url
+    redirect_to GraduateAuthentication.available? ? graduate_login_path : login_url
   end
 
   rescue_from CanCan::AccessDenied do |exception|
@@ -56,12 +56,30 @@ class ApplicationController < ActionController::Base
     @current_user = user
   end
 
-  def valid_external_identity?(user)
-    return !GraduateSession.marked?(session) unless session[:auth_source] == 'graduate_oauth'
-    return false unless GraduateAuthentication.active_student?(user)
+  def start_email_authentication_session(grant:)
+    raise GraduateAuthentication::Rejected unless grant.is_a?(GraduateEmail::Grant) &&
+      ActiveRecord::Base.connection.open_transactions.zero?
 
-    GraduateSession.valid_for?(session[:graduate_session_token], identity_id: session[:graduate_identity_id],
-                              student_id: user.id)
+    user = Student.find_by(id: grant.student_id)
+    raise GraduateAuthentication::Rejected unless grant.authentication_method == 'email' &&
+      GraduateSession.valid_for?(grant.session_token, email_connection_id: grant.connection_id,
+        generation: grant.generation, method: 'email', student_id: grant.student_id)
+
+    clear_authentication_session
+    request.env['warden']&.set_user(user, scope: :user)
+    session[:user_id] = user.id
+    session[:auth_source] = 'graduate_email'
+    session[:graduate_email_connection_id] = grant.connection_id
+    session[:graduate_email_generation] = grant.generation
+    session[:graduate_session_token] = grant.session_token
+    @current_user = user
+    nil
+  end
+
+  def valid_external_identity?(user)
+    return true unless GraduateSession.marked?(session)
+
+    GraduateSession.valid_markers_for?(session, user)
   end
 
   def valid_authentication_session?(user)

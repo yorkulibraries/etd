@@ -90,6 +90,6 @@ class Student < User
   private
 
   def revoke_graduate_sessions_on_block
-    GraduateSession.revoke_for_student(id) if saved_change_to_blocked? && blocked?
+    GraduateEmail::Revocation.for_student_locked!(student_id: id) if saved_change_to_blocked? && blocked?
   end
 end
