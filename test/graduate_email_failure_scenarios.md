@@ -36,3 +36,16 @@ Task 1 runner/probe isolation scenarios, specified before implementation:
 - Commit job in one process and read it in another; rollback retains neither challenge nor job. Never execute sentinel payloads.
 - Exercise each audit FK separately and real manager deletion; preserve policy columns and unrelated references.
 - Assertion and error hooks must touch neither browser nor files, even if URL/form/mail contain sentinels and HTML capture is enabled.
+
+Task 4 delivery isolation scenarios (written before delivery implementation):
+
+- D01 / F05 F09 F10: Persist/reload the real opaque-ID job; queued is unverifiable. Single claim commits six zero-padded random digits as contextual CODE_KEY HMAC only, claimed is unverifiable, only original immutable memory claim authorizes sending. No approval consumption/session issuance.
+- D02 / F05 F13 F19: Unknown/noop never generates or builds mail. Creation + five minutes is immutable even with queue delay. Disabled/re-enabled pending jobs never send.
+- D03 / F09 F10 F22: SIGKILL isolated real worker before claim commit, after claim commit, after authorization, after RAM SMTP acceptance, after sent commit. Restart and explicitly enqueue same ID; <=1 accepted message, no regeneration of claimed/sending. Only current sending/sent may match delivered code.
+- D04 / F12 F14 F20: Before authorization reject changed generation, blocked/inactive student/approver, revoked/consumed/expired approval, missing/changed mapping, connection revocation, same-browser replacement, challenge expiry/consumption/invalidation. Conditional success/error cannot overwrite terminal or old-generation state.
+- D05 / F09 F18 F23: During stalled RAM transport other database sessions complete disable, direct model block, HTTP controller block, same-browser resend and Google issue within five seconds. Render/transport/diagnostic callbacks assert zero open transactions; no sleeps establish race order. Ten-second deadline test proves bounded stall.
+- D06 / F09 F21: Explicit SMTP/render error clears digest conditionally, never retries or consumes approval. Retry conditional failure once on fresh database transaction after database failure; ambiguous sending remains conservative. Actual DEBUG Rails log subscribers, notification subscriber, notifier hook and backend last_error contain no sentinel code/token/mailbox/raw cause. Do not globally mute other mailers/loggers.
+- D07 / F03 F21 F23: Own boot-safe SMTP config fails closed on invalid sender/host/port/TLS/auth without feature-table queries; preserve general mail config. Exactly one canonical recipient and approved sender, no CC/BCC/contact helpers. Dedicated class builders return text Mail::Message with no ActionMailer dispatch/instrumentation. <=3 second open/read and ten second total deadline, worker 30 seconds.
+- D08 / F20 F21: Seed notice directly, identifier-only separate queue and 50 reserve constant; claim once, network outside locks, immutable old recipient only, no code/new address/link. Still send required notice while email control disabled; failure/duplicates never restore access or retry.
+
+Task 4 self-review D07 follow-up, before correction: a frozen ordinary Ruby Time with a non-UTC offset must render the original expiry without in-place timezone mutation. Exercise the real builder in the SMTP configuration integration case.

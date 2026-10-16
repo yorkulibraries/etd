@@ -292,14 +292,14 @@ class GraduateEmailLimitsTest < ActionDispatch::IntegrationTest
     end
     assert_equal [2, 0], Delayed::Worker.new(queues: ['graduate_email']).work_off(10)
     assert_equal 0, Delayed::Job.where(queue: 'graduate_email').count
-    assert_equal 'failed', challenge(real).state
-    assert notices.any? { |line| line.match?(/\Agraduate_email delivery_not_ready(?: challenge_id=\d+)?\z/) }
+    assert_equal 'queued', challenge(real).state
+    assert_empty notices # Missing dedicated SMTP config fails closed, no plaintext generated.
     assert_nil challenge(real).code_digest
     assert_equal 'noop', challenge(noop).state
     assert_nil @approval.reload.consumed_at
     assert_equal 0, GraduateSession.count
     assert_empty ActionMailer::Base.deliveries
-    assert_not GraduateEmail.const_defined?(:Delivery)
+    assert GraduateEmail.const_defined?(:Delivery)
     # Duplicate execution never overwrites a terminal state.
     sent = challenge(real)
     sent.update!(state: 'superseded', invalidated_at: Time.current)

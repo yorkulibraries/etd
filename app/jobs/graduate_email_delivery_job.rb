@@ -10,26 +10,10 @@ class GraduateEmailDeliveryJob
   end
 
   def perform
-    # Task 4 replaces this safe branch with Delivery.perform!. There is no code
-    # generation, unavailable future constant, mailer, approval or session work.
-    failed_id = nil
-    GraduateEmail::Control.synchronize do
-      row = GraduateEmailChallenge.find_by(public_id: challenge_public_id)
-      next unless row && row.purpose != 'noop' && row.state == 'queued'
-
-      Student.where(id: row.student_id).order(:id).lock.load
-      row = GraduateEmailChallenge.where(id: row.id).lock.first
-      next unless row && row.state == 'queued'
-
-      row.update!(state: 'failed', code_digest: nil, invalidated_at: Time.current)
-      failed_id = row.id
-    end
-    Rails.logger.warn("graduate_email delivery_not_ready challenge_id=#{failed_id}") if failed_id
+    GraduateEmail::Delivery.perform!(challenge_public_id: challenge_public_id)
     nil
   rescue StandardError
-    # Never allow backend last_error/notifiers to receive an original exception
-    # (including SQL/SMTP payloads). A later duplicate remains safe as well.
-    Rails.logger.warn('graduate_email delivery_not_ready')
+    # A raw error must never reach backend last_error or exception notifiers.
     nil
   end
 

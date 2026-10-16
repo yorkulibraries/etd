@@ -104,3 +104,121 @@ class GraduateEmailConcurrencyTest < ActionDispatch::IntegrationTest
     end
   end
 end
+
+require_relative '../support/graduate_email_delivery_process_helpers'
+
+# D03-D05 / F09 F10 F12 F14 F18 F20 F22. Process failure cases first.
+class GraduateEmailDeliveryConcurrencyTest < ActionDispatch::IntegrationTest
+  include GraduateEmailDeliveryHelpers
+  include GraduateEmailDeliveryProcessHelpers
+  include GraduateOAuthFlow
+  self.use_transactional_tests = false
+  setup do
+    setup_delivery
+    @delivery_forgery = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = true
+  end
+  teardown do
+    cleanup_delivery_workers
+    ActionController::Base.allow_forgery_protection = @delivery_forgery
+    teardown_delivery
+  end
+
+  test('crash_before_claim_can_claim_once') { assert_crash('before_claim_commit', 'queued') }
+  test('crash_after_claim_before_smtp_never_retries') { assert_crash('after_claim', 'claimed') }
+  test('crash_after_authorization_before_smtp_never_retries') { assert_crash('after_authorization', 'sending') }
+  test('crash_after_smtp_acceptance_keeps_sending_code_verifiable') { assert_crash('after_acceptance', 'sending', accepted: true) }
+  test('crash_after_sent_before_ack_is_noop') { assert_crash('after_sent', 'sent', accepted: true) }
+
+  test 'stalled_relay_does_not_hold_locks_or_block_disable_student_or_google' do
+    %w[disable model_block controller_block resend google connection_revoke approval_revoke].each do |action|
+      [false, true].each do |error|
+        # New independent fixtures for each invalidation and finalizer outcome.
+        cleanup_delivery_workers
+        GraduateEmailLimitEvent.delete_all
+        GraduateEmailChallenge.delete_all
+        Delayed::Job.delete_all
+        @student.update_columns(blocked: false)
+        @connection.update_columns(revoked_at: nil)
+        @approval.update_columns(revoked_at: nil)
+        @mapping = GraduateEmailActiveAddress.find_by(student_id: @student.id) ||
+          GraduateEmailActiveAddress.create!(student: @student, connection: @connection, normalized_address: @connection.normalized_address)
+        GraduateEmailControl.find(1).update!(enabled: true)
+        @approval.update_columns(generation: GraduateEmailControl.find(1).generation)
+        identity = GraduateIdentity.find_or_create_by!(student: @student, linked_by: @actor, provider: 'google_oauth2', uid: 'delivery-race')
+        email_token = GraduateEmail::Control.synchronize do |control|
+          GraduateSession.issue_email!(connection: @connection, generation: control.generation)
+        end
+        generation = GraduateEmailControl.find(1).generation
+        if action == 'controller_block'
+          ppy_login(@actor)
+          get users_path
+        end
+        row = challenge(request_code(**(action == 'approval_revoke' ? {purpose: :enroll, approval_id: @approval.id} : {})))
+        worker = start_delivery_worker(row, hold: true, outcome: error ? 'ERROR' : 'ACCEPT')
+        assert_equal 'DELIVERY_NETWORK', delivery_marker(worker)
+        assert Timeout.timeout(5) { worker[:received].pop }, 'No RAM transport acceptance'
+        assert_equal 'sending', row.reload.state
+        started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        operation = Thread.new do
+          ActiveRecord::Base.connection_pool.with_connection do
+            case action
+            when 'disable' then GraduateEmail::Control.set_enabled!(enabled: false, actor_id: @actor.id)
+            when 'model_block' then Student.find(@student.id).block
+            when 'controller_block'
+              post block_user_path(@student), params: {authenticity_token: csrf_token}
+              assert_response :redirect
+            when 'resend'
+              # Existing admitted event is moved to exact 60s boundary; no sleep.
+              GraduateEmailLimitEvent.where(kind: 'send_address').update_all(occurred_at: 61.seconds.ago)
+              request_code
+            when 'google'
+              token = GraduateSession.issue!(identity)
+              assert GraduateSession.valid_for?(token, identity_id: identity.id, student_id: @student.id)
+            when 'connection_revoke'
+              GraduateEmail::Control.synchronize { @connection.lock!; @connection.update_columns(revoked_at: Time.current) }
+            when 'approval_revoke'
+              GraduateEmail::Control.synchronize { @approval.lock!; @approval.update_columns(revoked_at: Time.current) }
+            end
+          end
+        end
+        Timeout.timeout(5) { operation.value }
+        elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
+        assert_operator elapsed, :<, 5
+        stale = row.reload.attributes
+        worker[:release] << true
+        finish_delivery_worker(worker)
+        code = otp_code_for(public_id: row.public_id)
+        assert code
+        if action == 'google'
+          assert_equal error ? 'failed' : 'sent', row.reload.state
+          assert_equal !error, eligible?(row)
+        else
+          assert_equal stale, row.reload.attributes
+          refute eligible?(row)
+          refute GraduateSession.valid_for?(email_token, method: 'email', email_connection_id: @connection.id,
+            generation: generation, student_id: @student.id) unless %w[resend approval_revoke].include?(action)
+        end
+        assert_equal 1, @mail_messages.count { |message| message.body.decoded.include?(code) }
+        puts "DELIVERY_COUNTS responsive_#{action}_#{error ? 'error' : 'success'} within_budget=1"
+      ensure
+        operation&.kill if operation&.alive?
+      end
+    end
+  end
+
+  test 'stalled_transport_has_ten_second_total_deadline' do
+    row = challenge(request_code)
+    worker = start_delivery_worker(row, hold: true)
+    assert_equal 'DELIVERY_NETWORK', delivery_marker(worker)
+    assert Timeout.timeout(5) { worker[:received].pop }
+    started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    finish_delivery_worker(worker)
+    elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
+    assert_operator elapsed, :>=, 8
+    assert_operator elapsed, :<, 12
+    assert_equal 'failed', row.reload.state
+    assert_nil row.code_digest
+    assert_equal 1, @mail_messages.size
+  end
+end
