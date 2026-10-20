@@ -238,10 +238,12 @@ class GraduateEmailSessionTest < ActionDispatch::IntegrationTest
 
   test 'email_session_cannot_prepare_ppy_google_link' do
     token = issue
-    state = email_markers(token)
+    state = email_markers(token).with_indifferent_access
     strategy = Struct.new(:name).new('google_oauth2')
     GraduateAuthentication.prepare_intent!('rack.session' => state, 'omniauth.strategy' => strategy)
     assert_equal 'login', state[:graduate_oauth_intent]['mode']
+    assert_equal @student.id, state[:user_id]
+    assert_equal token, state[:graduate_session_token]
     assert_not GraduateAuthentication.ppy_student_session?(state, @student)
     state['auth_source'] = 'ppy'
     assert_not GraduateAuthentication.ppy_student_session?(state, @student)
@@ -334,6 +336,18 @@ class GraduateEmailSessionTest < ActionDispatch::IntegrationTest
   ensure
     ActiveSupport::Notifications.unsubscribe(subscriber) if subscriber
     independent.kill if independent&.alive?
+  end
+
+  test 'materialized_savepoint_cannot_borrow_control_ownership' do
+    GraduateEmail::Control.synchronize do |control|
+      ActiveRecord::Base.transaction(requires_new: true) do
+        ActiveRecord::Base.connection.execute('SELECT 1')
+        assert_raises(GraduateAuthentication::Rejected) { GraduateEmail::Control.locked_state! }
+        assert_raises(GraduateAuthentication::Rejected) { GraduateSession.issue_email!(connection: @connection, generation: 1) }
+      end
+      assert_equal control, GraduateEmail::Control.locked_state!
+      assert GraduateSession.issue_email!(connection: @connection, generation: 1)
+    end
   end
 
   test 'email_lock_wait_is_bounded_and_connection_policy_is_restored' do

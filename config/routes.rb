@@ -20,6 +20,14 @@ Rails.application.routes.draw do
   get 'invalid_login' => 'sessions#invalid_login', as: 'invalid_login'
   get 'unauthorized' => 'home#unauthorized'
 
+  get 'graduate/email' => 'graduate_email_sessions#new', as: :graduate_email
+  get 'graduate/email/enroll' => 'graduate_email_sessions#enroll', as: :graduate_email_enroll
+  post 'graduate/email/challenges' => 'graduate_email_sessions#create', as: :graduate_email_challenges
+  get 'graduate/email/verify' => 'graduate_email_sessions#show', as: :graduate_email_verify
+  post 'graduate/email/verify' => 'graduate_email_sessions#verify'
+  post 'graduate/email/resend' => 'graduate_email_sessions#resend', as: :graduate_email_resend
+  post 'students/:student_id/graduate-email-invitations' => 'graduate_email_invitations#create', as: :student_graduate_email_invitations
+  delete 'students/:student_id/graduate-email-invitations/:id' => 'graduate_email_invitations#destroy', as: :student_graduate_email_invitation
   get 'graduate/login' => 'graduate_sessions#new', as: :graduate_login
   match 'graduate/enroll' => 'graduate_sessions#enroll', via: %i[get post], as: :graduate_enroll
   get 'graduate/auth/failure' => 'graduate_sessions#failure', as: :graduate_auth_failure

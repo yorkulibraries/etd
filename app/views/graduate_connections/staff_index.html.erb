@@ -71,3 +71,43 @@
     </ul>
   </section>
 <% end %>
+
+<%= render "email_connection" %>
+<% if can_manage && GraduateEmail::Control.enabled? && !@email_connection %>
+  <section class="card mb-4" aria-labelledby="email-approval-heading">
+    <div class="card-body">
+      <h2 id="email-approval-heading" class="h4">Approve email sign-in</h2>
+      <p>Verify this student's identity through the approved FGS process before choosing one individual sign-in address. Contact details below are reference information only and do not grant access.</p>
+      <p class="text-break">Contact email: <%= @student.email %></p>
+      <p class="text-break">External contact email: <%= @student.email_external %></p>
+      <%= form_with url: student_graduate_email_invitations_path(@student), method: :post, local: true, data: { turbo: false } do %>
+        <div class="mb-3">
+          <%= label_tag :email_address, "Approved sign-in address", class: "form-label" %>
+          <%= email_field_tag :address, nil, id: "email_address", maxlength: 254, required: true, class: "form-control" %>
+        </div>
+        <div class="mb-3">
+          <%= label_tag :confirmed_address, "Confirm approved address", class: "form-label" %>
+          <%= email_field_tag :confirmed_address, nil, maxlength: 254, required: true, class: "form-control" %>
+        </div>
+        <div class="form-check mb-3">
+          <%= check_box_tag :identity_verified, "1", false, id: "email_identity_verified", required: true, class: "form-check-input", data: { graduate_confirmation: true } %>
+          <%= label_tag :email_identity_verified, "I verified this student's identity through the approved FGS process and confirmed this individual recipient.", class: "form-check-label" %>
+        </div>
+        <%= submit_tag "Create email invitation", class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+<% if @email_approvals.any? %>
+  <section aria-labelledby="email-invitations-heading">
+    <h2 id="email-invitations-heading" class="h4">Email invitations</h2>
+    <% @email_approvals.each do |approval| %>
+      <div class="mb-3 text-break">
+        <p><%= approval.normalized_address %>: <%= approval.consumed_at ? "Used" : approval.revoked_at ? "Canceled" : approval.expires_at <= Time.current ? "Expired" : "Pending" %></p>
+        <% if can_manage && !approval.consumed_at && !approval.revoked_at && approval.expires_at > Time.current %>
+          <%= button_to "Cancel email invitation", student_graduate_email_invitation_path(@student, approval), method: :delete, class: "btn btn-outline-danger", form: { data: { turbo: false } } %>
+        <% end %>
+      </div>
+    <% end %>
+  </section>
+<% end %>

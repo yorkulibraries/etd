@@ -1,0 +1,12 @@
+<% content_for :title, "Email sign in" %>
+<p>Enter the address approved by the Faculty of Graduate Studies for your existing student record.</p>
+<%= form_with url: graduate_email_challenges_path, method: :post, local: true, data: { turbo: false } do %>
+  <div class="mb-3">
+    <%= label_tag :address, "Email address", class: "form-label" %>
+    <%= email_field_tag :address, nil, required: true, maxlength: 254, autocomplete: "email", class: "form-control" %>
+  </div>
+  <%= submit_tag "Email me a sign-in code", class: "btn btn-primary w-100" %>
+<% end %>
+<p class="mt-3">First-time access or a lost mailbox? Contact the Faculty of Graduate Studies through your usual support channel.</p>
+<p><%= link_to "Continue with Google", graduate_login_path %></p>
+<p><%= link_to "Sign in with Passport York", login_path %></p>

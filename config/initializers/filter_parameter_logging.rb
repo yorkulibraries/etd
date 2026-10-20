@@ -7,4 +7,5 @@ Rails.application.config.filter_parameters += %i[
   passw secret token _key crypt salt certificate otp ssn password code state
   client_id client_secret app_secret authorization credentials uid graduate_session_token embargo_request
   code_digest browser_digest token_digest normalized_address recipient invitation_token browser_token
+  address confirmed_address
 ]

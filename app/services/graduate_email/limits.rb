@@ -62,6 +62,14 @@ module GraduateEmail
         :allowed
       end
 
+      # Read-only global/IP preflight before any target lookup. Event writes
+      # remain after target/challenge/session locks in the caller transaction.
+      def verify_admission(ip_key:, now:)
+        owned!
+        return :capacity if capacity?(kind: :verify, now: now)
+        cooling?('verify_ip', ip_key, now) ? :limited : :allowed
+      end
+
       def admit!(kind:, address_key: nil, student_id: nil, ip_key:, now:)
         owned!
         raise GraduateAuthentication::Rejected unless %i[send verify].include?(kind) && digest?(ip_key)

@@ -115,12 +115,20 @@ class GraduateEmailDeliveryConcurrencyTest < ActionDispatch::IntegrationTest
   self.use_transactional_tests = false
   setup do
     setup_delivery
+    @delivery_app_forgery_inherited = !ApplicationController.config.key?(:allow_forgery_protection)
+    @delivery_app_forgery = ApplicationController.allow_forgery_protection
+    ApplicationController.allow_forgery_protection = true
     @delivery_forgery = ActionController::Base.allow_forgery_protection
     ActionController::Base.allow_forgery_protection = true
   end
   teardown do
     cleanup_delivery_workers
     ActionController::Base.allow_forgery_protection = @delivery_forgery
+    if @delivery_app_forgery_inherited
+      ApplicationController.config.delete(:allow_forgery_protection)
+    else
+      ApplicationController.allow_forgery_protection = @delivery_app_forgery
+    end
     teardown_delivery
   end
 
@@ -196,6 +204,8 @@ class GraduateEmailDeliveryConcurrencyTest < ActionDispatch::IntegrationTest
         else
           assert_equal stale, row.reload.attributes
           refute eligible?(row)
+          assert_nil GraduateEmail::Verification.redeem!(challenge_public_id: row.public_id,
+            browser_token: @browser, code: code, ip: @ip)
           refute GraduateSession.valid_for?(email_token, method: 'email', email_connection_id: @connection.id,
             generation: generation, student_id: @student.id) unless %w[resend approval_revoke].include?(action)
         end

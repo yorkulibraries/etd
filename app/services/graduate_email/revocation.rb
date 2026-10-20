@@ -1,6 +1,25 @@
 # frozen_string_literal: true
 module GraduateEmail
   module Revocation
+    def self.approval!(approval:, actor:, impersonating:)
+      raise GraduateAuthentication::Rejected unless impersonating == false && approval&.persisted? && actor&.persisted?
+
+      Control.synchronize do |control|
+        hint = GraduateEmailApproval.find_by(id: approval.id)
+        raise GraduateAuthentication::Rejected unless hint
+        users = User.where(id: [hint.student_id, actor.id]).order(:id).lock.index_by(&:id)
+        raise GraduateAuthentication::Rejected unless Enrollment.authorized?(users[actor.id])
+        current = GraduateEmailApproval.lock.find_by(id: hint.id)
+        raise GraduateAuthentication::Rejected unless current && current.student_id == hint.student_id
+        Enrollment.cancel_locked!(current, Time.current)
+        Audit.record!(event: 'approval', outcome: 'canceled', student_id: current.student_id,
+          actor_id: actor.id, approval_id: current.id, generation: control.generation)
+      end
+      nil
+    rescue ActiveRecord::ActiveRecordError
+      raise GraduateAuthentication::Rejected, 'Email approval unavailable', cause: nil
+    end
+
     # Called by Student's after_update, which already owns the student write
     # lock. Never acquire or read control here: that would invert lock order.
     def self.for_student_locked!(student_id:)

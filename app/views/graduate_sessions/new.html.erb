@@ -9,11 +9,14 @@
 <% end %>
 
 <% providers = @providers %>
-<% if providers.empty? %>
+<% if providers.empty? && !GraduateEmail::Control.enabled? %>
   <div class="alert alert-info" role="status">Graduate account sign in is currently unavailable. Use Passport York or contact the Faculty of Graduate Studies for help.</div>
 <% end %>
 
 <div class="d-grid gap-3 my-4">
+  <% if !@enrollment && GraduateEmail::Control.enabled? %>
+    <%= link_to "Email me a sign-in code", graduate_email_path, class: "btn btn-primary w-100" %>
+  <% end %>
   <% providers.each do |provider| %>
     <%= button_to "Continue with #{GraduateAuthentication.label(provider)}", graduate_auth_path(provider), method: :post, authenticity_token: form_authenticity_token, class: "btn btn-primary w-100", form: { data: { turbo: false } } %>
   <% end %>

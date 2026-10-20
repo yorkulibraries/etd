@@ -8,13 +8,16 @@ class GraduateConnectionsController < ApplicationController
     raise CanCan::AccessDenied unless GraduateAuthentication.active_student?(current_user)
 
     @student = current_user
+    @email_connection = @student.graduate_email_connections.where(revoked_at: nil).order(:id).last
     @identities = @student.graduate_identities.where(provider: GraduateAuthentication::PROVIDERS).order(:provider)
     @can_connect = GraduateAuthentication.ppy_student_session?(session, @student)
   end
 
   def staff_index
     load_staff_student
+    @email_connection = @student.graduate_email_connections.where(revoked_at: nil).order(:id).last
     @identities = @student.graduate_identities.where(provider: GraduateAuthentication::PROVIDERS).order(:provider)
+    @email_approvals = @student.graduate_email_approvals.order(created_at: :desc).limit(10)
     @invitations = @student.graduate_authentication_invitations.where(provider: GraduateAuthentication::PROVIDERS)
                           .order(created_at: :desc).limit(10)
   end

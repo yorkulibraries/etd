@@ -248,6 +248,34 @@ class GraduateEmailDeliveryTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'renderer_exception_sentinels_do_not_escape_backend_logger_or_notifier' do
+    row = challenge(request_code)
+    stream = StringIO.new
+    original = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(stream)
+    ExceptionNotifier.expects(:notify_exception).never
+    raw = ['004242', @browser, @connection.normalized_address].join(' ')
+    GraduateAuthenticationMailer.any_instance.stubs(:render_to_string).raises(RuntimeError, raw)
+    GraduateAuthenticationMailer.stub(:transport_class, @transport) do
+      assert_equal [1, 0], Delayed::Worker.new(queues: ['graduate_email']).work_off(1)
+    end
+    assert_equal 'failed', row.reload.state
+    assert_safe_absent(stream.string + Delayed::Job.pluck(:last_error).inspect, *raw.split)
+    assert_empty @mail_messages
+  ensure
+    Rails.logger = original if original
+  end
+
+  test 'missing_control_finalize_preserves_entire_challenge_row' do
+    row = challenge(request_code)
+    claim = GraduateEmail::Delivery.claim!(challenge_public_id: row.public_id)
+    assert GraduateEmail::Delivery.authorize_send!(claim: claim)
+    before = row.reload.attributes
+    GraduateEmailControl.delete_all
+    assert_raises(GraduateAuthentication::Rejected) { GraduateEmail::Delivery.finalize!(claim: claim, outcome: :sent) }
+    assert_equal before, row.reload.attributes
+  end
+
   test 'smtp_configuration_is_dedicated_validated_and_boot_safe' do
     general = ActionMailer::Base.smtp_settings.dup
     GraduateEmailControl.expects(:find_by).never
