@@ -9,7 +9,7 @@ module GraduateEmail
       def issue!(student:, actor:, address:, confirmed_address:, identity_verified:, impersonating:, replacement: false)
         normalized = Address.normalize(input: address)
         raise GraduateAuthentication::Rejected unless normalized && normalized == Address.normalize(input: confirmed_address) &&
-          identity_verified == true && impersonating == false && replacement == false && student&.persisted? && actor&.persisted?
+          identity_verified == true && impersonating == false && [true, false].include?(replacement) && student&.persisted? && actor&.persisted?
 
         Control.synchronize do |control|
           now = Time.current
@@ -18,16 +18,29 @@ module GraduateEmail
             GraduateAuthentication.active_student?(users[student.id]) && authorized?(users[actor.id])
 
           pending = GraduateEmailApproval.where(student_id: student.id).order(:id).lock.to_a
-          GraduateEmailConnection.where(student_id: student.id).order(:id).lock.load
+          connections = GraduateEmailConnection.where(student_id: student.id).order(:id).lock.to_a
           mappings = GraduateEmailActiveAddress.where('student_id = ? OR normalized_address = ?', student.id, normalized).order(:id).lock.to_a
-          # Recovery requires Task 6's atomic switch and notice producer.
-          raise GraduateAuthentication::Rejected if mappings.any?
-
-          pending.each { |approval| cancel_locked!(approval, now) }
+          raise GraduateAuthentication::Rejected if mappings.any? { |row| row.student_id != student.id }
+          current = mappings.find { |row| row.student_id == student.id }
+          old = current && connections.find { |row| row.id == current.connection_id }
+          if replacement
+            raise GraduateAuthentication::Rejected unless old && old.revoked_at.nil? && old.verified_at &&
+              current.normalized_address == old.normalized_address
+          else
+            raise GraduateAuthentication::Rejected if current || connections.any? { |row| row.revoked_at.nil? }
+          end
+          GraduateEmailChallenge.where(approval_id: pending.map(&:id)).order(:id).lock.load
+          pending.each do |approval|
+            next unless approval.revoked_at.nil? && approval.consumed_at.nil?
+            cancel_locked!(approval, now)
+            Audit.record!(event: 'approval', outcome: 'superseded', student_id: student.id,
+              actor_id: actor.id, approval_id: approval.id, generation: control.generation)
+          end
           token = SecureRandom.urlsafe_base64(32)
           approval = GraduateEmailApproval.create!(student_id: student.id, approved_by_id: actor.id,
             normalized_address: normalized, token_digest: Digest::SHA256.hexdigest(token),
-            generation: control.generation, expires_at: now + 48.hours)
+            generation: control.generation, expires_at: now + 48.hours,
+            replacement_of_connection_id: replacement ? old.id : nil)
           Audit.record!(event: 'approval', outcome: 'approved', student_id: student.id,
             actor_id: actor.id, approval_id: approval.id, generation: control.generation)
           [approval, token]
@@ -50,7 +63,18 @@ module GraduateEmail
             approval.student_id == hint.student_id && approval.approved_by_id == hint.approved_by_id &&
             approval.revoked_at.nil? && approval.consumed_at.nil? && approval.expires_at > now &&
             approval.created_at <= now && approval.created_at > now - 48.hours && approval.expires_at <= approval.created_at + 48.hours &&
-            approval.replacement_of_connection_id.nil? && GraduateAuthentication.active_student?(users[approval.student_id]) && authorized?(users[approval.approved_by_id])
+            GraduateAuthentication.active_student?(users[approval.student_id]) && authorized?(users[approval.approved_by_id])
+          connections = GraduateEmailConnection.where(student_id: approval.student_id).order(:id).lock.to_a
+          mappings = GraduateEmailActiveAddress.where('student_id = ? OR normalized_address = ?', approval.student_id, approval.normalized_address).order(:id).lock.to_a
+          raise GraduateAuthentication::Rejected if mappings.any? { |row| row.student_id != approval.student_id }
+          mapping = mappings.find { |row| row.student_id == approval.student_id }
+          if approval.replacement_of_connection_id
+            old = connections.find { |row| row.id == approval.replacement_of_connection_id }
+            raise GraduateAuthentication::Rejected unless old && old.revoked_at.nil? && old.verified_at && mapping &&
+              mapping.connection_id == old.id && mapping.normalized_address == old.normalized_address
+          else
+            raise GraduateAuthentication::Rejected if mapping
+          end
           approval.id
         end
       rescue ActiveRecord::ActiveRecordError

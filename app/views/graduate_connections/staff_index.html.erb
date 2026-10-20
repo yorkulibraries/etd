@@ -73,14 +73,18 @@
 <% end %>
 
 <%= render "email_connection" %>
-<% if can_manage && GraduateEmail::Control.enabled? && !@email_connection %>
+<% if can_manage && GraduateEmail::Control.enabled? %>
   <section class="card mb-4" aria-labelledby="email-approval-heading">
     <div class="card-body">
-      <h2 id="email-approval-heading" class="h4">Approve email sign-in</h2>
+      <h2 id="email-approval-heading" class="h4"><%= @email_connection ? "Replace or recover email sign-in" : "Approve email sign-in" %></h2>
       <p>Verify this student's identity through the approved FGS process before choosing one individual sign-in address. Contact details below are reference information only and do not grant access.</p>
       <p class="text-break">Contact email: <%= @student.email %></p>
       <p class="text-break">External contact email: <%= @student.email_external %></p>
       <%= form_with url: student_graduate_email_invitations_path(@student), method: :post, local: true, data: { turbo: false } do %>
+        <% if @email_connection %>
+          <%= hidden_field_tag :replacement, "1" %>
+          <p>The current address stays usable until the new mailbox is verified. For a lost mailbox, verify identity again through the approved FGS recovery process. The old mailbox does not need to confirm. Explicitly confirming the same address starts recovery for that mailbox.</p>
+        <% end %>
         <div class="mb-3">
           <%= label_tag :email_address, "Approved sign-in address", class: "form-label" %>
           <%= email_field_tag :address, nil, id: "email_address", maxlength: 254, required: true, class: "form-control" %>
@@ -93,7 +97,7 @@
           <%= check_box_tag :identity_verified, "1", false, id: "email_identity_verified", required: true, class: "form-check-input", data: { graduate_confirmation: true } %>
           <%= label_tag :email_identity_verified, "I verified this student's identity through the approved FGS process and confirmed this individual recipient.", class: "form-check-label" %>
         </div>
-        <%= submit_tag "Create email invitation", class: "btn btn-primary" %>
+        <%= submit_tag (@email_connection ? "Create replacement email invitation" : "Create email invitation"), class: "btn btn-primary" %>
       <% end %>
     </div>
   </section>
@@ -104,10 +108,30 @@
     <% @email_approvals.each do |approval| %>
       <div class="mb-3 text-break">
         <p><%= approval.normalized_address %>: <%= approval.consumed_at ? "Used" : approval.revoked_at ? "Canceled" : approval.expires_at <= Time.current ? "Expired" : "Pending" %></p>
+        <p data-email-approval-actor>Approved by <%= approval.approved_by.name %> on <%= time_tag approval.created_at %>. Expires <%= time_tag approval.expires_at %>.</p>
         <% if can_manage && !approval.consumed_at && !approval.revoked_at && approval.expires_at > Time.current %>
           <%= button_to "Cancel email invitation", student_graduate_email_invitation_path(@student, approval), method: :delete, class: "btn btn-outline-danger", form: { data: { turbo: false } } %>
         <% end %>
       </div>
+    <% end %>
+  </section>
+<% end %>
+
+<% if can_manage && @email_connection %>
+  <%= form_with url: student_graduate_email_connection_path(@student, @email_connection), method: :delete, local: true, data: { turbo: false } do %>
+    <div class="form-check mb-3">
+      <%= check_box_tag :confirmation, "1", false, id: "remove_email_#{@email_connection.id}", required: true, class: "form-check-input", data: { graduate_confirmation: true } %>
+      <%= label_tag "remove_email_#{@email_connection.id}", "I confirm removal of this student's email sign-in connection, pending invitations and email sessions.", class: "form-check-label" %>
+    </div>
+    <%= submit_tag "Remove email connection", class: "btn btn-outline-danger mb-4" %>
+  <% end %>
+<% end %>
+<% if @email_notices.any? %>
+  <section aria-labelledby="email-notices-heading">
+    <h2 id="email-notices-heading" class="h4">Email change notices</h2>
+    <p>Notices go only to the previous sign-in address. Mail acceptance does not confirm mailbox delivery. Follow up through the approved FGS process if the outcome is unknown or failed.</p>
+    <% @email_notices.each do |notice| %>
+      <p data-email-notice-state><%= {"queued" => "Queued", "claimed" => "Unknown (claimed; no automatic retry)", "sent" => "Accepted by mail transport; delivery unconfirmed", "failed" => "Failed; no automatic retry"}.fetch(notice.state) %>. Created <%= time_tag notice.created_at %>.</p>
     <% end %>
   </section>
 <% end %>

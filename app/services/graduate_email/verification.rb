@@ -24,14 +24,16 @@ module GraduateEmail
         # Terminal rows contribute only to limits; no state can be revived.
         address_key = bound ? hint.address_key : nil
         student_id = bound ? hint.student_id : nil
-        if row && bound && row.connection_id
-          GraduateSession.where(graduate_email_connection_id: row.connection_id).order(:id).lock.load
+        approval = row && row.purpose == 'enroll' ? GraduateEmailApproval.find(row.approval_id) : nil
+        old_id = approval&.replacement_of_connection_id
+        session_connection_id = old_id || row&.connection_id
+        if row && bound && session_connection_id
+          GraduateSession.where(graduate_email_connection_id: session_connection_id).order(:id).lock.load
         end
         admission = Limits.admit!(kind: :verify, address_key: address_key, student_id: student_id, ip_key: ip_key, now: now)
         next nil unless admission == :allowed
 
-        initial = row && (row.purpose != 'enroll' || GraduateEmailApproval.find(row.approval_id).replacement_of_connection_id.nil?)
-        unless row && bound && initial && Delivery.code_matches?(challenge: row, code: code)
+        unless row && bound && Delivery.code_matches?(challenge: row, code: code)
           if row && bound
             attempts = [row.failed_attempts + 1, 5].min
             attributes = {failed_attempts: attempts}
@@ -43,7 +45,12 @@ module GraduateEmail
         end
 
         connection = if row.purpose == 'enroll'
-          approval = GraduateEmailApproval.find(row.approval_id)
+          if old_id
+            # Existing target/mapping/challenge/session locks precede limits.
+            # Queue reserve is checked under the same shared Control ownership.
+            raise GraduateAuthentication::Rejected if Delayed::Job.where(queue: Limits::NOTICE_QUEUE).count >= Limits::NOTICE_CAPACITY
+            Revocation.replace_locked!(connection_id: old_id, student_id: row.student_id, now: now, except_challenge_id: row.id)
+          end
           created = GraduateEmailConnection.create!(student_id: row.student_id, approved_by_id: approval.approved_by_id,
             normalized_address: approval.normalized_address, verified_at: now)
           GraduateEmailActiveAddress.create!(student_id: row.student_id, connection_id: created.id,
@@ -55,6 +62,18 @@ module GraduateEmail
         end
         row.update!(state: 'consumed', consumed_at: now, code_digest: nil)
         token = GraduateSession.issue_email!(connection: connection, generation: control.generation)
+        if old_id
+          notice = GraduateEmailNotice.create!(old_connection_id: old_id, replacement_connection_id: connection.id, state: 'queued')
+          job = Delayed::Job.enqueue(GraduateEmailNoticeJob.new(notice.id), queue: Limits::NOTICE_QUEUE)
+          raise GraduateAuthentication::Rejected unless job&.persisted?
+          Audit.record!(event: 'replacement', outcome: 'replaced', student_id: row.student_id,
+            actor_id: approval.approved_by_id, connection_id: connection.id, approval_id: approval.id,
+            challenge_id: row.id, generation: control.generation)
+        elsif approval
+          Audit.record!(event: 'enrollment', outcome: 'consumed', student_id: row.student_id,
+            actor_id: approval.approved_by_id, connection_id: connection.id, approval_id: approval.id,
+            challenge_id: row.id, generation: control.generation)
+        end
         Audit.record!(event: 'authentication', outcome: 'authenticated', student_id: row.student_id,
           connection_id: connection.id, challenge_id: row.id, approval_id: row.approval_id, generation: control.generation)
         Grant.new(student_id: row.student_id, authentication_method: 'email', connection_id: connection.id,

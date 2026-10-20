@@ -71,11 +71,12 @@ class GraduateEmailSecurityTest < ActionDispatch::IntegrationTest
     assert_nil google.reload.revoked_at
   end
 
-  test 'initial_enrollment_rejects_active_mapping_and_unsupported_recovery_without_mutation' do
+  test 'initial_enrollment_rejects_active_mapping_and_explicit_recovery_preserves_it' do
     enrolled_connection
     before = @mapping.attributes
     assert_raises(GraduateAuthentication::Rejected) { issue_approval }
-    assert_raises(GraduateAuthentication::Rejected) { issue_approval(replacement: true) }
+    recovery, = issue_approval(replacement: true)
+    assert_equal @connection.id, recovery.replacement_of_connection_id
     other = create(:student)
     assert_raises(GraduateAuthentication::Rejected) { issue_approval(student: other) }
     assert_equal before, @mapping.reload.attributes

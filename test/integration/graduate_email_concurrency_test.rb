@@ -232,3 +232,147 @@ class GraduateEmailDeliveryConcurrencyTest < ActionDispatch::IntegrationTest
     assert_equal 1, @mail_messages.size
   end
 end
+
+require_relative '../support/graduate_email_recovery_helpers'
+
+# R01-R05. Independent sessions, bounded pre-transaction barriers, real clock.
+class GraduateEmailRecoveryConcurrencyTest < ActionDispatch::IntegrationTest
+  include GraduateEmailRecoveryHelpers
+  self.use_transactional_tests = false
+  setup do
+    setup_delivery
+    @approval.destroy!
+  end
+  teardown { teardown_delivery }
+
+  test 'replacement_address_uniqueness_race_has_one_winner' do
+    other, other_connection = second_owner
+    first = prepare_replacement
+    GraduateEmailLimitEvent.where(kind: 'send_address').update_all(occurred_at: 61.seconds.ago)
+    second = prepare_replacement(student: other)
+    old_tokens = [email_session, email_session(other_connection)]
+    outcomes = recovery_race(verify_input(first), verify_input(second))
+    assert_equal 1, outcomes.count('RECOVERY_ACCEPTED')
+    assert_equal 1, GraduateEmailActiveAddress.where(normalized_address: 'replacement@example.com').count
+    assert_equal 2, GraduateEmailActiveAddress.count
+    winner = GraduateEmailActiveAddress.find_by!(normalized_address: 'replacement@example.com').student_id
+    [first, second].each { |data| assert_equal data[0].student_id == winner, data[0].reload.consumed_at.present? }
+    assert_equal 1, GraduateEmailNotice.count
+    assert_equal 1, [valid_email?(old_tokens[0]), valid_email?(old_tokens[1], other_connection)].count(true)
+    assert_nil recovery_redeem(first)
+    assert_nil recovery_redeem(second)
+  end
+
+  test 'revoke_verify_and_disable_have_serial_outcomes' do
+    data = prepare_replacement
+    token = email_session
+    outcomes = recovery_race(verify_input(data), {action: 'revoke', connection: @connection.id, actor: @actor.id}, {action: 'disable', actor: @actor.id})
+    assert_equal 2, outcomes.drop(1).count('RECOVERY_ACCEPTED')
+    assert @connection.reload.revoked_at
+    assert_equal false, GraduateEmailControl.find(1).enabled
+    assert_nil recovery_redeem(data)
+    GraduateEmail::Control.set_enabled!(enabled: true, actor_id: @actor.id)
+    refute valid_email?(token)
+    assert_nil recovery_redeem(data)
+    assert_equal data[0].reload.consumed_at.present? ? 1 : 0, GraduateEmailNotice.count
+    assert_operator GraduateEmailActiveAddress.where(student_id: @student.id).count, :<=, 1
+  end
+
+  test 'approval_reissue_and_queued_delivery_do_not_resurrect' do
+    old = email_session
+    data = prepare_replacement
+    # Keep one delivered code, and a genuinely queued second-browser challenge.
+    GraduateEmailLimitEvent.where(kind: 'send_address').update_all(occurred_at: 61.seconds.ago)
+    queued = challenge(GraduateEmail::Challenges.request!(purpose: :enroll, approval_id: data[0].id, browser_token: SecureRandom.hex(32), ip: @ip))
+    assert_equal 'queued', queued.state
+    outcomes = recovery_race({action: 'reissue', student: @student.id, actor: @actor.id}, {action: 'deliver', id: queued.public_id})
+    assert_equal ['RECOVERY_ACCEPTED', 'RECOVERY_ACCEPTED'], outcomes
+    assert data[0].reload.revoked_at
+    assert_nil recovery_redeem(data)
+    assert valid_email?(old)
+    assert_equal 'revoked', data[2].reload.state
+    assert_equal 'revoked', queued.reload.state
+    assert_nil GraduateEmailApproval.order(:id).last.consumed_at
+  end
+
+  test 'address_and_student_limits_survive_recovery' do
+    8.times { fail_verify }
+    old_address_key = address_key
+    data = prepare_replacement
+    old_events = GraduateEmailLimitEvent.where(kind: %w[send_address verify_address verify_student]).pluck(:id)
+    assert_equal ['RECOVERY_ACCEPTED'], recovery_race(verify_input(data))
+    assert_equal old_events.sort, GraduateEmailLimitEvent.where(id: old_events).pluck(:id).sort
+    assert_equal 8, GraduateEmailLimitEvent.where(kind: 'verify_address', key_digest: old_address_key).count
+    new_connection = GraduateEmailConnection.find(GraduateEmailActiveAddress.find_by!(student_id: @student.id).connection_id)
+    # New address still shares the existing student failure budget.
+    2.times { fail_verify(address: address_key(new_connection.normalized_address)) }
+    assert_equal :limited, admit_verify(address: address_key(new_connection.normalized_address))
+    assert_equal 10, GraduateEmailLimitEvent.where(kind: 'verify_student').count
+  end
+
+  test 'notice_cap_remaining_one_competing_redemptions_commit_only_one_transition' do
+    other, other_connection = second_owner
+    first = prepare_replacement
+    second = prepare_replacement(student: other, address: 'other-new@example.com')
+    tokens = [email_session, email_session(other_connection)]
+    fill_notice_queue(49)
+    outcomes = recovery_race(verify_input(first), verify_input(second))
+    assert_equal 1, outcomes.count('RECOVERY_ACCEPTED')
+    assert_equal 50, Delayed::Job.where(queue: 'graduate_email_notice').count
+    assert_equal 1, GraduateEmailNotice.count
+    assert_equal 1, [first, second].count { |data| data[0].reload.consumed_at.present? }
+    [first, second].each_with_index do |data, index|
+      next if data[0].consumed_at
+      assert_equal 'sent', data[2].reload.state
+      assert valid_email?(tokens[index], index.zero? ? @connection : other_connection)
+    end
+  end
+
+  private
+
+  def second_owner
+    student = create(:student)
+    connection = GraduateEmailConnection.create!(student: student, approved_by: @actor, normalized_address: 'other-old@example.com', verified_at: Time.current)
+    GraduateEmailActiveAddress.create!(student: student, connection: connection, normalized_address: connection.normalized_address)
+    [student, connection]
+  end
+
+  def verify_input(data)
+    {action: 'verify', id: data[2].public_id, browser: data[3], code: data[4]}
+  end
+
+  def recovery_race(*inputs)
+    children = inputs.map do |data|
+      input, output, waiter = Open3.popen2e(RbConfig.ruby, '-S', 'bundle', 'exec', 'rails', 'runner', 'test/support/graduate_email_recovery_process.rb')
+      input.puts JSON.generate(data)
+      input.flush
+      [input, output, waiter]
+    end
+    marker = ->(output) do
+      Timeout.timeout(30) do
+        loop do
+          line = output.gets
+          raise 'Recovery child ended' unless line
+          break line.strip if line.start_with?('RECOVERY_')
+        end
+      end
+    end
+    children.each { |_, output, _| assert_equal 'RECOVERY_READY', marker.call(output) }
+    children.each { |input, _, _| input.puts 'START'; input.flush }
+    children.map do |_, output, waiter|
+      outcome = marker.call(output)
+      assert_includes %w[RECOVERY_ACCEPTED RECOVERY_REJECTED], outcome
+      assert Timeout.timeout(30) { waiter.value.success? }, 'Recovery child completed'
+      outcome
+    end
+  ensure
+    (children || []).each do |input, output, waiter|
+      input.close unless input.closed?
+      output.close unless output.closed?
+      if waiter.alive?
+        Process.kill('KILL', waiter.pid) rescue Errno::ESRCH
+        waiter.join(5)
+      end
+    end
+  end
+end

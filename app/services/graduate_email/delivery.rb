@@ -232,7 +232,7 @@ module GraduateEmail
             GraduateEmailApproval.where(id: hint.approval_id).select(:normalized_address)))
         end
         mappings = mappings.order(:id).lock.to_a
-        row = GraduateEmailChallenge.where(id: hint.id).lock.first
+        row = GraduateEmailChallenge.where(student_id: hint.student_id).order(:id).lock.to_a.find { |item| item.id == hint.id }
         target = hint.purpose == 'enroll' ? approvals.find { |item| item.id == hint.approval_id } : connections.find { |item| item.id == hint.connection_id }
         valid = row && target && target_hint && row.student_id == hint.student_id && row.purpose == hint.purpose &&
           row.approval_id == hint.approval_id && row.connection_id == hint.connection_id &&

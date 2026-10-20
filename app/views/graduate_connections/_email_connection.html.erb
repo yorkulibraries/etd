@@ -2,6 +2,7 @@
   <h2 id="email-connection-heading" class="h4">Email sign-in</h2>
   <% if @email_connection %>
     <p class="text-break">Verified address: <%= @email_connection.normalized_address %></p>
+    <p>Approved by <%= @email_connection.approved_by.name %>. Verified <%= time_tag @email_connection.verified_at %>.</p>
     <p>Contact FGS to change or remove email access.</p>
   <% else %>
     <p>No email sign-in address is connected. Contact FGS to approve access.</p>
