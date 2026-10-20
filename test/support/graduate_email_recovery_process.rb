@@ -27,7 +27,8 @@ begin
   when 'deliver'
     # RAM-only transport: a queued job that wins may send locally, never SMTP.
     transport = Class.new do
-      def initialize(*); end
+      attr_reader :settings
+      def initialize(settings); @settings = settings; end
       def deliver!(_message)
         raise 'Transport under lock' unless ActiveRecord::Base.connection.open_transactions.zero?
       end

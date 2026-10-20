@@ -209,6 +209,50 @@ class GraduateEmailManagementTest < GraduateEmailBrowserCase
     versions&.each { |version| version.submission_documents.each { |doc| FileUtils.rm_rf(File.dirname(doc.file.path)) } }
   end
 
+  test 'desktop_mobile_long_address_staff_confirmation_and_all_notice_states' do
+    long_address = ('a' * 64) + '@' + ('b' * 60) + '.example.org'
+    @student.update!(email: long_address, email_external: long_address)
+    browser_ppy_login(@actor)
+    visit staff_student_graduate_connections_path(@student)
+    [false, true].each do |mobile|
+      assert_selector 'h2', text: 'Approve email sign-in'
+      fill_in 'Approved sign-in address', with: long_address
+      fill_in 'Confirm approved address', with: long_address
+      assert_required_checkbox 'email_identity_verified'
+      find('#email_identity_verified').send_keys(:space)
+      assert find('#email_identity_verified').checked?, 'keyboard confirmation'
+      clean_browser_artifact('staff-confirmation', mobile: mobile)
+      uncheck 'email_identity_verified'
+    end
+    connection = GraduateEmailConnection.create!(student: @student, approved_by: @actor,
+      normalized_address: long_address, verified_at: Time.current)
+    GraduateEmailActiveAddress.create!(student: @student, connection: connection, normalized_address: long_address)
+    %w[queued claimed sent failed].each do |state|
+      replacement = GraduateEmailConnection.create!(student: @student, approved_by: @actor,
+        normalized_address: state + '@example.org', verified_at: Time.current, revoked_at: Time.current)
+      GraduateEmailNotice.create!(old_connection: connection, replacement_connection: replacement, state: state)
+    end
+    visit staff_student_graduate_connections_path(@student)
+    [false, true].each do |mobile|
+      assert_selector '[data-email-notice-state]', count: 4
+      assert_text 'Unknown (claimed; no automatic retry)'
+      assert_text 'Accepted by mail transport; delivery unconfirmed'
+      assert_text 'Failed; no automatic retry'
+      assert_required_checkbox "remove_email_#{connection.id}"
+      clean_browser_artifact('staff-recovery', mobile: mobile)
+      clean_browser_artifact('notice-states', mobile: mobile)
+    end
+    browser_fresh_session
+    request_login(long_address)
+    _, code = run_mail_worker
+    enter_code(code)
+    assert_current_path student_view_index_path
+    visit graduate_connections_path
+    assert_no_button 'Remove email connection'
+    assert_no_button 'Connect Google'
+    [false, true].each { |mobile| clean_browser_artifact('student-connection', mobile: mobile) }
+  end
+
   private
 
   def browser_download(path)

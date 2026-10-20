@@ -60,6 +60,12 @@ run = lambda do |label, args|
       line.match?(/\ASTORAGE_PROBE (?:PASS|FAIL) [a-z_]+\s*\z/) ||
       line.match?(/\AVERSIONS ruby=[0-9.]+ rails=[0-9.]+ delayed_job=[0-9.]+ backend=[0-9.]+ database=[0-9.]+\s*\z/)
   end
+  if ENV['GRADUATE_EMAIL_STRICT_REPORT'] == '1'
+    require File.join(root, 'test/support/graduate_email_safe_artifacts')
+    GraduateEmailSafeArtifacts.sanitize_report(output).lines.each do |line|
+      emit.call(line.strip) unless line.match?(/\A\d+ runs,/)
+    end
+  end
   unless status.success?
     %w[Errno::EADDRINUSE SyntaxError LoadError NameError ArgumentError NoMethodError
        ActiveRecord::PendingMigrationError ActiveRecord::StatementInvalid
@@ -84,8 +90,11 @@ else
   run.call('check_after_down', probe + ['check_after_down'])
   run.call('migrate_up_again', %w[bundle exec rails db:migrate])
   run.call('check_after_up_again', probe + ['check_after_up'])
+  run.call('clear_probe_fixtures', probe + ['clear_probe_fixtures'])
   ENV['GRADUATE_EMAIL_MIGRATION_PRESERVATION'] = '1'
-  run.call('storage_and_artifacts', %w[bundle exec rails test test/integration/graduate_email_storage_test.rb test/integration/graduate_email_artifacts_test.rb -v])
+  seed = ENV.fetch('ETD_SYSTEM_TEST_SEED', '27183')
+  reject.call unless seed.match?(/\A[0-9]+\z/)
+  run.call('storage_and_artifacts', %w[bundle exec rails test test/integration/graduate_email_storage_test.rb test/integration/graduate_email_artifacts_test.rb -v] + ["--seed=#{seed}"])
 end
 unless schema_before == Digest::SHA256.file("#{root}/db/schema.rb").hexdigest
   emit.call('Tracked schema changed unexpectedly')

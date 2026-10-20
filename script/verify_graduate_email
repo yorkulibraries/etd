@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# One entry point; all DB selection/safety belongs to the storage driver.
+set +x
+set -euo pipefail
+project_root="$(cd "$(dirname "$0")/.." && pwd -P)"
+cd "$project_root"
+export GRADUATE_EMAIL_PROJECT_ROOT="$project_root"
+exec ruby - "$@" <<'RUBY'
+require 'open3'
+require 'json'
+require 'digest'
+require 'fileutils'
+require 'socket'
+require_relative 'test/support/graduate_email_safe_artifacts'
+begin
+root = ENV.fetch('GRADUATE_EMAIL_PROJECT_ROOT')
+adapter, mode = ARGV
+abort 'Verification configuration rejected' unless ARGV.size.between?(1, 2) && %w[sqlite mysql].include?(adapter) && [nil, 'scan'].include?(mode)
+directory = File.join(root, 'tmp/graduate-email/verification', adapter)
+if mode == 'scan'
+  GraduateEmailSafeArtifacts.scan!(directory)
+  manifest = JSON.parse(File.read(File.join(directory, 'manifest.json')))
+  actual = Dir.children(directory).reject { |name| name == 'manifest.json' }.sort.to_h { |name| [name, Digest::SHA256.file(File.join(directory, name)).hexdigest] }
+  abort 'Artifact integrity rejected' unless manifest.fetch('files') == actual
+  puts "#{adapter} artifact_scan PASS"
+  exit
+end
+seed = ENV.fetch('ETD_SYSTEM_TEST_SEED', '')
+seed = '27183' if seed.empty?
+abort 'Verification seed rejected' unless seed.match?(/\A[0-9]+\z/)
+ENV['ETD_SYSTEM_TEST_SEED'] = seed
+ENV['GRADUATE_EMAIL_STRICT_REPORT'] = '1'
+# Inspect the requested local port without touching other listeners.
+port = ENV.fetch('ETD_SYSTEM_TEST_PORT', '3425')
+abort 'Verification port rejected' unless port.match?(/\A[0-9]+\z/) && (1024..65535).cover?(port.to_i)
+begin
+  server = TCPServer.new('127.0.0.1', port.to_i)
+  server.close
+rescue SystemCallError
+  abort 'Verification port unavailable'
+end
+ENV['ETD_SYSTEM_TEST_PORT'] = port
+ENV['GRADUATE_EMAIL_ARTIFACT_DIR'] = directory
+FileUtils.mkdir_p(File.dirname(directory))
+abort 'Artifact directory rejected' if File.symlink?(directory)
+FileUtils.rm_rf(directory)
+FileUtils.mkdir_p(directory)
+# Hash source bytes BEFORE gates, including newly created untracked helpers.
+source_paths = -> { (Dir.glob('{app,config,db,lib,script,test}/**/*') + %w[Gemfile Gemfile.lock .ruby-version .github/workflows/rubyonrails.yml docs/graduate-email-otp-verification.md]).select { |path| File.file?(path) }.sort }
+paths = source_paths.call
+snapshot = -> { paths.to_h { |path| [path, Digest::SHA256.file(path).hexdigest] } }
+source = JSON.pretty_generate(snapshot.call) + "\n"
+File.write(File.join(directory, 'source.json'), source)
+git = ->(*args) { out, status = Open3.capture2e('git', *args); abort 'Source identity unavailable' unless status.success?; out }
+head = git.call('rev-parse', 'HEAD').strip
+branch = git.call('branch', '--show-current').strip
+diff = git.call('diff', '--binary', 'HEAD', '--', *paths)
+metadata = {adapter: adapter, branch: branch, head: head, seed: seed.to_i,
+  source_sha256: Digest::SHA256.hexdigest(source), diff_sha256: Digest::SHA256.hexdigest(diff)}
+stages = []
+run = lambda do |label, args|
+  output, status = Open3.capture2e(*args)
+  # Nested storage stages have already filtered raw driver/migration output.
+  report = if %w[fresh upgrade].include?(label)
+    output.lines.select { |line| line.match?(/\A(?:#{adapter} [a-z_]+: (?:PASS|FAIL)|STORAGE_PROBE (?:PASS|FAIL) [a-z_]+|VERSIONS ruby=[0-9.]+ rails=[0-9.]+ delayed_job=[0-9.]+ backend=[0-9.]+ database=[0-9.]+|\d+ runs, \d+ assertions, \d+ failures, \d+ errors, \d+ skips)\s*\z/) }.join + GraduateEmailSafeArtifacts.sanitize_report(output).lines.reject { |line| line.match?(/\A\d+ runs,/) }.join
+  else
+    GraduateEmailSafeArtifacts.sanitize_report(output)
+  end
+  File.write(File.join(directory, "#{label}.txt"), report)
+  stages << {stage: label, command: args, exit: status.exitstatus || 1}
+  puts "#{adapter} #{label} #{status.success? ? 'PASS' : 'FAIL'}"
+  puts report.lines.grep(/\A\d+ runs,/)
+  status.success?
+end
+storage = ['bash', 'script/verify_graduate_email_storage', adapter]
+ok = run.call('fresh', storage + ['fresh'])
+ok = run.call('upgrade', storage + ['upgrade']) if ok
+if ok
+  otp = Dir['test/integration/graduate_email_*_test.rb'].sort
+  existing = %w[google_only_authentication graduate_authentication graduate_downloads graduate_staff_boundaries graduate_impersonation graduate_thesis_ownership graduate_session_security graduate_oauth_transaction graduate_oauth_intent graduate_oauth_lifecycle].map { |name| "test/integration/#{name}_test.rb" }
+  reporter = %w[ruby test/support/graduate_email_task5_test_reporter.rb]
+  ok = run.call('integration', storage + ['exec'] + reporter + otp + existing + ['-v', "--seed=#{seed}"])
+  if ok
+    system = %w[graduate_email_authentication graduate_email_management graduate_authentication graduate_downloads].map { |name| "test/system/#{name}_test.rb" }
+    ok = run.call('system', storage + ['exec'] + reporter + system + ['-v', "--seed=#{seed}"])
+  end
+end
+# Runtime versions are safe fixed numeric fields only, collected through guard.
+versions, version_status = Open3.capture2e(*(storage + ['exec', 'bundle', 'exec', 'rails', 'runner', 'test/support/graduate_email_storage_probe.rb', 'versions']))
+version_line = versions.lines.find { |line| line.match?(/\AVERSIONS ruby=[0-9.]+ rails=[0-9.]+ delayed_job=[0-9.]+ backend=[0-9.]+ database=[0-9.]+\s*\z/) }
+chrome, chrome_status = Open3.capture2e(ENV.fetch('CHROME_BIN', '/usr/bin/chromium'), '--version')
+chrome_version = chrome[/\b[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\b/]
+File.write(File.join(directory, 'versions.txt'), "#{version_line}browser=#{chrome_version}\n")
+unchanged = paths == source_paths.call && source == JSON.pretty_generate(snapshot.call) + "\n" && head == git.call('rev-parse', 'HEAD').strip && diff == git.call('diff', '--binary', 'HEAD', '--', *paths)
+ok &&= unchanged && version_status.success? && chrome_status.success? && !version_line.nil? && !chrome_version.nil?
+File.write(File.join(directory, 'result.json'), JSON.pretty_generate({passed: ok, source_unchanged: unchanged, stages: stages, synthetic_transport: true, live_provider: false}) + "\n")
+GraduateEmailSafeArtifacts.write_manifest(directory, metadata: metadata)
+GraduateEmailSafeArtifacts.scan!(directory, sentinels: %w[TASK7_ARTIFACT_SENTINEL ARTIFACT_SENTINEL])
+puts "#{adapter} source_integrity #{unchanged ? 'PASS' : 'FAIL'}"
+puts "#{adapter} artifact_scan PASS"
+exit(ok ? 0 : 1)
+rescue StandardError
+  warn 'Verification failed safely'
+  exit 1
+end
+RUBY

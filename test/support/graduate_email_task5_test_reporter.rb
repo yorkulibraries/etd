@@ -5,6 +5,11 @@ require 'open3'
 report = ENV['TASK5_REPORT'] && File.open(File.expand_path('../../..', __FILE__) + '/tmp/graduate-email/' + File.basename(ENV['TASK5_REPORT']), 'w')
 emit = ->(line) { puts line; report&.puts(line); report&.flush }
 output, status = Open3.capture2e('bundle', 'exec', 'rails', 'test', *ARGV)
+if ENV['GRADUATE_EMAIL_STRICT_REPORT'] == '1'
+  require_relative 'graduate_email_safe_artifacts'
+  emit.call(GraduateEmailSafeArtifacts.sanitize_report(output))
+  exit(status.exitstatus || 1)
+end
 output.lines.each do |line|
   stripped = line.strip
   if stripped.match?(/expected to find|Unable to find|expected .* to equal/)

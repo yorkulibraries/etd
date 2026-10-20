@@ -9,6 +9,12 @@ class GraduateEmailStorageTest < ActionDispatch::IntegrationTest
   include GraduateOAuthFlow
   self.use_transactional_tests = false # committed rows must be visible to independent processes
 
+  setup do
+    if ENV['GRADUATE_EMAIL_MIGRATION_PRESERVATION'] == '1'
+      assert !User.where(username: 'storage-actor').exists?, 'migration probe fixtures cleared before suite'
+    end
+  end
+
   def graph
     student = create(:student)
     actor = create(:user, role: User::MANAGER)

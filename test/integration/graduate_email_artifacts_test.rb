@@ -63,4 +63,41 @@ class GraduateEmailArtifactsTest < ActiveSupport::TestCase
       assert output.empty?, 'failure report must contain no page data'
     end
   end
+  test 'report_manifest_contains_no_mail_or_token' do
+    require 'tmpdir'
+    Dir.mktmpdir do |dir|
+      sentinel = 'TASK7_ARTIFACT_SENTINEL'
+      output = "GraduateEmailArtifactsTest#test_report_manifest_contains_no_mail_or_token = 0.1 s = .\nRuntimeError: #{sentinel} recipient@example.org https://example.invalid/?token=secret\n1 runs, 2 assertions, 0 failures, 0 errors, 0 skips\n"
+      report = GraduateEmailSafeArtifacts.sanitize_report(output)
+      assert report.include?('1 runs, 2 assertions'), 'counts retained'
+      refute report.include?(sentinel), 'sentinel excluded'
+      refute report.include?('@'), 'recipient excluded'
+      File.write(File.join(dir, 'integration.txt'), report)
+      metadata = {adapter: 'sqlite', seed: 12345, head: 'a' * 40, source_sha256: 'b' * 64, diff_sha256: 'c' * 64, branch: 'graduate-email-otp'}
+      GraduateEmailSafeArtifacts.write_manifest(dir, metadata: metadata)
+      assert GraduateEmailSafeArtifacts.scan!(dir, sentinels: [sentinel]), 'clean scan'
+      manifest = File.read(File.join(dir, 'manifest.json'))
+      refute manifest.include?(sentinel), 'manifest excludes secret'
+      File.write(File.join(dir, 'raw.log'), sentinel)
+      assert_raises(GraduateEmailSafeArtifacts::UnsafeArtifact) { GraduateEmailSafeArtifacts.write_manifest(dir, metadata: metadata) }
+      File.delete(File.join(dir, 'raw.log'))
+      File.write(File.join(dir, 'integration.txt'), sentinel)
+      assert_raises(GraduateEmailSafeArtifacts::UnsafeArtifact) { GraduateEmailSafeArtifacts.scan!(dir) }
+      File.delete(File.join(dir, 'integration.txt'))
+      File.symlink('/dev/null', File.join(dir, 'integration.txt'))
+      assert_raises(GraduateEmailSafeArtifacts::UnsafeArtifact) { GraduateEmailSafeArtifacts.scan!(dir) }
+    end
+  end
+
+  test 'only_allowlisted_clean_states_can_capture' do
+    clean = {path: '/graduate/email/verify', query: false, secret: false, entered: false,
+      heading: 'Enter your sign-in code', width: 390, height: 844}
+    assert GraduateEmailSafeArtifacts.clean_state?('code-error', clean), 'documented clean state'
+    [{query: true}, {secret: true}, {entered: true}, {path: '/other'}, {heading: 'Share this invitation once'}].each do |bad|
+      refute GraduateEmailSafeArtifacts.clean_state?('code-error', clean.merge(bad)), 'unsafe state rejected'
+    end
+    refute GraduateEmailSafeArtifacts.clean_state?('../code-error', clean), 'unknown name rejected'
+    refute GraduateEmailSafeArtifacts.clean_state?('generated-url', clean), 'Google token state rejected'
+  end
+
 end

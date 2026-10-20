@@ -6,7 +6,7 @@ require_relative 'graduate_email_delivery_helpers'
 require_relative 'graduate_oauth_flow'
 
 module GraduateEmailDeliveryProcessHelpers
-  def start_delivery_worker(row, barrier: 'none', hold: false, outcome: 'ACCEPT', limit: 1)
+  def start_delivery_worker(row, barrier: 'none', hold: false, outcome: 'ACCEPT', limit: 1, paused: false)
     parent_socket, child_socket = UNIXSocket.pair
     input, output, waiter = Open3.popen2e(RbConfig.ruby, '-S', 'bundle', 'exec', 'rails', 'runner',
       'test/support/graduate_email_delivery_worker.rb', 3 => child_socket)
@@ -30,8 +30,10 @@ module GraduateEmailDeliveryProcessHelpers
     input.puts JSON.generate(database: ActiveRecord::Base.connection_db_config.configuration_hash.slice(:adapter, :database), barrier: barrier, limit: limit)
     input.flush
     assert_equal 'DELIVERY_READY', delivery_marker(worker)
-    input.puts 'START'
-    input.flush
+    unless paused
+      input.puts 'START'
+      input.flush
+    end
     worker
   end
 

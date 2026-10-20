@@ -278,6 +278,19 @@ class GraduateEmailRecoveryConcurrencyTest < ActionDispatch::IntegrationTest
     assert_operator GraduateEmailActiveAddress.where(student_id: @student.id).count, :<=, 1
   end
 
+  test 'queued_recovery_transport_accepts_without_error' do
+    data = prepare_replacement
+    GraduateEmailLimitEvent.where(kind: 'send_address').update_all(occurred_at: 61.seconds.ago)
+    queued = challenge(GraduateEmail::Challenges.request!(purpose: :enroll, approval_id: data[0].id,
+      browser_token: SecureRandom.hex(32), ip: @ip))
+    assert_equal 'queued', queued.state
+    assert_equal ['RECOVERY_ACCEPTED'], recovery_race({action: 'deliver', id: queued.public_id})
+    assert_equal 'sent', queued.reload.state
+    assert queued.sent_at, 'RAM transport accepted without a post-delivery exception'
+    assert_nil data[0].reload.consumed_at
+    assert_equal 0, GraduateSession.count
+  end
+
   test 'approval_reissue_and_queued_delivery_do_not_resurrect' do
     old = email_session
     data = prepare_replacement

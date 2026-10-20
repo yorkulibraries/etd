@@ -49,3 +49,21 @@ Task 4 delivery isolation scenarios (written before delivery implementation):
 - D08 / F20 F21: Seed notice directly, identifier-only separate queue and 50 reserve constant; claim once, network outside locks, immutable old recipient only, no code/new address/link. Still send required notice while email control disabled; failure/duplicates never restore access or retry.
 
 Task 4 self-review D07 follow-up, before correction: a frozen ordinary Ruby Time with a non-UTC offset must render the original expiry without in-place timezone mutation. Exercise the real builder in the SMTP configuration integration case.
+
+## Task 7 verification boundary (before implementation)
+
+F27: Clean capture allowlist rejects unknown names/routes/headings, entered code,
+query/fragment URLs, invitation/generated-token DOM, token-shaped values and hidden
+secret inputs. Automatic and Google token capture suppression remains unconditional.
+F28: Report/manifest permits only static source-known identities, categories/counts,
+fixed metadata and hashes. Reject symlinks, unlisted files and sentinel-bearing bytes
+without printing the match. Never persist raw output, DOM, mail, cookies or URLs.
+F29: Runner reuses guarded storage fresh and seeded upgrade up/down/up, inherits both
+identical DB URLs, honors numeric seed, binds pre/post source and publishes only scan
+approved artifacts. Reject malformed adapter/seed and stale or modified sources.
+F30: At desktop 1440x1000/mobile 390x844 clean login/send/error/expired/revoked,
+connection/staff confirmation and notice states fit, have accessible names and error
+associations and support keyboard. A code submit clears input before capture.
+F31: Disable/re-enable invalidates dormant browser session/code/enrollment and a
+paused actual persisted worker. Fresh sign-in works; no old job sends. Stop/join
+workers and clear RAM mail in ensure before truncation.

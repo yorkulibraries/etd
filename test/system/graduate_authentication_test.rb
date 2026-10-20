@@ -72,6 +72,7 @@ class GraduateAuthenticationSystemTest < ActionDispatch::SystemTestCase
     assert_no_selector 'input:not([type="hidden"]):not([type="submit"])'
     assert_selector 'meta[name="csrf-token"]', visible: :all
     assert_button 'Continue with Google'
+    assert_no_link 'Email me a sign-in code'
     assert_no_button 'Continue with Facebook'
     GraduateAuthentication.enabled_providers.each do |provider|
       within "form[action='#{graduate_auth_path(provider)}'][method='post']" do

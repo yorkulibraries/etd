@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ETD_SYSTEM_TEST_SEED: ${{ inputs.system_test_seed }}
+      ETD_SYSTEM_TEST_PORT: 3425
+      GRADUATE_EMAIL_STRICT_REPORT: 1
     # The suite runs in roughly 5 minutes per database backend. Without a
     # timeout a hung job sits on the default 6 hour limit and surfaces as
     # "the hosted runner lost communication with the server" instead of a
@@ -29,7 +31,7 @@ jobs:
           - 3306:3306
         env:
           MYSQL_ROOT_PASSWORD: mysql
-          MYSQL_DATABASE: test
+          MYSQL_DATABASE: etd_graduate_email_test
           MYSQL_USER: test
           MYSQL_PASSWORD: test
         # Set health checks to wait until mysql has started
@@ -45,35 +47,52 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-      - name: Run tests with sqlite3
-        env:
-          RAILS_ENV: test
-          DATABASE_URL: sqlite3:db/test.sqlite3
+      - name: Select installed Chrome
         run: |
-          bundle exec rails db:reset
-          bundle exec rails db:seed
-          bundle exec rails test -v
-          options="-v"
-          if [ -n "$ETD_SYSTEM_TEST_SEED" ]; then
-            [[ "$ETD_SYSTEM_TEST_SEED" =~ ^[0-9]+$ ]] || exit 1
-            options="$options --seed=$ETD_SYSTEM_TEST_SEED"
-          fi
-          bundle exec rails test:system TESTOPTS="$options"
+          browser_bin="$(command -v chromium || command -v google-chrome || command -v google-chrome-stable)"
+          test -x "$browser_bin"
+          echo "CHROME_BIN=$browser_bin" >> "$GITHUB_ENV"
+
+      - name: Run tests with sqlite3
+        run: |
+          bash script/verify_graduate_email sqlite
+          bash script/verify_graduate_email_storage sqlite exec ruby test/support/graduate_email_task5_test_reporter.rb -v
+          bash script/verify_graduate_email_storage sqlite exec ruby test/support/graduate_email_task5_test_reporter.rb test/system -v --seed="${ETD_SYSTEM_TEST_SEED:-27183}"
 
       - name: Run tests with mysql
         env:
-          RAILS_ENV: test
-          DATABASE_URL: mysql2://test:test@127.0.0.1:3306/test
+          GRADUATE_EMAIL_TEST_DATABASE_URL: mysql2://test:test@127.0.0.1:3306/etd_graduate_email_test
+          GRADUATE_EMAIL_TEST_DATABASE_CONFIRMED: dedicated_disposable_test
         run: |
-          bundle exec rails db:reset
-          bundle exec rails db:seed
-          bundle exec rails test -v
-          options="-v"
-          if [ -n "$ETD_SYSTEM_TEST_SEED" ]; then
-            [[ "$ETD_SYSTEM_TEST_SEED" =~ ^[0-9]+$ ]] || exit 1
-            options="$options --seed=$ETD_SYSTEM_TEST_SEED"
-          fi
-          bundle exec rails test:system TESTOPTS="$options"
+          bash script/verify_graduate_email mysql
+          bash script/verify_graduate_email_storage mysql exec ruby test/support/graduate_email_task5_test_reporter.rb -v
+          bash script/verify_graduate_email_storage mysql exec ruby test/support/graduate_email_task5_test_reporter.rb test/system -v --seed="${ETD_SYSTEM_TEST_SEED:-27183}"
+
+      - name: Scan graduate email allowlisted artifacts
+        id: graduate_email_scan
+        if: always()
+        run: |
+          found=0
+          for adapter in sqlite mysql; do
+            if [ -d "tmp/graduate-email/verification/$adapter" ]; then
+              bash script/verify_graduate_email "$adapter" scan
+              found=1
+            fi
+          done
+          test "$found" = 1
+
+      - name: Upload clean graduate email evidence
+        uses: actions/upload-artifact@v4
+        if: always() && steps.graduate_email_scan.outcome == 'success'
+        with:
+          name: graduate-email-verification
+          path: |
+            tmp/graduate-email/verification/sqlite/*.txt
+            tmp/graduate-email/verification/sqlite/*.json
+            tmp/graduate-email/verification/sqlite/*.png
+            tmp/graduate-email/verification/mysql/*.txt
+            tmp/graduate-email/verification/mysql/*.json
+            tmp/graduate-email/verification/mysql/*.png
 
       - name: Create tar archive of screenshots
         run: |
@@ -87,5 +106,3 @@ jobs:
           name: test-screenshots
           path: |
             tmp/test-screenshots.tar
-            tmp/graduate-authentication/screenshots/
-            tmp/graduate-authentication/download-artifacts/download-sha256.txt

@@ -115,6 +115,13 @@ module GraduateEmailStorageProbe
   def call(mode)
     assert_connection
     case mode
+    when 'versions' then nil
+    when 'clear_probe_fixtures'
+      # All seed/up/down/up comparisons have finished. Do not let the first
+      # application test inherit sentinel users/sessions/jobs from the probes.
+      require 'database_cleaner/active_record'
+      DatabaseCleaner.url_allowlist = [%r{.*test.*}]
+      DatabaseCleaner.clean_with(:truncation)
     when 'seed_baseline' then seed
     when 'check_after_up' then after_up
     when 'check_after_down'
@@ -128,7 +135,7 @@ module GraduateEmailStorageProbe
     puts "VERSIONS ruby=#{RUBY_VERSION} rails=#{Rails.version} delayed_job=#{Gem.loaded_specs.fetch('delayed_job').version} backend=#{Gem.loaded_specs.fetch('delayed_job_active_record').version} database=#{version}"
     puts "STORAGE_PROBE PASS #{mode}"
   rescue StandardError
-    warn "STORAGE_PROBE FAIL #{%w[seed_baseline check_after_up check_after_down].include?(mode) ? mode : 'unknown'}"
+    warn "STORAGE_PROBE FAIL #{%w[versions clear_probe_fixtures seed_baseline check_after_up check_after_down].include?(mode) ? mode : 'unknown'}"
     exit 1
   end
 end
