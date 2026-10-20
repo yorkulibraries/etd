@@ -166,7 +166,7 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
 
   test 'real_browser_capture_rejects_entered_code_token_url_and_dom' do
     request_login
-    directory = Rails.root.join('tmp/graduate-email/verification', ENV['DB_ADAPTER'] == 'mysql2' ? 'mysql' : 'sqlite')
+    directory = Pathname.new(GraduateEmailSafeArtifacts.verification_directory(ENV['DB_ADAPTER'] == 'mysql2' ? 'mysql' : 'sqlite'))
     before = Dir[directory.join('*.png')].to_h { |file| [file, Digest::SHA256.file(file).hexdigest] }
     fill_in 'Sign-in code', with: '123456'
     assert_raises(GraduateEmailSafeArtifacts::UnsafeArtifact) { clean_browser_artifact('generic-send') }
@@ -188,6 +188,42 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
       assert_raises(GraduateEmailSafeArtifacts::UnsafeArtifact) { clean_browser_artifact('generic-send') }
     end
     assert_equal before, Dir[directory.join('*.png')].to_h { |file| [file, Digest::SHA256.file(file).hexdigest] }
+  end
+
+  test 'general_clean_assertions_and_failure_preserve_sealed_bytes' do
+    previous = ENV.delete('GRADUATE_EMAIL_ARTIFACT_DIR')
+    visit graduate_login_path
+    page.driver.browser.stub(:execute_cdp, ->(*) { raise 'image driver must not run' }) do
+      [false, true].each { |mobile| assert_nil clean_browser_artifact('login', mobile: mobile) }
+      assert_raises(Minitest::Assertion) do
+        clean_browser_artifact('login')
+        flunk 'controlled assertion after clean screen'
+      end
+      request_login
+      fill_in 'Sign-in code', with: '123456'
+      assert_raises(GraduateEmailSafeArtifacts::UnsafeArtifact) { clean_browser_artifact('generic-send') }
+    end
+  ensure
+    previous.nil? ? ENV.delete('GRADUATE_EMAIL_ARTIFACT_DIR') : ENV['GRADUATE_EMAIL_ARTIFACT_DIR'] = previous
+  end
+
+  test 'explicit_capture_rejects_sealed_package_before_image_driver' do
+    require 'tmpdir'
+    previous = ENV['GRADUATE_EMAIL_ARTIFACT_DIR']
+    visit graduate_login_path
+    Dir.mktmpdir do |directory|
+      File.write(File.join(directory, 'manifest.json'), '{}')
+      ENV['GRADUATE_EMAIL_ARTIFACT_DIR'] = directory
+      GraduateEmailSafeArtifacts.stub(:verification_directory, directory) do
+        page.driver.browser.stub(:execute_cdp, ->(*) { raise 'sealed image driver must not run' }) do
+          assert_raises(GraduateEmailSafeArtifacts::UnsafeArtifact) { clean_browser_artifact('login') }
+        end
+      end
+      assert_equal ['manifest.json'], Dir.children(directory)
+      assert_equal '{}', File.read(File.join(directory, 'manifest.json'))
+    end
+  ensure
+    previous.nil? ? ENV.delete('GRADUATE_EMAIL_ARTIFACT_DIR') : ENV['GRADUATE_EMAIL_ARTIFACT_DIR'] = previous
   end
 
   test 'combined_enabled_login_keeps_google_post_and_ppy_boundaries' do
@@ -224,10 +260,11 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
       clean_browser_artifact('login', mobile: mobile)
       request_login
       assert_generic_form
-      clean_browser_artifact('generic-send', mobile: mobile)
-      directory = Rails.root.join('tmp/graduate-email/verification', ENV['DB_ADAPTER'] == 'mysql2' ? 'mysql' : 'sqlite')
-      bytes = File.binread(directory.join("generic-send-#{mobile ? 'mobile' : 'desktop'}.png"))
-      assert_equal mobile ? 390 : 1440, bytes.byteslice(16, 4).unpack1('N'), 'capture keeps full viewport width'
+      captured = clean_browser_artifact('generic-send', mobile: mobile)
+      if captured
+        bytes = File.binread(captured)
+        assert_equal mobile ? 390 : 1440, bytes.byteslice(16, 4).unpack1('N'), 'capture keeps full viewport width'
+      end
       assert page.evaluate_script('document.documentElement.scrollWidth <= document.documentElement.clientWidth'), 'content fits usable viewport'
       enter_code('00000x')
       assert_selector '#code-error'

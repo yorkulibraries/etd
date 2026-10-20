@@ -100,4 +100,22 @@ class GraduateEmailArtifactsTest < ActiveSupport::TestCase
     refute GraduateEmailSafeArtifacts.clean_state?('generated-url', clean), 'Google token state rejected'
   end
 
+  test 'verification_run_directory_is_confined_and_shared' do
+    previous = ENV['GRADUATE_EMAIL_VERIFICATION_RUN']
+    ENV.delete('GRADUATE_EMAIL_VERIFICATION_RUN')
+    assert_equal Rails.root.join('tmp/graduate-email/verification/sqlite').to_s,
+      GraduateEmailSafeArtifacts.verification_directory('sqlite')
+    ENV['GRADUATE_EMAIL_VERIFICATION_RUN'] = 'task7-r1'
+    %w[sqlite mysql].each do |adapter|
+      assert_equal Rails.root.join('tmp/graduate-email/verification/task7-r1', adapter).to_s,
+        GraduateEmailSafeArtifacts.verification_directory(adapter)
+    end
+    ['', '..', '../outside', '/tmp/other'].each do |value|
+      ENV['GRADUATE_EMAIL_VERIFICATION_RUN'] = value
+      assert_raises(GraduateEmailSafeArtifacts::UnsafeArtifact) { GraduateEmailSafeArtifacts.verification_directory('sqlite') }
+    end
+  ensure
+    previous.nil? ? ENV.delete('GRADUATE_EMAIL_VERIFICATION_RUN') : ENV['GRADUATE_EMAIL_VERIFICATION_RUN'] = previous
+  end
+
 end

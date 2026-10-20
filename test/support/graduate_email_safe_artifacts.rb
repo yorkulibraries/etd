@@ -26,6 +26,14 @@ module GraduateEmailSafeArtifacts
   REPORTS = %w[fresh.txt upgrade.txt integration.txt system.txt versions.txt source.json result.json].freeze
   ROOT = File.expand_path('../..', __dir__)
 
+  # Optional named runs preserve historical packages during local verification.
+  def self.verification_directory(adapter)
+    raise UnsafeArtifact unless %w[sqlite mysql].include?(adapter)
+    run = ENV['GRADUATE_EMAIL_VERIFICATION_RUN']
+    raise UnsafeArtifact if run && !run.match?(/\A[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}\z/)
+    File.join(ROOT, 'tmp/graduate-email/verification', *[run, adapter].compact)
+  end
+
   def self.clean_state?(name, state)
     route, heading = STATES[name]
     !!(route && state[:path].to_s.match?(route) && state[:heading] == heading &&
@@ -140,15 +148,20 @@ module GraduateEmailSafeArtifacts
     JS
     raise UnsafeArtifact unless GraduateEmailSafeArtifacts.clean_state?(name, state)
     assert page.evaluate_script('document.documentElement.scrollWidth <= document.documentElement.clientWidth'), 'clean state overflow'
-    directory = ENV['GRADUATE_EMAIL_ARTIFACT_DIR'] || Rails.root.join('tmp/graduate-email/verification', ENV['DB_ADAPTER'] == 'mysql2' ? 'mysql' : 'sqlite').to_s
-    expected_directory = Rails.root.join('tmp/graduate-email/verification', ENV['DB_ADAPTER'] == 'mysql2' ? 'mysql' : 'sqlite').to_s
+    # General suites perform every clean-state/layout assertion without writing.
+    directory = ENV['GRADUATE_EMAIL_ARTIFACT_DIR']
+    return nil unless directory
+    expected_directory = GraduateEmailSafeArtifacts.verification_directory(ENV['DB_ADAPTER'] == 'mysql2' ? 'mysql' : 'sqlite')
     raise UnsafeArtifact unless directory == expected_directory && !File.symlink?(directory)
+    raise UnsafeArtifact if File.exist?(File.join(directory, 'manifest.json'))
     FileUtils.mkdir_p(directory)
     browser = page.driver.browser
     size = browser.execute_cdp('Page.getLayoutMetrics').fetch('cssContentSize')
     shot = browser.execute_cdp('Page.captureScreenshot', captureBeyondViewport: true,
       clip: {x: 0, y: 0, width: state.fetch(:width), height: size.fetch('height'), scale: 1})
-    File.binwrite(File.join(directory, "#{name}-#{mobile ? 'mobile' : 'desktop'}.png"), Base64.decode64(shot.fetch('data')))
+    path = File.join(directory, "#{name}-#{mobile ? 'mobile' : 'desktop'}.png")
+    File.binwrite(path, Base64.decode64(shot.fetch('data')))
+    path
   ensure
     current_window.resize_to(1440, 1000) if mobile
   end

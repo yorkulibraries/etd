@@ -67,3 +67,18 @@ associations and support keyboard. A code submit clears input before capture.
 F31: Disable/re-enable invalidates dormant browser session/code/enrollment and a
 paused actual persisted worker. Fresh sign-in works; no old job sends. Stop/join
 workers and clear RAM mail in ensure before truncation.
+
+## Task 7 R1 sealed package boundary (before fix)
+
+F32: General browser runs retain all clean DOM/layout assertions but never call
+the image driver or write files without the runner's explicit capture directory.
+An assertion failure after a clean screen cannot change the sealed package.
+F33: Explicit capture rejects an already sealed destination before the image
+driver. Named reruns use a validated single path component under verification;
+invalid/traversal names fail closed. A dedicated unsealed runner still writes all
+18 PNGs and checks their actual widths.
+F34: On BOTH adapters run the exact CI runner, broad application and general
+browser phases, then scan. Compare every sealed file including manifest before
+and after. Run a disposable controlled failing browser after a clean capture,
+require nonzero exit and unchanged package, then scan. A separate tampered copy
+must still fail publication scan; never reseal a stale successful result.

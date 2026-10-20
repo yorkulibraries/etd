@@ -87,3 +87,18 @@ QA. Native preview appearance review is additional to repository Chrome tests.
 Historical Task 6 full-suite reports have no pre-run source manifest; new Task 7
 proof does not repair that historical limitation. Earlier unexplained Task 1
 parallel MySQL and Task 2 SQLite failures remain unexplained.
+
+Clean assertions also run in general browser suites. PNG writes require the
+runner-owned `GRADUATE_EMAIL_ARTIFACT_DIR`; without it the helper validates the
+same DOM, geometry and safety rules and returns without invoking image capture.
+A destination containing `manifest.json` rejects further captures. General-suite
+failures therefore cannot partially replace a sealed runner package. CI retains
+the runner, broad application, broad browser, scan and conditional upload order.
+
+For an isolated local rerun, set `GRADUATE_EMAIL_VERIFICATION_RUN=task7-r1` for
+both runner and scan commands. Names accept 1 to 64 letters, digits, underscores
+or hyphens, starting with a letter or digit. This selects
+`tmp/graduate-email/verification/task7-r1/ADAPTER` for both writer and scanner;
+leave the capture-directory variable unset for subsequent general suites.
+Each full runner intentionally recreates only its selected package. Use a fresh
+name to preserve historical evidence. CI uses the unchanged default paths.

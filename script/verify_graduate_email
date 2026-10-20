@@ -16,7 +16,7 @@ begin
 root = ENV.fetch('GRADUATE_EMAIL_PROJECT_ROOT')
 adapter, mode = ARGV
 abort 'Verification configuration rejected' unless ARGV.size.between?(1, 2) && %w[sqlite mysql].include?(adapter) && [nil, 'scan'].include?(mode)
-directory = File.join(root, 'tmp/graduate-email/verification', adapter)
+directory = GraduateEmailSafeArtifacts.verification_directory(adapter)
 if mode == 'scan'
   GraduateEmailSafeArtifacts.scan!(directory)
   manifest = JSON.parse(File.read(File.join(directory, 'manifest.json')))
