@@ -86,3 +86,5 @@ Run a specific test
 docker compose exec web bash
 rt test/system/students_test.rb:14
 ```
+
+Graduate email operations and owner-gated rollout: [setup and FGS runbook](docs/graduate-email-otp-setup.md), [local verification and QA gates](docs/graduate-email-otp-verification.md). Email remains default off; templates do not install or activate services.

@@ -1,0 +1,37 @@
+# TEMPLATE ONLY. Replace release/user/env paths, then install two copies named
+# graduate-email-worker-a.service and graduate-email-worker-b.service.
+[Unit]
+Description=ETD dedicated graduate email worker
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=10
+
+[Service]
+Type=simple
+User=etd-app-placeholder
+Group=etd-app-placeholder
+WorkingDirectory=/srv/ETD_RELEASE_PLACEHOLDER
+EnvironmentFile=/etc/etd/GRADUATE_EMAIL_ENV_PLACEHOLDER
+Environment=RAILS_ENV=production
+Environment=GRADUATE_EMAIL_WORKER=1
+Environment=QUEUES=graduate_email,graduate_email_notice
+Environment=QUIET=1
+Environment=RAILS_MAX_THREADS=2
+ExecStart=/usr/bin/env bundle exec rake jobs:work
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=40
+KillMode=control-group
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/srv/ETD_RELEASE_PLACEHOLDER/log /srv/ETD_RELEASE_PLACEHOLDER/tmp
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=etd-graduate-email
+
+[Install]
+WantedBy=multi-user.target

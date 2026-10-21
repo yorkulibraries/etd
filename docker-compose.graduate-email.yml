@@ -1,0 +1,39 @@
+# Standalone optional template. Do not combine with the default web startup,
+# which seeds/migrates. Operator supplies the existing reviewed app image and
+# private environment file. Explicit opt-in profile, two foreground workers.
+x-graduate-email-worker: &graduate-email-worker
+  image: ${GRADUATE_EMAIL_IMAGE:?Set the reviewed existing app image}
+  user: ${GRADUATE_EMAIL_UID_GID:?Set the unprivileged application uid:gid}
+  working_dir: /app
+  env_file:
+    - ${GRADUATE_EMAIL_ENV_FILE:?Set the protected environment file path}
+  environment:
+    RAILS_ENV: production
+    GRADUATE_EMAIL_WORKER: '1'
+    QUEUES: graduate_email,graduate_email_notice
+    QUIET: '1'
+    RAILS_MAX_THREADS: '2'
+  command: ['bundle', 'exec', 'rake', 'jobs:work']
+  restart: on-failure
+  stop_grace_period: 40s
+  profiles: ['graduate-email']
+  read_only: true
+  tmpfs:
+    - /tmp:mode=0700
+    - /app/tmp:mode=0700
+    - /app/log:mode=0700
+  security_opt:
+    - no-new-privileges:true
+  cap_drop: ['ALL']
+  logging:
+    driver: local
+    options:
+      max-size: '5m'
+      max-file: '2'
+services:
+  graduate-email-worker-a:
+    <<: *graduate-email-worker
+  graduate-email-worker-b:
+    <<: *graduate-email-worker
+# Hourly cleanup remains an owner-managed timer invoking the same release/image;
+# this file deliberately adds no default web, database, seed or migration service.

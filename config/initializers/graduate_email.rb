@@ -2,6 +2,9 @@
 
 require 'openssl'
 require 'uri'
+# Initializers run before the main autoloader is ready. Validate sender on a
+# fresh CLI/worker boot too, rather than rescuing an unavailable parser.
+require Rails.root.join('app/services/graduate_email/address')
 
 # Configuration is deliberately independent of Google and never queries feature
 # tables during boot (including a pre-migration or rolled-back deployment).

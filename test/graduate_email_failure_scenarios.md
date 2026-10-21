@@ -82,3 +82,16 @@ browser phases, then scan. Compare every sealed file including manifest before
 and after. Run a disposable controlled failing browser after a clean capture,
 require nonzero exit and unchanged package, then scan. A separate tampered copy
 must still fail publication scan; never reseal a stale successful result.
+
+## Task 8 operations and retention (written before operations code)
+
+- O01: missing/short/equal keys, malformed/non-HTTPS canonical production origin, missing control or relay prerequisites must refuse enable/admission; disable remains available when configuration breaks. Missing/malformed/stale/blocked/student/non-manager operator refuses transitions with enum-only output.
+- O02: status/cleanup never enables; status reports enum/counts only, no identifier, mailbox, job handler, exception or secret. Repeated disable increments generation; re-enable cannot revive cookies, challenges or approvals.
+- O03: cleanup preserves live and recently expired real/noop challenges, current mappings, both current session methods, approvals/connections/history and active/recent limits/cooldowns. Expired challenge+24h, event+2h, cooldown expiry+2h, terminal/abandoned notice+24h, expired session+24h boundaries are exact and idempotent.
+- O04: successful policy audit survives challenge deletion and every nullable FK deletion, including authorized student destruction. No unknown/rejected/noop creates a target or policy audit.
+- O05: batches <=500, bounded transaction count per invocation, correct FK order and disabled operation; interrupted cleanup can repeat safely. Own queues only, unrelated jobs remain. Fresh locks and queued notices survive; expired abandoned claims never send/regenerate.
+- O06: multiple synthetic windows of unique unknown addresses/IPs, IP/global saturation, cleanup between windows stabilize at rate-times-retention bounds. Stopped cleanup still caps retained OTP at500/notices50 and saturation preserves a live challenge.
+- O07: real guarded CLI subprocess disables against concurrent session issuance in both lock orders; old generation never validates after enable. No network or process wait inside production transaction.
+- O08: notice transport/render exception containing sentinel/recipient/code remains secret-safe; failures never undo replacement. Metrics are fixed enum/count-only, heartbeat/oldest/failed/cleanup success safe.
+- O09: two real foreground installed jobs:work processes, each consuming QUEUES=graduate_email,graduate_email_notice, are killed/restarted with queued durable work and fake SMTP. Both queues progress, unrelated default sentinel remains; killed claimed OTP and notice are never retried/regenerated. Join and clean every child/transport.
+- O10: production cookie retains _etd_session and explicitly Secure/HttpOnly/Lax. Service templates have foreground worker, maxrun30/attempt1, stop40/restart5, protected env/unprivileged user, safe journaling, two workers plus web DB sizing and bounded hourly cleanup. Parser unavailability is an external QA limit, never a local pass.

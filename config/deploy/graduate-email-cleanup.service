@@ -1,0 +1,26 @@
+# TEMPLATE ONLY. Use the same reviewed release, unprivileged user and protected
+# environment file as the workers. No operator ID is needed for cleanup.
+[Unit]
+Description=ETD bounded graduate email cleanup
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=etd-app-placeholder
+Group=etd-app-placeholder
+WorkingDirectory=/srv/ETD_RELEASE_PLACEHOLDER
+EnvironmentFile=/etc/etd/GRADUATE_EMAIL_ENV_PLACEHOLDER
+Environment=RAILS_ENV=production
+Environment=RAILS_MAX_THREADS=2
+ExecStart=/usr/bin/env bundle exec rails graduate_email:cleanup
+TimeoutStartSec=300
+TimeoutStopSec=40
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/srv/ETD_RELEASE_PLACEHOLDER/log /srv/ETD_RELEASE_PLACEHOLDER/tmp
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=etd-graduate-email-cleanup

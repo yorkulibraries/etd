@@ -1,0 +1,11 @@
+[Unit]
+Description=Hourly ETD bounded graduate email cleanup
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=60
+Unit=graduate-email-cleanup.service
+
+[Install]
+WantedBy=timers.target
