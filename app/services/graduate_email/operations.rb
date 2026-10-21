@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 module GraduateEmail
   module Operations
+    # Matches the oldest-job alert. A queued notice/real challenge older than
+    # this has no progressing worker, including when its job is already gone.
+    STALE_QUEUED_AFTER = 60
+
     class << self
       # Protected process environment only, never a web parameter. Authorization
       # is repeated under Control's lock by set_enabled!, not trusted from here.
@@ -19,6 +23,7 @@ module GraduateEmail
 
             otp = Delayed::Job.where(queue: Limits::QUEUE)
             notice = Delayed::Job.where(queue: Limits::NOTICE_QUEUE)
+            stale = Time.current - STALE_QUEUED_AFTER
             {control: row.enabled ? 'enabled' : 'disabled', generation: row.generation,
               configuration: GraduateEmail.configured? && GraduateEmail.delivery_configured? ? 'ready' : 'unavailable',
               otp_jobs: otp.count, notice_jobs: notice.count, oldest_seconds: age(otp.or(notice).minimum(:created_at)),
@@ -26,6 +31,8 @@ module GraduateEmail
               oldest_failed_seconds: age(otp.or(notice).minimum(:failed_at)),
               notice_failed: GraduateEmailNotice.where(state: 'failed').count,
               notice_abandoned: GraduateEmailNotice.where(state: 'claimed').where('claimed_at <= ?', 30.seconds.ago).count,
+              notice_stale_queued: GraduateEmailNotice.where(state: 'queued').where('created_at <= ?', stale).count,
+              otp_stale_queued: GraduateEmailChallenge.where(state: 'queued').where('created_at <= ?', stale).count,
               challenges: GraduateEmailChallenge.count, cooldowns: GraduateEmailCooldown.count,
               limit_events: GraduateEmailLimitEvent.count}
           end

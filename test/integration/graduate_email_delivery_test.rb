@@ -129,7 +129,8 @@ class GraduateEmailDeliveryTest < ActionDispatch::IntegrationTest
   end
 
   test 'invalidation_before_authorization_prevents_send' do
-    mutations = [-> { @student.block }, -> { @actor.update_columns(blocked: true) },
+    # Historical approver turnover is covered separately below (I1).
+    mutations = [-> { @student.block },
       -> { @connection.update_columns(revoked_at: Time.current) }, -> { @mapping.delete },
       -> { GraduateEmail::Control.set_enabled!(enabled: false, actor_id: @actor.id) }]
     mutations.each do |mutation|
@@ -150,6 +151,39 @@ class GraduateEmailDeliveryTest < ActionDispatch::IntegrationTest
       GraduateEmailLimitEvent.delete_all
     end
     assert_empty @mail_messages
+  end
+
+  # I1: the approver of a verified connection is a historical audit reference.
+  # Pending enrollment/recovery approvals still require an authorized approver.
+  test 'approver_turnover_denies_pending_enrollment_but_not_verified_login_delivery' do
+    [{'blocked' => true}, {'role' => User::STAFF}].each do |change|
+      original = @actor.attributes.slice(*change.keys)
+      enroll = challenge(request_code(purpose: :enroll, approval_id: @approval.id, browser_token: SecureRandom.hex(32)))
+      login = challenge(request_code(browser_token: SecureRandom.hex(32)))
+      enroll_claim = GraduateEmail::Delivery.claim!(challenge_public_id: enroll.public_id)
+      login_claim = GraduateEmail::Delivery.claim!(challenge_public_id: login.public_id)
+      assert enroll_claim && login_claim
+      @actor.update_columns(change)
+      assert_nil GraduateEmail::Delivery.authorize_send!(claim: enroll_claim)
+      assert_equal 'failed', enroll.reload.state
+      assert_nil enroll.code_digest
+      assert GraduateEmail::Delivery.authorize_send!(claim: login_claim)
+      GraduateEmail::Delivery.finalize!(claim: login_claim, outcome: :sent)
+      assert_equal 'sent', login.reload.state
+      assert matches?(login, login_claim.code)
+      assert eligible?(login)
+      # A queued login job processed entirely after the change is also sent.
+      travel 61.seconds
+      queued = challenge(request_code(browser_token: SecureRandom.hex(32)))
+      deliver_row(queued)
+      assert_equal 'sent', queued.reload.state
+      assert_nil @approval.reload.consumed_at
+      @actor.update_columns(original)
+      GraduateEmailLimitEvent.delete_all
+      travel_back
+    end
+    assert_equal 2, @mail_messages.size
+    assert_equal 0, GraduateSession.count
   end
 
   test 'approval_current_checks_are_repeated_at_authorization' do
@@ -302,6 +336,68 @@ class GraduateEmailDeliveryTest < ActionDispatch::IntegrationTest
     assert_raises(GraduateAuthentication::Rejected) do
       GraduateAuthenticationMailer.code(recipient: 'one@example.com,two@example.com', code: '123456', expires_at: Time.current)
     end
+  end
+
+  # I2: configuration lost after worker start, or a standalone/default worker run.
+  # Durable work becomes visibly terminal; nothing is generated, sent or retried.
+  test 'unconfigured_execution_fails_visibly_without_code_or_silent_job_loss' do
+    enroll = challenge(request_code(purpose: :enroll, approval_id: @approval.id, browser_token: SecureRandom.hex(32)))
+    login = challenge(request_code)
+    unknown = challenge(request_code(browser_token: SecureRandom.hex(32), address: 'unknown@example.com'))
+    replacement = GraduateEmailConnection.create!(student: @student, approved_by: @actor,
+      normalized_address: 'replacement@example.net', verified_at: Time.current)
+    notice = GraduateEmailNotice.create!(old_connection: @connection, replacement_connection: replacement)
+    Delayed::Job.enqueue(GraduateEmailNoticeJob.new(notice.id), queue: GraduateEmailNoticeJob::QUEUE)
+    secret = 'I2_RUNTIME_SENTINEL'
+    ENV.update('GRADUATE_EMAIL_SMTP_USER_NAME' => 'worker', 'GRADUATE_EMAIL_SMTP_AUTHENTICATION' => 'plain',
+      'GRADUATE_EMAIL_SMTP_PASSWORD' => "#{secret}\r\nRCPT")
+    GraduateEmail.configure!
+    assert GraduateEmail.configured?
+    refute GraduateEmail.delivery_configured?
+    stream = StringIO.new
+    original = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(stream)
+    SecureRandom.expects(:random_number).never
+    GraduateAuthenticationMailer.expects(:code).never
+    GraduateAuthenticationMailer.expects(:access_changed).never
+    ExceptionNotifier.expects(:notify_exception).never
+    assert_equal [4, 0], Delayed::Worker.new(queues: %w[graduate_email graduate_email_notice], quiet: true).work_off(10)
+    [enroll, login].each do |row|
+      row.reload
+      assert_equal 'failed', row.state
+      assert row.invalidated_at
+      assert_nil row.code_digest
+      assert_nil row.claimed_at
+    end
+    assert_equal 'noop', unknown.reload.state
+    assert_equal 'failed', notice.reload.state
+    assert_nil notice.claimed_at
+    assert_nil notice.sent_at
+    assert_nil @approval.reload.consumed_at
+    assert_equal 0, GraduateSession.count
+    assert_empty Delayed::Job.where(queue: %w[graduate_email graduate_email_notice])
+    assert_empty @mail_messages
+    diagnostics = stream.string.lines.map(&:strip).grep(/graduate_email/).sort
+    assert_equal ['graduate_email delivery_unconfigured', 'graduate_email delivery_unconfigured',
+      'graduate_email notice_unconfigured'], diagnostics
+    assert_safe_absent(stream.string, secret, @connection.normalized_address, 'replacement@example.net',
+      'pending@example.com', login.public_id)
+    status = GraduateEmail::Operations.status
+    assert_equal [1, 0], status.values_at(:notice_failed, :notice_stale_queued)
+    # Restored configuration and a duplicate job never revive terminal work.
+    Rails.logger = original
+    %w[GRADUATE_EMAIL_SMTP_USER_NAME GRADUATE_EMAIL_SMTP_AUTHENTICATION GRADUATE_EMAIL_SMTP_PASSWORD].each { |key| ENV.delete(key) }
+    GraduateEmail.configure!
+    assert GraduateEmail.delivery_configured?
+    Delayed::Job.enqueue(GraduateEmailNoticeJob.new(notice.id), queue: GraduateEmailNoticeJob::QUEUE)
+    Delayed::Job.enqueue(GraduateEmailDeliveryJob.new(login.public_id), queue: GraduateEmail::Limits::QUEUE)
+    GraduateAuthenticationMailer.stub(:transport_class, @transport) do
+      assert_equal [2, 0], Delayed::Worker.new(queues: %w[graduate_email graduate_email_notice], quiet: true).work_off(10)
+    end
+    assert_equal %w[failed failed], [notice.reload.state, login.reload.state]
+    assert_empty @mail_messages
+  ensure
+    Rails.logger = original if original
   end
 
   test 'notice_claims_once_to_old_recipient_while_disabled_and_failure_never_restores_access' do

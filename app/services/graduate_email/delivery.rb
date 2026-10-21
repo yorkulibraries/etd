@@ -86,36 +86,48 @@ module GraduateEmail
       end
 
       def claim!(challenge_public_id:)
-        return unless opaque_id?(challenge_public_id) && GraduateEmail.delivery_configured?
+        return unless opaque_id?(challenge_public_id)
 
-        Control.synchronize do
+        # A worker without delivery configuration never generates a code. Real
+        # queued work becomes terminal failed (no retry), not silently consumed.
+        configured = GraduateEmail.delivery_configured?
+        unconfigured = false
+        claim = Control.synchronize do
           now = instant
           row, _target, valid = locked_context(challenge_public_id, %w[queued], now)
           next unless row && row.state == 'queued'
-          unless valid
+          unless valid && configured
             invalidate!(row, now)
+            unconfigured = !configured
             next
           end
           code = format('%06d', SecureRandom.random_number(1_000_000))
           row.update!(state: 'claimed', claimed_at: now, code_digest: code_digest(challenge: row, code: code))
           Claim.new(row: row, code: code)
         end
+        diagnostic(:delivery_unconfigured) if unconfigured
+        claim
       end
 
       def authorize_send!(claim:)
         return unless claim.is_a?(Claim)
 
-        Control.synchronize do
+        configured = GraduateEmail.delivery_configured?
+        unconfigured = false
+        envelope = Control.synchronize do
           now = instant
           row, target, valid = locked_context(claim.public_id, %w[claimed], now)
           next unless same_claim?(row, claim, 'claimed')
-          unless valid && GraduateEmail.delivery_configured?
+          unless valid && configured
             invalidate!(row, now)
+            unconfigured = !configured
             next
           end
           row.update!(state: 'sending', send_authorized_at: now)
           Envelope.new(recipient: target.normalized_address, expires_at: row.expires_at)
         end
+        diagnostic(:delivery_unconfigured) if unconfigured
+        envelope
       end
 
       def finalize!(claim:, outcome:)
@@ -244,7 +256,10 @@ module GraduateEmail
           row.expires_at > now && row.created_at <= now && row.expires_at <= row.created_at + 5.minutes &&
           opaque_id?(row.browser_digest) &&
           GraduateAuthentication.active_student?(users[row.student_id]) &&
-          GraduateAuthentication.staff_authorized?(users[target.approved_by_id]) && !users[target.approved_by_id].is_a?(Student) &&
+          # Only a pending approval depends on its approver's current role/block.
+          # A verified connection's approver is historical audit data (login).
+          (row.purpose == 'login' ||
+            (GraduateAuthentication.staff_authorized?(users[target.approved_by_id]) && !users[target.approved_by_id].is_a?(Student))) &&
           Address.normalize(input: target.normalized_address) == target.normalized_address &&
           row.address_key == Limits.address_key(input: target.normalized_address)
         if valid

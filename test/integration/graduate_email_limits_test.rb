@@ -239,10 +239,19 @@ class GraduateEmailLimitsTest < ActionDispatch::IntegrationTest
       assert_equal 'noop', challenge(request_code(purpose: :enroll, approval_id: @approval.id)).state
       @approval.update_columns(field => original)
     end
-    @actor.update_columns(blocked: true)
-    assert_equal 'noop', challenge(request_code).state
-    assert_equal 'noop', challenge(request_code(purpose: :enroll, approval_id: @approval.id)).state
-    @actor.update_columns(blocked: false)
+    # I1: pending approvals require a currently authorized approver. A verified
+    # connection's approver is historical audit data and never gates login.
+    [{'blocked' => true}, {'role' => User::STAFF}].each do |change|
+      original = @actor.attributes.slice(*change.keys)
+      # Fresh browsers: a noop answer otherwise returns that browser's live row.
+      enroll = -> { challenge(request_code(purpose: :enroll, approval_id: @approval.id, browser_token: SecureRandom.hex(32))) }
+      @actor.update_columns(change)
+      assert_equal 'noop', enroll.call.state
+      assert_equal 'queued', challenge(request_code(browser_token: SecureRandom.hex(32))).state
+      @actor.update_columns(original)
+      assert_equal 'queued', enroll.call.state
+      GraduateEmailLimitEvent.where(kind: 'send_address').delete_all
+    end
     @student.update_columns(blocked: true)
     assert_equal 'noop', challenge(request_code).state
     @student.update_columns(blocked: false)
@@ -292,8 +301,11 @@ class GraduateEmailLimitsTest < ActionDispatch::IntegrationTest
     end
     assert_equal [2, 0], Delayed::Worker.new(queues: ['graduate_email']).work_off(10)
     assert_equal 0, Delayed::Job.where(queue: 'graduate_email').count
-    assert_equal 'queued', challenge(real).state
-    assert_empty notices # Missing dedicated SMTP config fails closed, no plaintext generated.
+    # I2: missing dedicated SMTP config fails closed AND visibly: no plaintext
+    # is generated, the consumed job leaves no queued row and only an enum logs.
+    assert_equal 'failed', challenge(real).state
+    assert challenge(real).invalidated_at
+    assert_equal ['graduate_email delivery_unconfigured'], notices
     assert_nil challenge(real).code_digest
     assert_equal 'noop', challenge(noop).state
     assert_nil @approval.reload.consumed_at

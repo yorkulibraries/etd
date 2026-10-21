@@ -10,6 +10,12 @@ raise 'Probe role rejected' unless %w[dedicated ordinary].include?(role)
 ENV['GRADUATE_EMAIL_WORKER'] = role == 'dedicated' ? '1' : nil
 ENV['QUEUES'] = 'graduate_email,graduate_email_notice'
 defaults = [Delayed::Worker.max_run_time, Delayed::Worker.max_attempts, Delayed::Worker.destroy_failed_jobs]
+# No Rails here: stand in for READY configuration so the dedicated start gate
+# passes. Fresh jobs:work processes prove the real gate after initializers.
+module GraduateEmail
+  def self.configured? = true
+  def self.delivery_configured? = true
+end
 load File.expand_path('../../config/initializers/delayed_job.rb', __dir__)
 # This shutdown plugin queries storage; all other installed lifecycle stays real.
 Delayed::Worker.plugins.delete(Delayed::Plugins::ClearLocks)

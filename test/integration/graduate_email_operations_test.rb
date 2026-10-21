@@ -207,6 +207,33 @@ class GraduateEmailOperationsTest < ActionDispatch::IntegrationTest
     assert_safe_absent(JSON.generate(status),@connection.normalized_address,data[1],data[4])
   end
 
+  # I2: a notice or real OTP challenge that no worker claimed, including one
+  # whose job is gone, becomes an operator-visible count after a fixed threshold.
+  test 'status_counts_stale_queued_notices_and_challenges_without_identifiers' do
+    now=Time.current.change(usec:0)
+    travel_to now
+    login=challenge(request_code)
+    challenge(request_code(browser_token:SecureRandom.hex(32),address:'unknown@example.com'))
+    replacement=GraduateEmailConnection.create!(student:@student,approved_by:@actor,normalized_address:'stale@example.com',verified_at:now)
+    notice=GraduateEmailNotice.create!(old_connection:@connection,replacement_connection:replacement,state:'queued')
+    assert_equal [0,0],GraduateEmail::Operations.status.values_at(:notice_stale_queued,:otp_stale_queued)
+    travel_to now+59.seconds
+    assert_equal [0,0],GraduateEmail::Operations.status.values_at(:notice_stale_queued,:otp_stale_queued)
+    travel_to now+60.seconds
+    Delayed::Job.delete_all
+    status=GraduateEmail::Operations.status
+    assert_equal [1,1,0,0],status.values_at(:notice_stale_queued,:otp_stale_queued,:otp_jobs,:notice_jobs)
+    assert status.values.all? { |v| v.is_a?(Integer) || %w[enabled disabled ready unavailable].include?(v) }
+    assert_safe_absent(JSON.generate(status),@connection.normalized_address,'stale@example.com',login.public_id)
+    notice.update!(state:'failed')
+    login.update!(state:'failed',invalidated_at:now)
+    assert_equal [0,0,1],GraduateEmail::Operations.status.values_at(:notice_stale_queued,:otp_stale_queued,:notice_failed)
+    output,cli=Open3.capture2e(cli_env(nil),RbConfig.ruby,'-S','bundle','exec','rails','graduate_email:status')
+    assert cli.success?
+    parsed=JSON.parse(output.lines.find { |l| l.start_with?('{') })
+    assert_equal [0,0],parsed.values_at('notice_stale_queued','otp_stale_queued')
+  end
+
   test 'disable_command_serializes_with_session_issue' do
     input,output,waiter=Open3.popen2e(cli_env(@actor.id.to_s),RbConfig.ruby,'-S','bundle','exec','rails','runner','test/support/graduate_email_operations_cli.rb')
     marker = -> { Timeout.timeout(30) { loop { line = output.gets; raise 'CLI barrier ended' unless line; break line.strip if line.start_with?('COMMAND_') } } }

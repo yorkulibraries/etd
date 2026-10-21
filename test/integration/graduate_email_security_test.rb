@@ -107,6 +107,87 @@ class GraduateEmailSecurityTest < ActionDispatch::IntegrationTest
     assert_nil @approval.reload.consumed_at
   end
 
+  # I1: staff turnover never silently disables a verified connection. The
+  # pending-approval checks above remain; this login path is approver-independent.
+  test 'returning_login_survives_historical_approver_demotion_and_block' do
+    sent_enrollment
+    grant = redeem
+    assert_instance_of GraduateEmail::Grant, grant
+    connection = GraduateEmailConnection.find(grant.connection_id)
+    assert_equal @actor.id, connection.approved_by_id
+    identity = GraduateIdentity.create!(student: @student, linked_by: @actor, provider: 'google_oauth2', uid: 'turnover-google')
+    google = GraduateSession.issue!(identity)
+    Delayed::Job.delete_all
+    durable = [connection.attributes, GraduateEmailActiveAddress.sole.attributes, identity.attributes, Student.count]
+    restore = -> { @actor.update!(role: User::MANAGER, blocked: false) }
+    demote = -> { @actor.update!(role: User::STAFF) }
+    block = -> { @actor.update!(blocked: true) }
+    # Mutation before request, between request and worker, and between worker
+    # and redemption, through the real HTTP, durable job and RAM transport.
+    [[demote, nil, nil], [block, nil, nil], [nil, block, nil], [nil, demote, nil],
+      [nil, nil, block], [nil, nil, demote], [demote, block, nil]].each do |before, after_request, after_worker|
+      restore.call
+      fresh_browser
+      host! '127.0.0.1:3210'
+      GraduateEmailLimitEvent.where(kind: 'send_address').delete_all
+      before&.call
+      csrf_post '/graduate/email/challenges', address: connection.normalized_address
+      assert_response :accepted
+      row = GraduateEmailChallenge.where(purpose: 'login').order(:id).last
+      assert_equal 'queued', row&.state
+      after_request&.call
+      job = Delayed::Job.where(queue: GraduateEmail::Limits::QUEUE).to_a.find { |item| item.payload_object.challenge_public_id == row.public_id }
+      @capturing_id = row.public_id
+      GraduateAuthenticationMailer.stub(:transport_class, @transport) do
+        Delayed::Worker.new(queues: [GraduateEmail::Limits::QUEUE], quiet: true).run(job)
+      end
+      @capturing_id = nil
+      assert_equal 'sent', row.reload.state
+      code = otp_code_for(public_id: row.public_id)
+      assert code.is_a?(String), 'RAM transport captured code'
+      after_worker&.call
+      csrf_post '/graduate/email/verify', code: code
+      assert_redirected_to student_view_index_path
+      assert_equal 'graduate_email', session[:auth_source]
+      get student_view_details_path
+      assert_response :success
+      assert_equal 'consumed', row.reload.state
+      assert GraduateSession.valid_for?(grant.session_token, method: 'email', email_connection_id: connection.id,
+        generation: 1, student_id: @student.id)
+      assert GraduateSession.valid_for?(google, identity_id: identity.id, student_id: @student.id)
+      assert_equal durable, [connection.reload.attributes, GraduateEmailActiveAddress.sole.attributes, identity.reload.attributes, Student.count]
+    end
+    restore.call
+    # Pending recovery approval: issued by an authorized approver, then that
+    # approver is demoted/blocked before request, worker or redemption.
+    [demote, block].each do |change|
+      restore.call
+      GraduateEmailLimitEvent.where(kind: 'send_address').delete_all
+      approval, token = issue_approval(address: 'replacement@example.com', replacement: true)
+      browser = SecureRandom.hex(32)
+      pending = challenge(GraduateEmail::Challenges.request!(purpose: :enroll, approval_id: approval.id, browser_token: browser, ip: @ip))
+      deliver_row(pending)
+      code = otp_code_for(public_id: pending.public_id)
+      assert code.is_a?(String), 'Pending approval code captured'
+      GraduateEmailLimitEvent.where(kind: 'send_address').delete_all
+      queued = challenge(GraduateEmail::Challenges.request!(purpose: :enroll, approval_id: approval.id,
+        browser_token: SecureRandom.hex(32), ip: @ip))
+      claim = GraduateEmail::Delivery.claim!(challenge_public_id: queued.public_id)
+      assert claim
+      change.call
+      GraduateEmailLimitEvent.where(kind: 'send_address').delete_all
+      assert_raises(GraduateAuthentication::Rejected) { GraduateEmail::Enrollment.intent!(token: token, browser_token: SecureRandom.hex(32)) }
+      assert_equal 'noop', challenge(GraduateEmail::Challenges.request!(purpose: :enroll, approval_id: approval.id,
+        browser_token: SecureRandom.hex(32), ip: @ip)).state
+      assert_nil GraduateEmail::Delivery.authorize_send!(claim: claim)
+      assert_equal 'failed', queued.reload.state
+      assert_nil redeem(pending, browser: browser, code: code)
+      assert_nil approval.reload.consumed_at
+      assert_equal durable[0..1], [connection.reload.attributes, GraduateEmailActiveAddress.sole.attributes]
+    end
+    restore.call
+  end
+
   test 'forged_target_or_browser_binding_rejected' do
     sent_enrollment
     assert_nil redeem(browser: SecureRandom.hex(32))

@@ -141,6 +141,29 @@ stale backend locks after synthetic clock advancement, proves claimed OTP/notice
 state never retries, preserves a default-queue sentinel and joins all children.
 It does not install or run host services.
 
+## Important-finding fixes I1/I2
+
+The runner discovers these regressions in existing files; no new runner list.
+
+- **I1 (approver turnover).** Returning login keeps working when the historical
+  approver of a verified connection is demoted or blocked. This holds before the
+  request, between request and worker, and between delivery and redemption, through
+  real HTTP/CSRF, a persisted job, RAM transport and the browser flow. Existing
+  email and Google sessions stay valid. A pending initial or recovery approval whose
+  approver is demoted or blocked is still denied at intent, request, send
+  authorization and redemption.
+- **I2 (worker configuration).** Fresh installed `rake jobs:work` processes with
+  `GRADUATE_EMAIL_WORKER=1` and missing or invalid configuration exit non-zero with
+  a fixed line before any reservation. Queued jobs and rows stay byte-identical and
+  no sentinel value is printed. An ordinary boot and a default worker are unchanged.
+  A configured dedicated worker still delivers a notice while the feature is
+  disabled. Configuration lost after start turns queued real challenges and notices
+  into visible `failed` rows with fixed diagnostics and no code, mail or retry.
+  Status reports stale queued counts.
+
+Use a new run name such as `GRADUATE_EMAIL_VERIFICATION_RUN=opus-important-fixes-r1`;
+historical packages stay untouched.
+
 ## Owner-approved QA checklist, before any enable
 
 This checklist authorizes no QA data, requests, mail or provider changes. Supply

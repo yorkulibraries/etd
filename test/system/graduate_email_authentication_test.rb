@@ -37,6 +37,20 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
     assert_current_path student_view_thesis_process_path(thesis, Thesis::PROCESS_BEGIN)
   end
 
+  # I1: the verified connection's approver may later leave or lose staff role.
+  test 'returning_login_survives_historical_approver_demotion_and_block' do
+    enrolled_connection
+    @actor.update!(role: User::STAFF, blocked: true)
+    request_login
+    row, code = run_mail_worker
+    assert_equal @connection.id, row.connection_id
+    enter_code(code)
+    assert_current_path student_view_index_path
+    visit student_view_details_path
+    assert_text @student.name
+    assert_equal @actor.id, @connection.reload.approved_by_id
+  end
+
   test 'unknown_blocked_unenrolled_and_throttled_look_identical' do
     enrolled_connection
     structures = []

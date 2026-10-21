@@ -22,6 +22,14 @@ if ENV['GRADUATE_EMAIL_WORKER'] == '1'
   Delayed::Worker.logger = Logger.new(File::NULL)
   plugin = Class.new(Delayed::Plugin) do
     callbacks do |lifecycle|
+      # Worker#start runs after every initializer, so graduate_email.rb has
+      # finished configuring. Refuse before ClearLocks/reservation/any job, with
+      # a fixed message: no control/table/feature read, no configuration value.
+      lifecycle.before(:execute) do |_worker|
+        unless GraduateEmail.configured? && GraduateEmail.delivery_configured?
+          raise 'Graduate worker delivery configuration rejected'
+        end
+      end
       heartbeat = lambda do |*_args|
         now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         last = Thread.current[:graduate_email_heartbeat]

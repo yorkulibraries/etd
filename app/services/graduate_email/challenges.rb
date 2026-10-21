@@ -98,9 +98,13 @@ module GraduateEmail
         users = User.where(id: [hint.student_id, hint.approved_by_id]).order(:id).lock.index_by(&:id)
         student = users[hint.student_id]
         approver = users[hint.approved_by_id]
-        return unless GraduateAuthentication.active_student?(student) && GraduateAuthentication.staff_authorized?(approver) && !approver.is_a?(Student)
+        return unless GraduateAuthentication.active_student?(student)
 
         if purpose == :enroll
+          # Pending approvals need a currently authorized approver. A verified
+          # connection's approved_by is a historical audit reference only.
+          return unless GraduateAuthentication.staff_authorized?(approver) && !approver.is_a?(Student)
+
           approval = GraduateEmailApproval.where(id: hint.id).lock.first
           return unless same_owner?(approval, hint) && approval.generation == control.generation &&
             approval.revoked_at.nil? && approval.consumed_at.nil? && approval.expires_at > now &&

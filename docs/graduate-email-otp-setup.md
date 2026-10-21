@@ -84,6 +84,10 @@ Success output is JSON with enum/count fields only; rejection is
 `{"result":"rejected"}` and exit1. Status is read-only and reports authoritative
 control/generation, configuration readiness, OTP/notice retained jobs, oldest age
 in seconds, failed jobs, failed/abandoned notices, challenge/cooldown/limit counts.
+`notice_stale_queued` and `otp_stale_queued` count security notices and real OTP
+challenges still `queued` at least 60 s after creation. No worker has claimed them,
+including when their job row is already gone. Queued notices persist until handled.
+Queued OTP rows stay counted until cleanup removes them 24 h after expiry.
 It prints no operator/student IDs, addresses, handlers, URLs or exception messages.
 A safe status is not a health/approval check of the actual relay or procedure.
 Cleanup needs no operator ID, never enables and is safe while disabled.
@@ -108,6 +112,29 @@ OTP retained cap500 and distinct notice reserve50 include locked/failed rows.
 `QUEUE=graduate_email` alone is incorrect. Do not use `jobs:clear`, a default worker,
 retry abandoned claims or edit job handlers to regenerate mail.
 
+A dedicated worker refuses to start unless its own process has valid origin, code
+and limit keys and a valid sender/SMTP transport. The check runs when the worker
+starts, after all initializers. It runs before any job is reserved or any stale lock
+is cleared, and reads no control or feature state. A disabled feature therefore
+still lets a configured worker deliver queued security notices. The refusal is the
+fixed line `Graduate worker delivery configuration rejected` and a non-zero exit;
+no configuration value is printed. Queued OTP and notice jobs remain unchanged. The
+template's `Restart=on-failure`/`RestartSec=5` repeats each refused start. systemd
+stops retrying (`failed`) only if more than `StartLimitBurst=10` starts fall within
+60 s, so expect a recurring auto-restart and failure records rather than a running
+worker. Correct the worker's protected environment file (it can differ from the
+operator's), then restart it, using `systemctl reset-failed` if it stopped. The enable
+command's configuration check covers only the operator process; it does not prove
+the workers' configuration.
+
+If configuration is unavailable to a job anyway (for example a default worker or
+standalone run), nothing is silently consumed. A queued security notice becomes
+`failed`, shown to staff as failed with no automatic retry, and logs
+`graduate_email notice_unconfigured`. A queued real OTP challenge becomes `failed`
+without generating a code, consuming an approval or creating a session, and logs
+`graduate_email delivery_unconfigured`. The graduate can request a new code. Neither
+case is retried automatically.
+
 The dedicated role sets backend maxrun 30 s/maxattempts1/destroy-failed, enabling
 stale lock reclamation after 30 s. Payload state is independently single-claim:
 queued jobs survive restart; claimed/sending OTPs and claimed notices never
@@ -130,8 +157,9 @@ SMTP progress. Monitor both unit states, status counts/oldest and failures.
 Hourly timer invokes bounded `graduate_email:cleanup`; monitor its exit code and
 last successful `result=ok` JSON journal record/time. Alert through existing approved
 monitoring if no success in2 h, OTP queue>250, oldest>60 s, either dedicated worker
-fails/loses heartbeat, any SMTP delivery_failed/delivery_unavailable/worker_error
-or new failed/abandoned notice. Status exposes retained failures, not a lifetime
+fails/loses heartbeat or logs the worker configuration rejection, any SMTP
+delivery_failed/delivery_unavailable/delivery_unconfigured/notice_unconfigured/worker_error,
+new failed/abandoned notice, or `notice_stale_queued`/`otp_stale_queued` above 0. Status exposes retained failures, not a lifetime
 counter after deletion. Journal aggregation must count fixed outcome enums only,
 with no mailbox/IP/student labels or per-request permanent DB rows. No new external
 notification service is configured. Bound monitoring retention using existing policy.
@@ -189,6 +217,22 @@ time and explicitly confirm identity verification. No lists or shared/multi-addr
 fields. The invitation token is shown once, expires48 h and authorizes enrollment
 intent only. Provide it through the approved verified-contact channel. ETD does not
 email an invitation. Keep it out of screenshots, tickets, referrers and logs.
+
+Staff turnover: a **pending** approval works only while its approving staff member
+is still an active, unblocked administrator or manager. This is checked when the
+invitation is opened, when each code is sent and when it is redeemed. If that person
+leaves or changes role, another authorized staff member must reissue the pending
+approval after verification. A **verified** connection belongs to the student.
+Its recorded approver is historical audit information only. Blocking or demoting
+that staff member later does not stop returning sign-in, existing sessions or
+Google. Revoke the connection explicitly if access must end.
+
+Approvals and connections keep a restrictive database reference to the approving
+staff account (`approved_by`), so that account cannot be deleted while those
+records are retained. Block or demote departed staff instead of deleting them.
+Deleting them would require an authorized retention decision for those records,
+which is still pending above. Policy audit events are retained, and any audit
+reference to a deleted user becomes null.
 
 Cancel a mistaken or unreceived pending approval; reissue only after verification.
 Reissue supersedes prior pending email approval; it does not revoke Google or change

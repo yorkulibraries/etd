@@ -12,7 +12,15 @@ class GraduateEmailNoticeJob
   end
 
   def perform
-    return unless GraduateEmail.delivery_configured?
+    unless GraduateEmail.delivery_configured?
+      # Never silently consume a required security notice. A still-unclaimed
+      # notice becomes terminal failed (staff-visible follow-up), without a
+      # claim, recipient read, mail build or retry.
+      failed = GraduateEmailNotice.where(id: notice_id, state: 'queued', claimed_at: nil)
+        .update_all(state: 'failed', updated_at: Time.current)
+      Rails.logger.warn('graduate_email notice_unconfigured') if failed == 1
+      return
+    end
 
     # Write first for SQLite too. Notice is an immutable outbox reference; it
     # does not need the feature-control lock and must survive feature disable.

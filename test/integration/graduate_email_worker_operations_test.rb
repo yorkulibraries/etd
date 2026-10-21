@@ -63,7 +63,64 @@ class GraduateEmailWorkerOperationsTest < ActionDispatch::IntegrationTest
     assert_equal 'claimed',notice2.reload.state
     assert Delayed::Job.exists?(sentinel.id)
   end
+  # I2: fresh installed jobs:work processes, after every Rails initializer.
+  # Missing/invalid configuration stops before any reservation; rows are kept.
+  test 'dedicated_worker_refuses_start_without_configuration_and_retains_durable_work' do
+    otp=challenge(request_code)
+    replacement=GraduateEmailConnection.create!(student:@student,approved_by:@actor,normalized_address:'boot@example.com',verified_at:Time.current)
+    notice=GraduateEmailNotice.create!(old_connection:@connection,replacement_connection:replacement,state:'queued')
+    Delayed::Job.enqueue(GraduateEmailNoticeJob.new(notice.id),queue:'graduate_email_notice')
+    durable=-> { [Delayed::Job.where(queue:%w[graduate_email graduate_email_notice]).order(:id).map(&:attributes),otp.reload.attributes,notice.reload.attributes] }
+    before=durable.call
+    assert_equal 2,before[0].size
+    secret='I2_BOOT_SENTINEL'
+    dedicated={'GRADUATE_EMAIL_WORKER'=>'1','QUEUES'=>'graduate_email,graduate_email_notice','SLEEP_DELAY'=>'1'}
+    [{'GRADUATE_EMAIL_SMTP_ADDRESS'=>nil},
+      {'GRADUATE_EMAIL_SMTP_USER_NAME'=>'worker','GRADUATE_EMAIL_SMTP_AUTHENTICATION'=>'plain','GRADUATE_EMAIL_SMTP_PASSWORD'=>"#{secret}\r\nRCPT"},
+      {'GRADUATE_EMAIL_FROM'=>"#{secret}@example.org\r\nBcc: other@example.org"},
+      {'GRADUATE_EMAIL_CODE_KEY'=>nil},{'GRADUATE_EMAIL_BASE_URL'=>"https://#{secret}.example.org/path"}].each do |bad|
+      output,status=bounded_capture(dedicated.merge(bad),'rake','jobs:work')
+      assert status && !status.success?,'Unconfigured dedicated worker refuses start'
+      assert output.include?('Graduate worker delivery configuration rejected'),'Fixed start rejection'
+      assert_safe_absent(output,secret,'c'*32,'l'*32,@connection.normalized_address,otp.public_id)
+      assert_equal before,durable.call
+    end
+    # Ordinary boot and a default worker are unchanged without mail configuration.
+    ordinary={'GRADUATE_EMAIL_WORKER'=>nil,'QUEUES'=>nil,'GRADUATE_EMAIL_SMTP_ADDRESS'=>nil,'GRADUATE_EMAIL_FROM'=>nil}
+    output,status=bounded_capture(ordinary,'rails','runner','puts(GraduateEmail.delivery_configured? ? "BOOT_CONFIGURED" : "BOOT_UNCONFIGURED")')
+    assert status&.success?,'Ordinary boot unchanged'
+    assert output.include?('BOOT_UNCONFIGURED'),'Ordinary process boots without mail configuration'
+    _,status=bounded_capture(ordinary.merge('QUEUES'=>'graduate_email_ordinary_probe'),'rake','jobs:workoff')
+    assert status&.success?,'Default worker unchanged'
+    assert_equal before,durable.call
+    # Valid configuration with the feature disabled: start gate reads no control,
+    # the security notice is delivered and the stale OTP fails closed.
+    GraduateEmail::Control.set_enabled!(enabled:false,actor_id:@actor.id)
+    worker=start_ops_worker(otp)
+    wait_for { notice.reload.state=='sent' && Delayed::Job.where(queue:%w[graduate_email graduate_email_notice]).none? }
+    stop_ops_worker(worker)
+    assert_equal 1,@mail_messages.size
+    assert_equal [@connection.normalized_address],@mail_messages.first.to
+    assert_equal 'failed',otp.reload.state
+    assert_nil otp.code_digest
+  end
   private
+  def bounded_capture(env,*command,seconds:120)
+    Open3.popen2e(env,RbConfig.ruby,'-S','bundle','exec',*command,pgroup:true) do |input,stream,waiter|
+      input.close
+      reader=Thread.new { stream.read }
+      unless waiter.join(seconds)
+        begin
+          Process.kill('KILL',-waiter.pid)
+        rescue Errno::ESRCH
+          nil
+        end
+        waiter.join(10)
+        return [reader.join(10)&.value.to_s,nil]
+      end
+      [reader.value,waiter.value]
+    end
+  end
   def wait_for
     Timeout.timeout(30) { Thread.pass until yield }
   end
