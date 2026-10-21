@@ -13,6 +13,16 @@ class GraduateEmailWorkerOperationsTest < ActionDispatch::IntegrationTest
     cleanup_delivery_workers
     teardown_delivery
   end
+  test 'installed_lifecycle_heartbeats_cover_busy_and_idle_with_bounded_safe_output' do
+    %w[dedicated ordinary].each do |role|
+      text, status = Open3.capture2e(RbConfig.ruby, '-S', 'bundle', 'exec', 'ruby',
+        'test/support/graduate_email_worker_lifecycle_probe.rb', role)
+      result = JSON.parse(text)
+      assert status.success?, 'Installed lifecycle heartbeat contract'
+      assert result.fetch('checks').values.all?, 'Busy/idle rate and ordinary-worker contracts'
+    end
+  end
+
   test 'restart_reclaims_queued_but_not_claimed_delivery_on_both_dedicated_queues' do
     otp=challenge(request_code)
     replacement=GraduateEmailConnection.create!(student:@student,approved_by:@actor,normalized_address:'restart@example.com',verified_at:Time.current)

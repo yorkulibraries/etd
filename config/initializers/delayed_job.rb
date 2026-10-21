@@ -22,7 +22,7 @@ if ENV['GRADUATE_EMAIL_WORKER'] == '1'
   Delayed::Worker.logger = Logger.new(File::NULL)
   plugin = Class.new(Delayed::Plugin) do
     callbacks do |lifecycle|
-      lifecycle.before(:loop) do |_worker|
+      heartbeat = lambda do |*_args|
         now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         last = Thread.current[:graduate_email_heartbeat]
         if last.nil? || now - last >= 30
@@ -31,6 +31,10 @@ if ENV['GRADUATE_EMAIL_WORKER'] == '1'
           Thread.current[:graduate_email_heartbeat] = now
         end
       end
+      # work_off can process 100 jobs before returning to :loop. Keep liveness
+      # visible during sustained progress as well as idle polling.
+      lifecycle.before(:loop, &heartbeat)
+      lifecycle.after(:perform, &heartbeat)
       lifecycle.after(:error) { |_worker, _job| $stdout.puts 'graduate_email worker_error' }
     end
   end

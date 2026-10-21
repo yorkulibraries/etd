@@ -3,25 +3,41 @@
 # private environment file. Explicit opt-in profile, two foreground workers.
 x-graduate-email-worker: &graduate-email-worker
   image: ${GRADUATE_EMAIL_IMAGE:?Set the reviewed existing app image}
-  user: ${GRADUATE_EMAIL_UID_GID:?Set the unprivileged application uid:gid}
+  user: ${GRADUATE_EMAIL_UID:?Set the numeric nonroot application uid}:${GRADUATE_EMAIL_GID:?Set the numeric nonroot application gid}
   working_dir: /app
   env_file:
     - ${GRADUATE_EMAIL_ENV_FILE:?Set the protected environment file path}
   environment:
+    GRADUATE_EMAIL_UID: ${GRADUATE_EMAIL_UID:?Set the numeric nonroot application uid}
+    GRADUATE_EMAIL_GID: ${GRADUATE_EMAIL_GID:?Set the numeric nonroot application gid}
     RAILS_ENV: production
     GRADUATE_EMAIL_WORKER: '1'
     QUEUES: graduate_email,graduate_email_notice
     QUIET: '1'
     RAILS_MAX_THREADS: '2'
-  command: ['bundle', 'exec', 'rake', 'jobs:work']
+  # Reject root, names, malformed numbers or a mismatched process identity before
+  # loading Rails. Docker also requires numeric uid/gid for the tmpfs options.
+  command:
+    - sh
+    - -ec
+    - |
+      for value in "$$GRADUATE_EMAIL_UID" "$$GRADUATE_EMAIL_GID"; do
+        case "$$value" in
+          ''|0*|*[!0-9]*) echo 'graduate_email worker_identity_rejected'; exit 1 ;;
+        esac
+      done
+      if [ "$$(id -u):$$(id -g)" != "$$GRADUATE_EMAIL_UID:$$GRADUATE_EMAIL_GID" ]; then
+        echo 'graduate_email worker_identity_rejected'; exit 1
+      fi
+      exec bundle exec rake jobs:work
   restart: on-failure
   stop_grace_period: 40s
   profiles: ['graduate-email']
   read_only: true
   tmpfs:
-    - /tmp:mode=0700
-    - /app/tmp:mode=0700
-    - /app/log:mode=0700
+    - /tmp:mode=0700,uid=${GRADUATE_EMAIL_UID:?Set the numeric nonroot application uid},gid=${GRADUATE_EMAIL_GID:?Set the numeric nonroot application gid}
+    - /app/tmp:mode=0700,uid=${GRADUATE_EMAIL_UID:?Set the numeric nonroot application uid},gid=${GRADUATE_EMAIL_GID:?Set the numeric nonroot application gid}
+    - /app/log:mode=0700,uid=${GRADUATE_EMAIL_UID:?Set the numeric nonroot application uid},gid=${GRADUATE_EMAIL_GID:?Set the numeric nonroot application gid}
   security_opt:
     - no-new-privileges:true
   cap_drop: ['ALL']

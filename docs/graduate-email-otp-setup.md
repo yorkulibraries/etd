@@ -120,7 +120,9 @@ system and restricted writable log/tmp. Stop both and join their process groups
 before maintenance. Journal backend output is suppressed with QUIET and a null
 Delayed logger; only fixed heartbeat/error enums are emitted by the role. Review
 Rails/APM settings too; never enable SMTP/SQL payload debugging. Worker heartbeat
-is emitted per process on its loop at most every 30 s. The journal's timestamps and
+is checked per process on idle loops and after each job, with output rate-limited
+to once per 30 s. The 30 s maximum job runtime bounds the interval while busy;
+this is a progress callback, not a separate timer. The journal's timestamps and
 systemd unit identity distinguish workers without application identifiers.
 An absent heartbeat for90 s requires inspection; a heartbeat alone does not prove
 SMTP progress. Monitor both unit states, status counts/oldest and failures.
@@ -166,7 +168,14 @@ Use the actual process/thread inventory and primary max_connections at QA.
 `docker-compose.graduate-email.yml` is an optional standalone opt-in profile using
 an existing reviewed app image, unprivileged UID:GID and protected environment file.
 It creates two dedicated workers only, with no web/DB/seeds/migrations. Its temporary
-log/tmp mounts are private; fixed stdout enums use bounded local logging. Configure
+log/tmp mounts are private 0700 and owned by the selected process UID/GID. Set
+`GRADUATE_EMAIL_UID` and `GRADUATE_EMAIL_GID` separately to positive decimal
+numbers (no leading zeroes, names or root IDs). The same values select the process
+user and all three tmpfs owners. Startup rejects invalid or mismatched identities
+before loading Rails. Verify mkdir/write/read/delete on `/tmp`, `/app/tmp` and
+`/app/log` as that configured user, then foreground start/progress/stop using the
+resolved settings. Root workers and broader permissions are not a workaround.
+Fixed stdout enums use bounded local logging. Configure
 image/network/DB resolution with the owner and schedule hourly cleanup separately.
 Do not run the repository's default web compose startup for this feature.
 

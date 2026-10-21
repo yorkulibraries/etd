@@ -247,3 +247,36 @@ prove stale access remains denied. Leave email disabled unless an explicit autho
 QA continuation says otherwise. Production deployment **and** activation need separate
 owner approvals after QA. Follow the rollback compatibility instructions in the
 operations runbook, never destructive down migrations or restoration of old generation.
+
+## Task 8 fix regression checks
+
+On the Docker host, select the already installed reviewed image (no pull):
+
+```bash
+python3 test/support/graduate_email_container_probe.py --image IMAGE_ID --workers
+```
+
+This resolves both worker templates using the unpopulated example file and a
+numeric nonroot test identity, checks actual private mount writes and identity
+rejections, then uses a disposable network-disabled container with the resolved
+user/tmpfs/read-only/capability/logging/stop settings. The local image predates installed gems, so this harness copies only the existing
+runtime dependency code, including locked Git gem checkouts, into a disposable
+read-only volume. It excludes bundle config/cache, Git metadata and server
+environment files, verifies dependency hashes before/after copying, and removes
+the volume afterward. No dependency download or image build occurs.
+The checkout is read-only; SQLite is created only on its private tmpfs at the existing guard's allowlisted
+path. Actual foreground jobs:work processes exercise both dedicated queues with
+RAM transport, queued restart, claimed no-retry and an unrelated queue sentinel.
+The test command replaces production boot solely to prepare the disposable DB
+and install the existing test transport. It does not install a host service or
+validate production secrets, an owner-specific image, relay or supervision.
+
+The worker operations integration file also runs
+`test/support/graduate_email_worker_lifecycle_probe.rb` in dedicated and ordinary
+roles. This no-DB check uses the installed Worker's real start/work_off/perform
+lifecycle, synthetic execution and a private monotonic clock. It checks busy and
+idle heartbeats, rate bounds, static output and unchanged ordinary defaults.
+Run both operations integration files through the storage guard sequentially
+on SQLite and MySQL after a pre-gate host/container source freeze. Use the
+existing sanitized reporter. These scoped worker/template fixes do not require
+repeating broad exports or rewriting any sealed Task 7/8 runner package.
