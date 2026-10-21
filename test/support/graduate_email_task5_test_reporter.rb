@@ -15,7 +15,7 @@ output.lines.each do |line|
   if stripped.match?(/expected to find|Unable to find|expected .* to equal/)
     # Only known static labels; never print arbitrary actual DOM values.
     %w[h1 h2 button code authenticity_token].each { |word| emit.call("FLOW_LABEL #{word}") if stripped.include?(word) }
-    ['Enter your sign-in code', 'Approve email sign-in', 'Share this invitation once', 'Sign-in code'].each { |label| emit.call("FLOW_EXPECTED #{label}") if stripped.include?(label) }
+    ['Enter your sign-in code', 'Request your sign-in code', 'Approve email sign-in', 'Share this invitation once', 'Sign-in code'].each { |label| emit.call("FLOW_EXPECTED #{label}") if stripped.include?(label) }
     emit.call('FLOW_DOCUMENT_EXCEPTION') if stripped.match?(/Exception|Error|exception/)
     emit.call('FLOW_DOCUMENT_SIGN_IN') if stripped.include?('Graduate sign in')
   end

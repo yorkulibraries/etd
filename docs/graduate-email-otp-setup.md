@@ -236,8 +236,8 @@ reference to a deleted user becomes null.
 
 Cancel a mistaken or unreceived pending approval; reissue only after verification.
 Reissue supersedes prior pending email approval; it does not revoke Google or change
-ordinary contacts. Graduate opens the invitation, requests the code and enters it
-in the same browser. Code is six digits, including leading zeroes, valid5 min from
+ordinary contacts. Graduate opens the invitation, selects Send code and enters the
+code in the same browser. Opening the link never sends mail. Code is six digits, including leading zeroes, valid5 min from
 request including queue time, with at most5 failures. Resend is explicit and limited.
 
 Lost mailbox, suspected compromise/reassignment, or address replacement requires

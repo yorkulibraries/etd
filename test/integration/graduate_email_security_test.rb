@@ -361,6 +361,7 @@ class GraduateEmailSecurityTest < ActionDispatch::IntegrationTest
     assert_equal 1, GraduateSession.where(authentication_method: 'email').count
     follow_redirect!
     get '/graduate/email/verify'
+    assert_address_entry_page
     csrf_post '/graduate/email/verify', code: code
     assert_response :unprocessable_entity
     assert_equal 1, GraduateSession.where(authentication_method: 'email').count
@@ -383,6 +384,235 @@ class GraduateEmailSecurityTest < ActionDispatch::IntegrationTest
     doc = Nokogiri::HTML(response.body)
     [response.status, doc.css('h1').map(&:text), doc.css('[role="status"]').map(&:text),
       doc.css('main form').map { |form| [form['action'], form.css('input').map { |field| [field['name'], field['type']] }] }]
+  end
+
+  # M4: whole visible page shape, never CSRF values or other dynamic data.
+  def page_shape
+    doc = Nokogiri::HTML(response.body)
+    public_form + [main_buttons(doc), doc.css('main p').map { |item| item.text.strip },
+      doc.css('main a').map { |link| [link.text.strip, link['href']] }]
+  end
+
+  def main_buttons(doc)
+    doc.css('main button, main input[type="submit"]').map { |item| item.name == 'button' ? item.text.strip : item['value'] }
+  end
+
+  def assert_first_request_page
+    doc = Nokogiri::HTML(response.body)
+    assert_equal ['Request your sign-in code'], doc.css('h1').map { |item| item.text.strip }
+    assert_includes doc.at_css('main').text, 'No code has been sent yet.'
+    assert_includes doc.at_css('main').text, 'Enter the code in the browser that requested it.'
+    refute_includes response.body, GraduateEmail::RequestResult::MESSAGE
+    assert_nil doc.at_css('input[name="code"]')
+    assert_equal ['Send code'], main_buttons(doc)
+    assert_includes doc.at_css('form[action="/graduate/email/resend"][method="post"] button')['class'], 'btn-primary'
+  end
+
+  def assert_requested_page
+    doc = Nokogiri::HTML(response.body)
+    assert_equal ['Enter your sign-in code'], doc.css('h1').map { |item| item.text.strip }
+    assert_equal [GraduateEmail::RequestResult::MESSAGE], doc.css('[role="status"]').map(&:text)
+    refute_includes doc.at_css('main').text, 'No code has been sent yet.'
+    assert doc.at_css('input[name="code"][autocomplete="one-time-code"]')
+    assert_equal ['Verify code', 'Resend code'], main_buttons(doc)
+  end
+
+  def assert_address_entry_page
+    doc = Nokogiri::HTML(response.body)
+    assert_equal ['Request your sign-in code'], doc.css('h1').map { |item| item.text.strip }
+    assert_includes doc.at_css('main').text, 'No code has been requested in this browser.'
+    refute_includes response.body, GraduateEmail::RequestResult::MESSAGE
+    assert_nil doc.at_css('input[name="code"]')
+    assert_empty main_buttons(doc)
+    assert doc.at_css('main a.btn-primary[href="/graduate/email"]')
+  end
+
+  def open_invitation(token)
+    get '/graduate/email/enroll', params: {token: token}
+    assert_redirected_to graduate_email_verify_path
+    assert_equal 'no-store', response.headers['Cache-Control']
+    follow_redirect!
+    assert_response :success
+  end
+
+  def flow_counts
+    [GraduateEmailChallenge.count, Delayed::Job.count, GraduateSession.count]
+  end
+
+  # M4 S1-S5: opening an invitation creates intent only. The first send is one
+  # explicit CSRF POST; refresh, revisits and link prefetch never deliver.
+  test 'invitation_get_never_sends_and_one_first_post_queues_one_code' do
+    [:initial, :replacement].each do |kind|
+      fresh_browser
+      host! '127.0.0.1:3210'
+      approval, token = kind == :initial ? issue_approval : issue_approval(address: 'new@example.com', replacement: true)
+      before = flow_counts
+      approval_before = approval.reload.attributes
+      2.times do
+        open_invitation(token)
+        assert_first_request_page
+        get '/graduate/email/verify'
+        assert_first_request_page
+      end
+      assert_equal before, flow_counts
+      assert_equal approval_before, approval.reload.attributes
+      post '/graduate/email/resend'
+      assert_response :unprocessable_entity
+      get '/graduate/email/verify'
+      assert_first_request_page
+      assert_equal before, flow_counts
+      csrf_post '/graduate/email/resend', address: 'posted@example.com', approval_id: -1, purpose: 'login', student_id: -1
+      assert_response :accepted
+      assert_requested_page
+      row = GraduateEmailChallenge.order(:id).last
+      assert_equal ['enroll', 'queued', approval.id, approval.student_id], [row.purpose, row.state, row.approval_id, row.student_id]
+      assert_equal GraduateEmail::Limits.address_key(input: approval.normalized_address), row.address_key
+      assert_equal [before[0] + 1, before[1] + 1, before[2]], flow_counts
+      get '/graduate/email/verify'
+      assert_requested_page
+      assert_equal [before[0] + 1, before[1] + 1, before[2]], flow_counts
+      deliver_row(row)
+      code = otp_code_for(public_id: row.public_id)
+      assert code.is_a?(String), 'RAM transport captured code'
+      csrf_post '/graduate/email/verify', code: code == '000000' ? '000001' : '000000'
+      assert_response :unprocessable_entity
+      assert_requested_page
+      doc = Nokogiri::HTML(response.body)
+      assert_equal 'code-error', doc.at_css('input[name="code"]')['aria-describedby']
+      assert_nil doc.at_css('input[name="code"]')['value']
+      travel 61.seconds
+      csrf_post '/graduate/email/resend'
+      assert_response :accepted
+      assert_requested_page
+      resent = GraduateEmailChallenge.order(:id).last
+      assert_equal ['queued', approval.id], [resent.state, resent.approval_id]
+      assert_equal 'superseded', row.reload.state
+      deliver_row(resent)
+      csrf_post '/graduate/email/verify', code: otp_code_for(public_id: resent.public_id)
+      assert_redirected_to student_view_index_path
+      assert approval.reload.consumed_at
+      assert_equal approval_before['expires_at'], approval.expires_at
+      assert_equal approval.normalized_address, GraduateEmailActiveAddress.find_by!(student_id: approval.student_id).normalized_address
+      travel_back
+    end
+  end
+
+  # M4 S6/S12: every unusable invitation renders the valid first-request page
+  # and accepted page, and its POST sends, authenticates and renews nothing.
+  test 'invalid_invitations_match_valid_first_request_and_never_send_or_renew' do
+    valid, valid_token = issue_approval
+    open_invitation(valid_token)
+    assert_first_request_page
+    first = page_shape
+    csrf_post '/graduate/email/resend'
+    accepted = page_shape
+    assert_requested_page
+    valid_row = GraduateEmailChallenge.order(:id).last
+    deliver_row(valid_row)
+    csrf_post '/graduate/email/verify', code: otp_code_for(public_id: valid_row.public_id)
+    assert_redirected_to student_view_index_path
+    superseded, superseded_token = issue_approval(address: 'other@example.com', replacement: true)
+    revoked, revoked_token = issue_approval(address: 'third@example.com', replacement: true)
+    GraduateEmail::Revocation.approval!(approval: revoked, actor: @actor, impersonating: false)
+    expired, expired_token = issue_approval(student: create(:student), address: 'expired@example.com')
+    demoted, demoted_token = issue_approval(student: create(:student), address: 'demoted@example.com')
+    dormant, dormant_token = issue_approval(student: create(:student), address: 'dormant@example.com')
+    approvals = [valid, superseded, revoked, expired, demoted, dormant]
+    cases = {malformed: 'not-a-token', unknown: SecureRandom.urlsafe_base64(32), consumed: valid_token,
+      superseded: superseded_token, revoked: revoked_token, expired: expired_token, demoted: demoted_token,
+      expired_intent: dormant_token}
+    assert_equal 43, cases[:unknown].length
+    cases.each do |name, token|
+      fresh_browser
+      host! '127.0.0.1:3210'
+      travel_to(expired.expires_at) if name == :expired
+      @actor.update!(role: User::STAFF) if name == :demoted
+      durable = approvals.map { |item| item.reload.attributes }
+      before = flow_counts
+      targeted = GraduateEmailChallenge.where.not(student_id: nil).count
+      open_invitation(token)
+      assert_equal first, page_shape, "#{name} first-request page"
+      travel 10.minutes if name == :expired_intent
+      get '/graduate/email/verify'
+      assert_equal first, page_shape, "#{name} first-request refresh"
+      csrf_post '/graduate/email/resend'
+      assert_equal accepted, page_shape, "#{name} accepted page"
+      get '/graduate/email/verify'
+      assert_requested_page
+      assert_equal targeted, GraduateEmailChallenge.where.not(student_id: nil).count
+      assert_equal before[2], GraduateSession.count
+      assert_equal durable, approvals.map { |item| item.reload.attributes }
+      csrf_post '/graduate/email/verify', code: '000000'
+      assert_response :unprocessable_entity
+      assert_requested_page
+      assert_equal before[2], GraduateSession.count
+      @actor.update!(role: User::MANAGER)
+      travel_back
+    end
+    assert_nil dormant.reload.consumed_at
+  end
+
+  # M4 S7/S8: the request attempt, not its outcome, selects the page state.
+  test 'request_outcome_never_changes_requested_page' do
+    approval, token = issue_approval
+    open_invitation(token)
+    assert_first_request_page
+    csrf_post '/graduate/email/resend'
+    assert_requested_page
+    expected = page_shape
+    assert_equal 1, GraduateEmailChallenge.where(approval_id: approval.id, state: 'queued').count
+    outcomes = {
+      throttled_by_other_browser: -> { csrf_post '/graduate/email/resend' },
+      capacity: -> { GraduateEmail::Limits.stub(:send_admission, :capacity) { csrf_post '/graduate/email/resend' } },
+      internal_error: -> { GraduateEmail::Limits.stub(:send_admission, ->(*, **) { raise ActiveRecord::StatementInvalid, 'synthetic' }) { csrf_post '/graduate/email/resend' } }
+    }
+    outcomes.each do |name, request|
+      fresh_browser
+      host! '127.0.0.1:3210'
+      open_invitation(token)
+      assert_first_request_page
+      queued = GraduateEmailChallenge.where(state: 'queued').count
+      request.call
+      assert_equal expected, page_shape, "#{name} accepted page"
+      assert_equal queued, GraduateEmailChallenge.where(state: 'queued').count
+      get '/graduate/email/verify'
+      assert_requested_page
+    end
+    other = create(:student)
+    known = GraduateEmailConnection.create!(student: other, approved_by: @actor,
+      normalized_address: 'known@example.com', verified_at: Time.current)
+    GraduateEmailActiveAddress.create!(student: other, connection: known, normalized_address: known.normalized_address)
+    shapes = %w[known@example.com unknown@example.com].map do |address|
+      fresh_browser
+      host! '127.0.0.1:3210'
+      get '/graduate/email'
+      csrf_post '/graduate/email/challenges', address: address
+      assert_response :accepted
+      assert_requested_page
+      get '/graduate/email/verify'
+      assert_requested_page
+      page_shape
+    end
+    assert_equal shapes.first, shapes.last
+    assert_equal 1, GraduateEmailChallenge.where(purpose: 'login', state: 'queued').count
+  end
+
+  # M4 S10: without any transaction the page offers address entry, not a send.
+  test 'verify_without_transaction_offers_address_entry_and_sends_nothing' do
+    before = flow_counts
+    get '/graduate/email/verify'
+    assert_response :success
+    assert_address_entry_page
+    csrf_post '/graduate/email/resend'
+    assert_response :accepted
+    assert_address_entry_page
+    csrf_post '/graduate/email/verify', code: '000000'
+    assert_response :unprocessable_entity
+    assert_address_entry_page
+    assert_equal before, flow_counts
+    get '/graduate/email'
+    get '/graduate/email/verify'
+    assert_address_entry_page
   end
 
   test 'no_referrer_null_origin_requires_real_csrf_and_foreign_origin_is_denied' do

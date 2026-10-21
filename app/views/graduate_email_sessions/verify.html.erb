@@ -1,18 +1,37 @@
-<% content_for :title, "Enter your sign-in code" %>
-<p role="status"><%= GraduateEmail::RequestResult::MESSAGE %></p>
-<p>Enter the code in the browser that requested it. Codes expire five minutes after the request, including delivery time.</p>
+<% state = code_request_state %>
+<% content_for :title, state == :requested ? "Enter your sign-in code" : "Request your sign-in code" %>
+<% case state %>
+<% when :requested %>
+  <p role="status"><%= GraduateEmail::RequestResult::MESSAGE %></p>
+<% when :first %>
+  <p>No code has been sent yet. Select Send code to request a sign-in code for the address approved by the Faculty of Graduate Studies.</p>
+<% else %>
+  <p>No code has been requested in this browser. Open your invitation link again, or enter your approved email address to request a code.</p>
+<% end %>
+<% unless state == :none %>
+  <p>Enter the code in the browser that requested it. Codes expire five minutes after the request, including delivery time.</p>
+<% end %>
 <% if @verification_error %>
   <p id="code-error" class="alert alert-warning" role="alert"><%= @verification_error %></p>
 <% end %>
-<%= form_with url: graduate_email_verify_path, method: :post, local: true, data: { turbo: false } do %>
-  <div class="mb-3">
-    <%= label_tag :code, "Sign-in code", class: "form-label" %>
-    <%= text_field_tag :code, nil, inputmode: "numeric", autocomplete: "one-time-code", maxlength: 6, required: true, class: "form-control", aria: { describedby: @verification_error ? "code-error" : nil } %>
-  </div>
-  <%= submit_tag "Verify code", class: "btn btn-primary w-100" %>
+<% case state %>
+<% when :requested %>
+  <%= form_with url: graduate_email_verify_path, method: :post, local: true, data: { turbo: false } do %>
+    <div class="mb-3">
+      <%= label_tag :code, "Sign-in code", class: "form-label" %>
+      <%= text_field_tag :code, nil, inputmode: "numeric", autocomplete: "one-time-code", maxlength: 6, required: true, class: "form-control", aria: { describedby: @verification_error ? "code-error" : nil } %>
+    </div>
+    <%= submit_tag "Verify code", class: "btn btn-primary w-100" %>
+  <% end %>
+  <%= button_to "Resend code", graduate_email_resend_path, method: :post, class: "btn btn-outline-secondary w-100 mt-3", form: { data: { turbo: false } } %>
+<% when :first %>
+  <%= button_to "Send code", graduate_email_resend_path, method: :post, class: "btn btn-primary w-100", form: { data: { turbo: false } } %>
+<% else %>
+  <%= link_to "Enter your email address", graduate_email_path, class: "btn btn-primary w-100" %>
 <% end %>
-<%= button_to "Resend code", graduate_email_resend_path, method: :post, class: "btn btn-outline-secondary w-100 mt-3", form: { data: { turbo: false } } %>
-<p class="mt-3"><%= link_to "Use another email address", graduate_email_path %></p>
-<p><%= link_to "Continue with Google", graduate_login_path %></p>
+<% unless state == :none %>
+  <p class="mt-3"><%= link_to "Use another email address", graduate_email_path %></p>
+<% end %>
+<%= tag.p link_to("Continue with Google", graduate_login_path), class: ("mt-3" if state == :none) %>
 <p><%= link_to "Sign in with Passport York", login_path %></p>
 <p>Need help with access or a lost mailbox? Contact the Faculty of Graduate Studies through your usual support channel.</p>

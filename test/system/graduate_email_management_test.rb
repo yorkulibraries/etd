@@ -68,7 +68,7 @@ class GraduateEmailManagementTest < GraduateEmailBrowserCase
       approval, token = issue_approval(address: 'new@example.com', replacement: true)
       visit "/graduate/email/enroll?#{URI.encode_www_form(token: token)}"
       assert_current_path '/graduate/email/verify'
-      resend_code
+      send_first_code
       row, code = run_mail_worker
       enter_code(code)
       assert_current_path student_view_index_path

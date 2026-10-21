@@ -100,6 +100,19 @@ class GraduateEmailArtifactsTest < ActiveSupport::TestCase
     refute GraduateEmailSafeArtifacts.clean_state?('generated-url', clean), 'Google token state rejected'
   end
 
+  # M4: unusable invitations now show the first-request page before any send.
+  test 'first_request_enrollment_states_require_their_own_heading' do
+    clean = {path: '/graduate/email/verify', query: false, secret: false, entered: false,
+      heading: 'Request your sign-in code', width: 1440, height: 1000}
+    %w[expired-enrollment revoked-enrollment].each do |name|
+      assert GraduateEmailSafeArtifacts.clean_state?(name, clean), 'first-request state documented'
+      [{heading: 'Enter your sign-in code'}, {path: '/graduate/email/enroll'}, {query: true}, {secret: true}].each do |bad|
+        refute GraduateEmailSafeArtifacts.clean_state?(name, clean.merge(bad)), 'unsafe first-request state rejected'
+      end
+    end
+    refute GraduateEmailSafeArtifacts.clean_state?('generic-send', clean), 'accepted state keeps code heading'
+  end
+
   test 'verification_run_directory_is_confined_and_shared' do
     previous = ENV['GRADUATE_EMAIL_VERIFICATION_RUN']
     ENV.delete('GRADUATE_EMAIL_VERIFICATION_RUN')

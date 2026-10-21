@@ -4,6 +4,7 @@ class GraduateEmailSessionsController < ApplicationController
   protect_from_forgery with: :exception
   skip_before_action :login_required
   skip_authorization_check
+  helper_method :code_request_state
   before_action :private_response
   before_action :bounded_request
   rescue_from ActionController::InvalidAuthenticityToken, with: :invalid_csrf
@@ -85,7 +86,23 @@ class GraduateEmailSessionsController < ApplicationController
       intent['challenge_public_id'] = result.challenge_public_id
       session[:graduate_email_intent] = intent
     end
+    record_code_request
     render :verify, status: :accepted
+  end
+
+  # Record the attempt, never its outcome, for every intent kind, so the page
+  # cannot reveal invitation validity, mailbox eligibility or throttling.
+  def record_code_request
+    intent = session[:graduate_email_intent]
+    session[:graduate_email_intent] = intent.merge('requested' => true) if intent.is_a?(Hash)
+  end
+
+  # Browser request history only: no challenge, approval, target or expiry read.
+  def code_request_state
+    intent = session[:graduate_email_intent]
+    return :none unless intent.is_a?(Hash)
+
+    intent['requested'] == true ? :requested : :first
   end
 
   def failed_verification

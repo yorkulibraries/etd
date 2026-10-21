@@ -164,6 +164,17 @@ The runner discovers these regressions in existing files; no new runner list.
 Use a new run name such as `GRADUATE_EMAIL_VERIFICATION_RUN=opus-important-fixes-r1`;
 historical packages stay untouched.
 
+## Minor fix M4 (first code request)
+
+Opening an invitation, refreshing, going Back or a link scanner fetch creates intent
+only and queues no mail. The page says no code has been sent yet and offers one
+primary Send code POST. After any send POST, including address entry, the generic
+message, code field and Resend code appear. Invalid, expired, revoked, used and
+malformed invitations render the same pages and send nothing. The page state comes
+only from this browser's request history, never from invitation, target or
+challenge state. A verify page with no transaction offers address entry instead.
+Use a new run name such as `GRADUATE_EMAIL_VERIFICATION_RUN=opus-first-code-ux-r1`.
+
 ## Owner-approved QA checklist, before any enable
 
 This checklist authorizes no QA data, requests, mail or provider changes. Supply

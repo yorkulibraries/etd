@@ -73,10 +73,30 @@ class GraduateEmailBrowserCase < ActionDispatch::SystemTestCase
     [row, otp_code_for(public_id: row.public_id)]
   end
 
+  # An invitation GET never sends. The first send is this explicit POST.
+  def send_first_code
+    assert_first_request_form
+    click_button 'Send code'
+    assert_current_path '/graduate/email/resend'
+    assert_generic_form
+  end
+
   def resend_code
     click_button 'Resend code'
     assert_current_path '/graduate/email/resend'
     assert_selector 'h1', text: 'Enter your sign-in code'
+  end
+
+  def assert_first_request_form
+    assert_selector 'h1', text: 'Request your sign-in code'
+    assert_text 'No code has been sent yet.'
+    assert_text 'Enter the code in the browser that requested it.'
+    assert_includes find_button('Send code')[:class], 'btn-primary'
+    assert_no_button 'Resend code'
+    assert_no_field 'Sign-in code'
+    assert_no_text 'If this address is enabled for graduate sign-in'
+    assert_link 'Continue with Google'
+    assert_link 'Sign in with Passport York'
   end
 
   def enter_code(code)
@@ -89,6 +109,8 @@ class GraduateEmailBrowserCase < ActionDispatch::SystemTestCase
     assert_text 'If this address is enabled for graduate sign-in, we’ll send a code.'
     assert_selector 'input[type="text"][inputmode="numeric"][autocomplete="one-time-code"][maxlength="6"]'
     assert_button 'Resend code'
+    assert_no_button 'Send code'
+    assert_no_text 'No code has been sent yet.'
     assert_link 'Continue with Google'
     assert_link 'Sign in with Passport York'
   end

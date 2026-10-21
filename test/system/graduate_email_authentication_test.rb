@@ -12,7 +12,7 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
     assert_equal 0, GraduateSession.where(authentication_method: 'email').count
     assert_nil approval.reload.consumed_at
     assert_no_selector 'input[name="address"]'
-    resend_code
+    send_first_code
     row, code = run_mail_worker
     assert_equal approval.id, row.approval_id
     enter_code(code)
@@ -35,6 +35,72 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
     assert_equal before, [Student.count, @student.reload.email]
     visit student_view_thesis_process_path(thesis, Thesis::PROCESS_BEGIN)
     assert_current_path student_view_thesis_process_path(thesis, Thesis::PROCESS_BEGIN)
+  end
+
+  # M4: opening an invitation creates intent only. Refresh, Back and reopening
+  # never deliver; one explicit Send code queues one real job.
+  test 'first_invitation_offers_send_code_and_get_never_delivers' do
+    approval, token = issue_approval
+    before = flow_counts
+    visit "/graduate/email/enroll?#{URI.encode_www_form(token: token)}"
+    assert_current_path '/graduate/email/verify'
+    assert_first_request_form
+    page.refresh
+    assert_first_request_form
+    visit "/graduate/email/enroll?#{URI.encode_www_form(token: token)}"
+    assert_current_path '/graduate/email/verify'
+    assert_first_request_form
+    assert_equal before, flow_counts
+    send_first_code
+    assert_equal [before[0] + 1, before[1] + 1], flow_counts
+    queued = GraduateEmailChallenge.order(:id).last
+    assert_equal ['enroll', 'queued', approval.id], [queued.purpose, queued.state, queued.approval_id]
+    page.go_back
+    assert_current_path '/graduate/email/verify'
+    page.refresh
+    assert_generic_form
+    assert_equal [before[0] + 1, before[1] + 1], flow_counts
+    row, code = run_mail_worker
+    assert_equal queued.id, row.id
+    enter_code(code == '000000' ? '000001' : '000000')
+    assert_selector '#code-error'
+    assert_equal '', find('#code').value
+    assert_equal 'code-error', find('#code')['aria-describedby']
+    assert_generic_form
+    enter_code(code)
+    assert_current_path student_view_index_path
+    assert approval.reload.consumed_at
+    assert_equal 1, GraduateEmailActiveAddress.where(student_id: @student.id).count
+  end
+
+  test 'replacement_invitation_offers_send_code_then_resend' do
+    enrolled_connection
+    approval, token = issue_approval(address: 'new@example.com', replacement: true)
+    before = flow_counts
+    visit "/graduate/email/enroll?#{URI.encode_www_form(token: token)}"
+    assert_current_path '/graduate/email/verify'
+    assert_first_request_form
+    page.refresh
+    assert_first_request_form
+    assert_equal before, flow_counts
+    send_first_code
+    first, = run_mail_worker
+    assert_equal approval.id, first.approval_id
+    travel 61.seconds
+    resend_code
+    assert_generic_form
+    assert_equal 'superseded', first.reload.state
+    row, code = run_mail_worker
+    assert_equal approval.id, row.approval_id
+    enter_code(code)
+    assert_current_path student_view_index_path
+    assert approval.reload.consumed_at
+    assert_equal 'new@example.com', GraduateEmailActiveAddress.find_by!(student_id: @student.id).normalized_address
+  end
+
+  # The test thread caches identical count queries; read server writes fresh.
+  def flow_counts
+    ActiveRecord::Base.uncached { [GraduateEmailChallenge.count, Delayed::Job.count] }
   end
 
   # I1: the verified connection's approver may later leave or lose staff role.
@@ -143,8 +209,7 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
     travel_to approval.expires_at
     visit "/graduate/email/enroll?#{URI.encode_www_form(token: token)}"
     assert_current_path '/graduate/email/verify'
-    assert_generic_form
-    resend_code
+    send_first_code
     assert_equal 0, GraduateEmailChallenge.where.not(student_id: nil).count
     assert_nil approval.reload.consumed_at
     visit student_view_index_path
@@ -155,7 +220,7 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
     approval, token = issue_approval
     visit "/graduate/email/enroll?#{URI.encode_www_form(token: token)}"
     assert_current_path '/graduate/email/verify'
-    resend_code
+    send_first_code
     _, old_code = run_mail_worker
     click_link 'Use another email address'
     assert_current_path '/graduate/email'
@@ -167,12 +232,22 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
     travel 61.seconds
     visit "/graduate/email/enroll?#{URI.encode_www_form(token: token)}"
     assert_current_path '/graduate/email/verify'
-    resend_code
+    send_first_code
     _, code = run_mail_worker
     enter_code(code)
     assert_current_path student_view_index_path
     assert approval.reload.consumed_at
+    # No transaction remains, so no code form; the used link looks unused.
     visit '/graduate/email/verify'
+    assert_selector 'h1', text: 'Request your sign-in code'
+    assert_text 'No code has been requested in this browser.'
+    assert_no_field 'Sign-in code'
+    assert_no_button 'Send code'
+    jobs = flow_counts.last
+    visit "/graduate/email/enroll?#{URI.encode_www_form(token: token)}"
+    assert_current_path '/graduate/email/verify'
+    send_first_code
+    assert_equal jobs, flow_counts.last
     enter_code(code)
     assert_selector '#code-error', text: 'The code is incorrect or has expired'
     assert_equal 1, GraduateSession.uncached { GraduateSession.where(authentication_method: 'email').count }
@@ -299,15 +374,17 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
       travel_to approval.expires_at
       visit "/graduate/email/enroll?#{URI.encode_www_form(token: token)}"
       assert_current_path '/graduate/email/verify'
-      assert_generic_form
+      assert_first_request_form
       clean_browser_artifact('expired-enrollment', mobile: mobile)
       travel_back
       approval, token = issue_approval
       GraduateEmail::Revocation.approval!(approval: approval, actor: @actor, impersonating: false)
       visit "/graduate/email/enroll?#{URI.encode_www_form(token: token)}"
       assert_current_path '/graduate/email/verify'
-      assert_generic_form
+      assert_first_request_form
       clean_browser_artifact('revoked-enrollment', mobile: mobile)
+      send_first_code
+      assert page.evaluate_script('document.documentElement.scrollWidth <= document.documentElement.clientWidth'), 'accepted state fits'
       browser_fresh_session
     end
   end
@@ -350,7 +427,7 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
     Capybara.using_session(:old_enrollment) do
       visit "/graduate/email/enroll?#{URI.encode_www_form(token: token)}"
       assert_current_path '/graduate/email/verify'
-      resend_code
+      send_first_code
       assert_nil approval.reload.consumed_at
     end
     visit student_view_details_path
