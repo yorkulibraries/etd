@@ -37,7 +37,7 @@
       <% end %>
       <p class="mt-3 mb-0">
         <%= link_to "Change address", staff_student_graduate_connections_path(@student), class: "me-3", data: { review_exit: true, turbo: false } %>
-        <%= link_to "Cancel", student_path(@student), data: { review_exit: true, turbo: false } %>
+        <%= link_to "Cancel", staff_student_graduate_connections_path(@student), data: { review_exit: true, turbo: false } %>
       </p>
     </div>
   </section>

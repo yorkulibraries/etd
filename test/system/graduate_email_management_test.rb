@@ -69,7 +69,7 @@ class GraduateEmailManagementTest < GraduateEmailBrowserCase
     fill_in 'Confirm approved address', with: 'mine@example.com'
     click_button 'Review address'
     click_link 'Cancel'
-    assert_current_path student_path(@student)
+    assert_current_path staff_student_graduate_connections_path(@student)
     assert_equal 0, own.call
     visit staff_student_graduate_connections_path(@student)
     fill_in 'Approved sign-in address', with: 'mine@example.com'

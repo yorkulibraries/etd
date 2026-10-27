@@ -359,7 +359,12 @@ class GraduateEmailStaffReviewTest < ActionDispatch::IntegrationTest
       other_student: -> { post student_graduate_email_invitations_path(other), params: create_params('approved@example.com') },
       mode_flip: -> { post student_graduate_email_invitations_path(@student), params: create_params('approved@example.com', replacement: '1') },
       expired: -> { travel 16.minutes; post student_graduate_email_invitations_path(@student), params: create_params('approved@example.com') },
-      revisited: -> { get staff_student_graduate_connections_path(@student); post student_graduate_email_invitations_path(@student), params: create_params('approved@example.com') }
+      revisited: -> { get staff_student_graduate_connections_path(@student); post student_graduate_email_invitations_path(@student), params: create_params('approved@example.com') },
+      canceled: -> {
+        destination = Nokogiri::HTML(response.body).css('a[data-review-exit]').find { |link| link.text.strip == 'Cancel' }['href']
+        get destination
+        post student_graduate_email_invitations_path(@student), params: create_params('approved@example.com')
+      }
     }.each do |name, attempt|
       review(address: 'Approved@Example.com', confirmed: 'approved@example.com')
       assert_response :success
@@ -490,7 +495,7 @@ class GraduateEmailStaffReviewTest < ActionDispatch::IntegrationTest
     assert_includes form.at_css('label[for="email_address_confirmed"]').text, address
     assert_equal [replacement ? 'Create replacement email invitation' : 'Create email invitation'],
       form.css('input[type="submit"], button').map { |item| item.name == 'button' ? item.text.strip : item['value'] }
-    assert_equal [['Change address', staff_student_graduate_connections_path(@student)], ['Cancel', student_path(@student)]],
+    assert_equal [['Change address', staff_student_graduate_connections_path(@student)], ['Cancel', staff_student_graduate_connections_path(@student)]],
       doc.css('main a[data-review-exit]').map { |link| [link.text.strip, link['href']] }
     refute_includes response.body, 'Share this invitation once'
     assert_nil doc.at_css('a[href*="token="]')
