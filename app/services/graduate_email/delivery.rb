@@ -236,6 +236,11 @@ module GraduateEmail
         target_hint = hint.purpose == 'enroll' ? GraduateEmailApproval.find_by(id: hint.approval_id) : GraduateEmailConnection.find_by(id: hint.connection_id)
         users = User.where(id: [hint.student_id, target_hint&.approved_by_id]).order(:id).lock.index_by(&:id)
         approvals = GraduateEmailApproval.where(student_id: hint.student_id).order(:id).lock.to_a if hint.purpose == 'enroll'
+        # A duplicate claim from before cross-student reservation fails closed.
+        competing = if hint.purpose == 'enroll' && target_hint
+          Enrollment.competing_locked(student_id: hint.student_id, address: target_hint.normalized_address, generation: control.generation,
+            now: now, address_scope: GraduateEmailApproval.where(id: hint.approval_id).select(:normalized_address))
+        end
         connections = GraduateEmailConnection.where(student_id: hint.student_id).order(:id).lock.to_a
         mappings = GraduateEmailActiveAddress.where(student_id: hint.student_id)
         if hint.purpose == 'enroll'
@@ -269,7 +274,7 @@ module GraduateEmail
             valid = row.connection_id.nil? && target.generation == control.generation && target.revoked_at.nil? &&
               target.consumed_at.nil? && target.created_at <= now && target.created_at > now - 48.hours &&
               target.expires_at > now && target.expires_at <= target.created_at + 48.hours &&
-              mappings.none? { |item| item.student_id != row.student_id } &&
+              mappings.none? { |item| item.student_id != row.student_id } && competing.to_a.empty? &&
               (target.replacement_of_connection_id ? old && old.revoked_at.nil? && mapping &&
                 mapping.connection_id == old.id && mapping.normalized_address == old.normalized_address : mapping.nil?)
           else

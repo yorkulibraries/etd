@@ -24,6 +24,15 @@ begin
     true
   when 'reissue'
     GraduateEmail::Enrollment.issue!(student: Student.find(data['student']), actor: User.find(data['actor']), address: 'reissued@example.com', confirmed_address: 'reissued@example.com', identity_verified: true, impersonating: false, replacement: true)
+  when 'issue'
+    begin
+      GraduateEmail::Enrollment.issue!(student: Student.find(data['student']), actor: User.find(data['actor']), address: data['address'], confirmed_address: data['address'], identity_verified: true, impersonating: false, replacement: data['replacement'] == true)
+    rescue GraduateEmail::Enrollment::Refused
+      false
+    end
+  when 'cancel'
+    GraduateEmail::Revocation.approval!(approval: GraduateEmailApproval.find(data['approval']), actor: User.find(data['actor']), impersonating: false)
+    true
   when 'deliver'
     # RAM-only transport: a queued job that wins may send locally, never SMTP.
     transport = Class.new do

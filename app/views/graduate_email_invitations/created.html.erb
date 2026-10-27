@@ -1,5 +1,6 @@
 <% title "Share this invitation once" %>
 <p>FGS approved this individual sign-in address. Share the invitation through the verified contact channel. It expires after 48 hours and requires a mailbox code to connect the existing student record.</p>
+<p class="text-break">Approved sign-in address: <strong data-approved-address><%= @approval.normalized_address %></strong></p>
 <p>This invitation is shown once. Return to the student record to cancel it or issue a new one.</p>
 <p class="text-break"><%= link_to @invitation_url, @invitation_url, rel: "noreferrer", data: { turbo: false } %></p>
 <p><%= link_to "Back to graduate connections", staff_student_graduate_connections_path(@student) %></p>

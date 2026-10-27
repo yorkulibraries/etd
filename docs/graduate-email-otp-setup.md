@@ -212,10 +212,15 @@ Do not run the repository's default web compose startup for this feature.
 Use the named approved identity/lost-mailbox procedure above before touching real
 records. Verify the existing student's identity and exact individual mailbox through
 the approved contact channel. Do not infer access from contact fields or a matching
-Google email. Confirm the normalized recipient displayed by ETD, enter it a second
-time and explicitly confirm identity verification. No lists or shared/multi-address
-fields. The invitation token is shown once, expires48 h and authorizes enrollment
-intent only. Provide it through the approved verified-contact channel. ETD does not
+Google email. Enter the address twice and select Review address. ETD normalizes it
+(trims surrounding spaces, lowercases) and shows the exact address before anything
+is created. Check it, then confirm both identity verification and that the invitation
+is for exactly that address, and create the invitation. Change address and Cancel
+create nothing. A review lasts 15 minutes, works once, and ends when the staff
+connections page is opened again (including in another tab); create then asks for a
+new review. The success page shows the approved address next to the one-time link.
+No lists or shared/multi-address fields. The invitation token is shown once,
+expires48 h and authorizes enrollment intent only. Provide it through the approved verified-contact channel. ETD does not
 email an invitation. Keep it out of screenshots, tickets, referrers and logs.
 
 Staff turnover: a **pending** approval works only while its approving staff member
@@ -233,6 +238,20 @@ records are retained. Block or demote departed staff instead of deleting them.
 Deleting them would require an authorized retention decision for those records,
 which is still pending above. Policy audit events are retained, and any audit
 reference to a deleted user becomes null.
+
+One address belongs to one student record. ETD refuses an address that is another
+student record's verified sign-in address, or that another student record holds in a
+pending invitation. The staff review page says which of the two applies, without
+naming the other person, and links to the other record's connections page. Check for
+a duplicate record or a shared mailbox with FGS. Each graduate needs an individual
+mailbox. A pending invitation keeps its address until it is canceled, used, replaced
+by a newer invitation for the same student, expires, the other student is blocked,
+the other connection is removed, or email sign-in is disabled. Demoting or blocking
+the approving staff member does not release it, because that can be undone; cancel
+it instead. Typos, unsupported formats and mismatched entries get their own messages.
+An invitation listed as "Pending, blocked" collides with another record's claim from
+before these checks existed. Neither student can use it; cancel the one FGS did not
+verify. The graduate pages stay generic in every case.
 
 Cancel a mistaken or unreceived pending approval; reissue only after verification.
 Reissue supersedes prior pending email approval; it does not revoke Google or change

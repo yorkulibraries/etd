@@ -20,6 +20,8 @@ module GraduateEmailSafeArtifacts
     'student-connection' => [%r{\A/my/graduate-connections\z}, 'Email sign-in'],
     'staff-confirmation' => [%r{\A/students/\d+/graduate-connections\z}, 'Approve email sign-in'],
     'staff-recovery' => [%r{\A/students/\d+/graduate-connections\z}, 'Replace or recover email sign-in'],
+    'staff-review' => [%r{\A/students/\d+/graduate-email-invitations/review\z}, 'Review email sign-in address'],
+    'staff-conflict' => [%r{\A/students/\d+/graduate-email-invitations/review\z}, 'Review email sign-in address'],
     'notice-states' => [%r{\A/students/\d+/graduate-connections\z}, 'Email change notices']
   }.freeze
   SENTINELS = %w[TASK7_ARTIFACT_SENTINEL ARTIFACT_SENTINEL].freeze

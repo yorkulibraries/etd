@@ -245,22 +245,60 @@ class GraduateEmailRecoveryConcurrencyTest < ActionDispatch::IntegrationTest
   end
   teardown { teardown_delivery }
 
-  test 'replacement_address_uniqueness_race_has_one_winner' do
+  # D3: the first replacement claim is hidden while the second is issued and
+  # sent, recreating a duplicate that only pre-reservation code could produce.
+  test 'replacement_address_preexisting_duplicate_race_fails_closed' do
     other, other_connection = second_owner
     first = prepare_replacement
+    first[0].update_columns(revoked_at: Time.current)
     GraduateEmailLimitEvent.where(kind: 'send_address').update_all(occurred_at: 61.seconds.ago)
     second = prepare_replacement(student: other)
+    first[0].update_columns(revoked_at: nil)
     old_tokens = [email_session, email_session(other_connection)]
     outcomes = recovery_race(verify_input(first), verify_input(second))
-    assert_equal 1, outcomes.count('RECOVERY_ACCEPTED')
-    assert_equal 1, GraduateEmailActiveAddress.where(normalized_address: 'replacement@example.com').count
+    assert_equal 0, outcomes.count('RECOVERY_ACCEPTED')
+    assert_equal 0, GraduateEmailActiveAddress.where(normalized_address: 'replacement@example.com').count
     assert_equal 2, GraduateEmailActiveAddress.count
-    winner = GraduateEmailActiveAddress.find_by!(normalized_address: 'replacement@example.com').student_id
-    [first, second].each { |data| assert_equal data[0].student_id == winner, data[0].reload.consumed_at.present? }
-    assert_equal 1, GraduateEmailNotice.count
-    assert_equal 1, [valid_email?(old_tokens[0]), valid_email?(old_tokens[1], other_connection)].count(true)
-    assert_nil recovery_redeem(first)
+    [first, second].each { |data| assert_nil data[0].reload.consumed_at }
+    assert_equal 0, GraduateEmailNotice.count
+    assert_equal [true, true], [valid_email?(old_tokens[0]), valid_email?(old_tokens[1], other_connection)]
+    GraduateEmail::Revocation.approval!(approval: second[0], actor: @actor, impersonating: false)
+    assert recovery_redeem(first)
+    assert_equal @student.id, GraduateEmailActiveAddress.find_by!(normalized_address: 'replacement@example.com').student_id
     assert_nil recovery_redeem(second)
+  end
+
+  # C07: independent processes released together; control serializes them.
+  test 'simultaneous_cross_student_issuance_reserves_once' do
+    students = [create(:student), create(:student)]
+    2.times do |round|
+      address = "contended-#{round}@example.com"
+      outcomes = recovery_race(issue_input(students[0], address), issue_input(students[1], "  #{address.upcase}"))
+      assert_equal %w[RECOVERY_ACCEPTED RECOVERY_REJECTED], outcomes.sort, "round #{round}"
+      assert_equal 1, live_claims(address).count, "round #{round}"
+    end
+  end
+
+  # C08: issuance against redemption, cancellation and replacement.
+  test 'issuance_races_redemption_cancel_and_replacement_without_two_claims' do
+    claimant = create(:student)
+    first = prepare_replacement
+    outcomes = recovery_race(verify_input(first), issue_input(claimant, 'replacement@example.com'))
+    assert_equal %w[RECOVERY_ACCEPTED RECOVERY_REJECTED], outcomes
+    assert_equal @student.id, GraduateEmailActiveAddress.find_by!(normalized_address: 'replacement@example.com').student_id
+    assert_equal 0, GraduateEmailApproval.where(student_id: claimant.id).count
+    pending, = issue_approval(student: create(:student), address: 'canceled@example.com')
+    outcomes = recovery_race({action: 'cancel', approval: pending.id, actor: @actor.id}, issue_input(claimant, 'canceled@example.com'))
+    assert_equal 'RECOVERY_ACCEPTED', outcomes[0]
+    assert pending.reload.revoked_at
+    assert_equal(outcomes[1] == 'RECOVERY_ACCEPTED' ? 1 : 0, GraduateEmailApproval.where(student_id: claimant.id).count)
+    assert_operator live_claims('canceled@example.com').count, :<=, 1
+    other, other_connection = second_owner
+    outcomes = recovery_race(issue_input(other, 'switch@example.com', replacement: true), issue_input(create(:student), 'switch@example.com'))
+    assert_equal %w[RECOVERY_ACCEPTED RECOVERY_REJECTED], outcomes.sort
+    assert_equal 1, live_claims('switch@example.com').count
+    assert_nil other_connection.reload.revoked_at
+    assert_equal 'other-old@example.com', GraduateEmailActiveAddress.find_by!(student_id: other.id).normalized_address
   end
 
   test 'revoke_verify_and_disable_have_serial_outcomes' do
@@ -352,6 +390,14 @@ class GraduateEmailRecoveryConcurrencyTest < ActionDispatch::IntegrationTest
 
   def verify_input(data)
     {action: 'verify', id: data[2].public_id, browser: data[3], code: data[4]}
+  end
+
+  def issue_input(student, address, replacement: false)
+    {action: 'issue', student: student.id, actor: @actor.id, address: address, replacement: replacement}
+  end
+
+  def live_claims(address)
+    GraduateEmailApproval.where(normalized_address: address, revoked_at: nil, consumed_at: nil)
   end
 
   def recovery_race(*inputs)

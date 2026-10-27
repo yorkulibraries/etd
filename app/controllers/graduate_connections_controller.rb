@@ -19,6 +19,9 @@ class GraduateConnectionsController < ApplicationController
     @identities = @student.graduate_identities.where(provider: GraduateAuthentication::PROVIDERS).order(:provider)
     @email_notices = GraduateEmailNotice.joins(:old_connection).where(graduate_email_connections: {student_id: @student.id}).order(id: :desc).limit(10)
     @email_approvals = @student.graduate_email_approvals.order(created_at: :desc).limit(10)
+    @email_blocked_ids = GraduateEmail::Enrollment.blocked_approval_ids(@email_approvals)
+    # Leaving the review page (change address, cancel, another tab) ends it.
+    session.delete(GraduateEmailInvitationsController::REVIEW_KEY)
     @invitations = @student.graduate_authentication_invitations.where(provider: GraduateAuthentication::PROVIDERS)
                           .order(created_at: :desc).limit(10)
   end

@@ -101,3 +101,16 @@ must still fail publication scan; never reseal a stale successful result.
 - O11/R1: resolve both Compose workers with numeric nonroot UID/GID. Each 0700 tmpfs root must match that identity and permit mkdir/write/read/delete as that actual user. Reject zero, malformed and mismatched identities before foreground work. Retain read-only root, dropped capabilities, no-new-privileges and bounded safe logging. In a disposable container with those resolved settings, run actual foreground workers with RAM transport, prove progress on both dedicated queues, unrelated queue preservation, queued restart and claimed no-retry; stop/join all workers.
 - O12/M1: no-DB installed Delayed Job lifecycle, 100 synthetic one-second jobs followed by 100 idle seconds. Heartbeats must cover busy and idle progress, be separated by at least 30 seconds with no gap over 31 seconds in this workload, contain only the fixed enum and remain bounded. An ordinary worker must retain defaults and emit no graduate heartbeat.
 - O13/M2: preserve the historical package and binding. Record the historical claimed SHA and independently observed current whole-package SHA, prove the diff section equals the original committed diff, and explicitly leave cause/time unknown.
+
+## Pending collision and staff address review (written before product code)
+
+C01-C17 are recorded in
+`.superpowers/sdd/2026-10-15-graduate-email-otp/opus-pending-collision-staff-confirmation-r1-report.md`
+before tests and product changes. In short: cross-student pending and active
+collisions refuse with specific staff reasons (case and whitespace variants); same
+student supersession and replacement keep working; only irreversible events release a
+reservation; simultaneous issuance and issue/redeem/cancel/replace races leave one
+claim; preexisting duplicates fail closed until one is canceled; staff review shows
+the normalized address and rejects direct, tampered, stale, expired and replayed
+creates; staff roles, impersonation and students stay denied; public pages stay
+generic; no token, code or raw database error leaks.

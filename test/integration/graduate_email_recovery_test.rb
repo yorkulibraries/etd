@@ -275,8 +275,11 @@ class GraduateEmailRecoveryTest < ActionDispatch::IntegrationTest
     assert_equal 'no-referrer', response.headers['Referrer-Policy']
     other = create(:student)
     get staff_student_graduate_connections_path(@student)
-    post student_graduate_email_invitations_path(@student), params: {student_id: other.id,
-      address: 'route-owner@example.com', confirmed_address: 'route-owner@example.com', identity_verified: '1', replacement: '1', authenticity_token: csrf_token}
+    post review_student_graduate_email_invitations_path(@student), params: {student_id: other.id,
+      address: 'route-owner@example.com', confirmed_address: 'route-owner@example.com', replacement: '1', authenticity_token: csrf_token}
+    assert_response :success
+    post student_graduate_email_invitations_path(@student), params: {student_id: other.id, reviewed_address: 'route-owner@example.com',
+      identity_verified: '1', address_confirmed: '1', replacement: '1', authenticity_token: csrf_token}
     assert_response :success
     assert_equal @student.id, GraduateEmailApproval.order(:id).last.student_id
     [User::STAFF, User::MANAGER].each do |role|

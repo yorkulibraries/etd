@@ -27,6 +27,7 @@ Rails.application.routes.draw do
   post 'graduate/email/verify' => 'graduate_email_sessions#verify'
   post 'graduate/email/resend' => 'graduate_email_sessions#resend', as: :graduate_email_resend
   delete 'students/:student_id/graduate-email-connections/:id' => 'graduate_email_connections#destroy', as: :student_graduate_email_connection
+  post 'students/:student_id/graduate-email-invitations/review' => 'graduate_email_invitations#review', as: :review_student_graduate_email_invitations
   post 'students/:student_id/graduate-email-invitations' => 'graduate_email_invitations#create', as: :student_graduate_email_invitations
   delete 'students/:student_id/graduate-email-invitations/:id' => 'graduate_email_invitations#destroy', as: :student_graduate_email_invitation
   get 'graduate/login' => 'graduate_sessions#new', as: :graduate_login

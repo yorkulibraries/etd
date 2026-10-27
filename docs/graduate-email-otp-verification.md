@@ -175,6 +175,24 @@ only from this browser's request history, never from invitation, target or
 challenge state. A verify page with no transaction offers address entry instead.
 Use a new run name such as `GRADUATE_EMAIL_VERIFICATION_RUN=opus-first-code-ux-r1`.
 
+## Pending collision and staff address review (N1/N2)
+
+One canonical address has at most one usable claim across student records. Issuing
+is refused when another record holds the address as an active mapping or as a
+pending approval that has not been canceled, used, superseded, expired or
+invalidated by a generation change. Approver demotion does not release it.
+Simultaneous issuance, issue against redemption, cancel and replacement run in
+independent processes; exactly one claim results. Duplicates created before these
+checks fail closed at intent, request, send and redemption until staff cancel one.
+Staff see distinct messages for another record's active address, another record's
+pending invitation, typo or unsupported format, mismatch, changed state, stale review
+and unavailability, with no other student's details. Staff must review the
+server-normalized address and confirm it exactly before issuing, for initial and
+replacement invitations. Direct POST, tampered, expired, replayed, other-student,
+mode-flipped and other-tab reviews create nothing. Public pages are unchanged. Use a
+new run name such as
+`GRADUATE_EMAIL_VERIFICATION_RUN=opus-pending-collision-staff-confirmation-r1`.
+
 ## Owner-approved QA checklist, before any enable
 
 This checklist authorizes no QA data, requests, mail or provider changes. Supply

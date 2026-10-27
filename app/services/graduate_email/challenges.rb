@@ -110,6 +110,9 @@ module GraduateEmail
             approval.revoked_at.nil? && approval.consumed_at.nil? && approval.expires_at > now &&
             approval.created_at <= now && approval.created_at > now - 48.hours &&
             approval.expires_at <= approval.created_at + 48.hours
+          # A duplicate claim from before cross-student reservation fails closed.
+          return if Enrollment.competing_locked(student_id: student.id, address: approval.normalized_address,
+            generation: control.generation, now: now, address_scope: GraduateEmailApproval.where(id: approval.id).select(:normalized_address)).any?
 
           # Replacement must still point at the current mapping; initial
           # enrollment cannot silently replace an existing connection.

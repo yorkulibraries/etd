@@ -1,0 +1,66 @@
+<% title "Review email sign-in address" %>
+<% if @review_error %>
+  <% message, guidance = GraduateEmailInvitationsController::MESSAGES.fetch(@review_error) %>
+  <div class="alert <%= GraduateEmailInvitationsController::CONFLICTS.include?(@review_error) ? "alert-warning" : "alert-danger" %> text-break" role="alert" data-review-error="<%= @review_error %>">
+    <p class="mb-1"><%= message %></p>
+    <% if guidance %>
+      <p class="mb-0"><%= guidance %></p>
+    <% end %>
+    <% if @other_student %>
+      <p class="mt-2 mb-0"><%= link_to "Open the other student record", staff_student_graduate_connections_path(@other_student), data: { conflict_record: true, turbo: false } %></p>
+    <% end %>
+  </div>
+<% end %>
+<% if @address %>
+  <section class="card mb-4" aria-labelledby="review-address-heading">
+    <div class="card-body">
+      <h2 id="review-address-heading" class="h4"><%= @replacement ? "New sign-in address" : "Approved sign-in address" %></h2>
+      <p class="fs-5 text-break mb-2"><strong data-reviewed-address><%= @address %></strong></p>
+      <p>ETD normalized the address you entered. Sign-in codes for <%= @student.name %> will go only to this exact mailbox. If it is not the individual mailbox FGS verified, change it before creating the invitation.</p>
+      <% if @replacement %>
+        <p>The current address stays usable until the new mailbox is verified. Confirming the current address again starts recovery for that mailbox.</p>
+      <% end %>
+      <%= form_with url: student_graduate_email_invitations_path(@student), method: :post, local: true, data: { turbo: false } do %>
+        <%= hidden_field_tag :reviewed_address, @address %>
+        <% if @replacement %>
+          <%= hidden_field_tag :replacement, "1" %>
+        <% end %>
+        <div class="form-check mb-3">
+          <%= check_box_tag :identity_verified, "1", false, id: "email_identity_verified", required: true, class: "form-check-input", data: { graduate_confirmation: true } %>
+          <%= label_tag :email_identity_verified, "I verified this student's identity through the approved FGS process.", class: "form-check-label" %>
+        </div>
+        <div class="form-check mb-3">
+          <%= check_box_tag :address_confirmed, "1", false, id: "email_address_confirmed", required: true, class: "form-check-input", data: { graduate_confirmation: true } %>
+          <label for="email_address_confirmed" class="form-check-label text-break">The invitation is for exactly <%= @address %>, this student's individual mailbox.</label>
+        </div>
+        <%= submit_tag (@replacement ? "Create replacement email invitation" : "Create email invitation"), class: "btn btn-primary" %>
+      <% end %>
+      <p class="mt-3 mb-0">
+        <%= link_to "Change address", staff_student_graduate_connections_path(@student), class: "me-3", data: { review_exit: true, turbo: false } %>
+        <%= link_to "Cancel", student_path(@student), data: { review_exit: true, turbo: false } %>
+      </p>
+    </div>
+  </section>
+  <%= render "graduate_connections/confirmation_script" %>
+<% else %>
+  <section class="card mb-4" aria-labelledby="review-entry-heading">
+    <div class="card-body">
+      <h2 id="review-entry-heading" class="h4">Enter the approved address again</h2>
+      <%= form_with url: review_student_graduate_email_invitations_path(@student), method: :post, local: true, data: { turbo: false } do %>
+        <% if @replacement %>
+          <%= hidden_field_tag :replacement, "1" %>
+        <% end %>
+        <div class="mb-3">
+          <%= label_tag :email_address, "Approved sign-in address", class: "form-label" %>
+          <%= email_field_tag :address, nil, id: "email_address", maxlength: 254, required: true, class: "form-control" %>
+        </div>
+        <div class="mb-3">
+          <%= label_tag :confirmed_address, "Confirm approved address", class: "form-label" %>
+          <%= email_field_tag :confirmed_address, nil, maxlength: 254, required: true, class: "form-control" %>
+        </div>
+        <%= submit_tag "Review address", class: "btn btn-primary" %>
+      <% end %>
+      <p class="mt-3 mb-0"><%= link_to "Back to graduate connections", staff_student_graduate_connections_path(@student), data: { turbo: false } %></p>
+    </div>
+  </section>
+<% end %>

@@ -626,10 +626,14 @@ class GraduateEmailSecurityTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test 'competing_students_same_address_have_one_mapping_and_loser_changes_no_ownership' do
+  # D3: a duplicate pending claim created before cross-student reservation is
+  # simulated by hiding the first claim while the second is issued and sent.
+  # Neither mailbox redemption may silently choose a student.
+  test 'competing_students_same_address_preexisting_duplicates_fail_closed' do
     sent_enrollment
     first_row, first_browser, first_code, first_approval = @row, @browser, @code, @approval
     other = create(:student)
+    first_approval.update_columns(revoked_at: Time.current)
     second_approval, = issue_approval(student: other)
     other_browser = SecureRandom.hex(32)
     GraduateEmail::Control.synchronize do
@@ -639,6 +643,8 @@ class GraduateEmailSecurityTest < ActionDispatch::IntegrationTest
       approval_id: second_approval.id, ip: @ip))
     deliver_row(second)
     other_code = otp_code_for(public_id: second.public_id)
+    assert other_code.is_a?(String), 'Second code sent before the duplicate existed'
+    first_approval.update_columns(revoked_at: nil)
     assert_operator second.created_at.to_f, :<=, Process.clock_gettime(Process::CLOCK_REALTIME), 'Both process contenders must exist at the real worker clock'
     with_redemption_child do |input, marker|
       GraduateEmail::Control.synchronize do
@@ -648,17 +654,17 @@ class GraduateEmailSecurityTest < ActionDispatch::IntegrationTest
       end
       grant = redeem(first_row, browser: first_browser, code: first_code)
       outcome = marker.call
-      assert_equal 1, [!!grant, outcome == 'RACE_ACCEPTED'].count(true)
+      assert_equal 0, [!!grant, outcome == 'RACE_ACCEPTED'].count(true)
     end
-    assert_equal 1, GraduateEmailActiveAddress.count
-    assert_equal 1, GraduateEmailConnection.count
-    assert_equal 1, GraduateSession.where(authentication_method: 'email').count
-    winner = GraduateEmailActiveAddress.first.student_id
-    [first_approval, second_approval].each do |approval|
-      assert_equal approval.student_id == winner, approval.reload.consumed_at.present?
-    end
+    assert_equal 0, GraduateEmailActiveAddress.count
+    assert_equal 0, GraduateEmailConnection.count
+    assert_equal 0, GraduateSession.where(authentication_method: 'email').count
+    [first_approval, second_approval].each { |approval| assert_nil approval.reload.consumed_at }
+    # Staff cancel the claim FGS did not verify; the other code then redeems.
+    GraduateEmail::Revocation.approval!(approval: second_approval, actor: @actor, impersonating: false)
+    assert_instance_of GraduateEmail::Grant, redeem(first_row, browser: first_browser, code: first_code)
+    assert_equal first_approval.student_id, GraduateEmailActiveAddress.sole.student_id
     before = GraduateEmailActiveAddress.first.attributes
-    assert_nil redeem(first_row, browser: first_browser, code: first_code)
     assert_nil redeem(second, browser: other_browser, code: other_code)
     assert_equal before, GraduateEmailActiveAddress.first.reload.attributes
   end
