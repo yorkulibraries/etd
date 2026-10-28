@@ -118,7 +118,7 @@ module GraduateEmailSafeArtifacts
 
   def clean_browser_artifact(name, mobile: false)
     raise UnsafeArtifact unless STATES.key?(name)
-    current_window.resize_to(*(mobile ? [390, 844] : [1440, 1000]))
+    resize_clean_viewport(mobile ? [390, 844] : [1440, 1000])
     assert_selector 'main'
     expected = STATES.fetch(name).last
     assert_text expected
@@ -165,10 +165,23 @@ module GraduateEmailSafeArtifacts
     File.binwrite(path, Base64.decode64(shot.fetch('data')))
     path
   ensure
-    current_window.resize_to(1440, 1000) if mobile
+    resize_clean_viewport([1440, 1000]) if mobile
   end
 
   private
+
+  # WebDriver sizes the outer window. New headless Chrome includes browser
+  # chrome in that size, so compensate and verify the exact inner viewport.
+  def resize_clean_viewport(target)
+    current_window.resize_to(*target)
+    3.times do
+      actual = page.evaluate_script('[innerWidth, innerHeight]')
+      return if actual == target
+      outer = current_window.size
+      current_window.resize_to(*outer.zip(target, actual).map { |size, wanted, measured| size + wanted - measured })
+    end
+    raise UnsafeArtifact unless page.evaluate_script('[innerWidth, innerHeight]') == target
+  end
 
   def save_html; end
   def save_image; end

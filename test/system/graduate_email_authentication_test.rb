@@ -296,6 +296,31 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
     previous.nil? ? ENV.delete('GRADUATE_EMAIL_ARTIFACT_DIR') : ENV['GRADUATE_EMAIL_ARTIFACT_DIR'] = previous
   end
 
+  test 'clean_artifacts_restore_exact_inner_viewport_after_window_resize' do
+    previous = ENV.delete('GRADUATE_EMAIL_ARTIFACT_DIR')
+    visit graduate_login_path
+    page.driver.browser.stub(:execute_cdp, ->(*) { raise 'image driver must not run' }) do
+      [false, true].each do |mobile|
+        current_window.resize_to(800, 600)
+        assert_nil clean_browser_artifact('login', mobile: mobile)
+        assert_equal [1440, 1000], page.evaluate_script('[innerWidth, innerHeight]'),
+          'clean assertions restore the documented desktop viewport'
+      end
+    end
+  ensure
+    previous.nil? ? ENV.delete('GRADUATE_EMAIL_ARTIFACT_DIR') : ENV['GRADUATE_EMAIL_ARTIFACT_DIR'] = previous
+  end
+
+  test 'clean_capture_rejects_unattainable_viewport_before_image_driver' do
+    visit graduate_login_path
+    current_window.resize_to(800, 600)
+    page.driver.stub(:resize_window_to, nil) do
+      page.driver.browser.stub(:execute_cdp, ->(*) { raise 'unsafe capture reached' }) do
+        assert_raises(GraduateEmailSafeArtifacts::UnsafeArtifact) { clean_browser_artifact('login') }
+      end
+    end
+  end
+
   test 'explicit_capture_rejects_sealed_package_before_image_driver' do
     require 'tmpdir'
     previous = ENV['GRADUATE_EMAIL_ARTIFACT_DIR']
