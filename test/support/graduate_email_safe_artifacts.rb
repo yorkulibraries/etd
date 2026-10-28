@@ -43,6 +43,24 @@ module GraduateEmailSafeArtifacts
       [[1440, 1000], [390, 844]].include?([state[:width], state[:height]]))
   end
 
+  DIAGNOSTIC_FLAGS = {query: :query, secret: :secret, entered: :entered,
+    attribute: :attribute_secret, text: :text_secret, invitation: :invitation_secret,
+    link: :link_secret, input: :input_secret}.freeze
+  DIAGNOSTIC_LINE = /\AARTIFACT_GUARD state=(?:#{(STATES.keys + ['unknown']).join('|')}) width=[0-9]{1,5} height=[0-9]{1,5} route=[01] heading=[01]#{DIAGNOSTIC_FLAGS.keys.map { |key| " #{key}=[01]" }.join}\z/
+
+  # Diagnostics contain only reviewed state names, bounded sizes and booleans.
+  # Never interpolate paths, headings, attributes, input values or exceptions.
+  def self.guard_diagnostic(name, state)
+    route, heading = STATES[name]
+    size = %i[width height].map do |key|
+      value = state[key]
+      value.is_a?(Integer) && value.between?(0, 99_999) ? value : 0
+    end
+    flags = DIAGNOSTIC_FLAGS.map { |label, key| "#{label}=#{state[key] == true ? 1 : 0}" }
+    "ARTIFACT_GUARD state=#{STATES.key?(name) ? name : 'unknown'} width=#{size[0]} height=#{size[1]} " +
+      "route=#{route && state[:path].to_s.match?(route) ? 1 : 0} heading=#{heading && state[:heading] == heading ? 1 : 0} " + flags.join(' ')
+  end
+
   def self.test_identities
     Dir[File.join(ROOT, 'test/{integration,system}/*_test.rb')].flat_map do |file|
       source = File.read(file)
@@ -56,7 +74,9 @@ module GraduateEmailSafeArtifacts
     identities = test_identities
     lines = output.lines.filter_map do |line|
       line = line.strip
-      if line.match?(/\A\d+ runs, \d+ assertions, \d+ failures, \d+ errors, \d+ skips\z/) ||
+      if line.match?(DIAGNOSTIC_LINE)
+        line
+      elsif line.match?(/\A\d+ runs, \d+ assertions, \d+ failures, \d+ errors, \d+ skips\z/) ||
           line.match?(/\A--seed [0-9]+\z/)
         line
       elsif (match = line.match(/\A(?:TEST )?([A-Za-z0-9]+)(?:#| )(test_[a-zA-Z0-9_]+)/)) && identities.include?([match[1], match[2]])
@@ -138,17 +158,22 @@ module GraduateEmailSafeArtifacts
               /[.](?:js|css|png|gif|svg|ico|woff2?)$/.test(a.value)) return false;
           return /token|password/i.test(a.name) || secretValue(a.value);
         }));
-        const secret = unsafeAttributes || secretValue(document.documentElement.textContent) ||
-          /Share this invitation once/.test(document.body.innerText) ||
-          links.some(v => /[?&](token|code)=/i.test(v)) ||
-          values.some(e => /token|password/i.test(e.name) || secretValue(e.value));
+        const textSecret = secretValue(document.documentElement.textContent);
+        const invitationSecret = /Share this invitation once/.test(document.body.innerText);
+        const linkSecret = links.some(v => /[?&](token|code)=/i.test(v));
+        const inputSecret = values.some(e => /token|password/i.test(e.name) || secretValue(e.value));
+        const secret = unsafeAttributes || textSecret || invitationSecret || linkSecret || inputSecret;
         return {path: location.pathname, query: !!(location.search || location.hash), secret,
           entered: values.some(e => e.name === 'code' && e.value !== ''),
           heading: Array.from(document.querySelectorAll('h1,h2')).some(e => e.textContent.trim() === expected) ? expected : '',
-          width: innerWidth, height: innerHeight};
+          width: innerWidth, height: innerHeight, attribute_secret: unsafeAttributes,
+          text_secret: textSecret, invitation_secret: invitationSecret, link_secret: linkSecret, input_secret: inputSecret};
       })(arguments[0])
     JS
-    raise UnsafeArtifact unless GraduateEmailSafeArtifacts.clean_state?(name, state)
+    unless GraduateEmailSafeArtifacts.clean_state?(name, state)
+      warn GraduateEmailSafeArtifacts.guard_diagnostic(name, state)
+      raise UnsafeArtifact
+    end
     assert page.evaluate_script('document.documentElement.scrollWidth <= document.documentElement.clientWidth'), 'clean state overflow'
     # General suites perform every clean-state/layout assertion without writing.
     directory = ENV['GRADUATE_EMAIL_ARTIFACT_DIR']

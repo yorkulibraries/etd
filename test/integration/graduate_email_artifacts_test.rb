@@ -89,6 +89,21 @@ class GraduateEmailArtifactsTest < ActiveSupport::TestCase
     end
   end
 
+  test 'guard_diagnostics_expose_only_bounded_dimensions_and_fixed_boolean_flags' do
+    sentinel = 'TASK7_ARTIFACT_SENTINEL'
+    state = {path: "/#{sentinel}", heading: sentinel, width: 1440, height: 1000,
+      query: false, secret: true, entered: false, attribute_secret: true,
+      text_secret: false, invitation_secret: false, link_secret: false, input_secret: false}
+    line = GraduateEmailSafeArtifacts.guard_diagnostic('staff-conflict', state)
+    assert_equal 'ARTIFACT_GUARD state=staff-conflict width=1440 height=1000 route=0 heading=0 query=0 secret=1 entered=0 attribute=1 text=0 invitation=0 link=0 input=0', line
+    assert_equal line + "\n", GraduateEmailSafeArtifacts.sanitize_report(line + "\n")
+    refute_includes line, sentinel
+    assert_equal "\n", GraduateEmailSafeArtifacts.sanitize_report(line + " recipient@example.com\n")
+    invalid = GraduateEmailSafeArtifacts.guard_diagnostic(sentinel, state.merge(width: sentinel, height: 1000000))
+    assert_includes invalid, 'state=unknown width=0 height=0'
+    refute_includes invalid, sentinel
+  end
+
   test 'only_allowlisted_clean_states_can_capture' do
     clean = {path: '/graduate/email/verify', query: false, secret: false, entered: false,
       heading: 'Enter your sign-in code', width: 390, height: 844}

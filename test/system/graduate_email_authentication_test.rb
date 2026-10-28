@@ -296,6 +296,22 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
     previous.nil? ? ENV.delete('GRADUATE_EMAIL_ARTIFACT_DIR') : ENV['GRADUATE_EMAIL_ARTIFACT_DIR'] = previous
   end
 
+  test 'rejected_clean_capture_reports_safe_flags_without_dom_values' do
+    visit graduate_login_path
+    sentinel = 'TASK7_ARTIFACT_SENTINEL' + ('a' * 64)
+    page.execute_script('document.body.setAttribute("data-probe", arguments[0])', sentinel)
+    page.driver.browser.stub(:execute_cdp, ->(*) { raise 'unsafe capture reached' }) do
+      _out, error = capture_io do
+        assert_raises(GraduateEmailSafeArtifacts::UnsafeArtifact) { clean_browser_artifact('login') }
+      end
+      assert_match(/ARTIFACT_GUARD state=login width=1440 height=1000 route=1 heading=1 query=0 secret=1 entered=0 attribute=1/, error)
+      refute_includes error, sentinel
+      assert_equal error, GraduateEmailSafeArtifacts.sanitize_report(error)
+    end
+  ensure
+    page.execute_script('document.body.removeAttribute("data-probe")') if page
+  end
+
   test 'clean_artifacts_restore_exact_inner_viewport_after_window_resize' do
     previous = ENV.delete('GRADUATE_EMAIL_ARTIFACT_DIR')
     visit graduate_login_path
