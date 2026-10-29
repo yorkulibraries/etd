@@ -95,6 +95,7 @@ class GraduateEmailBrowserCase < ActionDispatch::SystemTestCase
     assert_no_button 'Resend code'
     assert_no_field 'Sign-in code'
     assert_no_text 'If this address is enabled for graduate sign-in'
+    assert_no_text 'If no email arrives, wait a minute before selecting Resend code.'
     assert_link 'Continue with Google'
     assert_link 'Sign in with Passport York'
   end
@@ -107,6 +108,7 @@ class GraduateEmailBrowserCase < ActionDispatch::SystemTestCase
   def assert_generic_form
     assert_selector 'h1', text: 'Enter your sign-in code'
     assert_text 'If this address is enabled for graduate sign-in, we’ll send a code.'
+    assert_text 'If no email arrives, wait a minute before selecting Resend code.'
     assert_selector 'input[type="text"][inputmode="numeric"][autocomplete="one-time-code"][maxlength="6"]'
     assert_button 'Resend code'
     assert_no_button 'Send code'

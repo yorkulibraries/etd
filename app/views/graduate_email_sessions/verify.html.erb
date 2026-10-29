@@ -24,6 +24,7 @@
     <%= submit_tag "Verify code", class: "btn btn-primary w-100" %>
   <% end %>
   <%= button_to "Resend code", graduate_email_resend_path, method: :post, class: "btn btn-outline-secondary w-100 mt-3", form: { data: { turbo: false } } %>
+  <p class="mt-2">If no email arrives, wait a minute before selecting Resend code.</p>
 <% when :first %>
   <%= button_to "Send code", graduate_email_resend_path, method: :post, class: "btn btn-primary w-100", form: { data: { turbo: false } } %>
 <% else %>
