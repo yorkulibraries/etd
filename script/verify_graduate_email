@@ -6,6 +6,9 @@ project_root="$(cd "$(dirname "$0")/.." && pwd -P)"
 cd "$project_root"
 export GRADUATE_EMAIL_PROJECT_ROOT="$project_root"
 exec ruby - "$@" <<'RUBY'
+# Activate locked gems first; CI installs them outside the default gem path,
+# so an earlier stdlib require would pin a conflicting default gem version.
+require 'bundler/setup'
 require 'open3'
 require 'json'
 require 'digest'
