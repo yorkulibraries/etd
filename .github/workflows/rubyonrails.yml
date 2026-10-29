@@ -59,14 +59,17 @@ jobs:
           test -x "$browser_bin"
           echo "CHROME_BIN=$browser_bin" >> "$GITHUB_ENV"
 
+      - name: Verify complete disjoint test selection
+        run: bundle exec ruby test/support/graduate_email_test_selection_check.rb
+
       - name: Run graduate email verification
         run: bash script/verify_graduate_email "$GRADUATE_EMAIL_CI_ADAPTER"
 
-      - name: Run full application suite
-        run: bash script/verify_graduate_email_storage "$GRADUATE_EMAIL_CI_ADAPTER" exec ruby test/support/graduate_email_task5_test_reporter.rb -v
+      - name: Run remaining application suite
+        run: bash script/verify_graduate_email_storage "$GRADUATE_EMAIL_CI_ADAPTER" exec ruby script/run_graduate_email_remaining application
 
-      - name: Run full browser suite
-        run: bash script/verify_graduate_email_storage "$GRADUATE_EMAIL_CI_ADAPTER" exec ruby test/support/graduate_email_task5_test_reporter.rb test/system -v --seed="${ETD_SYSTEM_TEST_SEED:-27183}"
+      - name: Run remaining browser suite
+        run: bash script/verify_graduate_email_storage "$GRADUATE_EMAIL_CI_ADAPTER" exec ruby script/run_graduate_email_remaining system
 
       - name: Scan graduate email allowlisted artifacts
         id: graduate_email_scan

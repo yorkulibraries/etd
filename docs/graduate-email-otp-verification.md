@@ -10,12 +10,19 @@ bash script/verify_graduate_email sqlite
 bash script/verify_graduate_email mysql
 ```
 
-For the existing local container:
+For the existing local container, use a prepared isolated source copy with its
+own guarded DB/uploads and Git metadata. The examples use the existing copy
+below. Verify its source hashes first. Never run these gates in `/app` while the
+live demo uses `/app/tmp/graduate-email-storage_test.sqlite3`; the guard deliberately
+permits that root-derived path and cannot distinguish a demo from a disposable DB.
 
 ```bash
-docker exec etd-graduate-auth bash -lc 'set +x; cd /app; bash script/verify_graduate_email sqlite'
-docker exec etd-graduate-auth bash -lc 'set +x; source /tmp/graduate-email-mysql-env; cd /app; bash script/verify_graduate_email mysql'
+docker exec etd-graduate-auth bash -lc 'set +x; cd /tmp/etd-ci-40736564325-r1; ETD_SYSTEM_TEST_PORT=3435 GRADUATE_EMAIL_VERIFICATION_RUN=local-review-r1 bash script/verify_graduate_email sqlite'
+docker exec etd-graduate-auth bash -lc 'set +x; source /tmp/graduate-email-mysql-env; cd /tmp/etd-ci-40736564325-r1; ETD_SYSTEM_TEST_PORT=3435 GRADUATE_EMAIL_VERIFICATION_RUN=local-review-r1 bash script/verify_graduate_email mysql'
 ```
+
+Choose a fresh run name for each verification attempt. Confirm the test port is
+free and the dedicated MySQL DB has no concurrent user before resetting it.
 
 The private MySQL environment file lives inside the container. It must provide
 `GRADUATE_EMAIL_TEST_DATABASE_URL` for the dedicated `etd_graduate_email_test`
@@ -93,11 +100,11 @@ runner-owned `GRADUATE_EMAIL_ARTIFACT_DIR`; without it the helper validates the
 same DOM, geometry and safety rules and returns without invoking image capture.
 A destination containing `manifest.json` rejects further captures. General-suite
 failures therefore cannot partially replace a sealed runner package. CI retains
-the runner, broad application, broad browser, scan and conditional upload order.
+the runner, remaining application, remaining browser, scan and conditional upload order.
 
 CI runs `Tests (sqlite)` and `Tests (mysql)` in parallel on separate runners,
-each with a 30-minute budget. Within each job, the focused runner, full application
-suite and full browser suite remain sequential. One database failing does not
+each with a 30-minute budget. Within each job, the focused runner, remaining application
+suite and remaining browser suite remain sequential. One database failing does not
 cancel the other. MySQL's service starts only in its own job. Evidence uploads
 are named `graduate-email-verification-sqlite` and
 `graduate-email-verification-mysql`; each still requires its own successful scan.
@@ -341,3 +348,52 @@ Run both operations integration files through the storage guard sequentially
 on SQLite and MySQL after a pre-gate host/container source freeze. Use the
 existing sanitized reporter. These scoped worker/template fixes do not require
 repeating broad exports or rewriting any sealed Task 7/8 runner package.
+
+## CI file selection and intentional migration repeats
+
+`test/support/graduate_email_test_selection.rb` owns the focused file selection
+for both the sealed runner and the remaining-suite command. It uses the installed
+Rails runner's actual default application discovery and explicit `test/system`
+discovery. Rails 7.0.8.1 normally excludes `test/system` and `test/dummy` from the
+application default. `DEFAULT_TEST` and `DEFAULT_TEST_EXCLUDE` are respected,
+and incompatible overrides fail the coverage check rather than dropping files.
+The ordinary application and system file sets are partitioned into focused and
+remaining groups. No additional filename guesses exclude coverage.
+
+Before database work, the selector checks exact coverage, disjointness, existing
+expected files, nonempty dynamic focus and nonempty groups. It also verifies
+Rails discovers exactly each explicit file list. Unknown groups and invalid seeds
+fail with a fixed message. File arguments use array exec, including names with
+spaces. Empty or unset `ETD_SYSTEM_TEST_SEED` means 27183; a numeric supplied seed
+is forwarded to both remaining suites and the focused runner.
+
+CI first runs the automatic command-level selection gate. This compares every
+normally discovered file with its assignment and exercises missing/empty sets,
+unknown groups, discovery overrides, argument boundaries and seed forwarding in
+private temporary fixture trees without booting Rails or opening a database:
+
+```bash
+bundle exec ruby test/support/graduate_email_test_selection_check.rb
+bash script/verify_graduate_email sqlite
+bash script/verify_graduate_email_storage sqlite exec ruby script/run_graduate_email_remaining application
+bash script/verify_graduate_email_storage sqlite exec ruby script/run_graduate_email_remaining system
+bash script/verify_graduate_email sqlite scan
+```
+
+Repeat on MySQL using the existing dedicated disposable database guard. All
+commands for one adapter stay sequential. Local runs need an isolated source root,
+its own SQLite DB/uploads, a free test port and Git metadata for the full runner.
+Never run these commands in a source root hosting a live demo on the guard's DB.
+Use a fresh named verification run and leave the artifact directory unset for
+remaining suites. The sealed runner package, manifests, reporter, artifact safety
+checks and final stable CI check retain their existing behavior.
+
+"Once" means one ordinary focused-or-remaining execution of each discovered test
+file per adapter. It excludes intentional migration-state checks: both `fresh`
+and seeded `upgrade` independently perform up/down/up probes and
+storage/artifact tests with migration preservation, dump schemas under `tmp`,
+and verify the tracked schema checksum. Those two state contexts
+remain intact, as do their ordinary focused regression executions. This is file
+assignment, not a claim that shared helpers or each assertion execute only once.
+Local timings are workload comparisons only; hosted speedup needs a later approved
+push and successful hosted run on the resulting source.

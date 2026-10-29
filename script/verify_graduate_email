@@ -25,9 +25,10 @@ if mode == 'scan'
   puts "#{adapter} artifact_scan PASS"
   exit
 end
-seed = ENV.fetch('ETD_SYSTEM_TEST_SEED', '')
-seed = '27183' if seed.empty?
-abort 'Verification seed rejected' unless seed.match?(/\A[0-9]+\z/)
+require_relative 'test/support/graduate_email_test_selection'
+seed = GraduateEmailTestSelection.seed
+# Validate the complete, disjoint assignment before any database or artifact work.
+selection = GraduateEmailTestSelection.partitions
 ENV['ETD_SYSTEM_TEST_SEED'] = seed
 ENV['GRADUATE_EMAIL_STRICT_REPORT'] = '1'
 # Inspect the requested local port without touching other listeners.
@@ -76,13 +77,10 @@ storage = ['bash', 'script/verify_graduate_email_storage', adapter]
 ok = run.call('fresh', storage + ['fresh'])
 ok = run.call('upgrade', storage + ['upgrade']) if ok
 if ok
-  otp = Dir['test/integration/graduate_email_*_test.rb'].sort
-  existing = %w[google_only_authentication graduate_authentication graduate_downloads graduate_staff_boundaries graduate_impersonation graduate_thesis_ownership graduate_session_security graduate_oauth_transaction graduate_oauth_intent graduate_oauth_lifecycle].map { |name| "test/integration/#{name}_test.rb" }
   reporter = %w[ruby test/support/graduate_email_task5_test_reporter.rb]
-  ok = run.call('integration', storage + ['exec'] + reporter + otp + existing + ['-v', "--seed=#{seed}"])
+  ok = run.call('integration', storage + ['exec'] + reporter + selection.fetch('focused_application') + ['-v', "--seed=#{seed}"])
   if ok
-    system = %w[graduate_email_authentication graduate_email_management graduate_authentication graduate_downloads].map { |name| "test/system/#{name}_test.rb" }
-    ok = run.call('system', storage + ['exec'] + reporter + system + ['-v', "--seed=#{seed}"])
+    ok = run.call('system', storage + ['exec'] + reporter + selection.fetch('focused_system') + ['-v', "--seed=#{seed}"])
   end
 end
 # Runtime versions are safe fixed numeric fields only, collected through guard.

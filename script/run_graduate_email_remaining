@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+# Invoke through verify_graduate_email_storage for the database safety boundary.
+# Array exec preserves file arguments, including spaces, without shell parsing.
+require_relative '../test/support/graduate_email_test_selection'
+begin
+  Dir.chdir(File.expand_path('..', __dir__))
+  raise GraduateEmailTestSelection::InvalidSelection unless ARGV.size == 1 && %w[application system].include?(ARGV.first)
+  files = GraduateEmailTestSelection.files(ARGV.first)
+  seed = GraduateEmailTestSelection.seed
+rescue StandardError
+  abort 'Test selection rejected'
+end
+exec('ruby', 'test/support/graduate_email_task5_test_reporter.rb', *files, '-v', "--seed=#{seed}")
