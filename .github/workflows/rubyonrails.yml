@@ -12,21 +12,27 @@ on:
         required: false
         type: string
 jobs:
-  build_and_run_tests:
-    name: Build and run tests
+  database_tests:
+    name: Tests (${{ matrix.adapter }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        adapter: [sqlite, mysql]
     env:
+      GRADUATE_EMAIL_CI_ADAPTER: ${{ matrix.adapter }}
+      GRADUATE_EMAIL_TEST_DATABASE_URL: ${{ matrix.adapter == 'mysql' && 'mysql2://test:test@127.0.0.1:3306/etd_graduate_email_test' || '' }}
+      GRADUATE_EMAIL_TEST_DATABASE_CONFIRMED: ${{ matrix.adapter == 'mysql' && 'dedicated_disposable_test' || '' }}
       ETD_SYSTEM_TEST_SEED: ${{ inputs.system_test_seed }}
       ETD_SYSTEM_TEST_PORT: 3425
       GRADUATE_EMAIL_STRICT_REPORT: 1
-    # The suite runs in roughly 5 minutes per database backend. Without a
-    # timeout a hung job sits on the default 6 hour limit and surfaces as
-    # "the hosted runner lost communication with the server" instead of a
-    # readable failure.
+    # Each database gets its own runner and time budget; tests within it
+    # remain sequential because they share a disposable database.
     timeout-minutes: 30
     services:
       mysql:
-        image: mysql
+        image: ${{ matrix.adapter == 'mysql' && 'mysql' || '' }}
         ports:
           - 3306:3306
         env:
@@ -53,46 +59,29 @@ jobs:
           test -x "$browser_bin"
           echo "CHROME_BIN=$browser_bin" >> "$GITHUB_ENV"
 
-      - name: Run tests with sqlite3
-        run: |
-          bash script/verify_graduate_email sqlite
-          bash script/verify_graduate_email_storage sqlite exec ruby test/support/graduate_email_task5_test_reporter.rb -v
-          bash script/verify_graduate_email_storage sqlite exec ruby test/support/graduate_email_task5_test_reporter.rb test/system -v --seed="${ETD_SYSTEM_TEST_SEED:-27183}"
+      - name: Run graduate email verification
+        run: bash script/verify_graduate_email "$GRADUATE_EMAIL_CI_ADAPTER"
 
-      - name: Run tests with mysql
-        env:
-          GRADUATE_EMAIL_TEST_DATABASE_URL: mysql2://test:test@127.0.0.1:3306/etd_graduate_email_test
-          GRADUATE_EMAIL_TEST_DATABASE_CONFIRMED: dedicated_disposable_test
-        run: |
-          bash script/verify_graduate_email mysql
-          bash script/verify_graduate_email_storage mysql exec ruby test/support/graduate_email_task5_test_reporter.rb -v
-          bash script/verify_graduate_email_storage mysql exec ruby test/support/graduate_email_task5_test_reporter.rb test/system -v --seed="${ETD_SYSTEM_TEST_SEED:-27183}"
+      - name: Run full application suite
+        run: bash script/verify_graduate_email_storage "$GRADUATE_EMAIL_CI_ADAPTER" exec ruby test/support/graduate_email_task5_test_reporter.rb -v
+
+      - name: Run full browser suite
+        run: bash script/verify_graduate_email_storage "$GRADUATE_EMAIL_CI_ADAPTER" exec ruby test/support/graduate_email_task5_test_reporter.rb test/system -v --seed="${ETD_SYSTEM_TEST_SEED:-27183}"
 
       - name: Scan graduate email allowlisted artifacts
         id: graduate_email_scan
         if: always()
-        run: |
-          found=0
-          for adapter in sqlite mysql; do
-            if [ -d "tmp/graduate-email/verification/$adapter" ]; then
-              bash script/verify_graduate_email "$adapter" scan
-              found=1
-            fi
-          done
-          test "$found" = 1
+        run: bash script/verify_graduate_email "$GRADUATE_EMAIL_CI_ADAPTER" scan
 
       - name: Upload clean graduate email evidence
         uses: actions/upload-artifact@v4
         if: always() && steps.graduate_email_scan.outcome == 'success'
         with:
-          name: graduate-email-verification
+          name: graduate-email-verification-${{ matrix.adapter }}
           path: |
-            tmp/graduate-email/verification/sqlite/*.txt
-            tmp/graduate-email/verification/sqlite/*.json
-            tmp/graduate-email/verification/sqlite/*.png
-            tmp/graduate-email/verification/mysql/*.txt
-            tmp/graduate-email/verification/mysql/*.json
-            tmp/graduate-email/verification/mysql/*.png
+            tmp/graduate-email/verification/${{ matrix.adapter }}/*.txt
+            tmp/graduate-email/verification/${{ matrix.adapter }}/*.json
+            tmp/graduate-email/verification/${{ matrix.adapter }}/*.png
 
       - name: Create tar archive of screenshots
         run: |
@@ -103,6 +92,18 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-screenshots
+          name: test-screenshots-${{ matrix.adapter }}
           path: |
             tmp/test-screenshots.tar
+
+  build_and_run_tests:
+    name: Build and run tests
+    needs: database_tests
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DATABASE_TEST_RESULT: ${{ needs.database_tests.result }}
+    steps:
+      - name: Require both database jobs to pass
+        run: test "$DATABASE_TEST_RESULT" = success

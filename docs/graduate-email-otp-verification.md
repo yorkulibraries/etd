@@ -95,6 +95,15 @@ A destination containing `manifest.json` rejects further captures. General-suite
 failures therefore cannot partially replace a sealed runner package. CI retains
 the runner, broad application, broad browser, scan and conditional upload order.
 
+CI runs `Tests (sqlite)` and `Tests (mysql)` in parallel on separate runners,
+each with a 30-minute budget. Within each job, the focused runner, full application
+suite and full browser suite remain sequential. One database failing does not
+cancel the other. MySQL's service starts only in its own job. Evidence uploads
+are named `graduate-email-verification-sqlite` and
+`graduate-email-verification-mysql`; each still requires its own successful scan.
+The existing `Build and run tests` check is a final gate: it passes only when both
+database jobs succeed, and fails if either fails, is cancelled or is skipped.
+
 For an isolated local rerun, set `GRADUATE_EMAIL_VERIFICATION_RUN=task7-r1` for
 both runner and scan commands. Names accept 1 to 64 letters, digits, underscores
 or hyphens, starting with a letter or digit. This selects
