@@ -50,6 +50,10 @@ Configure one canonical approved sender, approved SMTP host/port and explicit
 The implementation permits an unauthenticated configuration for an approved
 restricted university relay, but this is not evidence of mail-owner approval.
 Prefer approved authenticated TLS transport. No credentials in this repository.
+Staging only: `GRADUATE_EMAIL_SMTP_TLS=none` sends without encryption to a test
+mailbox such as mailcatcher. It is refused when the site address is
+etd.library.yorku.ca, when the relay is not a private-network IPv4 address
+(10/8, 172.16/12, 192.168/16, 127/8), and when any SMTP credential is set.
 Open/read timeouts are3 s; total delivery deadline10 s; no SMTP debug output. The
 standalone authentication mail builder raises errors, renders in worker memory,
 addresses exactly one approved recipient, has no contact-list/default recipient

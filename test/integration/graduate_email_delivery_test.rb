@@ -338,6 +338,94 @@ class GraduateEmailDeliveryTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # Staging test mailboxes (mailcatcher) cannot encrypt. Unencrypted delivery is
+  # an explicit opt-in that production's address, public relays and credentials refuse.
+  test 'unencrypted_test_relay_is_refused_for_production_public_relays_and_credentials' do
+    plain = {'GRADUATE_EMAIL_SMTP_TLS' => 'none', 'GRADUATE_EMAIL_SMTP_ADDRESS' => '10.0.0.196', 'GRADUATE_EMAIL_SMTP_PORT' => '1025'}
+    configured = lambda do |overrides = {}|
+      ENV.update(plain.merge(overrides))
+      GraduateEmail.configure!
+      GraduateEmail.delivery_configured?
+    end
+    assert configured.call('GRADUATE_EMAIL_BASE_URL' => 'https://etdqa.library.yorku.ca'), 'Staging test relay refused'
+    settings = GraduateEmail.smtp_settings
+    assert_equal [false, false, nil], settings.values_at(:enable_starttls, :enable_starttls_auto, :tls)
+    %w[192.168.1.5 172.16.0.9 127.0.0.1].each { |host| assert configured.call('GRADUATE_EMAIL_SMTP_ADDRESS' => host), host }
+
+    %w[https://etd.library.yorku.ca https://ETD.Library.YorkU.ca/].each do |url|
+      refute configured.call('GRADUATE_EMAIL_BASE_URL' => url), "Production allowed #{url}"
+    end
+    ENV['GRADUATE_EMAIL_BASE_URL'] = 'https://etdqa.library.yorku.ca'
+    %w[mailcatcher.example.org mailrelay.yorku.ca 8.8.8.8 172.32.0.1 11.0.0.1 10.0.0].each do |host|
+      refute configured.call('GRADUATE_EMAIL_SMTP_ADDRESS' => host), "Public or invalid relay allowed: #{host}"
+    end
+    refute configured.call('GRADUATE_EMAIL_SMTP_USER_NAME' => 'worker', 'GRADUATE_EMAIL_SMTP_PASSWORD' => 'secret',
+      'GRADUATE_EMAIL_SMTP_AUTHENTICATION' => 'plain'), 'Credentials sent unencrypted'
+    %w[GRADUATE_EMAIL_SMTP_USER_NAME GRADUATE_EMAIL_SMTP_PASSWORD GRADUATE_EMAIL_SMTP_AUTHENTICATION].each { |key| ENV.delete(key) }
+    %w[NONE plain off].each { |mode| refute configured.call('GRADUATE_EMAIL_SMTP_TLS' => mode), mode }
+    ENV.delete('GRADUATE_EMAIL_BASE_URL')
+    refute configured.call, 'Unencrypted allowed without a site address'
+
+    # Production keeps its encrypted relay.
+    ENV.update('GRADUATE_EMAIL_BASE_URL' => 'https://etd.library.yorku.ca', 'GRADUATE_EMAIL_SMTP_TLS' => 'starttls',
+      'GRADUATE_EMAIL_SMTP_ADDRESS' => 'mailrelay.yorku.ca', 'GRADUATE_EMAIL_SMTP_PORT' => '25')
+    GraduateEmail.configure!
+    assert GraduateEmail.delivery_configured?
+    assert GraduateEmail.smtp_settings[:enable_starttls]
+  ensure
+    ENV['GRADUATE_EMAIL_BASE_URL'] = 'http://127.0.0.1:3210'
+    GraduateEmail.configure!
+  end
+
+  # Real SMTP exchange with a mailcatcher-like server that offers no STARTTLS.
+  test 'unencrypted_test_relay_delivers_a_real_code_email_without_starttls' do
+    server = TCPServer.new('127.0.0.1', 0)
+    received = Queue.new
+    relay = Thread.new do
+      2.times do
+        client = server.accept
+        client.write("220 test relay\r\n")
+        data = nil
+        while (line = client.gets)
+          if data
+            line == ".\r\n" ? (received << data; data = nil; client.write("250 queued\r\n")) : data << line
+          elsif line.start_with?('EHLO')
+            client.write("250-test relay\r\n250 SIZE 1000000\r\n")
+          elsif line.start_with?('DATA')
+            data = +''
+            client.write("354 go ahead\r\n")
+          elsif line.start_with?('QUIT')
+            client.write("221 bye\r\n")
+            break
+          elsif line.start_with?('STARTTLS')
+            client.write("502 not supported\r\n")
+          else
+            client.write("250 OK\r\n")
+          end
+        end
+        client.close
+      end
+    end
+    message = -> { GraduateAuthenticationMailer.code(recipient: @connection.normalized_address, code: '012345', expires_at: 5.minutes.from_now) }
+    ENV.update('GRADUATE_EMAIL_SMTP_ADDRESS' => '127.0.0.1', 'GRADUATE_EMAIL_SMTP_PORT' => server.addr[1].to_s,
+      'GRADUATE_EMAIL_BASE_URL' => 'https://etdqa.library.yorku.ca')
+
+    ENV['GRADUATE_EMAIL_SMTP_TLS'] = 'starttls'
+    GraduateEmail.configure!
+    assert_raises(Net::SMTPUnsupportedCommand) { message.call.deliver }
+
+    ENV['GRADUATE_EMAIL_SMTP_TLS'] = 'none'
+    GraduateEmail.configure!
+    message.call.deliver
+    body = Timeout.timeout(5) { received.pop }
+    assert_includes body, 'Your sign-in code is 012345.'
+  ensure
+    relay&.kill
+    server&.close
+    ENV['GRADUATE_EMAIL_BASE_URL'] = 'http://127.0.0.1:3210'
+    GraduateEmail.configure!
+  end
+
   # I2: configuration lost after worker start, or a standalone/default worker run.
   # Durable work becomes visibly terminal; nothing is generated, sent or retried.
   test 'unconfigured_execution_fails_visibly_without_code_or_silent_job_loss' do

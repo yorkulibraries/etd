@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'ipaddr'
 require 'openssl'
 require 'uri'
 # Initializers run before the main autoloader is ready. Validate sender on a
@@ -9,6 +10,12 @@ require Rails.root.join('app/services/graduate_email/address')
 # Configuration is deliberately independent of Google and never queries feature
 # tables during boot (including a pre-migration or rolled-back deployment).
 module GraduateEmail
+  # Unencrypted delivery (GRADUATE_EMAIL_SMTP_TLS=none) exists only for staging
+  # test mailboxes such as mailcatcher. It is refused for this site address,
+  # for any relay outside a private network, and whenever credentials are set.
+  PRODUCTION_HOST = 'etd.library.yorku.ca'
+  PRIVATE_RELAY_NETWORKS = %w[10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 127.0.0.0/8].map { |cidr| IPAddr.new(cidr) }.freeze
+
   class << self
     attr_reader :base_url, :code_key, :from_address, :smtp_settings
 
@@ -47,7 +54,7 @@ module GraduateEmail
       @delivery_configured = @from_address && @from_address == sender &&
         host.is_a?(String) && host.match?(/\A[a-zA-Z0-9](?:[a-zA-Z0-9.-]{0,251}[a-zA-Z0-9])?\z/) &&
         port.is_a?(String) && port.match?(/\A[0-9]{1,5}\z/) && (1..65535).cover?(port.to_i) &&
-        %w[starttls tls].include?(tls) && valid_auth
+        (%w[starttls tls].include?(tls) || (tls == 'none' && plain_test_relay?(host, user, password, auth))) && valid_auth
       @smtp_settings = if @delivery_configured
         {address: host.dup.freeze, port: port.to_i, domain: URI.parse(@base_url.to_s).host || 'localhost',
           user_name: user&.dup&.freeze, password: password&.dup&.freeze, authentication: auth&.to_sym,
@@ -64,6 +71,19 @@ module GraduateEmail
 
     def configured?
       @configured == true
+    end
+
+    private
+
+    def plain_test_relay?(host, user, password, auth)
+      site = URI.parse(@base_url.to_s).host
+      return false if site.blank? || site.downcase == PRODUCTION_HOST || [user, password, auth].any?
+      return false unless host.match?(/\A[0-9]{1,3}(?:\.[0-9]{1,3}){3}\z/)
+
+      address = IPAddr.new(host)
+      address.ipv4? && PRIVATE_RELAY_NETWORKS.any? { |network| network.include?(address) }
+    rescue IPAddr::InvalidAddressError
+      false
     end
   end
 end
