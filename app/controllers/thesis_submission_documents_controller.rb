@@ -5,7 +5,7 @@ class ThesisSubmissionDocumentsController < ApplicationController
 
   def show
     send_file @submission_document.file.path,
-              filename: @submission_document.display_name,
+              filename: @submission_document.download_filename,
               type: @submission_document.content_type || 'application/octet-stream',
               disposition: 'attachment'
   end
