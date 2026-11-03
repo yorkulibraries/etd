@@ -113,7 +113,7 @@ module GraduateEmail
           raise GraduateAuthentication::Rejected if approval && competing_locked(student_id: approval.student_id,
             address: approval.normalized_address, generation: control.generation, now: now).any?
           raise GraduateAuthentication::Rejected unless control.enabled && GraduateEmail.configured? && approval &&
-            approval.token_digest == Digest::SHA256.hexdigest(token) && approval.generation == control.generation &&
+            approval.source == 'staff' && approval.token_digest == Digest::SHA256.hexdigest(token) && approval.generation == control.generation &&
             approval.student_id == hint.student_id && approval.approved_by_id == hint.approved_by_id &&
             approval.revoked_at.nil? && approval.consumed_at.nil? && approval.expires_at > now &&
             approval.created_at <= now && approval.created_at > now - 48.hours && approval.expires_at <= approval.created_at + 48.hours &&
@@ -147,6 +147,16 @@ module GraduateEmail
 
       def authorized?(actor)
         GraduateAuthentication.staff_authorized?(actor) && !actor.is_a?(Student)
+      end
+
+      # A pending staff approval needs a currently authorized approver. A record
+      # match has none; it needs the record to still list exactly this address.
+      def approval_authorized?(approval, users)
+        if approval.source == 'record'
+          approval.approved_by_id.nil? && RecordMatch.owner_id(approval.normalized_address) == approval.student_id
+        else
+          approval.source == 'staff' && authorized?(users[approval.approved_by_id])
+        end
       end
 
       # A pending approval reserves its address until it can never become usable

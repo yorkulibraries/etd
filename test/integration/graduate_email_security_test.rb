@@ -41,11 +41,16 @@ class GraduateEmailSecurityTest < ActionDispatch::IntegrationTest
     assert_equal 0, GraduateEmailChallenge.where.not(student_id: nil).count
   end
 
-  test 'contact_lists_never_enroll_or_receive_codes' do
+  # Record match policy (2026-11-03): one typed address from a record list may
+  # enroll that exact address only; the list itself is never a recipient.
+  test 'contact_lists_enroll_only_the_typed_address_and_staff_cannot_approve_lists' do
     @student.update_columns(email: 'approved@example.com,other@example.com')
     csrf_post '/graduate/email/challenges', address: 'approved@example.com'
     assert_response :accepted
-    assert_equal 0, GraduateEmailChallenge.where.not(student_id: nil).count
+    rows = GraduateEmailChallenge.where.not(student_id: nil).to_a
+    assert_equal [['enroll', @student.id]], rows.map { |row| [row.purpose, row.student_id] }
+    approval = GraduateEmailApproval.find(rows.first.approval_id)
+    assert_equal ['record', 'approved@example.com'], [approval.source, approval.normalized_address]
     assert_empty @mail_messages
     assert_raises(GraduateAuthentication::Rejected) { issue_approval(address: 'one@example.com,two@example.com') }
     [false, '1', nil].each do |verified|

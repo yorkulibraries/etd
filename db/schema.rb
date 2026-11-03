@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
+ActiveRecord::Schema[7.0].define(version: 2026_11_03_130000) do
   create_table "action_text_rich_texts", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
@@ -226,7 +226,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
 
   create_table "graduate_email_approvals", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "student_id", null: false
-    t.integer "approved_by_id", null: false
+    t.integer "approved_by_id"
     t.string "normalized_address", limit: 254, null: false, collation: (ActiveRecord::Base.connection.adapter_name == "Mysql2" ? "utf8mb4_bin" : nil)
     t.string "token_digest", limit: 64, null: false
     t.bigint "generation", null: false
@@ -236,11 +236,13 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
     t.bigint "replacement_of_connection_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "source", limit: 16, default: "staff", null: false
     t.index ["approved_by_id"], name: "idx_ge_approvals_approved_by"
     t.index ["replacement_of_connection_id"], name: "idx_ge_approval_replacement"
     t.index ["student_id"], name: "idx_ge_approvals_student"
     t.index ["token_digest"], name: "idx_ge_approval_token", unique: true
     t.check_constraint "(`generation` > 0)", name: "graduate_email_approval_generation"
+    t.check_constraint "(`source` = 'staff' and `approved_by_id` is not null) or (`source` = 'record' and `approved_by_id` is null)", name: "graduate_email_approval_source"
   end
 
   create_table "graduate_email_audit_events", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -295,14 +297,16 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_15_160100) do
 
   create_table "graduate_email_connections", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "student_id", null: false
-    t.integer "approved_by_id", null: false
+    t.integer "approved_by_id"
     t.string "normalized_address", limit: 254, null: false, collation: (ActiveRecord::Base.connection.adapter_name == "Mysql2" ? "utf8mb4_bin" : nil)
     t.datetime "verified_at", null: false
     t.datetime "revoked_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "source", limit: 16, default: "staff", null: false
     t.index ["approved_by_id"], name: "idx_ge_connections_approved_by"
     t.index ["student_id"], name: "idx_ge_connections_student"
+    t.check_constraint "(`source` = 'staff' and `approved_by_id` is not null) or (`source` = 'record' and `approved_by_id` is null)", name: "graduate_email_connection_source"
   end
 
   create_table "graduate_email_controls", id: :bigint, default: nil, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|

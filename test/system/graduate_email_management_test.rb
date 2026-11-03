@@ -6,6 +6,8 @@ class GraduateEmailManagementTest < GraduateEmailBrowserCase
     browser_ppy_login(@actor)
     visit staff_student_graduate_connections_path(@student)
     assert_selector 'h2', text: 'Approve email sign-in'
+    assert_selector '[data-email-not-connected]', text: 'No email sign-in address is connected yet.'
+    assert_text 'The graduate can connect one on their own by signing in with a code sent to the contact email'
     assert_no_selector '#email_identity_verified'
     fill_in 'Approved sign-in address', with: 'approved@example.com'
     fill_in 'Confirm approved address', with: 'different@example.com'
@@ -113,6 +115,7 @@ class GraduateEmailManagementTest < GraduateEmailBrowserCase
       browser_ppy_login(@actor)
       visit staff_student_graduate_connections_path(@student)
       assert_selector 'h2', text: 'Replace or recover email sign-in'
+      assert_no_selector '[data-email-not-connected]'
       fill_in 'Approved sign-in address', with: 'new@example.com'
       fill_in 'Confirm approved address', with: 'NEW@example.com'
       click_button 'Review address'

@@ -64,14 +64,16 @@ class GraduateAuthenticationTest < ActionDispatch::IntegrationTest
     assert_redirected_to invalid_login_path
   end
 
-  test 'same email and callback supplied student id never link or create accounts' do
-    mock_provider(email: @student.email)
+  # Record emails now connect (see graduate_google_record_match_test); a posted
+  # student id or mode still never chooses or creates an account.
+  test 'callback supplied student id never links or creates accounts' do
+    mock_provider(email: 'unrelated@example.com')
     assert_no_difference(['User.count', 'GraduateIdentity.count']) do
       complete_oauth(params: { student_id: @student.id, mode: 'link' })
     end
     assert_nil session[:user_id]
     follow_redirect!
-    assert_includes response.body, 'FGS'
+    assert_includes response.body, 'Faculty of Graduate Studies'
     assert_not_includes response.body, @student.sisid
   end
 

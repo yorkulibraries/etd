@@ -219,7 +219,8 @@ class GraduateEmailLimitsTest < ActionDispatch::IntegrationTest
     @mapping.delete
     request_code
     assert_equal 'noop', GraduateEmailChallenge.order(:id).last.state
-    # No fallback to ordinary editable contact fields.
+    # The student still has a verified connection, so a record email never
+    # opens a second one (FGS handles address changes).
     @student.update_columns(email: 'contact@example.com')
     request_code(address: 'contact@example.com')
     assert_equal 'noop', GraduateEmailChallenge.order(:id).last.state

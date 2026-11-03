@@ -73,7 +73,8 @@ class GraduateSessionsController < ApplicationController
       redirect_to student_view_index_path, notice: 'Your graduate sign-in is connected.'
     when 'login'
       identity = GraduateIdentity.find_by(provider: provider, uid: uid)
-      raise GraduateAuthentication::Rejected unless identity && GraduateAuthentication.active_student?(identity.student)
+      return record_match_sign_in(provider, uid) unless identity
+      raise GraduateAuthentication::Rejected unless GraduateAuthentication.active_student?(identity.student)
 
       student = identity.student
       student.with_lock do
@@ -87,6 +88,8 @@ class GraduateSessionsController < ApplicationController
     else
       raise GraduateAuthentication::Rejected
     end
+  rescue GraduateAuthentication::NoRecordMatch
+    failed_sign_in(GraduateAuthentication::NOT_FOUND_MESSAGE)
   rescue GraduateAuthentication::Rejected, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique,
          ActiveRecord::RecordNotFound
     failed_sign_in
@@ -120,9 +123,31 @@ class GraduateSessionsController < ApplicationController
     invitation if invitation&.usable? && GraduateAuthentication.enabled_providers.include?(invitation.provider)
   end
 
-  def failed_sign_in
+  # Policy (FGS, 2026-11-03): a first Google sign-in connects to the one active
+  # student record that lists the Google-verified email (primary or
+  # secondary). Afterwards the Google subject is the key, never the email.
+  def record_match_sign_in(provider, uid)
+    student_id = GraduateEmail::RecordMatch.owner_id(GraduateAuthentication.verified_email(request.env))
+    student = Student.find_by(id: student_id) if student_id
+    raise GraduateAuthentication::NoRecordMatch unless GraduateAuthentication.active_student?(student)
+
+    student.with_lock do
+      email = GraduateAuthentication.verified_email(request.env)
+      raise GraduateAuthentication::Rejected unless GraduateAuthentication.active_student?(student) &&
+                                                  GraduateEmail::RecordMatch.owner_id(email) == student.id &&
+                                                  student.graduate_identities.where(provider: provider).none?
+      identity = nil
+      Audited.audit_class.as_user(student) do
+        identity = student.graduate_identities.create!(provider: provider, uid: uid, linked_by: nil, link_method: 'record_email')
+      end
+      start_authentication_session(student, source: 'graduate_oauth', identity: identity)
+    end
+    redirect_to student_view_index_path, notice: 'Your Google account is now connected to your student record.'
+  end
+
+  def failed_sign_in(message = GraduateAuthentication::FAILURE_MESSAGE)
     session.delete(:graduate_oauth_intent)
     session.delete(:graduate_enrollment)
-    redirect_to graduate_login_path, alert: GraduateAuthentication::FAILURE_MESSAGE
+    redirect_to graduate_login_path, alert: message
   end
 end

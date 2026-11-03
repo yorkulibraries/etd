@@ -21,6 +21,18 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
     assert approval.reload.consumed_at
   end
 
+  test 'graduate_connects_with_the_email_on_their_student_record' do
+    @student.update_columns(email_external: 'graduate.personal@example.com')
+    request_login('Graduate.Personal@example.com')
+    assert_text 'If you are a current student, sign in with Passport York.'
+    row, code = run_mail_worker
+    assert_equal 'enroll', row.purpose
+    enter_code(code)
+    assert_current_path student_view_index_path
+    connection = GraduateEmailActiveAddress.find_by!(student_id: @student.id).connection
+    assert_equal ['record', 'graduate.personal@example.com'], [connection.source, connection.normalized_address]
+  end
+
   test 'returning_graduate_opens_existing_student_record' do
     enrolled_connection
     thesis = create(:thesis, student: @student)
