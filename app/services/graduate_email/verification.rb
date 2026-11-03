@@ -51,7 +51,7 @@ module GraduateEmail
             raise GraduateAuthentication::Rejected if Delayed::Job.where(queue: Limits::NOTICE_QUEUE).count >= Limits::NOTICE_CAPACITY
             Revocation.replace_locked!(connection_id: old_id, student_id: row.student_id, now: now, except_challenge_id: row.id)
           end
-          created = GraduateEmailConnection.create!(student_id: row.student_id, approved_by_id: approval.approved_by_id,
+          created = GraduateEmailConnection.create!(student_id: row.student_id, approved_by_id: approval.approved_by_id, source: approval.source,
             normalized_address: approval.normalized_address, verified_at: now)
           GraduateEmailActiveAddress.create!(student_id: row.student_id, connection_id: created.id,
             normalized_address: created.normalized_address)

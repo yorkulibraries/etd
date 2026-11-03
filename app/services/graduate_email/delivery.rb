@@ -263,8 +263,7 @@ module GraduateEmail
           GraduateAuthentication.active_student?(users[row.student_id]) &&
           # Only a pending approval depends on its approver's current role/block.
           # A verified connection's approver is historical audit data (login).
-          (row.purpose == 'login' ||
-            (GraduateAuthentication.staff_authorized?(users[target.approved_by_id]) && !users[target.approved_by_id].is_a?(Student))) &&
+          (row.purpose == 'login' || Enrollment.approval_authorized?(target, users)) &&
           Address.normalize(input: target.normalized_address) == target.normalized_address &&
           row.address_key == Limits.address_key(input: target.normalized_address)
         if valid

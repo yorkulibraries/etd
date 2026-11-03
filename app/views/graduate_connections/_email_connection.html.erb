@@ -2,9 +2,19 @@
   <h2 id="email-connection-heading" class="h4">Email sign-in</h2>
   <% if @email_connection %>
     <p class="text-break">Verified address: <%= @email_connection.normalized_address %></p>
-    <p>Approved by <%= @email_connection.approved_by.name %>. Verified <%= time_tag @email_connection.verified_at %>.</p>
-    <p>Contact FGS to change or remove email access.</p>
+    <% if @email_connection.source == "record" %>
+      <p>Connected using an email address on the student record. Verified <%= time_tag @email_connection.verified_at %>.</p>
+    <% else %>
+      <p>Approved by <%= @email_connection.approved_by.name %>. Verified <%= time_tag @email_connection.verified_at %>.</p>
+    <% end %>
+    <% if !local_assigns[:staff] %>
+      <p>Contact FGS to change or remove email access.</p>
+    <% elsif local_assigns[:can_manage] %>
+      <p>Replace or remove it using the options below.</p>
+    <% end %>
+  <% elsif local_assigns[:staff] %>
+    <p>No address is connected yet.</p>
   <% else %>
-    <p>No email sign-in address is connected. Contact FGS to approve access.</p>
+    <p>No email sign-in address is connected yet. Signing in with a code sent to an email address on the student record connects it. Contact FGS to connect a different address.</p>
   <% end %>
 </section>

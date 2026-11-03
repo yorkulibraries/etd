@@ -211,12 +211,35 @@ Fixed stdout enums use bounded local logging. Configure
 image/network/DB resolution with the owner and schedule hourly cleanup separately.
 Do not run the repository's default web compose startup for this feature.
 
+## Addresses on the student record (no FGS step)
+
+Policy agreed with FGS on 2026-11-03: a graduate can connect sign-in without
+FGS by proving they own an address that is already on their student record,
+either the contact email (`email`, usually from GEM) or the external contact
+email (`email_external`, entered by the student while signed in with Passport
+York). Fields holding several addresses count each one.
+
+- Email sign-in: the graduate enters the address and gets a code at that
+  address, exactly like an invitation enrollment. The page is identical whether
+  or not the address matched, so it never reveals who is on file.
+- Google: on the first sign-in, Google's verified email must match. After that the
+  Google account itself is the key, so later email changes do not matter.
+- It works only when exactly one student record lists the address, the student
+  is active, and the record has no email sign-in connection yet. Anything else
+  (no match, an address on two records, an address pending or connected for another
+  record) shows the "current students use Passport York, graduates contact FGS"
+  message, and FGS uses the procedure below.
+- The record is checked again before the code is sent and when it is entered.
+- Accepted risk: if an address on a record was mistyped and belongs to someone else,
+  that person could connect. The staff page shows how each connection was made, and
+  staff can remove it.
+
 ## FGS staff procedure
 
-Use the named approved identity/lost-mailbox procedure above before touching real
-records. Verify the existing student's identity and exact individual mailbox through
-the approved contact channel. Do not infer access from contact fields or a matching
-Google email. Enter the address twice and select Review address. ETD normalizes it
+Use this for graduates whose address is not on their record, or is on more than
+one record. Use the named approved identity/lost-mailbox procedure above before
+touching real records. Verify the existing student's identity and exact individual
+mailbox through the approved contact channel. Enter the address twice and select Review address. ETD normalizes it
 (trims surrounding spaces, lowercases) and shows the exact address before anything
 is created. Check it, then confirm both identity verification and that the invitation
 is for exactly that address, and create the invitation. Change address and Cancel
@@ -224,7 +247,8 @@ create nothing. A review lasts 15 minutes, works once, and ends when the staff
 connections page is opened again (including in another tab); create then asks for a
 new review. The success page shows the approved address next to the one-time link.
 No lists or shared/multi-address fields. The invitation token is shown once,
-expires48 h and authorizes enrollment intent only. Provide it through the approved verified-contact channel. ETD does not
+expires48 h and authorizes enrollment intent only. Provide it through the approved
+verified-contact channel, usually the reply to the graduate's help email. ETD does not
 email an invitation. Keep it out of screenshots, tickets, referrers and logs.
 
 Staff turnover: a **pending** approval works only while its approving staff member

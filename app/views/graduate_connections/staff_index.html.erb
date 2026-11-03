@@ -25,7 +25,7 @@
     <div class="card-body">
       <h2 id="invitation-heading" class="h4">Create a connection invitation</h2>
       <p>First verify this student's identity through an approved Faculty of Graduate Studies process outside this app. Agree on the provider and a secure way to share the invitation.</p>
-      <p>Matching an email address is not identity verification. Each invitation expires after 48 hours, can be used once, and replaces any earlier unused invitation. No email is sent by this app.</p>
+      <p>Graduates whose Google email is on their student record connect on their own. Use an invitation only for a Google account with a different email address. Each invitation expires after 48 hours, can be used once, and replaces any earlier unused invitation. No email is sent by this app.</p>
       <% providers = GraduateAuthentication.enabled_providers %>
       <% if providers.any? %>
         <%= form_with url: student_graduate_invitations_path(@student), method: :post, local: true, data: { turbo: false } do %>
@@ -72,12 +72,19 @@
   </section>
 <% end %>
 
-<%= render "email_connection" %>
+<%= render "email_connection", staff: true, can_manage: can_manage %>
 <% if can_manage && GraduateEmail::Control.enabled? %>
   <section class="card mb-4" aria-labelledby="email-approval-heading">
     <div class="card-body">
       <h2 id="email-approval-heading" class="h4"><%= @email_connection ? "Replace or recover email sign-in" : "Approve email sign-in" %></h2>
-      <p>Verify this student's identity through the approved FGS process before choosing one individual sign-in address. Contact details below are reference information only and do not grant access.</p>
+      <% unless @email_connection %>
+        <div class="alert alert-info" role="status" data-email-not-connected>
+          <p class="fw-bold">No email sign-in address is connected yet.</p>
+          <p>The graduate can connect one on their own by signing in with a code sent to the contact email or external contact email below. This works only while that address is on this one student record.</p>
+          <p class="mb-0">To use a different address, approve it below, then share the one-time invitation link with the graduate.</p>
+        </div>
+      <% end %>
+      <p>Before approving an address that is not on the student record, verify this student's identity through the approved FGS process.</p>
       <p class="text-break">Contact email: <%= @student.email %></p>
       <p class="text-break">External contact email: <%= @student.email_external %></p>
       <%= form_with url: review_student_graduate_email_invitations_path(@student), method: :post, local: true, data: { turbo: false } do %>
@@ -108,7 +115,11 @@
         <% if @email_blocked_ids.include?(approval.id) %>
           <p data-email-approval-blocked>Another student record also claims this address, so this invitation cannot be used. Check the records with FGS and cancel the invitation FGS did not verify.</p>
         <% end %>
-        <p data-email-approval-actor>Approved by <%= approval.approved_by.name %> on <%= time_tag approval.created_at %>. Expires <%= time_tag approval.expires_at %>.</p>
+        <% if approval.source == "record" %>
+          <p data-email-approval-actor>Requested by the graduate using an email address on the student record on <%= time_tag approval.created_at %>. Expires <%= time_tag approval.expires_at %>.</p>
+        <% else %>
+          <p data-email-approval-actor>Approved by <%= approval.approved_by.name %> on <%= time_tag approval.created_at %>. Expires <%= time_tag approval.expires_at %>.</p>
+        <% end %>
         <% if can_manage && !approval.consumed_at && !approval.revoked_at && approval.expires_at > Time.current %>
           <%= button_to "Cancel email invitation", student_graduate_email_invitation_path(@student, approval), method: :delete, class: "btn btn-outline-danger", form: { data: { turbo: false } } %>
         <% end %>

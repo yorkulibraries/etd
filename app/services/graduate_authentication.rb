@@ -8,7 +8,13 @@ module GraduateAuthentication
   PROVIDERS = %w[google_oauth2].freeze
   INTENT_LIFETIME = 10.minutes
   FAILURE_MESSAGE = 'We could not complete graduate sign-in. Please try again. If your account is not connected, contact FGS for help.'
+  # Shown only after Google verified the person owns the email, so it reveals
+  # nothing about anyone else's address.
+  NOT_FOUND_MESSAGE = 'We could not find a student record with this Google account’s email address. ' \
+    'If you are a current student, sign in with Passport York. ' \
+    'If you have graduated, contact the Faculty of Graduate Studies to connect your email address.'
   class Rejected < StandardError; end
+  class NoRecordMatch < Rejected; end
 
   # Only the registered web-server code flow is accepted. The upstream Google
   # strategy also supports direct tokens, JSON and postmessage flows.
@@ -164,6 +170,12 @@ module GraduateAuthentication
       verified = auth.dig('extra', 'raw_info', 'email_verified')
       raise Rejected unless verified == true || verified == 'true'
       uid
+    end
+
+    # Call only after verified_subject!, which requires Google's email_verified.
+    def verified_email(env)
+      email = env['omniauth.auth']&.info&.email
+      GraduateEmail::Address.normalize(input: email) if email.is_a?(String)
     end
 
     private

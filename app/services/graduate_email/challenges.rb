@@ -1,9 +1,12 @@
 # frozen_string_literal: true
+require 'digest'
 module GraduateEmail
   module Challenges
     PURPOSES = %i[login enroll].freeze
     LIVE_STATES = %w[queued claimed sending sent].freeze
     TOKEN_FORMAT = /\A[0-9a-f]{64}\z/
+    # A record match reserves its address only briefly: long enough to resend.
+    RECORD_APPROVAL_LIFETIME = 1.hour
 
     class << self
       # The HTTP caller supplies its signed/encrypted session, never params.
@@ -45,8 +48,23 @@ module GraduateEmail
           target = if admission == :allowed && control.enabled && valid_browser
             eligible_target(purpose, address, approval_id, control, now)
           end
-          address_digest = target && Limits.address_key(input: target.normalized_address)
-          real = target && Limits.send_allowed?(address_key: address_digest, now: now)
+          # An address with no connection may still be on exactly one student
+          # record. Ownership is proved the same way: an enrollment code. The
+          # page and limits are identical either way.
+          match = if target.nil? && purpose == :login && admission == :allowed && control.enabled && valid_browser
+            RecordMatch.locate_locked(address: address, control: control, now: now)
+          end
+          address_digest = (target || match) && Limits.address_key(input: (target || match).normalized_address)
+          real = address_digest && Limits.send_allowed?(address_key: address_digest, now: now)
+          if real && match
+            target = match.approval || GraduateEmailApproval.create!(source: 'record', student_id: match.student_id,
+              approved_by_id: nil, normalized_address: match.normalized_address,
+              token_digest: Digest::SHA256.hexdigest(SecureRandom.urlsafe_base64(32)),
+              generation: control.generation, expires_at: now + RECORD_APPROVAL_LIFETIME)
+            # Same browser token, enrollment binding: the code redeems only here.
+            purpose = :enroll
+            digest = browser_digest(browser_token: browser_token, purpose: :enroll)
+          end
           previous = valid_browser ? existing(digest, purpose, control.generation, now).lock.to_a : []
           previous_id = previous.last&.public_id
           if real
@@ -106,7 +124,7 @@ module GraduateEmail
           return unless GraduateAuthentication.staff_authorized?(approver) && !approver.is_a?(Student)
 
           approval = GraduateEmailApproval.where(id: hint.id).lock.first
-          return unless same_owner?(approval, hint) && approval.generation == control.generation &&
+          return unless same_owner?(approval, hint) && approval.source == 'staff' && approval.generation == control.generation &&
             approval.revoked_at.nil? && approval.consumed_at.nil? && approval.expires_at > now &&
             approval.created_at <= now && approval.created_at > now - 48.hours &&
             approval.expires_at <= approval.created_at + 48.hours

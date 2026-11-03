@@ -1,6 +1,6 @@
 <li class="list-group-item p-3">
   <h3 class="h5"><%= GraduateAuthentication.label(identity.provider) %></h3>
-  <p class="mb-<%= removal_path ? '3' : '0' %>">Linked on <%= time_tag identity.created_at, identity.created_at.strftime("%B %-d, %Y") %></p>
+  <p class="mb-<%= removal_path ? '3' : '0' %>">Linked on <%= time_tag identity.created_at, identity.created_at.strftime("%B %-d, %Y") %><%= ", using an email address on the student record" if identity.link_method == "record_email" %></p>
   <% if removal_path %>
     <%= form_with url: removal_path, method: :delete, local: true, data: { turbo: false } do %>
       <div class="form-check mb-3">
