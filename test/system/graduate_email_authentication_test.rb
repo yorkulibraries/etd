@@ -23,6 +23,10 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
 
   test 'graduate_connects_with_the_email_on_their_student_record' do
     @student.update_columns(email_external: 'graduate.personal@example.com')
+    visit graduate_email_path
+    assert_text 'Enter an email address that is on your student record.'
+    assert_text 'Email address not on your student record, or lost access to your mailbox?'
+    assert_no_text 'approved by the Faculty of Graduate Studies'
     request_login('Graduate.Personal@example.com')
     assert_text 'If you are a current student, sign in with Passport York.'
     row, code = run_mail_worker

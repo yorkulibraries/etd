@@ -7,7 +7,13 @@
     <% else %>
       <p>Approved by <%= @email_connection.approved_by.name %>. Verified <%= time_tag @email_connection.verified_at %>.</p>
     <% end %>
-    <p>Contact FGS to change or remove email access.</p>
+    <% if !local_assigns[:staff] %>
+      <p>Contact FGS to change or remove email access.</p>
+    <% elsif local_assigns[:can_manage] %>
+      <p>Replace or remove it using the options below.</p>
+    <% end %>
+  <% elsif local_assigns[:staff] %>
+    <p>No address is connected yet.</p>
   <% else %>
     <p>No email sign-in address is connected yet. Signing in with a code sent to an email address on the student record connects it. Contact FGS to connect a different address.</p>
   <% end %>
