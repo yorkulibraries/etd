@@ -30,7 +30,7 @@
 					<tbody>
 						<% submission_version.submission_documents.each do |submission_document| %>
 							<tr>
-								<td class="text-wrap text-break"><%= submission_document.display_name %></td>
+								<td class="text-wrap text-break"><%= submission_document.download_filename %></td>
 								<td><%= submission_document.document_type&.humanize || 'Unknown' %></td>
 								<td><%= number_to_human_size submission_document.file_size %></td>
 								<td class="text-end">

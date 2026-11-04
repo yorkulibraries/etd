@@ -103,7 +103,7 @@ class SubmissionVersionsTest < ApplicationSystemTestCase
     assert_nil unknown.reload.usage
     visit student_thesis_path(thesis.student, thesis)
     within(version_section(1)) do
-      assert_selector 'tr', text: /#{Regexp.escape(unknown.display_name)}.*Unknown/m
+      assert_selector 'tr', text: /#{Regexp.escape(unknown.download_filename)}.*Unknown/m
       assert_link 'Download', count: Document.usages.size + 1
     end
     File.write(evidence_dir.join('downloads.json'), JSON.pretty_generate(
