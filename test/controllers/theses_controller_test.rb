@@ -61,6 +61,20 @@ class ThesesControllerTest < ActionController::TestCase
       end
     end
 
+    should 'list submitted version files under the same labelled names they download as' do
+      thesis = create(:thesis, student: @student)
+      create(:document, supplemental: false, thesis:, user: @student,
+                        file: fixture_file_upload('Tony_Rich_E_2012_Phd.pdf'))
+      version = thesis.create_submission_snapshot!(@student)
+      version.update!(submitted_at: Time.zone.local(2026, 10, 8, 15, 7))
+      submission_document = version.submission_documents.first
+
+      get :show, params: { id: thesis.id, student_id: @student.id }
+
+      assert_match(/_v1_submitted_2026-10-08\.pdf\z/, submission_document.download_filename)
+      assert_select '.submission-versions td', text: submission_document.download_filename, count: 1
+    end
+
     should 'load documents separately, as primary and non primary. All must be not_deleted' do
       thesis = create(:thesis, student: @student)
       create_list(:document, 1, supplemental: false, thesis:, user: @student,
