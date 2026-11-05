@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require_relative 'support/selenium_detached_element_errors'
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   options = ENV["SELENIUM_REMOTE_URL"].present? ? { browser: :remote, url: ENV["SELENIUM_REMOTE_URL"] } : nil
