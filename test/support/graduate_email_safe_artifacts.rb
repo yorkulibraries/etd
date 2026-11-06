@@ -142,8 +142,10 @@ module GraduateEmailSafeArtifacts
     assert_selector 'main'
     expected = STATES.fetch(name).last
     assert_text expected
-    state = page.evaluate_script(<<~JS, expected).transform_keys(&:to_sym)
-      ((expected) => {
+    # The layout footer prints the app's short commit hash, which can contain six digits in a row.
+    version_label = "(Version: #{Rails.application.config.git_commit_hash})"
+    state = page.evaluate_script(<<~JS, expected, version_label).transform_keys(&:to_sym)
+      ((expected, versionLabel) => {
         const withoutEmail = value => value.replace(/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+/g, "");
         const secretValue = value => /(?:^|[^0-9])[0-9]{6}(?:[^0-9]|$)|[a-f0-9]{64}|[A-Za-z0-9_-]{43,}/i.test(withoutEmail(value));
         const values = Array.from(document.querySelectorAll('input,textarea')).filter(e => e.name !== 'authenticity_token');
@@ -158,7 +160,7 @@ module GraduateEmailSafeArtifacts
               /[.](?:js|css|png|gif|svg|ico|woff2?)$/.test(a.value)) return false;
           return /token|password/i.test(a.name) || secretValue(a.value);
         }));
-        const textSecret = secretValue(document.documentElement.textContent);
+        const textSecret = secretValue(document.documentElement.textContent.split(versionLabel).join(''));
         const invitationSecret = /Share this invitation once/.test(document.body.innerText);
         const linkSecret = links.some(v => /[?&](token|code)=/i.test(v));
         const inputSecret = values.some(e => /token|password/i.test(e.name) || secretValue(e.value));
@@ -168,7 +170,7 @@ module GraduateEmailSafeArtifacts
           heading: Array.from(document.querySelectorAll('h1,h2')).some(e => e.textContent.trim() === expected) ? expected : '',
           width: innerWidth, height: innerHeight, attribute_secret: unsafeAttributes,
           text_secret: textSecret, invitation_secret: invitationSecret, link_secret: linkSecret, input_secret: inputSecret};
-      })(arguments[0])
+      })(arguments[0], arguments[1])
     JS
     unless GraduateEmailSafeArtifacts.clean_state?(name, state)
       warn GraduateEmailSafeArtifacts.guard_diagnostic(name, state)
