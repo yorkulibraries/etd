@@ -1,4 +1,5 @@
 require Rails.root.join('lib/etd/exporter.rb')
+require Rails.root.join('lib/etd/script_license_attacher.rb')
 require 'ostruct'
 
 OPTIONS = {
@@ -23,6 +24,10 @@ namespace :dspace do
 
     exporter = ETD::Exporter.new options
     exporter.prepare_collection
+
+    # Attach the LICENSE bundle after each complete deposit (ATTACH_LICENCES=false turns it off).
+    licences = ETD::ScriptLicenseAttacher.from_env(ENV, complete: complete_thesis?, log: $stdout)
+    puts(licences.enabled? ? "Licences: on (#{ETD::ScriptLicenseAttacher.rest_settings(ENV)[:base_url]})" : 'Licences: off')
 
     # three things to do
 
@@ -51,6 +56,8 @@ namespace :dspace do
 
         log("Deposited. status_code:  #{receipt.status_code}. status_message:  #{receipt.status_message}")
 
+        licences.attach(receipt: receipt, thesis_id: thesis.id)
+
         # 3) set status of each thesis to publish after it has been published
         if (receipt != nil)
           thesis.publish if publish_thesis?
@@ -76,6 +83,9 @@ namespace :dspace do
     if failed_deposits.size > 0
       STDERR.puts("\n\nFailed: #{failed_deposits.size}, see logged output.")
     end
+
+    licences.finish(retry_path: ENV['LICENCE_RETRY_CSV'].presence ||
+                                File.join(Dir.home, "licence-retry-#{Time.now.strftime('%Y%m%d-%H%M%S')}.csv"))
 
     ## Run Temp file clean up
     Dir.glob('/tmp/etd-*.zip').each { |f| File.delete(f) }
