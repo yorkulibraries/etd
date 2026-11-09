@@ -15,6 +15,29 @@ module ETD
 
     TWO_GIGABYTES = 2 * 1024**3
 
+    # Nothing was kept in YorkSpace, so the thesis can safely be sent again later.
+    class NothingSent < StandardError; end
+
+    # YorkSpace made the item, but a later step failed. Sending again would make a second item.
+    class PartialDeposit < StandardError
+      attr_reader :receipt
+
+      def initialize(message, receipt = nil)
+        super(message)
+        @receipt = receipt
+      end
+    end
+
+    # YorkSpace may or may not have made the item (for example a gateway error after it was made).
+    class UncertainDeposit < StandardError; end
+
+    # Gateway errors can come from a proxy after YorkSpace already made the item.
+    UNCERTAIN_STATUS_CODES = %w[502 503 504].freeze
+
+    # Errors that mean the request never reached YorkSpace.
+    NOT_CONNECTED_ERRORS = [Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ENETUNREACH, SocketError,
+                            Net::OpenTimeout].freeze
+
     # Create a new instance of Exporter and tell it where to deposit Theses to
     # Options:
     # username: The user name to use
@@ -85,45 +108,50 @@ module ETD
       options.files = [options.files] if options.files.instance_of?(String)
       raise 'Files parameter has to be a String or an Array of strings' unless options.files.instance_of?(Array)
 
-      options.files.each do |file_path|
-        unless file_path.starts_with?('/')
-          raise "File paths must be absolute, #{file_path}. #{options.entry.title} was not deposited."
+      options.files.each { |file_path| check_file!(file_path, options.entry) }
+
+      # 1) Deposit Entry, kept in progress until the files are added (step 3 completes it if required).
+      #    sword2ruby raises its own error type for an error status; it is not a StandardError.
+      begin
+        deposit_receipt = @collection.post!(entry: options.entry, in_progress: true,
+                                            on_behalf_of: options.on_behalf_of)
+      rescue Sword2Ruby::Exception => e
+        code = e.message[/server returned (?:code )?(\d{3})/, 1]
+        raise UncertainDeposit, "YorkSpace may have made the item: #{e.message}" if UNCERTAIN_STATUS_CODES.include?(code)
+
+        raise NothingSent, "YorkSpace did not accept the new item: #{e.message}"
+      rescue *NOT_CONNECTED_ERRORS => e
+        raise NothingSent, "YorkSpace could not be reached: #{e.message}"
+      end
+
+      # From here YorkSpace has the item, so any failure is a partial deposit.
+      begin
+        # 2) Deposit each file
+        options.files.each do |file_path|
+          deposit_receipt.entry.post_media!(filepath: file_path, content_type: get_content_type(file_path))
         end
-      end
 
-      # try and deposit
-
-      # 1) Deposit Entry, by default always keep submission in progress, it will be completed in step 3 if required
-      deposit_receipt = @collection.post!(entry: options.entry, in_progress: true, on_behalf_of: options.on_behalf_of)
-
-      # 2) Deposit Media if any (zip first if required)
-      if options.files.size.positive? && deposit_receipt.status_code.to_i >= 200
-          # if there are files to send and original entry has been successfully deposited
-          options.files.each do |file_path|
-            file_size = File.size(file_path)
-            if File.exist?(file_path) && file_size < TWO_GIGABYTES
-              e = deposit_receipt.entry
-              deposit_receipt.entry.post_media!(filepath: file_path, content_type: get_content_type(file_path))
-            else
-              puts "Skipping #{file_path}. Size: #{file_size}"
-            end 
+        # 3) Send a completed signal if required
+        if options.complete
+          response = @connection.post(deposit_receipt.location, nil, { 'In-Progress' => 'false' })
+          unless response.is_a?(Net::HTTPSuccess)
+            raise "YorkSpace did not finish the submission: server returned #{response&.code} #{response&.message}"
           end
-      end
-
-      # 3) Send a completed signal if required
-      if options.complete && deposit_receipt.status_code.to_i >= 200
-        # send a completion flag
-        headers = { 'In-Progress' => 'false' }
-        @connection.post(deposit_receipt.location, nil, headers)
-      end
-
-      # 4) Delete the tmp file if it exits
-      if !@zipped_file.nil? && File.exist?(@zipped_file)
-        puts "DELETING #{@zipped_file}"
-        File.delete(@zipped_file)
+        end
+      rescue StandardError, Sword2Ruby::Exception => e
+        raise PartialDeposit.new("YorkSpace made the item but a later step failed: #{e.message}", deposit_receipt)
       end
 
       deposit_receipt
+    end
+
+    # Refuse before anything is sent: a missing or oversized file would leave the item without it.
+    def check_file!(file_path, entry)
+      raise NothingSent, "File paths must be absolute, #{file_path}. #{entry.title} was not deposited." unless file_path.start_with?('/')
+      raise NothingSent, "File not found: #{File.basename(file_path)}. Nothing was sent." unless File.file?(file_path)
+      return if File.size(file_path) < TWO_GIGABYTES
+
+      raise NothingSent, "File is 2GB or more, too large for YorkSpace: #{File.basename(file_path)}. Nothing was sent."
     end
 
     # Get the content type of the file by reading it

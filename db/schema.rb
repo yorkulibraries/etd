@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_11_03_130000) do
+ActiveRecord::Schema[7.0].define(version: 2026_11_09_120000) do
   create_table "action_text_rich_texts", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
@@ -174,12 +174,15 @@ ActiveRecord::Schema[7.0].define(version: 2026_11_03_130000) do
     t.text "output_error"
     t.string "job_id"
     t.string "job_status"
-    t.date "job_started_at"
-    t.date "job_completed_at"
-    t.date "job_cancelled_at"
+    t.datetime "job_started_at"
+    t.datetime "job_completed_at"
+    t.datetime "job_cancelled_at"
     t.integer "job_cancelled_by_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.integer "active_slot"
+    t.integer "needs_checking_count", default: 0, null: false
+    t.index ["active_slot"], name: "index_export_logs_on_active_slot", unique: true
   end
 
   create_table "gem_records", id: :integer, charset: "utf8mb3", force: :cascade do |t|
@@ -436,6 +439,21 @@ ActiveRecord::Schema[7.0].define(version: 2026_11_03_130000) do
     t.text "notes"
     t.integer "embargo_selection", default: 0, null: false
     t.index ["student_id"], name: "index_theses_on_student_id"
+  end
+
+  create_table "thesis_deposit_attempts", charset: "utf8mb3", force: :cascade do |t|
+    t.integer "thesis_id", null: false
+    t.integer "export_log_id", null: false
+    t.string "state", null: false
+    t.integer "open_thesis_id"
+    t.string "sword_location"
+    t.string "licence_handoff"
+    t.text "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["export_log_id"], name: "index_thesis_deposit_attempts_on_export_log_id"
+    t.index ["open_thesis_id"], name: "index_thesis_deposit_attempts_on_open_thesis_id", unique: true
+    t.index ["thesis_id"], name: "index_thesis_deposit_attempts_on_thesis_id"
   end
 
   create_table "thesis_invitations", charset: "utf8mb4", force: :cascade do |t|

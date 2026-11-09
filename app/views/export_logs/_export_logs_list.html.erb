@@ -4,8 +4,7 @@
       <th>User</th>
       <th>Published Date</th>
       <th>Total Theses</th>
-      <th>Successsful / Failed</th>
-      <th>Production Server?</th>
+      <th>Successful / Failed</th>
       <th>More Info</th>
     </tr>
   </thead>
@@ -16,7 +15,6 @@
         <td class="date"><%=  export_log.published_date.strftime("%b %d, %Y") rescue nil %></td>
         <td><%= export_log.theses_count.to_i %></td>
         <td><%= export_log.successful_count.to_i %> / <%= export_log.failed_count.to_i %></td>
-        <td><%= export_log.production_export? ? "Production" : "Test" %></td>
         <td><%= link_to "More Info", export_log_path(export_log), remote: true %></td>
       </tr>
     <% end %>

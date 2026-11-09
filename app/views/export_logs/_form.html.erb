@@ -7,17 +7,15 @@
       </div>
       <%= simple_form_for @export_log, html: { remote: true } do |f| %>
         <div class="modal-body">
-          <%= f.input :published_date, collection: publish_on_dates %>
-          <div class="row">
-            <div class="span3">
-              <p class="trivial">The following options are for advance users, leave them unchanged unless you are sure of their use</p>
-              <%= f.input :production_export, as: :boolean, boolean_style: :inline, label: "Export To Production Server?" %>
-            </div>
-            <div class="span3">
-              <%= f.input :complete_thesis, as: :boolean, boolean_style: :inline, label: "Complete Submission?" %>
-              <%= f.input :publish_thesis, as: :boolean, boolean_style: :inline, label: "Change status to published?" %>
-            </div>
-          </div>
+          <% if f.object.errors[:base].any? %>
+            <div class="alert alert-danger" role="alert"><%= f.object.errors[:base].join(' ') %></div>
+          <% end %>
+          <% dates = publish_on_dates(1.year, ahead: 0.days) %>
+          <%= f.input :published_date, collection: dates, include_blank: false,
+                      selected: f.object.published_date&.iso8601 || dates.last&.last %>
+          <p class="trivial">Every accepted thesis with this publish date, or an earlier one that is still
+            waiting, is deposited to YorkSpace, gets its licences, and is marked published. Check the list on
+            Review Accepted Theses first.</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

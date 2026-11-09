@@ -30,4 +30,31 @@ class ExportLogTest < ActiveSupport::TestCase
     assert_equal 4, ExportLog.done.size
     assert_equal 5, ExportLog.failed.size
   end
+
+  # Written before the code: two waiting or running exports must be impossible even when both
+  # requests pass the friendly check together; a thesis can only have one unresolved send.
+  should 'let the database hold only one active export' do
+    create(:export_log, active_slot: ExportLog::ACTIVE)
+
+    assert_raises(ActiveRecord::RecordNotUnique) { create(:export_log, active_slot: ExportLog::ACTIVE) }
+    assert_difference('ExportLog.count', 2) { create_list(:export_log, 2, active_slot: nil) }
+  end
+
+  should 'let the database hold only one unresolved send per thesis' do
+    thesis = create(:thesis)
+    assert ThesisDepositAttempt.claim(thesis:, export_log: create(:export_log))
+    assert_nil ThesisDepositAttempt.claim(thesis:, export_log: create(:export_log))
+  end
+
+  should 'keep a send held back when saving its result fails' do
+    thesis = create(:thesis)
+    attempt = ThesisDepositAttempt.claim(thesis:, export_log: create(:export_log))
+    attempt.stubs(:save!).raises(ActiveRecord::StatementInvalid, 'Incorrect string value')
+
+    assert_raises(ActiveRecord::StatementInvalid) { attempt.failed!('nothing sent') }
+
+    assert_equal thesis.id, attempt.open_thesis_id
+    assert_equal ThesisDepositAttempt::SENDING, attempt.state
+    assert_equal thesis.id, ThesisDepositAttempt.find(attempt.id).open_thesis_id
+  end
 end
