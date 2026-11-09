@@ -6,6 +6,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <%= render "export_logs/summary" %>
         <div class="row">
           <div class="span3">
             <blockquote class="export_log">
@@ -13,12 +14,6 @@
               <p><%= @export_log.creator.name %></p>
               <small>Published Date</small>
               <p><%= @export_log.published_date.strftime("%b %d, %Y") rescue nil %></p>
-              <small>Production / Test Server</small>
-              <p><%= @export_log.production_export? ? "Production" : "Test" %></p>
-              <small>Complete Submission?</small>
-              <p><%= @export_log.complete_thesis? ? "Yes" : "No" %></p>
-              <small>Change Thesis Status To Publish?</small>
-              <p><%= @export_log.publish_thesis? ? "Yes" : "No" %></p>
             </blockquote>
 
           </div>
@@ -32,7 +27,7 @@
               <small>Successful Count</small>
               <p><%= @export_log.successful_count.to_i %></p>
               <small>Failed Count</small>
-              <p><%= @export_log.successful_count.to_i %></p>
+              <p><%= @export_log.failed_count.to_i %></p>
               <% if @export_log.job_status == ExportLog::JOB_OPEN %>
                 <small>Export Pending</small>
                 <p>
@@ -42,28 +37,24 @@
                 </p>
               <% elsif @export_log.job_status == ExportLog::JOB_CANCELLED %>
                 <small>Export Cancelled</small>
-                <p><%= @export_log.job_cancelled_at.strftime("%b %d, %Y") rescue nil %></p>
+                <p><%= @export_log.job_cancelled_at.in_time_zone.strftime("%b %d, %Y %l:%M %p") rescue nil %></p>
                 <p><%= @export_log.job_cancelled_by.name rescue nil %></p>
               <% else %>
                 <small>Export Started</small>
-                <p><%= @export_log.job_started_at.strftime("%b %d, %Y") rescue nil %></p>
+                <p><%= @export_log.job_started_at.in_time_zone.strftime("%b %d, %Y %l:%M %p") rescue nil %></p>
+                <% if @export_log.job_completed_at %>
+                  <small>Export Finished</small>
+                  <p><%= @export_log.job_completed_at.in_time_zone.strftime("%b %d, %Y %l:%M %p") %></p>
+                <% end %>
               <% end %>
             </blockquote>
           </div>
         </div>
 
-        <blockquote class="export_log">
-          <small>Theses IDs To Export</small>
-          <p><%= format @export_log.theses_ids %></p>
-          <small>Successfully Exported IDs</small>
-          <p><%= format @export_log.successful_ids %></p>
-          <small>Failed IDs</small>
-          <p><%= format @export_log.failed_ids %></p>
-        </blockquote>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <%= link_to "Click here to see export log output ", export_log_path(@export_log, anchor: "full_output"), class: "btn btn-primary" %>
+        <%= link_to "Open export page", export_log_path(@export_log), class: "btn btn-primary" %>
       </div>
     </div>
   </div>

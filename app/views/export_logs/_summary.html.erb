@@ -1,0 +1,36 @@
+<% needs_checking = @export_log.needs_checking_count.to_i.positive? %>
+<% problem = @export_log.failed_count.to_i.positive? || needs_checking || @export_log.job_status == ExportLog::JOB_FAILED %>
+<div class="alert <%= problem ? 'alert-warning' : 'alert-info' %>" id="export_summary">
+  <% if [ExportLog::JOB_DONE, ExportLog::JOB_FAILED].include?(@export_log.job_status) %>
+    <% if (reason = @export_log.stop_reason) %>
+      <p class="mb-1"><strong>Nothing more was sent to YorkSpace.</strong> <%= reason %></p>
+    <% end %>
+    <p class="mb-1"><strong><%= @export_log.summary %></strong></p>
+    <p class="mb-1"><%= @export_log.licence_summary %></p>
+    <% if @export_log.failed_count.to_i.positive? || (@export_log.job_status == ExportLog::JOB_FAILED && !needs_checking) %>
+      <p class="mb-1">Theses that failed were left as accepted, so a new export for the same date will try them again.</p>
+    <% end %>
+  <% elsif @export_log.stale? %>
+    <p class="mb-0"><strong>This export stopped making progress over two hours ago</strong> (for example,
+      the server restarted). Theses it already deposited were marked published. Start a new export
+      for the same date to send the rest.</p>
+  <% elsif @export_log.job_status == ExportLog::JOB_RUNNING %>
+    <p class="mb-0">Running: <%= @export_log.summary %> Refresh the page to see progress.</p>
+  <% elsif @export_log.never_started? %>
+    <p class="mb-0"><strong>This export never started</strong> (for example, the server restarted). Nothing
+      was sent. Start a new export for the same date.</p>
+  <% elsif @export_log.job_status == ExportLog::JOB_OPEN %>
+    <p class="mb-0">Waiting to start.</p>
+  <% else %>
+    <p class="mb-0">Cancelled. <%= @export_log.successful_count.to_i.positive? ? "Before it stopped: #{@export_log.summary}" : 'Nothing was deposited.' %></p>
+  <% end %>
+  <% if needs_checking %>
+    <p class="mb-1 mt-2">These theses may already be in YorkSpace, so they were left as accepted and
+      will not be sent again until a developer checks YorkSpace for them:</p>
+    <ul class="mb-0">
+      <% @export_log.theses_needing_checking.each do |thesis| %>
+        <li><%= link_to thesis.title, student_thesis_path(thesis.student, thesis) %> (thesis <%= thesis.id %>)</li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

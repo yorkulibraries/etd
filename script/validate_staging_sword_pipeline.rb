@@ -54,7 +54,7 @@ begin
                             supervisor: 'Synthetic test supervisor', gem_record_event_id: 0,
                             degree_name: 'MA', degree_level: Thesis::MASTERS,
                             program: 'Synthetic staging test', language: 'English',
-                            exam_date: Date.current, status: Thesis::ACCEPTED, embargoed: false,
+                            exam_date: Date.current, published_date: Date.current, status: Thesis::ACCEPTED, embargoed: false,
                             abstract: 'Synthetic staging-only SWORD and licence automation test. Not a genuine thesis. No student content.')
     Tempfile.create(['etd-synthetic-pipeline-', '.txt']) do |file|
       file.write("Synthetic ETD pipeline test #{token}. Not a genuine thesis. Staging only.\n")
@@ -68,11 +68,11 @@ begin
       end
     end
     export_log = ExportLog.create!(creator: student, published_date: Date.current,
-                                    job_status: ExportLog::JOB_OPEN, production_export: true,
-                                    complete_thesis: true, publish_thesis: false,
+                                    job_status: ExportLog::JOB_OPEN,
+                                    complete_thesis: true, publish_thesis: true,
                                     theses_count: 1, theses_ids: thesis.id.to_s,
                                     successful_count: 0, failed_count: 0)
-    # The production flag enables the real hook; every endpoint above is staging.
+    # The job always completes, adds licences and publishes (mail is off); every endpoint above is staging.
     job = DspaceExportJob.new
     job.thesis_to_atom_entry(thesis)
     paths = job.extract_thesis_filepaths(thesis)

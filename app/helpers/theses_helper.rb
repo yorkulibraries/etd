@@ -28,9 +28,10 @@ module ThesesHelper
     end
   end
 
-  def publish_on_dates(start = 1.year)
+  # Publish dates (Mar 1, Jul 1, Nov 1) from start before today to ahead after today.
+  def publish_on_dates(start = 1.year, ahead: 4.years)
     dates = []
-    ((Date.today - start)..(Date.today + 4.years)).each do |date|
+    ((Date.today - start)..(Date.today + ahead)).each do |date|
       if (date.month == 11 || date.month == 7 || date.month == 3) && date.day == 1
         dates.push([date.strftime('%b %e, %Y'), date.strftime('%Y-%m-%d')])
       end

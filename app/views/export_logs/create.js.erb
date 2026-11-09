@@ -1,8 +1,9 @@
 <% if @export_log.errors.size == 0 %>
   $("#new_export_log").modal('hide');
   $("#new_export_log_holder").empty();
-  $("#export_logs_list").replaceWith('<%=escape_javascript render partial: "export_logs_list" %>');
+  $("#export_logs_list").html('<%=escape_javascript render partial: "export_logs_list" %>');
 <% else %>
-  $("#new_export_log_holder").empty();
-  $('#new_export_log_holder').prepend('<%=escape_javascript render("export_logs/form") %>');
+  // Keep the open dialog and swap in the form with its error, so staff can see why it was refused.
+  var refreshed = $('<%=escape_javascript render("export_logs/form") %>');
+  $('#new_export_log .modal-content').replaceWith(refreshed.find('.modal-content'));
 <% end %>

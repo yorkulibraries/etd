@@ -1,5 +1,6 @@
 require Rails.root.join('lib/etd/exporter.rb')
 require Rails.root.join('lib/etd/script_license_attacher.rb')
+require Rails.root.join('lib/etd/dspace_deposit_package.rb')
 require 'ostruct'
 
 OPTIONS = {
@@ -107,82 +108,16 @@ namespace :dspace do
 
   end
 
-  # Maps thesis to atom entry
+  # Record and files come from the shared package, so the website export sends exactly the same.
   def thesis_to_atom_entry(thesis)
-    entry = Atom::Entry.new
-    entry.add_dublin_core_extension!("title", thesis.title)
-    entry.add_dublin_core_extension!("creator", thesis.author)
-
-    thesis.supervisor.split("/").map(&:strip).each do | supervisor |
-      entry.add_dublin_core_extension!("supervisor", supervisor)
-    end
-
-
-    thesis.loc_subjects.each do |subject|
-      entry.add_dublin_core_extension!("subject", subject.name)
-    end
-
-    thesis.subject_keywords.each do |keyword|
-      entry.add_dublin_core_extension!("relationSubjectKeywords", keyword)
-    end
-
-    entry.add_dublin_core_extension!("abstract", thesis.abstract.tr("\u0002\u000B\u000C\u000E\u000F",''))
-    entry.add_dublin_core_extension!("language", language_to_iso(thesis.language))
-    entry.add_dublin_core_extension!("name", thesis.degree_name_full)
-    entry.add_dublin_core_extension!("level", thesis.degree_level)
-
-    entry.add_dublin_core_extension!("discipline", short_program_name(thesis.program))
-    entry.add_dublin_core_extension!("issued", Date.current.strftime("%Y-%m-%d"))
-    entry.add_dublin_core_extension!("dateCopyrighted", thesis.exam_date.strftime("%Y-%m-%d"))
-    entry.add_dublin_core_extension!("date.copyright", thesis.exam_date.strftime("%Y-%m-%d"))
-
-    entry.add_dublin_core_extension!("type", "Electronic Thesis or Dissertation")
-    entry.add_dublin_core_extension!("rights", "Author owns copyright, except where explicitly noted. Please contact the author directly with licensing requests.")
-
-    return entry
+    ETD::DspaceDepositPackage.entry(thesis)
   end
 
-  def language_to_iso(language)
-    language = "" if language.blank?
-
-    iso = case language.downcase
-    when "en", "english", "eng"
-       "en"
-    when "fr", "french"
-      "fr"
-    else
-      "other"
-    end
-
-    return iso
-  end
-
-  def short_program_name(program)
-    if program != nil && program.is_a?(String)
-      program.split(".,").last.strip
-    else
-      program
-    end
-  end
-
-  # Go through documents and get the file paths
+  # Main thesis file first, then supplemental files (PRIMARY_FILES_ONLY=true skips those).
   def extract_thesis_filepaths(thesis)
-    return [] if thesis == nil
-
-    files = []
-    thesis.documents.not_deleted.where(usage: Document.usages[:thesis], embargo_request_id: nil).where(supplemental: false).each do |document|
-      log "       #{document.file.path}"
-      files.push document.file.path
-    end
-
-    unless ENV["PRIMARY_FILES_ONLY"] == "true"
-    thesis.documents.not_deleted.where(usage: Document.usages[:thesis], embargo_request_id: nil, supplemental: true).each do |document|
-        log "       #{document.file.path}"
-        files.push document.file.path
-      end
-    end
-
-    return files
+    files = ETD::DspaceDepositPackage.files(thesis, primary_only: ENV["PRIMARY_FILES_ONLY"] == "true")
+    files.each { |path| log "       #{path}" }
+    files
   end
 
   # Which options to load
