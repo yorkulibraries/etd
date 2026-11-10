@@ -27,7 +27,10 @@ class ThesesController < ApplicationController
     @embargo_documents = @thesis.documents.not_deleted.embargo.where(embargo_request_id: nil)
     @modification_request_documents = @thesis.documents.not_deleted.modification_request
     @embargo_requests = @thesis.embargo_requests.includes(:decided_by, :documents).order(created_at: :desc)
-    @submission_versions = @thesis.submission_versions.order(version_number: :desc) if current_user.role != User::STUDENT
+    if current_user.role != User::STUDENT
+      @submission_versions = @thesis.submission_versions.order(version_number: :desc)
+      @replaced_documents = @thesis.replaced_documents.includes(:replaced_by).order(replaced_at: :desc, id: :desc)
+    end
     permission = current_user.role == User::STUDENT ? :show : :read
     authorize! permission, @thesis
   end

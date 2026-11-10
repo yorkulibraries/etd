@@ -186,6 +186,7 @@
 
 <% if current_user.role != User::STUDENT %>
 	<%= render partial: "submission_versions", locals: { submission_versions: @submission_versions } %>
+	<%= render partial: "replaced_documents", locals: { replaced_documents: @replaced_documents } %>
 <% end %>
 
 <hr />

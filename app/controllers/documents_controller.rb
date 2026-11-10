@@ -64,11 +64,16 @@ class DocumentsController < ApplicationController
     verify_document_request_thesis!
     authorize! :manage, @document
     @document.audit_comment = "Document was updated. File: #{@document.name}"
+    # Staff can replace files after the student submits. Copy the current file
+    # first, because the upload overwrites it at the same path.
+    replaced_copy = if document_params[:file].present? && ThesisReplacedDocument.keep_copy?(@document)
+                      ThesisReplacedDocument.build_from(@document, replaced_by: current_user)
+                    end
     @document.assign_attributes(document_params.except(:embargo_request_id))
     # Keep the displayed name in sync with the replacement file so the
     # extension matches what was actually uploaded (e.g. .docx -> .pdf).
     @document.name = @document.file.filename if @document.file.present?
-    if @document.save
+    if save_replacing(@document, replaced_copy)
       redirect_to document_return_path(@document), notice: 'File uploaded.'
     else
       render action: 'edit'
@@ -85,6 +90,20 @@ class DocumentsController < ApplicationController
   end
 
   private
+
+  # Saves the kept copy only when the replacement itself is accepted, so a
+  # rejected upload leaves nothing behind.
+  def save_replacing(document, replaced_copy)
+    return document.save unless replaced_copy
+    return false unless document.valid?
+
+    saved = Document.transaction do
+      replaced_copy.save!
+      document.save || raise(ActiveRecord::Rollback)
+    end
+    replaced_copy.remove_file! unless saved
+    saved
+  end
 
   def load_student_and_thesis
     @student = Student.find(params[:student_id])

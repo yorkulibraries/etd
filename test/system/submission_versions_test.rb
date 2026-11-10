@@ -114,11 +114,98 @@ class SubmissionVersionsTest < ApplicationSystemTestCase
     ))
   end
 
+  test 'staff replacements on a submitted thesis keep the file they replaced' do
+    evidence_dir = Rails.root.join('tmp/replaced-files-evidence')
+    FileUtils.rm_rf(evidence_dir)
+    FileUtils.mkdir_p(evidence_dir)
+    staff = FactoryGirl.create(:user, role: User::STAFF)
+    thesis = FactoryGirl.create(:thesis, embargo_selection: :not_requested)
+    thesis.loc_subjects << LocSubject.first
+    original = Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf')
+    first_staff_file = evidence_dir.join('first-staff-replacement.pdf')
+    second_staff_file = evidence_dir.join('second-staff-replacement.pdf')
+    returned_draft_file = evidence_dir.join('returned-draft.pdf')
+    write_replacement_pdf(first_staff_file, 'First staff replacement')
+    write_replacement_pdf(second_staff_file, 'Second staff replacement')
+    write_replacement_pdf(returned_draft_file, 'Draft after return')
+    hashes = [original, first_staff_file, second_staff_file, returned_draft_file].map { |path| Digest::SHA256.file(path).hexdigest }
+    assert_equal 4, hashes.uniq.size
+
+    primary = FactoryGirl.create(:document, thesis: thesis, user: thesis.student, usage: :thesis, supplemental: false,
+                                            file: Rack::Test::UploadedFile.new(original, 'application/pdf'))
+    supplemental = FactoryGirl.create(:document, thesis: thesis, user: thesis.student, usage: :thesis, supplemental: true,
+                                                 file: Rack::Test::UploadedFile.new(original, 'application/pdf'))
+    sign_in_for_browser(thesis.student)
+    submit_thesis(thesis)
+    assert_equal 1, thesis.submission_versions.count
+
+    sign_in_for_browser(staff)
+    visit student_thesis_path(thesis.student, thesis)
+    within('.replaced-documents') { assert_text 'No files have been replaced since the student submitted.' }
+
+    replace_through_browser(primary, first_staff_file)
+    replace_through_browser(primary, second_staff_file)
+    replace_through_browser(supplemental, first_staff_file)
+    assert_equal hashes[2], Digest::SHA256.file(primary.reload.file.path).hexdigest
+    assert_equal 1, thesis.submission_versions.count, 'A staff replacement is not a student submission'
+
+    # A rejected upload must not leave a copy behind or touch the live file.
+    within("#document_#{primary.id}") { click_link('Replace') }
+    rejected = evidence_dir.join('rejected.txt')
+    File.write(rejected, 'not a thesis')
+    attach_file('document_file', rejected, make_visible: true)
+    click_button('Upload')
+    visit student_thesis_path(thesis.student, thesis)
+    assert_equal hashes[2], Digest::SHA256.file(primary.reload.file.path).hexdigest
+
+    replaced = thesis.replaced_documents.order(:id).to_a
+    assert_equal [[primary.id, hashes[0]], [primary.id, hashes[1]], [supplemental.id, hashes[0]]],
+                 replaced.map { |copy| [copy.source_document_id, Digest::SHA256.file(copy.file.path).hexdigest] }
+    assert(replaced.all? { |copy| copy.replaced_by_id == staff.id })
+
+    visit student_thesis_path(thesis.student, thesis)
+    downloads = within('.replaced-documents') do
+      assert_selector 'tbody tr', count: 3
+      replaced.map do |copy|
+        assert_selector 'td', text: copy.download_filename
+        assert_match(/_replaced_\d{4}-\d{2}-\d{2}_\d{4}\.pdf\z/, copy.download_filename)
+        href = student_thesis_replaced_document_path(thesis.student, thesis, copy)
+        response = download_through_browser(href)
+        assert_equal 200, response['status']
+        assert_includes response['disposition'], %(filename="#{copy.download_filename}")
+        bytes = Base64.strict_decode64(response.fetch('base64'))
+        File.binwrite(evidence_dir.join("downloaded-#{copy.id}.pdf"), bytes)
+        assert_equal Digest::SHA256.file(copy.file.path).hexdigest, Digest::SHA256.hexdigest(bytes)
+        { id: copy.id, document: copy.source_document_id, name: copy.download_filename, status: response['status'],
+          sha256: Digest::SHA256.hexdigest(bytes), replaced_by: staff.id }
+      end
+    end
+
+    # Once returned, the student is editing a draft again; those changes are not kept.
+    thesis.update!(status: Thesis::RETURNED)
+    sign_in_for_browser(thesis.student)
+    visit student_view_thesis_process_path(thesis, Thesis::PROCESS_UPLOAD)
+    within("#document_#{primary.id}") { click_link('Replace') }
+    attach_file('document_file', returned_draft_file, make_visible: true)
+    click_button('Upload')
+    assert_selector '.alert-success', text: 'File uploaded.'
+    assert_equal 3, thesis.replaced_documents.count, 'Draft replacements after a return must not be kept'
+    student_download = download_through_browser(student_thesis_replaced_document_path(thesis.student, thesis, replaced.first))
+    assert_not_includes student_download['disposition'].to_s, 'attachment', 'Students must not download replaced files'
+
+    File.write(evidence_dir.join('replaced-files.json'), JSON.pretty_generate(
+      scenario: 'student submits; staff replaces primary twice and a supplemental once; rejected upload; return; student draft replace',
+      original_sha256: hashes[0], kept_after_staff_replacements: 3, kept_after_rejected_upload: 3,
+      kept_after_returned_draft_replace: thesis.replaced_documents.count, submitted_versions: thesis.submission_versions.count,
+      student_download_status: student_download['status'], downloads: downloads
+    ))
+  end
+
   private
 
-  def write_replacement_pdf(path)
+  def write_replacement_pdf(path, text = 'Revised snapshot test PDF')
     # A valid one-page PDF with visibly different content from the original thesis fixture.
-    stream = "BT /F1 24 Tf 72 720 Td (Revised snapshot test PDF) Tj ET\n"
+    stream = "BT /F1 24 Tf 72 720 Td (#{text}) Tj ET\n"
     objects = [
       '<< /Type /Catalog /Pages 2 0 R >>',
       '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
@@ -152,6 +239,14 @@ class SubmissionVersionsTest < ApplicationSystemTestCase
     assert_selector '.student-view.status h2', text: 'Thesis Submission Status'
     assert_selector '.student-view.status .text-bg-success', text: 'Under review'
     assert_equal Thesis::UNDER_REVIEW, thesis.reload.status
+  end
+
+  def replace_through_browser(document, path)
+    visit student_thesis_path(document.thesis.student, document.thesis)
+    within("#document_#{document.id}") { click_link('Replace') }
+    attach_file('document_file', path, make_visible: true)
+    click_button('Upload')
+    assert_selector '.alert-success', text: 'File uploaded.'
   end
 
   def version_section(number)

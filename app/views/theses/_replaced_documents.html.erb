@@ -1,0 +1,35 @@
+<div class="replaced-documents fitted student-view mt-4">
+	<h4>Replaced Files</h4>
+	<p class="weak small">Copies of files that staff replaced after the student submitted.</p>
+
+	<% if replaced_documents.empty? %>
+		<p>No files have been replaced since the student submitted.</p>
+	<% else %>
+		<table class="table table-sm align-middle">
+			<thead>
+				<tr>
+					<th>File</th>
+					<th>Type</th>
+					<th>Replaced</th>
+					<th>Size</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<% replaced_documents.each do |replaced_document| %>
+					<tr>
+						<td class="text-wrap text-break"><%= replaced_document.download_filename %></td>
+						<td><%= replaced_document.document_type&.humanize || 'Unknown' %></td>
+						<td><%= l replaced_document.replaced_at.in_time_zone, format: :long %> by <%= replaced_document.replaced_by.display_name %></td>
+						<td><%= number_to_human_size replaced_document.file_size %></td>
+						<td class="text-end">
+							<%= link_to student_thesis_replaced_document_path(@student, @thesis, replaced_document), class: 'btn btn-secondary btn-sm', title: 'Download' do %>
+								<i class="fa fa-download"></i> Download
+							<% end %>
+						</td>
+					</tr>
+				<% end %>
+			</tbody>
+		</table>
+	<% end %>
+</div>

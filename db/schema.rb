@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_11_09_120000) do
+ActiveRecord::Schema[7.0].define(version: 2026_11_10_120000) do
   create_table "action_text_rich_texts", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
@@ -476,6 +476,24 @@ ActiveRecord::Schema[7.0].define(version: 2026_11_09_120000) do
     t.integer "rank"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+  end
+
+  create_table "thesis_replaced_documents", id: :integer, charset: "utf8mb4", force: :cascade do |t|
+    t.integer "thesis_id", null: false
+    t.integer "source_document_id"
+    t.integer "replaced_by_id", null: false
+    t.datetime "replaced_at", null: false
+    t.boolean "supplemental", default: true, null: false
+    t.integer "usage", null: false
+    t.string "name"
+    t.string "original_filename"
+    t.string "content_type"
+    t.bigint "file_size"
+    t.string "file"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_document_id"], name: "index_thesis_replaced_documents_on_source_document_id"
+    t.index ["thesis_id"], name: "index_thesis_replaced_documents_on_thesis_id"
   end
 
   create_table "thesis_submission_documents", id: :integer, charset: "utf8mb4", force: :cascade do |t|

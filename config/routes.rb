@@ -90,6 +90,8 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :replaced_documents, only: [:show], path: 'replaced-files', controller: 'thesis_replaced_documents'
+
       resources :submission_versions, only: [] do
         resources :submission_documents, only: [:show], path: 'files', controller: 'thesis_submission_documents'
       end
