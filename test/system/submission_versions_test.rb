@@ -170,7 +170,7 @@ class SubmissionVersionsTest < ApplicationSystemTestCase
       assert_selector 'tbody tr', count: 3
       replaced.map do |copy|
         assert_selector 'td', text: copy.download_filename
-        assert_match(/_replaced_\d{4}-\d{2}-\d{2}_\d{4}\.pdf\z/, copy.download_filename)
+        assert_match(/_replaced_\d{4}-\d{2}-\d{2}_\d{6}\.pdf\z/, copy.download_filename)
         href = student_thesis_replaced_document_path(thesis.student, thesis, copy)
         response = download_through_browser(href)
         assert_equal 200, response['status']

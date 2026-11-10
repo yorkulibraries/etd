@@ -41,13 +41,13 @@ class ThesisReplacedDocument < ApplicationRecord
     name.presence || original_filename.presence || File.basename(file.path.to_s)
   end
 
-  # e.g. Genny_Jon_2024_PhD_replaced_2026-11-09_1729.pdf. The time keeps two
-  # replacements made on the same day apart.
+  # e.g. Genny_Jon_2024_PhD_replaced_2026-11-09_172905.pdf. The time, to the
+  # second, keeps a quick second replacement (wrong file, fixed) apart.
   def download_filename
     extension = File.extname(display_name)
     stem = File.basename(display_name, extension)
     extension = File.extname(original_filename.presence || file.path.to_s) if extension.blank?
-    "#{stem}_replaced_#{replaced_at.in_time_zone.strftime('%Y-%m-%d_%H%M')}#{extension}"
+    "#{stem}_replaced_#{replaced_at.in_time_zone.strftime('%Y-%m-%d_%H%M%S')}#{extension}"
   end
 
   def document_type
