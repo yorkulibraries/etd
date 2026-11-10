@@ -121,6 +121,8 @@ class SubmissionVersionsTest < ApplicationSystemTestCase
     staff = FactoryGirl.create(:user, role: User::STAFF)
     thesis = FactoryGirl.create(:thesis, embargo_selection: :not_requested)
     thesis.loc_subjects << LocSubject.first
+    # Names like O'Kon are encoded in the download header; always cover one.
+    thesis.student.update!(name: "Ryan O'Kon")
     original = Rails.root.join('test/fixtures/files/Tony_Rich_E_2012_Phd.pdf')
     first_staff_file = evidence_dir.join('first-staff-replacement.pdf')
     second_staff_file = evidence_dir.join('second-staff-replacement.pdf')
@@ -172,7 +174,9 @@ class SubmissionVersionsTest < ApplicationSystemTestCase
         href = student_thesis_replaced_document_path(thesis.student, thesis, copy)
         response = download_through_browser(href)
         assert_equal 200, response['status']
-        assert_includes response['disposition'], %(filename="#{copy.download_filename}")
+        expected_disposition = ActionDispatch::Http::ContentDisposition.format(disposition: 'attachment',
+                                                                              filename: copy.download_filename)
+        assert_equal expected_disposition, response['disposition']
         bytes = Base64.strict_decode64(response.fetch('base64'))
         File.binwrite(evidence_dir.join("downloaded-#{copy.id}.pdf"), bytes)
         assert_equal Digest::SHA256.file(copy.file.path).hexdigest, Digest::SHA256.hexdigest(bytes)
