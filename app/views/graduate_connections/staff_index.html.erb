@@ -24,10 +24,14 @@
   <section class="card mb-4" aria-labelledby="invitation-heading">
     <div class="card-body">
       <h2 id="invitation-heading" class="h4">Create an invitation for a student to connect a secondary email address</h2>
+      <% enabled = GraduateAuthentication.enabled_providers %>
+      <% providers = enabled - @identities.map(&:provider) %>
+      <% if enabled.any? && providers.empty? %>
+        <p class="mb-0">This student already has a Google account connected. To connect a different one, remove the current connection above first.</p>
+      <% else %>
       <p>Before creating a connection invitation for a student or former student, first verify their identity through an approved Faculty of Graduate Studies (FGS) process outside of the ETD system.</p>
       <p>Former students who added a Google email as a secondary non-YorkU email address to their account will be able to create a connection to the ETD system using their Google email on their own after logging into their Google account in the same browser.</p>
       <p>Only use an invitation if the Google email is not on their FGS account as a secondary non-YorkU email address. Each invitation expires after 48 hours, can only be used once, and replaces any earlier unused invitation. No email is sent by the ETD system.</p>
-      <% providers = GraduateAuthentication.enabled_providers %>
       <% if providers.any? %>
         <%= form_with url: student_graduate_invitations_path(@student), method: :post, local: true, data: { turbo: false } do %>
           <% if providers.one? %>
@@ -46,6 +50,7 @@
         <% end %>
       <% else %>
         <p class="text-secondary mb-0">No account providers are enabled. Invitations are currently unavailable.</p>
+      <% end %>
       <% end %>
     </div>
   </section>

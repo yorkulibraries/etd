@@ -9,6 +9,10 @@ class GraduateInvitationsController < ApplicationController
     response.set_header('Cache-Control', 'no-store')
     response.set_header('Referrer-Policy', 'no-referrer')
     raise GraduateAuthentication::Rejected unless params[:identity_verified] == '1'
+    if @student.graduate_identities.exists?(provider: params[:provider])
+      return redirect_to staff_student_graduate_connections_path(@student),
+                         alert: 'This student already has a Google account connected. Remove it before creating a new invitation.'
+    end
 
     token = nil
     Audited.audit_class.as_user(current_user) do

@@ -440,7 +440,8 @@ class GraduateAuthenticationTest < ActionDispatch::IntegrationTest
     assert_raises(ActiveRecord::RecordNotUnique) do
       GraduateIdentity.insert_all!([{ student_id: create(:student).id, provider: identity.provider, uid: identity.uid, created_at: Time.current, updated_at: Time.current }])
     end
-    invitation, url = invite(@student)
+    # A student with Google already connected cannot get a new Google invitation, so audit another student's.
+    invitation, url = invite(create(:student))
     raw_token = CGI.parse(URI.parse(url).query)['token'].first
     audits = Audited.audit_class.where(auditable_type: ['GraduateIdentity', 'GraduateAuthenticationInvitation'])
     assert audits.any?
