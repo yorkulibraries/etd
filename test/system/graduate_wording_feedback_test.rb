@@ -11,6 +11,9 @@ class GraduateWordingFeedbackTest < GraduateEmailBrowserCase
 
   setup do
     @student.update_columns(email: YORKU, email_external: PERSONAL)
+  end
+
+  def link_google
     GraduateIdentity.create!(student: @student, linked_by: @student, provider: 'google_oauth2',
                              uid: 'wording-google', link_method: 'record_email')
   end
@@ -33,10 +36,7 @@ class GraduateWordingFeedbackTest < GraduateEmailBrowserCase
     browser_ppy_login(@actor)
     visit staff_student_graduate_connections_path(@student)
 
-    assert_selector 'h3', text: 'Google account'
-    assert_text "Google account linked by student on #{Date.current.strftime('%B %-d, %Y')}."
-    assert_text 'I confirm removal of this Google account connection.'
-
+    # The invitation box shows while no Google account is connected.
     assert_selector 'h2', text: 'Create an invitation for a student to connect a secondary email address'
     assert_text 'first verify their identity through an approved Faculty of Graduate Studies (FGS) process outside of the ETD system.'
     assert_text 'on their own after logging into their Google account in the same browser.'
@@ -44,6 +44,12 @@ class GraduateWordingFeedbackTest < GraduateEmailBrowserCase
     assert_no_selector 'select#provider'
     assert_no_text 'Account provider'
     assert_text 'I verified this student’s identity via an approved FGS process outside of the ETD system.'
+
+    link_google
+    visit staff_student_graduate_connections_path(@student)
+    assert_selector 'h3', text: 'Google account'
+    assert_text "Google account linked by student on #{Date.current.strftime('%B %-d, %Y')}."
+    assert_text 'I confirm removal of this Google account connection.'
 
     # The connected address is the YorkU one, so the sentence must not call it non-YorkU.
     assert_text 'Connected using the YorkU email address on the student record.'
@@ -56,6 +62,7 @@ class GraduateWordingFeedbackTest < GraduateEmailBrowserCase
   end
 
   test 'a non-YorkU record address is described as secondary non-YorkU, and the student sees your' do
+    link_google
     connect_record_address(PERSONAL)
     browser_ppy_login(@actor)
     visit staff_student_graduate_connections_path(@student)
