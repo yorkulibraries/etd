@@ -3,7 +3,12 @@
   <% if @email_connection %>
     <p class="text-break">Verified address: <%= @email_connection.normalized_address %></p>
     <% if @email_connection.source == "record" %>
-      <p>Connected using an email address on the student record. Verified <%= time_tag @email_connection.verified_at %>.</p>
+      <% address = @email_connection.normalized_address %>
+      <% owner = local_assigns[:staff] ? "the" : "your" %>
+      <% kind = if address.casecmp?(@student.email_external.to_s.strip) then "a secondary non-YorkU email address"
+                elsif address.casecmp?(@student.email.to_s.strip) then "the YorkU email address"
+                else "an email address" end %>
+      <p>Connected using <%= kind %> on <%= owner %> student record. Verified <%= time_tag @email_connection.verified_at %>.</p>
     <% else %>
       <p>Approved by <%= @email_connection.approved_by.name %>. Verified <%= time_tag @email_connection.verified_at %>.</p>
     <% end %>

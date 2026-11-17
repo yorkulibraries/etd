@@ -25,7 +25,7 @@ class GraduateEmailAuthenticationTest < GraduateEmailBrowserCase
     @student.update_columns(email_external: 'graduate.personal@example.com')
     visit graduate_email_path
     assert_text 'Enter an email address that is on your student record.'
-    assert_text 'Email address not on your student record, or lost access to your mailbox?'
+    assert_text 'If a non-YorkU email address is not on your student record or you have lost access'
     assert_no_text 'approved by the Faculty of Graduate Studies'
     request_login('Graduate.Personal@example.com')
     assert_text 'If you are a current student, sign in with Passport York.'

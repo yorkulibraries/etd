@@ -1,28 +1,51 @@
-<% content_for :title, @enrollment ? "Connect your graduate account" : "Graduate sign in" %>
+<% content_for :title, @enrollment ? "Connect your graduate account" : "Graduate Student Sign-In" %>
 
 <% if @enrollment %>
   <p>Use the account agreed with the Faculty of Graduate Studies to connect it to your existing student record.</p>
   <p class="text-secondary">This invitation does not create a new student record. Choose the provider named in your invitation.</p>
-<% else %>
-  <p>Sign in with Google or an email address that is on your student record.</p>
-  <p class="text-secondary">If you are a current student, sign in with Passport York. If your email address is not on your student record, contact the Faculty of Graduate Studies to connect it.</p>
 <% end %>
 
 <% providers = @providers %>
+<% email_enabled = !@enrollment && GraduateEmail::Control.enabled? %>
+<% graduate_options = providers.size + (email_enabled ? 1 : 0) %>
+
+<% unless @enrollment %>
+  <p><strong>Current students:</strong> Sign-in with your Passport York.</p>
+  <div class="d-grid my-3">
+    <%= link_to "Sign in with Passport York", login_path, class: "btn btn-primary w-100" %>
+  </div>
+<% end %>
+
 <% if providers.empty? && !GraduateEmail::Control.enabled? %>
   <div class="alert alert-info" role="status">Graduate account sign in is currently unavailable. Use Passport York or contact the Faculty of Graduate Studies for help.</div>
 <% end %>
 
-<div class="d-grid gap-3 my-4">
-  <% if !@enrollment && GraduateEmail::Control.enabled? %>
-    <%= link_to "Email me a sign-in code", graduate_email_path, class: "btn btn-primary w-100" %>
+<% if graduate_options.positive? %>
+  <% unless @enrollment %>
+    <% google = providers.include?("google_oauth2") %>
+    <p class="mt-4"><strong>Students who have graduated:</strong>
+      <% if google && email_enabled %>
+        Sign-in with your Google account or a secondary, non-YorkU email that is part of your student record. If your secondary non-YorkU email is not part of your student record, contact the Faculty of Graduate Studies to connect it.
+      <% elsif email_enabled %>
+        Sign-in with a secondary, non-YorkU email that is part of your student record. If your secondary non-YorkU email is not part of your student record, contact the Faculty of Graduate Studies to connect it.
+      <% else %>
+        Sign-in with the option below. If you need help, contact the Faculty of Graduate Studies.
+      <% end %>
+    </p>
   <% end %>
-  <% providers.each do |provider| %>
-    <%= button_to "Continue with #{GraduateAuthentication.label(provider)}", graduate_auth_path(provider), method: :post, authenticity_token: form_authenticity_token, class: "btn btn-primary w-100", form: { data: { turbo: false } } %>
-  <% end %>
-  <%= link_to "Sign in with Passport York", login_path, class: "btn btn-primary w-100" %>
-</div>
+  <div class="d-grid gap-3 my-3">
+    <% providers.each do |provider| %>
+      <%= button_to "Continue with #{GraduateAuthentication.label(provider)}", graduate_auth_path(provider), method: :post, authenticity_token: form_authenticity_token, class: "btn btn-primary w-100", form: { data: { turbo: false } } %>
+    <% end %>
+    <% if email_enabled %>
+      <%= link_to "Email me a sign-in code", graduate_email_path, class: "btn btn-primary w-100" %>
+    <% end %>
+  </div>
+<% end %>
 
 <% if @enrollment %>
+  <div class="d-grid my-3">
+    <%= link_to "Sign in with Passport York", login_path, class: "btn btn-primary w-100" %>
+  </div>
   <p class="small mb-0"><%= link_to "Return to graduate sign in", graduate_login_path %></p>
 <% end %>

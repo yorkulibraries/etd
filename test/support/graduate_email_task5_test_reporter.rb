@@ -17,7 +17,7 @@ output.lines.each do |line|
     %w[h1 h2 button code authenticity_token].each { |word| emit.call("FLOW_LABEL #{word}") if stripped.include?(word) }
     ['Enter your sign-in code', 'Request your sign-in code', 'Approve email sign-in', 'Share this invitation once', 'Sign-in code'].each { |label| emit.call("FLOW_EXPECTED #{label}") if stripped.include?(label) }
     emit.call('FLOW_DOCUMENT_EXCEPTION') if stripped.match?(/Exception|Error|exception/)
-    emit.call('FLOW_DOCUMENT_SIGN_IN') if stripped.include?('Graduate sign in')
+    emit.call('FLOW_DOCUMENT_SIGN_IN') if stripped.include?('Graduate Student Sign-In')
   end
   %w[InvalidAuthenticityToken Unable ElementNotInteractable Capybara::ElementNotFound].each { |word| emit.call("FLOW_CATEGORY #{word}") if stripped.include?(word) }
   if stripped.include?('Unable to find')

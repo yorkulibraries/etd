@@ -67,7 +67,7 @@ class GraduateAuthenticationSystemTest < ActionDispatch::SystemTestCase
 
   test 'anonymous login has configured POST buttons and fits desktop and mobile' do
     visit graduate_login_path
-    assert_selector 'h1', text: 'Graduate sign in'
+    assert_selector 'h1', text: 'Graduate Student Sign-In'
     assert_link 'Sign in with Passport York', href: login_path
     assert_no_selector 'input:not([type="hidden"]):not([type="submit"])'
     assert_selector 'meta[name="csrf-token"]', visible: :all
@@ -89,7 +89,7 @@ class GraduateAuthenticationSystemTest < ActionDispatch::SystemTestCase
     browser_fresh_session
     visit root_path
     assert_current_path graduate_login_path
-    assert_selector 'h1', text: 'Graduate sign in'
+    assert_selector 'h1', text: 'Graduate Student Sign-In'
     assert_button 'Continue with Google'
     assert_link 'Sign in with Passport York', href: login_path
     browser_artifact('anonymous-home-sign-in')
@@ -117,8 +117,9 @@ class GraduateAuthenticationSystemTest < ActionDispatch::SystemTestCase
     browser_fresh_session
     browser_ppy_login(manager)
     visit staff_student_graduate_connections_path(student)
-    assert_selector 'select#provider option', text: 'Google', count: 1
-    assert_no_selector 'select#provider option[value="facebook"]'
+    # Only Google is enabled, so the provider dropdown is replaced by a hidden field.
+    assert_no_selector 'select#provider'
+    assert_selector 'input[type="hidden"][name="provider"][value="google_oauth2"]', visible: :hidden, count: 1
     assert_no_text 'Facebook'
     browser_artifact('google-only-legacy-staff')
     browser_artifact('google-only-legacy-staff-mobile', mobile: true)
@@ -152,7 +153,7 @@ class GraduateAuthenticationSystemTest < ActionDispatch::SystemTestCase
     assert_current_path graduate_connections_path
     assert_text 'No graduate accounts are connected yet.'
     click_button 'Connect Google'
-    assert_text 'Linked on'
+    assert_text 'Google account linked by student on'
     assert_current_path graduate_connections_path
     identity = student.graduate_identities.find_by!(provider: 'google_oauth2')
     assert_no_text 'browser-google-subject'
@@ -193,9 +194,8 @@ class GraduateAuthenticationSystemTest < ActionDispatch::SystemTestCase
     visit student_path(student)
     click_link 'Graduate account connections'
     assert_current_path staff_student_graduate_connections_path(student)
-    assert_text 'outside this app'
+    assert_text 'outside of the ETD system'
     assert_required_checkbox 'identity_verified'
-    select 'Google', from: 'Account provider'
     browser_artifact('staff-invitation')
     browser_artifact('staff-invitation-mobile', mobile: true)
     click_button 'Create invitation'

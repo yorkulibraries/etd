@@ -78,7 +78,7 @@ class GraduateGoogleRecordMatchTest < ActionDispatch::IntegrationTest
     complete_oauth
     body = failure_page
     assert_includes body, NOT_FOUND
-    assert_includes body, 'If you are a current student, sign in with Passport York.'
+    assert_includes body, 'Sign-in with your Passport York.'
     assert_includes body, 'contact the Faculty of Graduate Studies'
   end
 

@@ -78,8 +78,9 @@ class GoogleOnlyAuthenticationTest < ActionDispatch::IntegrationTest
     get staff_student_graduate_connections_path(@student)
     assert_response :success
     assert_not_includes response.body, 'Facebook'
-    assert_select 'select[name=provider] option[value=google_oauth2]', count: 1
-    assert_select 'select[name=provider] option[value=facebook]', count: 0
+    # Only Google is enabled, so the provider dropdown is replaced by a hidden field.
+    assert_select 'select[name=provider]', count: 0
+    assert_select 'input[type=hidden][name=provider][value=google_oauth2]', count: 1
     fresh_browser
     get graduate_enroll_path, params: { token: raw_token }
     assert_response :unprocessable_entity
