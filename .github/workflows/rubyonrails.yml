@@ -14,7 +14,8 @@ on:
 jobs:
   database_tests:
     name: Tests (${{ matrix.adapter }})
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest (26.04) has no Ruby 3.1.4 build, which this app uses.
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       max-parallel: 2
