@@ -7,7 +7,7 @@ class GraduateEmailManagementTest < GraduateEmailBrowserCase
     visit staff_student_graduate_connections_path(@student)
     assert_selector 'h2', text: 'Approve email sign-in'
     assert_selector '[data-email-not-connected]', text: 'No email sign-in address is connected yet.'
-    assert_text 'The graduate can connect one on their own by signing in with a code sent to the contact email'
+    assert_text 'The graduate can connect one on their own by signing in with a code sent to the YorkU email or non-YorkU email'
     assert_text 'Graduates whose Google email is on their student record connect on their own.'
     assert_text 'Before approving an address that is not on the student record'
     assert_no_text 'Matching an email address is not identity verification'

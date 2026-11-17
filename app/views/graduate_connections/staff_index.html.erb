@@ -80,13 +80,13 @@
       <% unless @email_connection %>
         <div class="alert alert-info" role="status" data-email-not-connected>
           <p class="fw-bold">No email sign-in address is connected yet.</p>
-          <p>The graduate can connect one on their own by signing in with a code sent to the contact email or external contact email below. This works only while that address is on this one student record.</p>
+          <p>The graduate can connect one on their own by signing in with a code sent to the YorkU email or non-YorkU email below. This works only while that address is on this one student record.</p>
           <p class="mb-0">To use a different address, approve it below, then share the one-time invitation link with the graduate.</p>
         </div>
       <% end %>
       <p>Before approving an address that is not on the student record, verify this student's identity through the approved FGS process.</p>
-      <p class="text-break">Contact email: <%= @student.email %></p>
-      <p class="text-break">External contact email: <%= @student.email_external %></p>
+      <p class="text-break">YorkU email: <%= @student.email %></p>
+      <p class="text-break">Non-YorkU email: <%= @student.email_external %></p>
       <%= form_with url: review_student_graduate_email_invitations_path(@student), method: :post, local: true, data: { turbo: false } do %>
         <% if @email_connection %>
           <%= hidden_field_tag :replacement, "1" %>
