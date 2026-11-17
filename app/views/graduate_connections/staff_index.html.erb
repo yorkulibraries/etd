@@ -23,19 +23,24 @@
 <% if can_manage %>
   <section class="card mb-4" aria-labelledby="invitation-heading">
     <div class="card-body">
-      <h2 id="invitation-heading" class="h4">Create a connection invitation</h2>
-      <p>First verify this student's identity through an approved Faculty of Graduate Studies process outside this app. Agree on the provider and a secure way to share the invitation.</p>
-      <p>Graduates whose Google email is on their student record connect on their own. Use an invitation only for a Google account with a different email address. Each invitation expires after 48 hours, can be used once, and replaces any earlier unused invitation. No email is sent by this app.</p>
+      <h2 id="invitation-heading" class="h4">Create an invitation for a student to connect a secondary email address</h2>
+      <p>Before creating a connection invitation for a student or former student, first verify their identity through an approved Faculty of Graduate Studies (FGS) process outside of the ETD system.</p>
+      <p>Former students who added a Google email as a secondary non-YorkU email address to their account will be able to create a connection to the ETD system using their Google email on their own after logging into their Google account in the same browser.</p>
+      <p>Only use an invitation if the Google email is not on their FGS account as a secondary non-YorkU email address. Each invitation expires after 48 hours, can only be used once, and replaces any earlier unused invitation. No email is sent by the ETD system.</p>
       <% providers = GraduateAuthentication.enabled_providers %>
       <% if providers.any? %>
         <%= form_with url: student_graduate_invitations_path(@student), method: :post, local: true, data: { turbo: false } do %>
-          <div class="mb-3">
-            <%= label_tag :provider, "Account provider", class: "form-label" %>
-            <%= select_tag :provider, options_for_select(providers.map { |provider| [GraduateAuthentication.label(provider), provider] }), required: true, class: "form-select" %>
-          </div>
+          <% if providers.one? %>
+            <%= hidden_field_tag :provider, providers.first %>
+          <% else %>
+            <div class="mb-3">
+              <%= label_tag :provider, "Account provider", class: "form-label" %>
+              <%= select_tag :provider, options_for_select(providers.map { |provider| [GraduateAuthentication.label(provider), provider] }), required: true, class: "form-select" %>
+            </div>
+          <% end %>
           <div class="form-check mb-3">
             <%= check_box_tag :identity_verified, "1", false, required: true, class: "form-check-input", data: { graduate_confirmation: true } %>
-            <%= label_tag :identity_verified, "I verified this student's identity outside this app and agreed on this provider.", class: "form-check-label" %>
+            <%= label_tag :identity_verified, "I verified this student’s identity via an approved FGS process outside of the ETD system.", class: "form-check-label" %>
           </div>
           <%= submit_tag "Create invitation", class: "btn btn-primary" %>
         <% end %>
@@ -76,17 +81,19 @@
 <% if can_manage && GraduateEmail::Control.enabled? %>
   <section class="card mb-4" aria-labelledby="email-approval-heading">
     <div class="card-body">
-      <h2 id="email-approval-heading" class="h4"><%= @email_connection ? "Replace or recover email sign-in" : "Approve email sign-in" %></h2>
+      <h2 id="email-approval-heading" class="h4"><%= @email_connection ? "Replace or recover a secondary non-YorkU email sign-in" : "Approve email sign-in" %></h2>
       <% unless @email_connection %>
         <div class="alert alert-info" role="status" data-email-not-connected>
           <p class="fw-bold">No email sign-in address is connected yet.</p>
-          <p>The graduate can connect one on their own by signing in with a code sent to the YorkU email or non-YorkU email below. This works only while that address is on this one student record.</p>
+          <p>The graduate can connect one on their own by signing in with a code sent to the YorkU email or alternate (non-YorkU) email below. This works only while that address is on this one student record.</p>
           <p class="mb-0">To use a different address, approve it below, then share the one-time invitation link with the graduate.</p>
         </div>
       <% end %>
       <p>Before approving an address that is not on the student record, verify this student's identity through the approved FGS process.</p>
-      <p class="text-break">YorkU email: <%= @student.email %></p>
-      <p class="text-break">Non-YorkU email: <%= @student.email_external %></p>
+      <ul class="text-break" data-record-addresses>
+        <li>YorkU email: <%= @student.email %></li>
+        <li>Alternate (non-YorkU) email: <%= @student.email_external %></li>
+      </ul>
       <%= form_with url: review_student_graduate_email_invitations_path(@student), method: :post, local: true, data: { turbo: false } do %>
         <% if @email_connection %>
           <%= hidden_field_tag :replacement, "1" %>
@@ -132,7 +139,7 @@
   <%= form_with url: student_graduate_email_connection_path(@student, @email_connection), method: :delete, local: true, data: { turbo: false } do %>
     <div class="form-check mb-3">
       <%= check_box_tag :confirmation, "1", false, id: "remove_email_#{@email_connection.id}", required: true, class: "form-check-input", data: { graduate_confirmation: true } %>
-      <%= label_tag "remove_email_#{@email_connection.id}", "I confirm removal of this student's email sign-in connection, pending invitations and email sessions.", class: "form-check-label" %>
+      <%= label_tag "remove_email_#{@email_connection.id}", "Check this box to remove this student’s email sign-in connection, pending invitations and email sessions.", class: "form-check-label" %>
     </div>
     <%= submit_tag "Remove email connection", class: "btn btn-outline-danger mb-4" %>
   <% end %>

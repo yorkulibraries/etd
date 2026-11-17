@@ -12,14 +12,14 @@ module GraduateEmailSafeArtifacts
     def initialize; super('unsafe_artifact'); end
   end
   STATES = {
-    'login' => [%r{\A/graduate/login\z}, 'Graduate sign in'],
+    'login' => [%r{\A/graduate/login\z}, 'Graduate Student Sign-In'],
     'generic-send' => [%r{\A/graduate/email/(?:challenges|resend|verify)\z}, 'Enter your sign-in code'],
     'code-error' => [%r{\A/graduate/email/verify\z}, 'Enter your sign-in code'],
     'expired-enrollment' => [%r{\A/graduate/email/verify\z}, 'Request your sign-in code'],
     'revoked-enrollment' => [%r{\A/graduate/email/verify\z}, 'Request your sign-in code'],
     'student-connection' => [%r{\A/my/graduate-connections\z}, 'Email sign-in'],
     'staff-confirmation' => [%r{\A/students/\d+/graduate-connections\z}, 'Approve email sign-in'],
-    'staff-recovery' => [%r{\A/students/\d+/graduate-connections\z}, 'Replace or recover email sign-in'],
+    'staff-recovery' => [%r{\A/students/\d+/graduate-connections\z}, 'Replace or recover a secondary non-YorkU email sign-in'],
     'staff-review' => [%r{\A/students/\d+/graduate-email-invitations/review\z}, 'Review email sign-in address'],
     'staff-conflict' => [%r{\A/students/\d+/graduate-email-invitations/review\z}, 'Review email sign-in address'],
     'notice-states' => [%r{\A/students/\d+/graduate-connections\z}, 'Email change notices']

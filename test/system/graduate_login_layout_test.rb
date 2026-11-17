@@ -8,9 +8,11 @@ class GraduateLoginLayoutTest < GraduateEmailBrowserCase
     visit graduate_login_path
     main = find('main')
     text = main.text
-    ppy_intro = 'If you are a current student, sign in with Passport York.'
-    grad_intro = 'If you are a graduate, sign in with one of the two following options. ' \
-                 'If your email address is not on your student record, contact the Faculty of Graduate Studies to connect it.'
+    assert_selector 'h1', text: 'Graduate Student Sign-In'
+    ppy_intro = 'Current students: Sign-in with your Passport York.'
+    grad_intro = 'Students who have graduated: Sign-in with your Google account or a secondary, non-YorkU email ' \
+                 'that is part of your student record. If your secondary non-YorkU email is not part of your student record, ' \
+                 'contact the Faculty of Graduate Studies to connect it.'
     assert_includes text, ppy_intro
     assert_includes text, grad_intro
 
@@ -33,9 +35,9 @@ class GraduateLoginLayoutTest < GraduateEmailBrowserCase
     @student.update_columns(email: 'student@yorku.ca', email_external: 'student.personal@example.com')
     browser_ppy_login(@actor)
     visit staff_student_graduate_connections_path(@student)
-    assert_text 'sent to the YorkU email or non-YorkU email below'
-    assert_text 'YorkU email: student@yorku.ca'
-    assert_text 'Non-YorkU email: student.personal@example.com'
+    assert_text 'sent to the YorkU email or alternate (non-YorkU) email below'
+    assert_selector '[data-record-addresses] li', text: 'YorkU email: student@yorku.ca'
+    assert_selector '[data-record-addresses] li', text: 'Alternate (non-YorkU) email: student.personal@example.com'
     assert_no_text 'Contact email:'
     assert_no_text 'External contact email:'
     current_window.resize_to(1440, 1500)
