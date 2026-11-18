@@ -14,6 +14,20 @@ class StudentsControllerTest < ActionController::TestCase
       log_user_in(@user)
     end
 
+    # A student made by a script or an import can have no creator. The list
+    # and the student page must still load and say the creator is unknown.
+    should 'list and show a student who has no creator' do
+      student = create(:student, created_by: nil, blocked: false)
+
+      get :index
+      assert_response :success
+      assert_select 'td', text: /created by unknown/
+
+      get :show, params: { id: student.id }
+      assert_response :success
+      assert_select 'p', text: /Created by unknown/
+    end
+
     should 'list all students' do
       create_list(:student, 5, blocked: false)
       create_list(:student, 2, blocked: true)
