@@ -4,7 +4,7 @@
     </div>
     <div class="col-lg-9 my-auto">
       <h5><%= link_to student.name, student %></h5>
-      <p class="card-text">created by <%= student.created_by&.name || "unknown" %> on <%= student.created_at.strftime("%B %d, %Y") %></p>
+      <p class="card-text">created by <%= student.created_by.name %> on <%= student.created_at.strftime("%B %d, %Y") %></p>
     </div>
     <div class="col-lg-2 my-auto">
       <%= student.sisid %>
