@@ -9,6 +9,7 @@ require_relative '../support/graduate_email_browser_case'
 # - an empty alternate email shows as a blank line instead of saying so
 # - the approved sign-in address is missing from either page
 # - more than one alternate email is listed (record address and sign-in address)
+# - a student signing in with the YorkU email has it listed as non-YorkU
 # - a removed (revoked) sign-in address still shows
 # - staff who cannot manage sign-in (role "staff") see the sign-in address
 # - the Google email is shown even though ETD never stores it
@@ -49,6 +50,15 @@ class GraduateAlternateEmailDisplayTest < GraduateEmailBrowserCase
     assert_equal 'record.alt@example.com', alternate_on_student_page
     visit staff_student_graduate_connections_path(@student)
     assert_equal 'Alternate (non-YorkU) email: record.alt@example.com', alternate_on_connections_page
+
+    # Signing in with the YorkU email: the record alternate still shows.
+    yorku_conn = GraduateEmailConnection.create!(student: @student, source: 'record',
+                                                 normalized_address: @student.email.downcase, verified_at: Time.current)
+    visit student_path(@student)
+    assert_equal 'record.alt@example.com', alternate_on_student_page
+    visit staff_student_graduate_connections_path(@student)
+    assert_equal 'Alternate (non-YorkU) email: record.alt@example.com', alternate_on_connections_page
+    yorku_conn.update_columns(revoked_at: Time.current)
 
     # The record address is also the sign-in address: listed once.
     record_conn = GraduateEmailConnection.create!(student: @student, source: 'record',
