@@ -15,7 +15,7 @@ class GraduateConnectionsController < ApplicationController
 
   def staff_index
     load_staff_student
-    @email_connection = @student.graduate_email_connections.where(revoked_at: nil).order(:id).last
+    @email_connection = @student.active_graduate_email_connection
     @identities = @student.graduate_identities.where(provider: GraduateAuthentication::PROVIDERS).order(:provider)
     @email_notices = GraduateEmailNotice.joins(:old_connection).where(graduate_email_connections: {student_id: @student.id}).order(id: :desc).limit(10)
     @email_approvals = @student.graduate_email_approvals.order(created_at: :desc).limit(10)

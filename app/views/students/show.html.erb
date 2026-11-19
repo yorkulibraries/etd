@@ -16,6 +16,12 @@
 			<p><%= @student.username%></p>
 			<h4>Email</h4>
 			<p><%= @student.email%></p>
+			<h4>Alternate (non-YorkU) email</h4>
+			<p data-alternate-email><%= alternate_email_list(@student, @email_connection, empty: "None on the student record") %></p>
+			<% if @google_identity %>
+			<h4>Google sign-in</h4>
+			<p>Google account connected on <%= @google_identity.created_at.strftime("%B %d, %Y") %>.</p>
+			<% end %>
 			<h4>Invitation</h4>
 			<p>
 			<% if @student.invitation_sent_at.nil? %>

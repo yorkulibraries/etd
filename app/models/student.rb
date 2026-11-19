@@ -33,6 +33,11 @@ class Student < User
   has_many :graduate_authentication_invitations, dependent: :destroy
   has_many :thesis_invitations, dependent: :delete_all
 
+  # The email sign-in address in use now (removed ones are kept for history).
+  def active_graduate_email_connection
+    graduate_email_connections.where(revoked_at: nil).order(:id).last
+  end
+
   audited
   has_associated_audits
 
