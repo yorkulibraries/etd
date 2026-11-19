@@ -85,6 +85,12 @@ class StudentsController < AuthenticatedStaffController
                         else
                           GemRecord.where(sisid: @student.sisid)
                         end
+
+    # Sign-in details are shown only to staff who can manage them.
+    return unless GraduateAuthentication.staff_authorized?(current_user)
+
+    @email_connection = @student.active_graduate_email_connection
+    @google_identity = @student.graduate_identities.find_by(provider: 'google_oauth2')
   end
 
   def new

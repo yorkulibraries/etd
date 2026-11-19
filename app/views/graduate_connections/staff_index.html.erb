@@ -97,7 +97,7 @@
       <p>Before approving an address that is not on the student record, verify this student's identity through the approved FGS process.</p>
       <ul class="text-break" data-record-addresses>
         <li>YorkU email: <%= @student.email %></li>
-        <li>Alternate (non-YorkU) email: <%= @student.email_external %></li>
+        <li>Alternate (non-YorkU) email: <%= alternate_email_list(@student, @email_connection) %></li>
       </ul>
       <%= form_with url: review_student_graduate_email_invitations_path(@student), method: :post, local: true, data: { turbo: false } do %>
         <% if @email_connection %>
